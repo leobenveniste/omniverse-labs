@@ -148,7 +148,7 @@ switch ($Command) {
     }
 
     "list" {
-        Write-Host "`n=== Mobile Apps Workspace ===" -ForegroundColor Cyan
+        Write-Host "`n=== Omniverse Labs Workspace ===" -ForegroundColor Cyan
         if (-not (Test-Path $appsDir)) {
             Write-Host "No 'apps' directory found yet." -ForegroundColor Gray
             return

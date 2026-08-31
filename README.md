@@ -1,4 +1,4 @@
-# Omniverse Labs - Mobile Apps Hub 🚀
+# Omniverse Labs 🚀
 
 An automated Flutter and Android development workspace by **Omniverse Labs**, configured for rapid app scaffolding, local testing, release keystore generation, and automated Google Play Console deployment.
 
@@ -7,7 +7,7 @@ An automated Flutter and Android development workspace by **Omniverse Labs**, co
 ## 📂 Project Structure
 
 ```
-c:\Projects\Mobile Apps\
+Omniverse Labs/
 ├── apps\                      # All individual Flutter mobile applications
 ├── scripts\                   # Automation & CLI management scripts
 │   ├── app-manager.ps1        # Central orchestrator (create, run, build, test, deploy)
@@ -36,7 +36,7 @@ Verify Android SDK, ADB, connected physical devices, and Flutter toolchain:
 ### 2. Scaffold a New Android App
 Creates a new Flutter app with pre-configured Android release signing and keystore generation:
 ```powershell
-.\scripts\app-manager.ps1 create -Name my_awesome_app -Org com.yourcompany
+.\scripts\app-manager.ps1 create -Name my_awesome_app -Org com.omniverselabs
 ```
 
 ### 3. List All Apps & Status
