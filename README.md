@@ -1,6 +1,6 @@
-# Mobile Apps Hub 🚀
+# Omniverse Labs - Mobile Apps Hub 🚀
 
-An automated Flutter and Android development workspace configured for rapid app scaffolding, local testing, release keystore generation, and automated Google Play Console deployment.
+An automated Flutter and Android development workspace by **Omniverse Labs**, configured for rapid app scaffolding, local testing, release keystore generation, and automated Google Play Console deployment.
 
 ---
 

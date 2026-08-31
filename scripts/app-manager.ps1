@@ -24,7 +24,7 @@ param(
     [string]$App,
 
     [Parameter(Mandatory=$false)]
-    [string]$Org = "com.company",
+    [string]$Org = "com.omniverselabs",
 
     [Parameter(Mandatory=$false)]
     [ValidateSet("apk", "aab")]

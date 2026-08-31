@@ -11,7 +11,7 @@ param()
 $ErrorActionPreference = "Continue"
 
 Write-Host "============================================================" -ForegroundColor Cyan
-Write-Host "       Mobile Apps - Environment & Toolchain Diagnostics    " -ForegroundColor Cyan
+Write-Host "   Omniverse Labs - Environment & Toolchain Diagnostics     " -ForegroundColor Cyan
 Write-Host "============================================================" -ForegroundColor Cyan
 
 # 1. Check Android SDK
