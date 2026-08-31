@@ -39,7 +39,10 @@ param(
     [string]$Track = "internal",
 
     [Parameter(Mandatory=$false)]
-    [string]$Device = ""
+    [string]$Device = "",
+
+    [Parameter(Mandatory=$false)]
+    [switch]$Bump = $false
 )
 
 $ErrorActionPreference = "Stop"
@@ -233,6 +236,24 @@ switch ($Command) {
     "build" {
         $targetAppPath = Get-AppPath -AppName $App
         if (-not $targetAppPath) { return }
+
+        $pubspecPath = Join-Path $targetAppPath "pubspec.yaml"
+        if (Test-Path $pubspecPath) {
+            $pubContent = Get-Content $pubspecPath -Raw
+            if ($pubContent -match "version:\s*(\d+\.\d+\.\d+)\+(\d+)") {
+                $verName = $Matches[1]
+                $buildNum = [int]$Matches[2]
+                if ($Bump) {
+                    $buildNum++
+                    $newVerStr = "version: $verName+$buildNum"
+                    $pubContent = $pubContent -replace "version:\s*(\d+\.\d+\.\d+)\+(\d+)", $newVerStr
+                    Set-Content -Path $pubspecPath -Value $pubContent -Encoding UTF8
+                    Write-Host "Auto-incremented version to: $verName+$buildNum (Version code: $buildNum)" -ForegroundColor Green
+                } else {
+                    Write-Host "Building version: $verName+$buildNum (Version code: $buildNum)" -ForegroundColor Cyan
+                }
+            }
+        }
 
         Push-Location $targetAppPath
         try {
