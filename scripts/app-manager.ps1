@@ -56,12 +56,20 @@ if ([string]::IsNullOrWhiteSpace($App) -and -not [string]::IsNullOrWhiteSpace($N
     $App = $Name
 }
 
+if ([string]::IsNullOrWhiteSpace($App)) {
+    $appsFound = Get-ChildItem $appsDir -Directory | Select-Object -ExpandProperty Name
+    if ($appsFound.Count -eq 1) {
+        $App = $appsFound[0]
+    } else {
+        $App = "central_de_juegos"
+    }
+}
+
 # Helper: Find App Directory
 function Get-AppPath {
     param([string]$AppName)
     if ([string]::IsNullOrWhiteSpace($AppName)) {
-        Write-Error "Please specify an app name using -App <app_name>"
-        return $null
+        $AppName = "central_de_juegos"
     }
     $candidate = Join-Path $appsDir $AppName
     if (Test-Path $candidate) { return $candidate }
@@ -358,7 +366,9 @@ switch ($Command) {
 
         $checkerScript = Join-Path $PSScriptRoot "check-play-status.py"
         $pkgName = "com.omniverselabs.$App"
-        if ($App -eq "anotador_de_juegos") { $pkgName = "com.omniverselabs.anotadordejuegos" }
+        if ($App -eq "anotador_de_juegos" -or $App -eq "central_de_juegos") { 
+            $pkgName = "com.omniverselabs.anotadordejuegos" 
+        }
 
         & python $checkerScript $pkgName
     }
