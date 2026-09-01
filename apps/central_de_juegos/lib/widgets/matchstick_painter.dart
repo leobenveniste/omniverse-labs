@@ -93,9 +93,9 @@ class MatchstickDisplayGrid extends StatelessWidget {
   const MatchstickDisplayGrid({
     super.key,
     required this.score,
-    this.maxScore = 15,
+    this.maxScore = 30,
     this.color = const Color(0xFFE53935),
-    this.boxSize = 44.0,
+    this.boxSize = 46.0,
   });
 
   @override

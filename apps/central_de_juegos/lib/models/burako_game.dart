@@ -1,73 +1,54 @@
 import 'player.dart';
 
-class BurakoRoundEntry {
-  final int pureCanastas; // 200 pts c/u
-  final int impureCanastas; // 100 pts c/u
-  final bool hasClosed; // 100 pts
-  final bool tookDead; // Muerto tomado (si no, -100)
-  final int tableCardPoints;
-  final int handCardPenalty; // Restan
+class BurakoRoundTeamScore {
+  final int base;
+  final int puntos;
 
-  BurakoRoundEntry({
-    this.pureCanastas = 0,
-    this.impureCanastas = 0,
-    this.hasClosed = false,
-    this.tookDead = true,
-    this.tableCardPoints = 0,
-    this.handCardPenalty = 0,
+  BurakoRoundTeamScore({
+    this.base = 0,
+    this.puntos = 0,
   });
 
-  int calculateTotal() {
-    int score = (pureCanastas * 200) + (impureCanastas * 100);
-    if (hasClosed) score += 100;
-    if (!tookDead) score -= 100;
-    score += tableCardPoints;
-    score -= handCardPenalty;
-    return score;
-  }
+  int get total => base + puntos;
 
   Map<String, dynamic> toJson() => {
-        'pureCanastas': pureCanastas,
-        'impureCanastas': impureCanastas,
-        'hasClosed': hasClosed,
-        'tookDead': tookDead,
-        'tableCardPoints': tableCardPoints,
-        'handCardPenalty': handCardPenalty,
+        'base': base,
+        'puntos': puntos,
       };
 
-  factory BurakoRoundEntry.fromJson(Map<String, dynamic> json) => BurakoRoundEntry(
-        pureCanastas: json['pureCanastas'] as int? ?? 0,
-        impureCanastas: json['impureCanastas'] as int? ?? 0,
-        hasClosed: json['hasClosed'] as bool? ?? false,
-        tookDead: json['tookDead'] as bool? ?? true,
-        tableCardPoints: json['tableCardPoints'] as int? ?? 0,
-        handCardPenalty: json['handCardPenalty'] as int? ?? 0,
+  factory BurakoRoundTeamScore.fromJson(Map<String, dynamic> json) => BurakoRoundTeamScore(
+        base: json['base'] as int? ?? 0,
+        puntos: json['puntos'] as int? ?? 0,
       );
 }
 
 class BurakoRound {
   final int roundNumber;
-  final Map<String, BurakoRoundEntry> teamEntries; // teamId -> entry
+  final String? starterTeamId; // ID of the team that started/lead this round
+  final Map<String, BurakoRoundTeamScore> teamScores; // teamId -> score
 
   BurakoRound({
     required this.roundNumber,
-    required this.teamEntries,
+    this.starterTeamId,
+    required this.teamScores,
   });
 
   Map<String, dynamic> toJson() => {
         'roundNumber': roundNumber,
-        'teamEntries': teamEntries.map((k, v) => MapEntry(k, v.toJson())),
+        'starterTeamId': starterTeamId,
+        'teamScores': teamScores.map((k, v) => MapEntry(k, v.toJson())),
       };
 
   factory BurakoRound.fromJson(Map<String, dynamic> json) {
-    final raw = json['teamEntries'] as Map<String, dynamic>? ?? {};
-    final entries = <String, BurakoRoundEntry>{};
+    final raw = json['teamScores'] as Map<String, dynamic>? ?? {};
+    final scores = <String, BurakoRoundTeamScore>{};
     raw.forEach((k, v) {
-      entries[k] = BurakoRoundEntry.fromJson(v as Map<String, dynamic>);
+      scores[k] = BurakoRoundTeamScore.fromJson(v as Map<String, dynamic>);
     });
     return BurakoRound(
       roundNumber: json['roundNumber'] as int,
-      teamEntries: entries,
+      starterTeamId: json['starterTeamId'] as String?,
+      teamScores: scores,
     );
   }
 }
@@ -75,7 +56,7 @@ class BurakoRound {
 class BurakoGame {
   List<Player> teams;
   List<BurakoRound> rounds;
-  int targetScore; // e.g. 2000, 3000
+  int targetScore;
   bool isFinished;
   String? winnerId;
 
@@ -87,18 +68,48 @@ class BurakoGame {
     this.winnerId,
   }) : rounds = rounds ?? [];
 
-  void addRound(Map<String, BurakoRoundEntry> entries) {
+  void addRound({
+    required String? starterTeamId,
+    required Map<String, BurakoRoundTeamScore> scores,
+  }) {
     if (isFinished) return;
     final rNum = rounds.length + 1;
-    rounds.add(BurakoRound(roundNumber: rNum, teamEntries: entries));
+    rounds.add(BurakoRound(
+      roundNumber: rNum,
+      starterTeamId: starterTeamId,
+      teamScores: scores,
+    ));
 
+    _recalculateTotals();
+  }
+
+  void undoLastRound() {
+    if (rounds.isNotEmpty) {
+      rounds.removeLast();
+      isFinished = false;
+      winnerId = null;
+      _recalculateTotals();
+    }
+  }
+
+  void _recalculateTotals() {
     for (var team in teams) {
-      final entry = entries[team.id];
-      if (entry != null) {
-        team.score += entry.calculateTotal();
-        if (team.score >= targetScore) {
-          isFinished = true;
+      team.score = 0;
+    }
+
+    for (var r in rounds) {
+      for (var team in teams) {
+        final sc = r.teamScores[team.id];
+        if (sc != null) {
+          team.score += sc.total;
         }
+      }
+    }
+
+    // Check if finished
+    for (var team in teams) {
+      if (team.score >= targetScore) {
+        isFinished = true;
       }
     }
 

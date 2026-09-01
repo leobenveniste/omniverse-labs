@@ -119,27 +119,57 @@ class _EscobaScreenState extends State<EscobaScreen> {
                     const SizedBox(height: 8),
                     ..._game.players.map((p) {
                       return Padding(
-                        padding: const EdgeInsets.only(bottom: 6.0),
+                        padding: const EdgeInsets.only(bottom: 4.0),
                         child: Row(
                           children: [
-                            CircleAvatar(backgroundColor: p.color, radius: 10),
+                            CircleAvatar(backgroundColor: p.color, radius: 12),
                             const SizedBox(width: 8),
-                            Expanded(child: Text(p.name)),
+                            Expanded(
+                              child: Text(
+                                p.name,
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.remove_circle_outline, size: 22),
+                              onPressed: () {
+                                final cur = int.tryParse(escobasControllers[p.id]?.text ?? '0') ?? 0;
+                                if (cur > 0) {
+                                  setModalState(() {
+                                    escobasControllers[p.id]?.text = '${cur - 1}';
+                                  });
+                                }
+                              },
+                            ),
                             SizedBox(
-                              width: 80,
+                              width: 48,
                               child: TextField(
                                 controller: escobasControllers[p.id],
                                 keyboardType: TextInputType.number,
                                 textAlign: TextAlign.center,
-                                decoration: const InputDecoration(isDense: true, border: OutlineInputBorder()),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                decoration: const InputDecoration(
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.symmetric(vertical: 8),
+                                  border: OutlineInputBorder(),
+                                ),
                               ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.add_circle_outline, size: 22),
+                              onPressed: () {
+                                final cur = int.tryParse(escobasControllers[p.id]?.text ?? '0') ?? 0;
+                                setModalState(() {
+                                  escobasControllers[p.id]?.text = '${cur + 1}';
+                                });
+                              },
                             ),
                           ],
                         ),
                       );
                     }),
 
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 14),
                     // Tantos específicos (1 pt cada uno)
                     _buildSelectorRow('Mayoría de Cartas (+1)', mostCardsWinner, (val) {
                       setModalState(() => mostCardsWinner = val);
@@ -184,28 +214,23 @@ class _EscobaScreenState extends State<EscobaScreen> {
 
   Widget _buildSelectorRow(String title, String? selectedId, ValueChanged<String?> onChanged) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
           const SizedBox(height: 4),
           Wrap(
-            spacing: 6,
-            children: [
-              ChoiceChip(
-                label: const Text('Ninguno / Empate'),
-                selected: selectedId == null,
-                onSelected: (_) => onChanged(null),
-              ),
-              ..._game.players.map((p) {
-                return ChoiceChip(
-                  label: Text(p.name),
-                  selected: selectedId == p.id,
-                  onSelected: (sel) => onChanged(sel ? p.id : null),
-                );
-              }),
-            ],
+            spacing: 8,
+            children: _game.players.map((p) {
+              final isSel = selectedId == p.id;
+              return ChoiceChip(
+                label: Text(p.name),
+                selected: isSel,
+                selectedColor: p.color.withOpacity(0.25),
+                onSelected: (sel) => onChanged(sel ? p.id : null),
+              );
+            }).toList(),
           ),
         ],
       ),

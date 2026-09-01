@@ -89,17 +89,23 @@ void main() {
   });
 
   group('BurakoGame Logic Tests', () {
-    test('Calculates pure/impure canastas, hand penalties, and closing bonuses', () {
-      final entry = BurakoRoundEntry(
-        pureCanastas: 2, // 400 pts
-        impureCanastas: 1, // 100 pts
-        hasClosed: true, // 100 pts
-        tookDead: true, // 0
-        tableCardPoints: 150, // +150
-        handCardPenalty: 30, // -30
+    test('Calculates Base and Puntos totals and manages starter team', () {
+      final t1 = Player(id: 't1', name: 'Nosotros', colorValue: 0xFF2196F3);
+      final t2 = Player(id: 't2', name: 'Ellos', colorValue: 0xFFE53935);
+      final game = BurakoGame(teams: [t1, t2], targetScore: 3000);
+
+      game.addRound(
+        starterTeamId: 't1',
+        scores: {
+          't1': BurakoRoundTeamScore(base: 300, puntos: 150), // 450
+          't2': BurakoRoundTeamScore(base: 100, puntos: 40),  // 140
+        },
       );
 
-      expect(entry.calculateTotal(), 720);
+      expect(t1.score, 450);
+      expect(t2.score, 140);
+      expect(game.rounds.first.starterTeamId, 't1');
+      expect(game.isFinished, false);
     });
   });
 }

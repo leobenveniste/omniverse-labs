@@ -244,7 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     title: 'Burako',
                     icon: Icons.grid_view,
                     color: const Color(0xFF7B1FA2),
-                    badge: 'Canasta',
+                    badge: '3000 Pts',
                   ),
                   _buildVerticalGameCard(
                     type: GameType.escoba,

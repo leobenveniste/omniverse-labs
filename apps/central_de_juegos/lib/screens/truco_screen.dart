@@ -335,45 +335,49 @@ class _TrucoScreenState extends State<TrucoScreen> {
 
             const SizedBox(height: 12),
 
-            // Matchsticks or Giant Digits Display
+            // Matchsticks or Giant Digits Display starting from top
             Expanded(
-              child: Center(
-                child: _showMatchsticks
-                    ? MatchstickDisplayGrid(
-                        score: score,
-                        maxScore: _game.targetPoints,
-                        color: color,
-                      )
-                    : Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            '$score',
-                            style: TextStyle(
-                              fontSize: 72,
-                              fontWeight: FontWeight.w900,
-                              color: color,
-                              height: 1.0,
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: _showMatchsticks
+                      ? MatchstickDisplayGrid(
+                          score: score,
+                          maxScore: _game.targetPoints,
+                          color: color,
+                        )
+                      : Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '$score',
+                              style: TextStyle(
+                                fontSize: 72,
+                                fontWeight: FontWeight.w900,
+                                color: color,
+                                height: 1.0,
+                              ),
                             ),
-                          ),
-                          Text(
-                            'de 30',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            Text(
+                              'de 30',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            '($displayScore ${isBuenas ? "Buenas" : "Malas"})',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: isBuenas ? Colors.green : Colors.orange,
+                            const SizedBox(height: 8),
+                            Text(
+                              '($displayScore ${isBuenas ? "Buenas" : "Malas"})',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: isBuenas ? Colors.green : Colors.orange,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
+                ),
               ),
             ),
 
