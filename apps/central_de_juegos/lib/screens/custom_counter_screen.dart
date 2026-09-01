@@ -105,6 +105,37 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
     _saveState();
   }
 
+  void _addPlayerMidGame() async {
+    if (_game.players.length >= 12) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Máximo 12 jugadores permitidos')),
+      );
+      return;
+    }
+
+    final newName = await PlayerNameDialog.show(
+      context,
+      currentName: 'Jugador ${_game.players.length + 1}',
+      title: 'Nuevo Jugador',
+    );
+
+    if (newName != null && newName.isNotEmpty) {
+      final colorIdx = _game.players.length % AppTheme.playerColors.length;
+      setState(() {
+        _game.players.add(
+          Player(
+            id: const Uuid().v4(),
+            name: newName,
+            colorValue: AppTheme.playerColors[colorIdx].value,
+            score: 0,
+          ),
+        );
+      });
+      SoundHapticsService.click();
+      _saveState();
+    }
+  }
+
   Player? _getLeader() {
     if (_game.players.isEmpty) return null;
     Player leader = _game.players.first;
@@ -206,6 +237,11 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.person_add, color: AppTheme.cyberGold),
+            tooltip: 'Agregar Jugador',
+            onPressed: _addPlayerMidGame,
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white70),
             tooltip: 'Reiniciar Puntajes',
             onPressed: _resetAll,
@@ -218,24 +254,25 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
             // List of separate interactive player cards
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 itemCount: _game.players.length,
                 itemBuilder: (ctx, idx) {
                   final player = _game.players[idx];
                   final isLeader = leader?.id == player.id;
+                  final subtleBg = Color.alphaBlend(player.color.withOpacity(0.12), AppTheme.surfaceDark);
 
                   return Container(
                     margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
-                      color: AppTheme.surfaceDark,
+                      color: subtleBg,
                       borderRadius: BorderRadius.circular(18),
                       border: Border.all(
-                        color: isLeader ? AppTheme.cyberGold : player.color.withOpacity(0.5),
-                        width: isLeader ? 2.5 : 1.5,
+                        color: isLeader ? AppTheme.cyberGold : player.color.withOpacity(0.4),
+                        width: isLeader ? 2.5 : 1.2,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: (isLeader ? AppTheme.cyberGold : player.color).withOpacity(0.18),
+                          color: (isLeader ? AppTheme.cyberGold : player.color).withOpacity(isLeader ? 0.25 : 0.1),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -246,27 +283,13 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
                       color: Colors.transparent,
                       child: InkWell(
                         onTap: () => _addPoints(player, _game.step),
-                        splashColor: player.color.withOpacity(0.2),
-                        highlightColor: player.color.withOpacity(0.1),
+                        splashColor: player.color.withOpacity(0.25),
+                        highlightColor: player.color.withOpacity(0.12),
                         child: Container(
                           height: 140,
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(14),
                           child: Stack(
                             children: [
-                              // Top Colored accent bar
-                              Positioned(
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                child: Container(
-                                  height: 3,
-                                  decoration: BoxDecoration(
-                                    color: isLeader ? AppTheme.cyberGold : player.color,
-                                    borderRadius: BorderRadius.circular(2),
-                                  ),
-                                ),
-                              ),
-
                               // Big centered score
                               Center(
                                 child: Text(
@@ -282,8 +305,8 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
 
                               // Top Left Player Pill Badge (editable on tap)
                               Positioned(
-                                top: 8,
-                                left: 4,
+                                top: 0,
+                                left: 0,
                                 child: GestureDetector(
                                   onTap: () async {
                                     final newName = await PlayerNameDialog.show(
@@ -296,77 +319,82 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
                                       _saveState();
                                     }
                                   },
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                        decoration: BoxDecoration(
-                                          color: Colors.black54,
-                                          borderRadius: BorderRadius.circular(6),
-                                          border: Border.all(color: player.color.withOpacity(0.6)),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Container(
-                                              width: 8,
-                                              height: 8,
-                                              decoration: BoxDecoration(
-                                                color: player.color,
-                                                shape: BoxShape.circle,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 6),
-                                            Text(
-                                              'P${idx + 1} : ${player.name.toUpperCase()}',
-                                              style: TextStyle(
-                                                color: player.color,
-                                                fontWeight: FontWeight.w900,
-                                                fontSize: 11,
-                                                letterSpacing: 1.0,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 4),
-                                            const Icon(Icons.edit, size: 11, color: Colors.white38),
-                                          ],
-                                        ),
-                                      ),
-                                      if (isLeader) ...[
-                                        const SizedBox(width: 8),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black54,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: player.color.withOpacity(0.6)),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
                                         Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          width: 9,
+                                          height: 9,
                                           decoration: BoxDecoration(
-                                            color: AppTheme.cyberGold,
-                                            borderRadius: BorderRadius.circular(6),
-                                          ),
-                                          child: const Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(Icons.emoji_events, size: 12, color: Colors.black),
-                                              SizedBox(width: 4),
-                                              Text(
-                                                'LÍDER',
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.w900,
-                                                  fontSize: 10,
-                                                  letterSpacing: 0.8,
-                                                ),
-                                              ),
-                                            ],
+                                            color: player.color,
+                                            shape: BoxShape.circle,
                                           ),
                                         ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          'P${idx + 1} : ${player.name.toUpperCase()}',
+                                          style: TextStyle(
+                                            color: player.color,
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 12,
+                                            letterSpacing: 0.8,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 5),
+                                        const Icon(Icons.edit, size: 12, color: Colors.white38),
                                       ],
-                                    ],
+                                    ),
                                   ),
                                 ),
                               ),
 
+                              // Top Right Leader Badge
+                              if (isLeader)
+                                Positioned(
+                                  top: 0,
+                                  right: 0,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.cyberGold,
+                                      borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: AppTheme.cyberGold.withOpacity(0.4),
+                                          blurRadius: 6,
+                                        ),
+                                      ],
+                                    ),
+                                    child: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.emoji_events, size: 14, color: Colors.black),
+                                        SizedBox(width: 4),
+                                        Text(
+                                          'LÍDER',
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 11,
+                                            letterSpacing: 0.8,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+
                               // Bottom Left Subtract Button
                               Positioned(
-                                bottom: 4,
-                                left: 4,
+                                bottom: 0,
+                                left: 0,
                                 child: GestureDetector(
                                   onTap: () => _addPoints(player, -_game.step),
                                   child: Container(
@@ -386,14 +414,14 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
 
                               // Bottom Right Add Button Indicator
                               Positioned(
-                                bottom: 4,
-                                right: 4,
+                                bottom: 0,
+                                right: 0,
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                   decoration: BoxDecoration(
-                                    color: player.color.withOpacity(0.18),
+                                    color: player.color.withOpacity(0.2),
                                     borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(color: player.color.withOpacity(0.35)),
+                                    border: Border.all(color: player.color.withOpacity(0.4)),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,

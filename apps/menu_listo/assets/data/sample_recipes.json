@@ -1,0 +1,127 @@
+[
+  {
+    "id": "recipe_1",
+    "title": "Risotto Cremoso de Hongos y Parmesano",
+    "title_en": "Creamy Mushroom & Parmesan Risotto",
+    "description": "Un clásico italiano reconfortante con textura aterciopelada y sabor profundo a hongos salteados.",
+    "description_en": "A comforting Italian classic with velvety texture and deep sautéed mushroom flavor.",
+    "category": "Almuerzo",
+    "prepTimeMinutes": 15,
+    "cookTimeMinutes": 30,
+    "baseServings": 4,
+    "tags": ["Italiana", "Vegetariano", "Gourmet"],
+    "imageUrl": "",
+    "isFavorite": 1,
+    "ingredients": [
+      {"amount": 320.0, "unit": "g", "name": "Arroz Carnaroli o Arborio", "notes": ""},
+      {"amount": 300.0, "unit": "g", "name": "Champiñones y Portobellos", "notes": "fileteados"},
+      {"amount": 1.0, "unit": "l", "name": "Caldo de verduras caliente", "notes": ""},
+      {"amount": 1.0, "unit": "unidad", "name": "Cebolla mediana", "notes": "picada fina"},
+      {"amount": 2.0, "unit": "dientes", "name": "Ajo", "notes": "picados"},
+      {"amount": 100.0, "unit": "ml", "name": "Vino blanco seco", "notes": ""},
+      {"amount": 50.0, "unit": "g", "name": "Manteca fría", "notes": "en cubos"},
+      {"amount": 60.0, "unit": "g", "name": "Queso Parmesano", "notes": "rallado fresco"},
+      {"amount": 2.0, "unit": "cda", "name": "Aceite de oliva virgen extra", "notes": ""},
+      {"amount": 0.0, "unit": "", "name": "Sal y pimienta negra", "notes": "a gusto"}
+    ],
+    "steps": [
+      {"stepNumber": 1, "instruction": "En una sartén grande, calentar una cucharada de aceite de oliva y saltear los hongos a fuego alto hasta que doren. Salpimentar y reservar."},
+      {"stepNumber": 2, "instruction": "En una cacerola amplia, rehogar la cebolla y el ajo con el resto del aceite hasta que estén transparentes."},
+      {"stepNumber": 3, "instruction": "Incorporar el arroz y tostar (nacarar) durante 2 minutos revolviendo constantemente."},
+      {"stepNumber": 4, "instruction": "Verter el vino blanco y dejar evaporar el alcohol por completo."},
+      {"stepNumber": 5, "instruction": "Agregar el caldo caliente cucharón a cucharón, revolviendo con cuchara de madera, esperando que el arroz absorba el líquido antes de añadir más (unos 18 minutos)."},
+      {"stepNumber": 6, "instruction": "Retirar del fuego, incorporar los hongos salteados, la manteca fría y el parmesano. Emulsionar enérgicamente (mantecatura) y servir de inmediato."}
+    ]
+  },
+  {
+    "id": "recipe_2",
+    "title": "Bowl Mediterráneo de Quinoa y Palta",
+    "title_en": "Mediterranean Quinoa & Avocado Bowl",
+    "description": "Almuerzo fresco, nutritivo y lleno de colores con aderezo de limón y hierbas.",
+    "description_en": "Fresh, nutritious, and colorful lunch with lemon herb dressing.",
+    "category": "Almuerzo",
+    "prepTimeMinutes": 15,
+    "cookTimeMinutes": 15,
+    "baseServings": 2,
+    "tags": ["Saludable", "Vegano", "Rápido"],
+    "imageUrl": "",
+    "isFavorite": 1,
+    "ingredients": [
+      {"amount": 160.0, "unit": "g", "name": "Quinoa tricolor o blanca", "notes": "enjuagada"},
+      {"amount": 1.0, "unit": "unidad", "name": "Palta / Aguacate", "notes": "en láminas"},
+      {"amount": 150.0, "unit": "g", "name": "Tomates cherry", "notes": "cortados al medio"},
+      {"amount": 1.0, "unit": "unidad", "name": "Pepino", "notes": "en cubitos"},
+      {"amount": 50.0, "unit": "g", "name": "Aceitunas negras", "notes": "descarozadas"},
+      {"amount": 3.0, "unit": "cda", "name": "Aceite de oliva virgen extra", "notes": ""},
+      {"amount": 1.0, "unit": "unidad", "name": "Limón", "notes": "jugo exprimido"},
+      {"amount": 0.0, "unit": "", "name": "Hojas de menta fresca y orégano", "notes": "a gusto"}
+    ],
+    "steps": [
+      {"stepNumber": 1, "instruction": "Cocinar la quinoa en el doble de agua hirviendo con sal durante 15 minutos. Escurrir y dejar enfriar."},
+      {"stepNumber": 2, "instruction": "En dos bowls amplios, colocar la base de quinoa."},
+      {"stepNumber": 3, "instruction": "Distribuir en secciones los tomates cherry, el pepino, las aceitunas y la palta."},
+      {"stepNumber": 4, "instruction": "Emulsionar el aceite de oliva con el jugo de limón, sal, pimienta y hierbas frescas. Rociar sobre el bowl y disfrutar."}
+    ]
+  },
+  {
+    "id": "recipe_3",
+    "title": "Panqueques de Avena y Arándanos",
+    "title_en": "Oatmeal & Blueberry Pancakes",
+    "description": "Desayuno esponjoso, saludable y sin harinas refinadas.",
+    "description_en": "Fluffy, healthy breakfast pancakes made with whole oats.",
+    "category": "Desayuno",
+    "prepTimeMinutes": 10,
+    "cookTimeMinutes": 10,
+    "baseServings": 2,
+    "tags": ["Desayuno", "Saludable", "Fácil"],
+    "imageUrl": "",
+    "isFavorite": 0,
+    "ingredients": [
+      {"amount": 120.0, "unit": "g", "name": "Avena en copos o harina de avena", "notes": ""},
+      {"amount": 1.0, "unit": "unidad", "name": "Banana madura", "notes": "pisada"},
+      {"amount": 2.0, "unit": "unidades", "name": "Huevos", "notes": ""},
+      {"amount": 80.0, "unit": "ml", "name": "Leche o bebida vegetal", "notes": ""},
+      {"amount": 1.0, "unit": "cdta", "name": "Polvo de hornear", "notes": ""},
+      {"amount": 1.0, "unit": "cdta", "name": "Extracto de vainilla", "notes": ""},
+      {"amount": 80.0, "unit": "g", "name": "Arándanos frescos", "notes": ""},
+      {"amount": 1.0, "unit": "cda", "name": "Miel o jarabe de arce", "notes": "para servir"}
+    ],
+    "steps": [
+      {"stepNumber": 1, "instruction": "Licuar o procesar la avena, la banana, los huevos, la leche, el polvo de hornear y la vainilla hasta obtener una mezcla homogénea."},
+      {"stepNumber": 2, "instruction": "Calentar una sartén antiadherente a fuego medio y engrasar ligeramente con unas gotas de aceite o manteca."},
+      {"stepNumber": 3, "instruction": "Verter porciones de masa y colocar 4 o 5 arándanos por encima de cada panqueque."},
+      {"stepNumber": 4, "instruction": "Cocinar 2 minutos hasta que aparezcan burbujas en la superficie, dar vuelta con espátula y dorar 1 minuto más del otro lado."},
+      {"stepNumber": 5, "instruction": "Servir apilados con un hilo de miel y arándanos frescos extras."}
+    ]
+  },
+  {
+    "id": "recipe_4",
+    "title": "Salmón al Horno con Limón y Espárragos",
+    "title_en": "Baked Salmon with Lemon & Asparagus",
+    "description": "Cena gourmet ligera lista en menos de 25 minutos con aromas cítricos y hierbas.",
+    "description_en": "Light gourmet dinner ready in under 25 minutes with citrus aromas and herbs.",
+    "category": "Cena",
+    "prepTimeMinutes": 10,
+    "cookTimeMinutes": 15,
+    "baseServings": 2,
+    "tags": ["Cena", "Pescado", "Keto", "Rápido"],
+    "imageUrl": "",
+    "isFavorite": 1,
+    "ingredients": [
+      {"amount": 400.0, "unit": "g", "name": "Filetes de salmón fresco", "notes": "con piel"},
+      {"amount": 1.0, "unit": "atado", "name": "Espárragos verdes", "notes": "sin el tallo duro"},
+      {"amount": 1.0, "unit": "unidad", "name": "Limón", "notes": "en rodajas finas"},
+      {"amount": 2.0, "unit": "cda", "name": "Aceite de oliva virgen extra", "notes": ""},
+      {"amount": 2.0, "unit": "dientes", "name": "Ajo", "notes": "rallado"},
+      {"amount": 1.0, "unit": "cda", "name": "Eneldo fresco o perejil", "notes": "picado"},
+      {"amount": 0.0, "unit": "", "name": "Sal marina y pimienta negra", "notes": "a gusto"}
+    ],
+    "steps": [
+      {"stepNumber": 1, "instruction": "Precalentar el horno a 200°C y forrar una bandeja con papel manteca o aluminio."},
+      {"stepNumber": 2, "instruction": "Colocar los espárragos en un lateral y los filetes de salmón en el centro con la piel hacia abajo."},
+      {"stepNumber": 3, "instruction": "Pincelar el salmón y los espárragos con la mezcla de aceite de oliva, ajo rallado, sal y pimienta."},
+      {"stepNumber": 4, "instruction": "Disponer las rodajas de limón sobre el salmón."},
+      {"stepNumber": 5, "instruction": "Hornear de 12 a 15 minutos hasta que el salmón esté tierno y los espárragos crujientes. Espolvorear eneldo fresco y servir."}
+    ]
+  }
+]

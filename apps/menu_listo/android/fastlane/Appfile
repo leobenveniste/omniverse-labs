@@ -1,0 +1,2 @@
+json_key_file(ENV["PLAY_CONSOLE_JSON_KEY_PATH"] || "../../../service_account.json")
+package_name(ENV["PLAY_CONSOLE_PACKAGE"] || "com.omniverselabs.menu_listo")

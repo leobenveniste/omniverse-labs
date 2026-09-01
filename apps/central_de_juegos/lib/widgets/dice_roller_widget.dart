@@ -35,7 +35,7 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
       6,
       (i) => AnimationController(
         vsync: this,
-        duration: Duration(milliseconds: 650 + i * 70),
+        duration: Duration(milliseconds: 700 + i * 80),
       ),
     );
     _rotationsX = List.generate(6, (_) => 0.0);
@@ -58,8 +58,8 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
 
     setState(() {
       _isRolling = true;
-      _rotationsX = List.generate(6, (_) => (_random.nextDouble() + 1.0) * 4 * pi);
-      _rotationsY = List.generate(6, (_) => (_random.nextDouble() + 1.0) * 4 * pi);
+      _rotationsX = List.generate(6, (_) => (_random.nextDouble() + 1.2) * 4 * pi);
+      _rotationsY = List.generate(6, (_) => (_random.nextDouble() + 1.2) * 4 * pi);
       _rotationsZ = List.generate(6, (_) => (_random.nextDouble() - 0.5) * 2 * pi);
     });
 
@@ -77,12 +77,12 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
       setState(() {
         _results = List.generate(_diceCount, (_) => _random.nextInt(_diceSides) + 1);
       });
-      if (ticks >= 10) {
+      if (ticks >= 11) {
         t.cancel();
       }
     });
 
-    Future.delayed(const Duration(milliseconds: 800), () {
+    Future.delayed(const Duration(milliseconds: 850), () {
       if (!mounted) return;
       _diceJitterTimer?.cancel();
       setState(() {
@@ -100,9 +100,9 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // Top Config Section
+        // Responsive Top Config Section without overflow
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           decoration: BoxDecoration(
             color: AppTheme.surfaceDark,
             borderRadius: BorderRadius.circular(16),
@@ -111,18 +111,19 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'CANTIDAD DE DADOS:',
+                    'Dados:',
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
-                      fontSize: 12,
-                      letterSpacing: 0.8,
+                      fontSize: 13,
+                      letterSpacing: 0.5,
                       color: Colors.white70,
                     ),
                   ),
+                  const Spacer(),
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [1, 2, 3, 4, 5, 6].map((count) {
                       final isSel = _diceCount == count;
                       return GestureDetector(
@@ -134,9 +135,9 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
                           SoundHapticsService.click();
                         },
                         child: Container(
-                          width: 34,
-                          height: 34,
-                          margin: const EdgeInsets.only(left: 4),
+                          width: 32,
+                          height: 32,
+                          margin: const EdgeInsets.symmetric(horizontal: 2.5),
                           decoration: BoxDecoration(
                             color: isSel ? AppTheme.cyberGold : AppTheme.surfaceElevated,
                             borderRadius: BorderRadius.circular(8),
@@ -149,7 +150,7 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
                               '$count',
                               style: TextStyle(
                                 fontWeight: FontWeight.w900,
-                                fontSize: 14,
+                                fontSize: 13,
                                 color: isSel ? Colors.black : Colors.white,
                               ),
                             ),
@@ -160,20 +161,21 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'TIPO DE DADO:',
+                    'Tipo:',
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
-                      fontSize: 12,
-                      letterSpacing: 0.8,
+                      fontSize: 13,
+                      letterSpacing: 0.5,
                       color: Colors.white70,
                     ),
                   ),
+                  const Spacer(),
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [6, 10, 20].map((sides) {
                       final isSel = _diceSides == sides;
                       return GestureDetector(
@@ -185,8 +187,8 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
                           SoundHapticsService.click();
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          margin: const EdgeInsets.only(left: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          margin: const EdgeInsets.symmetric(horizontal: 3),
                           decoration: BoxDecoration(
                             color: isSel ? AppTheme.cyberGold : AppTheme.surfaceElevated,
                             borderRadius: BorderRadius.circular(8),
@@ -198,7 +200,7 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
                             'd$sides',
                             style: TextStyle(
                               fontWeight: FontWeight.w900,
-                              fontSize: 13,
+                              fontSize: 12,
                               color: isSel ? Colors.black : Colors.white,
                             ),
                           ),
@@ -212,13 +214,13 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
           ),
         ),
 
-        const SizedBox(height: 32),
+        const SizedBox(height: 28),
 
-        // Center 3D Animated Large Dice Area
+        // Center 3D Isometric Animated Dice Area
         Center(
           child: Wrap(
-            spacing: 20,
-            runSpacing: 20,
+            spacing: 22,
+            runSpacing: 22,
             alignment: WrapAlignment.center,
             children: List.generate(_diceCount, (index) {
               final value = index < _results.length ? _results[index] : 1;
@@ -231,17 +233,45 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
                   final angleX = _isRolling ? (1.0 - progress) * _rotationsX[index] : 0.0;
                   final angleY = _isRolling ? (1.0 - progress) * _rotationsY[index] : 0.0;
                   final angleZ = _isRolling ? (1.0 - progress) * _rotationsZ[index] : 0.0;
-                  final scale = _isRolling ? (1.0 + sin(progress * pi) * 0.3) : 1.0;
 
-                  return Transform(
-                    alignment: Alignment.center,
-                    transform: Matrix4.identity()
-                      ..setEntry(3, 2, 0.0018)
-                      ..rotateX(angleX)
-                      ..rotateY(angleY)
-                      ..rotateZ(angleZ)
-                      ..scale(scale),
-                    child: _build3DDiceFace(value),
+                  // 3D Jump & Drop physics
+                  final jumpHeight = _isRolling ? -sin(progress * pi) * 60.0 : 0.0;
+                  final shadowScale = _isRolling ? (1.0 - sin(progress * pi) * 0.4) : 1.0;
+                  final shadowOpacity = _isRolling ? (0.6 - sin(progress * pi) * 0.35) : 0.6;
+
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Dice body with jump and 3D tumble
+                      Transform.translate(
+                        offset: Offset(0, jumpHeight),
+                        child: Transform(
+                          alignment: Alignment.center,
+                          transform: Matrix4.identity()
+                            ..setEntry(3, 2, 0.002)
+                            ..rotateX(angleX)
+                            ..rotateY(angleY)
+                            ..rotateZ(angleZ),
+                          child: _buildDice(value),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      // Dynamic cast shadow on the ground
+                      Container(
+                        width: 70 * shadowScale,
+                        height: 12 * shadowScale,
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(shadowOpacity),
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(shadowOpacity),
+                              blurRadius: 10 * shadowScale,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   );
                 },
               );
@@ -249,7 +279,7 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
           ),
         ),
 
-        const SizedBox(height: 32),
+        const SizedBox(height: 28),
 
         // Bottom Total & Action Section
         Column(
@@ -293,7 +323,7 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
             // Roll Dice Button
             SizedBox(
               width: double.infinity,
-              height: 56,
+              height: 54,
               child: FilledButton(
                 onPressed: _isRolling ? null : _rollDice,
                 style: FilledButton.styleFrom(
@@ -325,24 +355,53 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
     );
   }
 
-  Widget _build3DDiceFace(int value) {
+  Widget _buildDice(int value) {
     if (_diceSides == 6) {
-      return _build3DD6(value);
+      return Container(
+        width: 86,
+        height: 86,
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF9FAFB),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: const Color(0xFFD0D5DD), width: 2),
+          gradient: const LinearGradient(
+            colors: [Color(0xFFFFFFFF), Color(0xFFE5E7EB)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.4),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+            const BoxShadow(
+              color: Colors.white,
+              blurRadius: 2,
+              offset: const Offset(-1, -1),
+            ),
+          ],
+        ),
+        child: CustomPaint(
+          painter: _D6DotPainter(value: value),
+        ),
+      );
     }
 
     // Polyhedral d10 / d20
     return Container(
-      width: 88,
-      height: 88,
+      width: 86,
+      height: 86,
       decoration: BoxDecoration(
         color: const Color(0xFF1E222B),
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppTheme.cyberGold, width: 3),
         boxShadow: [
           BoxShadow(
             color: AppTheme.cyberGold.withOpacity(0.4),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
+            blurRadius: 14,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -358,34 +417,6 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
       ),
     );
   }
-
-  Widget _build3DD6(int value) {
-    return Container(
-      width: 88,
-      height: 88,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF7F8FA),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFD0D5DD), width: 2),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.55),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
-          ),
-          const BoxShadow(
-            color: Color(0xFFE4E7EC),
-            blurRadius: 2,
-            offset: const Offset(-2, -2),
-          ),
-        ],
-      ),
-      child: CustomPaint(
-        painter: _D6DotPainter(value: value),
-      ),
-    );
-  }
 }
 
 class _D6DotPainter extends CustomPainter {
@@ -395,10 +426,10 @@ class _D6DotPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final dotPaint = Paint()
-      ..color = const Color(0xFF121316)
+      ..color = const Color(0xFF111827)
       ..style = PaintingStyle.fill;
 
-    final dotRadius = size.width * 0.115;
+    final dotRadius = size.width * 0.11;
     final center = Offset(size.width / 2, size.height / 2);
     final topLeft = Offset(size.width * 0.25, size.height * 0.25);
     final topRight = Offset(size.width * 0.75, size.height * 0.25);
