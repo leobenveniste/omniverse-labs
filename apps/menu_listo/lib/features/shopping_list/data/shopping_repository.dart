@@ -1,4 +1,4 @@
-import '../../core/database/app_database.dart';
+import 'package:menu_listo/core/database/app_database.dart';
 import '../models/shopping_item_model.dart';
 
 class ShoppingRepository {

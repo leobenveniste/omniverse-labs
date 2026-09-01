@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
-import '../../../core/localization/app_localizations.dart';
-import '../../../core/widgets/empty_state_view.dart';
-import '../models/shopping_item_model.dart';
+import 'package:menu_listo/core/localization/app_localizations.dart';
+import 'package:menu_listo/core/widgets/empty_state_view.dart';
 import '../providers/shopping_provider.dart';
 import 'widgets/add_item_dialog.dart';
 import 'widgets/shopping_item_tile.dart';
@@ -13,7 +12,6 @@ class ShoppingListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final strings = AppStrings.of(context);
     final itemsAsync = ref.watch(shoppingListProvider);
     final notifier = ref.read(shoppingListProvider.notifier);
@@ -49,7 +47,6 @@ class ShoppingListScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          // Banner button: Generate from Weekly Meal Plan
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: SizedBox(
@@ -69,7 +66,6 @@ class ShoppingListScreen extends ConsumerWidget {
               ),
             ),
           ),
-          // Items List
           Expanded(
             child: itemsAsync.when(
               data: (items) {
@@ -105,7 +101,7 @@ class ShoppingListScreen extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) => Center(child: Text(strings.emptyTitle)),
+              error: (_, _) => Center(child: Text(strings.emptyTitle)),
             ),
           ),
         ],

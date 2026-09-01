@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import '../../core/database/app_database.dart';
+import 'package:menu_listo/core/database/app_database.dart';
 import '../../meal_planner/models/meal_plan_model.dart';
 import '../../recipes/models/recipe_model.dart';
 import '../../shopping_list/models/shopping_item_model.dart';

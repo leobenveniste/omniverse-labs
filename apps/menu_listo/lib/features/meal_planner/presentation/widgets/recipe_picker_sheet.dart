@@ -130,7 +130,7 @@ class _RecipePickerSheetState extends ConsumerState<RecipePickerSheet> {
                   return ListView.separated(
                     controller: scrollController,
                     itemCount: filtered.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
+                    separatorBuilder: (_, _) => const Divider(height: 1),
                     itemBuilder: (context, index) {
                       final recipe = filtered[index];
                       return ListTile(
@@ -150,7 +150,7 @@ class _RecipePickerSheetState extends ConsumerState<RecipePickerSheet> {
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (_, __) => Center(child: Text(strings.emptyTitle)),
+                error: (_, _) => Center(child: Text(strings.emptyTitle)),
               ),
             ),
           ],

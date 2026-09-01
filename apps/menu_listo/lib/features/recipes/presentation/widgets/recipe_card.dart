@@ -134,7 +134,7 @@ class RecipeCard extends StatelessWidget {
         return Image.network(
           recipe.imageUrl,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _buildPlaceholder(theme),
+          errorBuilder: (_, _, _) => _buildPlaceholder(theme),
         );
       } else {
         final file = File(recipe.imageUrl);

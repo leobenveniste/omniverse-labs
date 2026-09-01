@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../core/utils/portion_calculator.dart';
-import '../../core/utils/shopping_consolidator.dart';
-import '../../meal_planner/providers/meal_planner_provider.dart';
-import '../../recipes/data/recipe_repository.dart';
-import '../../recipes/models/ingredient_model.dart';
-import '../../recipes/providers/recipe_provider.dart';
+import 'package:menu_listo/core/utils/portion_calculator.dart';
+import 'package:menu_listo/core/utils/shopping_consolidator.dart';
+import 'package:menu_listo/features/meal_planner/providers/meal_planner_provider.dart';
+import 'package:menu_listo/features/recipes/data/recipe_repository.dart';
+import 'package:menu_listo/features/recipes/models/ingredient_model.dart';
+import 'package:menu_listo/features/recipes/providers/recipe_provider.dart';
 import '../data/shopping_repository.dart';
 import '../models/shopping_item_model.dart';
 
@@ -113,9 +113,9 @@ class ShoppingListNotifier extends StateNotifier<AsyncValue<List<ShoppingItem>>>
 
     if (pending.isNotEmpty) {
       for (var item in pending) {
-        final amountText = item.amount > 0 ? '\${PortionCalculator.formatAmount(item.amount)} ' : '';
-        final unitText = item.unit.isNotEmpty ? '\${item.unit} ' : '';
-        buffer.writeln('▫️ \$amountText\$unitText\${item.name}');
+        final amountStr = item.amount > 0 ? '${PortionCalculator.formatAmount(item.amount)} ' : '';
+        final unitStr = item.unit.isNotEmpty ? '${item.unit} ' : '';
+        buffer.writeln('▫️ $amountStr$unitStr${item.name}');
       }
     }
 
@@ -123,7 +123,7 @@ class ShoppingListNotifier extends StateNotifier<AsyncValue<List<ShoppingItem>>>
       buffer.writeln('');
       buffer.writeln('✅ *Comprados:*');
       for (var item in done) {
-        buffer.writeln('~ \${item.name} ~');
+        buffer.writeln('~ ${item.name} ~');
       }
     }
 

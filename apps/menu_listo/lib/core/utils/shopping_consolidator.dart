@@ -1,5 +1,5 @@
-import '../../features/recipes/models/ingredient_model.dart';
-import '../../features/shopping_list/models/shopping_item_model.dart';
+import 'package:menu_listo/features/recipes/models/ingredient_model.dart';
+import 'package:menu_listo/features/shopping_list/models/shopping_item_model.dart';
 
 class ShoppingConsolidator {
   static List<ShoppingItem> consolidateIngredients(List<MapEntry<String, Ingredient>> recipeIngredientPairs) {

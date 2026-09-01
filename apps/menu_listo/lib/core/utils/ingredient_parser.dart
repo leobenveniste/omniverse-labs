@@ -1,8 +1,8 @@
-import '../../features/recipes/models/ingredient_model.dart';
+import 'package:menu_listo/features/recipes/models/ingredient_model.dart';
 
 class IngredientParser {
   static final RegExp _amountAndUnitRegex = RegExp(
-    r'^([0-9]+(?:[\.,][0-9]+)?|[0-9]+\s+[0-9]+/[0-9]+|[0-9]+/[0-9]+|½|¼|¾|⅓|⅔)\s*([a-zA-ZáéíóúÁÉÍÓÚñÑ]+)?(?:\s+(?:de\s+)?)?(.*)$',
+    r'^([0-9]+\s+[0-9]+/[0-9]+|[0-9]+/[0-9]+|[0-9]+(?:[\.,][0-9]+)?|½|¼|¾|⅓|⅔)\s*([a-zA-ZáéíóúÁÉÍÓÚñÑ]+)?(?:\s+(?:de\s+)?)?(.*)$',
     caseSensitive: false,
   );
 
@@ -18,18 +18,27 @@ class IngredientParser {
              .replaceAll('⅓', '0.33')
              .replaceAll('⅔', '0.67');
 
-    raw = raw.replaceFirst(RegExp(r'^[-*•\d+\.]\s*'), '').trim();
+    raw = raw.replaceFirst(RegExp(r'^(?:[-*•]|\d+[\.\)])\s*'), '').trim();
 
     final match = _amountAndUnitRegex.firstMatch(raw);
     if (match != null) {
       final amountStr = match.group(1)?.replaceAll(',', '.') ?? '';
       double amount = 0.0;
       if (amountStr.contains('/')) {
-        final parts = amountStr.split('/');
-        if (parts.length == 2) {
-          final n = double.tryParse(parts[0].trim()) ?? 0;
-          final d = double.tryParse(parts[1].trim()) ?? 1;
-          amount = d != 0 ? n / d : 0;
+        if (amountStr.contains(' ')) {
+          final spaceParts = amountStr.split(' ');
+          final whole = double.tryParse(spaceParts[0].trim()) ?? 0;
+          final fracParts = spaceParts[1].split('/');
+          final n = double.tryParse(fracParts[0].trim()) ?? 0;
+          final d = double.tryParse(fracParts[1].trim()) ?? 1;
+          amount = whole + (d != 0 ? n / d : 0);
+        } else {
+          final parts = amountStr.split('/');
+          if (parts.length == 2) {
+            final n = double.tryParse(parts[0].trim()) ?? 0;
+            final d = double.tryParse(parts[1].trim()) ?? 1;
+            amount = d != 0 ? n / d : 0;
+          }
         }
       } else {
         amount = double.tryParse(amountStr) ?? 0.0;

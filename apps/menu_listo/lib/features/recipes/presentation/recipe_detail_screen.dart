@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/localization/app_localizations.dart';
-import '../../../core/utils/portion_calculator.dart';
+import 'package:menu_listo/core/localization/app_localizations.dart';
+import 'package:menu_listo/core/utils/portion_calculator.dart';
 import '../models/recipe_model.dart';
 import '../providers/recipe_provider.dart';
 import 'recipe_cook_mode_screen.dart';
@@ -180,7 +180,7 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: recipe.ingredients.length,
-                        separatorBuilder: (_, __) => const Divider(height: 16),
+                        separatorBuilder: (_, _) => const Divider(height: 16),
                         itemBuilder: (context, index) {
                           final ing = recipe.ingredients[index];
                           final scaledIng = ing.scale(scalingFactor);
@@ -224,7 +224,7 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: recipe.steps.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 16),
+                        separatorBuilder: (_, _) => const SizedBox(height: 16),
                         itemBuilder: (context, index) {
                           final step = recipe.steps[index];
                           return Row(
@@ -303,7 +303,7 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
         );
       },
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (_, __) => Scaffold(body: Center(child: Text(strings.emptyTitle))),
+      error: (_, _) => Scaffold(body: Center(child: Text(strings.emptyTitle))),
     );
   }
 

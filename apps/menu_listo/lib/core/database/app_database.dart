@@ -3,11 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
-import '../../features/recipes/models/ingredient_model.dart';
-import '../../features/recipes/models/recipe_model.dart';
-import '../../features/recipes/models/recipe_step_model.dart';
-import '../../features/meal_planner/models/meal_plan_model.dart';
-import '../../features/shopping_list/models/shopping_item_model.dart';
+import 'package:menu_listo/features/recipes/models/ingredient_model.dart';
+import 'package:menu_listo/features/recipes/models/recipe_model.dart';
+import 'package:menu_listo/features/recipes/models/recipe_step_model.dart';
+import 'package:menu_listo/features/meal_planner/models/meal_plan_model.dart';
+import 'package:menu_listo/features/shopping_list/models/shopping_item_model.dart';
 
 class AppDatabase {
   static final AppDatabase instance = AppDatabase._init();

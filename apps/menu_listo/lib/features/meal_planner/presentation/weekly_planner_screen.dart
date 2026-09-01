@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import '../../../core/localization/app_localizations.dart';
+import 'package:menu_listo/core/localization/app_localizations.dart';
 import '../models/meal_plan_model.dart';
 import '../providers/meal_planner_provider.dart';
 import 'widgets/meal_slot_card.dart';
@@ -192,7 +192,7 @@ class WeeklyPlannerScreen extends ConsumerWidget {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (_, __) => Center(child: Text(strings.emptyTitle)),
+              error: (_, _) => Center(child: Text(strings.emptyTitle)),
             ),
           ),
         ],

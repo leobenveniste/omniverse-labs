@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import '../../../core/localization/app_localizations.dart';
+import 'package:menu_listo/core/localization/app_localizations.dart';
 import '../models/ingredient_model.dart';
 import '../models/recipe_model.dart';
 import '../models/recipe_step_model.dart';
@@ -385,7 +385,7 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: _ingredientEntries.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
               itemBuilder: (context, index) {
                 final entry = _ingredientEntries[index];
                 return Container(
@@ -477,7 +477,7 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: _stepControllers.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
               itemBuilder: (context, index) {
                 final ctrl = _stepControllers[index];
                 return Row(

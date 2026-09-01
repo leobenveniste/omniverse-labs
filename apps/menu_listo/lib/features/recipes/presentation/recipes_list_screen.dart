@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/localization/app_localizations.dart';
-import '../../../core/widgets/empty_state_view.dart';
-import '../models/recipe_model.dart';
+import 'package:menu_listo/core/localization/app_localizations.dart';
+import 'package:menu_listo/core/widgets/empty_state_view.dart';
 import '../providers/recipe_provider.dart';
 import 'recipe_detail_screen.dart';
 import 'recipe_form_screen.dart';
@@ -14,7 +13,6 @@ class RecipesListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final strings = AppStrings.of(context);
     final filter = ref.watch(recipeFilterProvider);
     final filterNotifier = ref.read(recipeFilterProvider.notifier);
@@ -51,7 +49,6 @@ class RecipesListScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          // Search Box
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: TextField(
@@ -68,14 +65,13 @@ class RecipesListScreen extends ConsumerWidget {
               onChanged: (val) => filterNotifier.setSearchQuery(val),
             ),
           ),
-          // Category Filter Chips
           SizedBox(
             height: 44,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               itemCount: categories.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              separatorBuilder: (_, _) => const SizedBox(width: 8),
               itemBuilder: (context, index) {
                 final cat = categories[index];
                 final isSelected = filter.selectedCategory == cat || (index == 0 && filter.selectedCategory == 'Todas');
@@ -93,7 +89,6 @@ class RecipesListScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 8),
-          // Recipes Grid
           Expanded(
             child: recipesAsync.when(
               data: (recipes) {

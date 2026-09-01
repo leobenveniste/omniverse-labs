@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-import '../../../core/localization/app_localizations.dart';
-import '../../../core/utils/portion_calculator.dart';
+import 'package:menu_listo/core/localization/app_localizations.dart';
+import 'package:menu_listo/core/utils/portion_calculator.dart';
 import '../models/recipe_model.dart';
 
 class RecipeCookModeScreen extends StatefulWidget {
@@ -242,7 +242,7 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
                 child: ListView.separated(
                   controller: scrollController,
                   itemCount: widget.recipe.ingredients.length,
-                  separatorBuilder: (_, __) => const Divider(height: 12),
+                  separatorBuilder: (_, _) => const Divider(height: 12),
                   itemBuilder: (context, index) {
                     final ing = widget.recipe.ingredients[index].scale(factor);
                     return ListTile(

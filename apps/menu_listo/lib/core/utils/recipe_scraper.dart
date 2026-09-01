@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:html/parser.dart' as html_parser;
 import 'package:http/http.dart' as http;
-import '../../features/recipes/models/ingredient_model.dart';
-import '../../features/recipes/models/recipe_model.dart';
-import '../../features/recipes/models/recipe_step_model.dart';
+import 'package:menu_listo/features/recipes/models/ingredient_model.dart';
+import 'package:menu_listo/features/recipes/models/recipe_model.dart';
+import 'package:menu_listo/features/recipes/models/recipe_step_model.dart';
 import 'ingredient_parser.dart';
 
 class RecipeScraper {
