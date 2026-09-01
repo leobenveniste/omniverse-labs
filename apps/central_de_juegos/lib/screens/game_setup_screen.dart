@@ -10,7 +10,7 @@ class GameSetupScreen extends StatefulWidget {
   final int minPlayers;
   final int maxPlayers;
   final List<Player>? initialPlayers;
-  final ValueChanged<List<Player>> onStartGame;
+  final void Function(List<Player> players, Map<String, dynamic> config) onStartGame;
 
   const GameSetupScreen({
     super.key,
@@ -29,6 +29,10 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
   final TextEditingController _nameController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   late List<Player> _players;
+
+  // Diez Mil config
+  int _entryScore = 750;
+  int _minRoundScore = 350;
 
   @override
   void initState() {
@@ -161,12 +165,16 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
     }
 
     SoundHapticsService.click();
-    widget.onStartGame(_players);
+    widget.onStartGame(_players, {
+      'entryScore': _entryScore,
+      'minRoundScore': _minRoundScore,
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final headerCode = widget.gameTitle.toUpperCase().replaceAll(' ', '_');
+    final isDiezMil = widget.gameTitle.toLowerCase().contains('diez');
 
     return Scaffold(
       backgroundColor: AppTheme.bgDark,
@@ -216,7 +224,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                   color: Colors.white.withOpacity(0.6),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 18),
 
               // Player input row with white background box + golden square '+' button
               Row(
@@ -266,7 +274,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                 ],
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
               // Reorderable list of players
               Expanded(
@@ -360,12 +368,81 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                 ),
               ),
 
+              // Diez Mil Specific Config (Mínimo para entrar & Mínimo por ronda)
+              if (isDiezMil) ...[
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surfaceElevated,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppTheme.borderDark),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Mínimo para Entrar (Apertura):',
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white70),
+                          ),
+                          DropdownButton<int>(
+                            value: _entryScore,
+                            dropdownColor: AppTheme.surfaceDark,
+                            style: const TextStyle(color: AppTheme.cyberGold, fontWeight: FontWeight.w900, fontSize: 14),
+                            underline: const SizedBox(),
+                            items: const [
+                              DropdownMenuItem(value: 0, child: Text('Sin mínimo')),
+                              DropdownMenuItem(value: 500, child: Text('500 pts')),
+                              DropdownMenuItem(value: 750, child: Text('750 pts (Def)')),
+                              DropdownMenuItem(value: 1000, child: Text('1.000 pts')),
+                            ],
+                            onChanged: (val) {
+                              if (val != null) setState(() => _entryScore = val);
+                            },
+                          ),
+                        ],
+                      ),
+                      const Divider(color: AppTheme.borderDark, height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Mínimo por Ronda (Plantarse):',
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white70),
+                          ),
+                          DropdownButton<int>(
+                            value: _minRoundScore,
+                            dropdownColor: AppTheme.surfaceDark,
+                            style: const TextStyle(color: AppTheme.cyberGold, fontWeight: FontWeight.w900, fontSize: 14),
+                            underline: const SizedBox(),
+                            items: const [
+                              DropdownMenuItem(value: 0, child: Text('Sin mínimo')),
+                              DropdownMenuItem(value: 200, child: Text('200 pts')),
+                              DropdownMenuItem(value: 300, child: Text('300 pts')),
+                              DropdownMenuItem(value: 350, child: Text('350 pts (Def)')),
+                              DropdownMenuItem(value: 400, child: Text('400 pts')),
+                              DropdownMenuItem(value: 500, child: Text('500 pts')),
+                            ],
+                            onChanged: (val) {
+                              if (val != null) setState(() => _minRoundScore = val);
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
               const SizedBox(height: 12),
 
               // Big full-width Golden "COMENZAR JUEGO ▶" button
               SizedBox(
                 width: double.infinity,
-                height: 56,
+                height: 54,
                 child: FilledButton(
                   onPressed: _submit,
                   style: FilledButton.styleFrom(
@@ -382,7 +459,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                       Text(
                         'COMENZAR JUEGO',
                         style: TextStyle(
-                          fontSize: 17,
+                          fontSize: 16,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 1.0,
                           color: Colors.black,

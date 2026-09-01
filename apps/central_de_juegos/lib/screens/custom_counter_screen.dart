@@ -215,135 +215,207 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // List of full-height/stacked player sections
+            // List of separate interactive player cards
             Expanded(
               child: ListView.builder(
-                padding: EdgeInsets.zero,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 itemCount: _game.players.length,
                 itemBuilder: (ctx, idx) {
                   final player = _game.players[idx];
                   final isLeader = leader?.id == player.id;
 
                   return Container(
-                    height: 145,
+                    margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
                       color: AppTheme.surfaceDark,
-                      border: Border(
-                        top: BorderSide(
-                          color: isLeader ? AppTheme.cyberGold : player.color,
-                          width: isLeader ? 4 : 3,
-                        ),
-                        bottom: const BorderSide(color: AppTheme.bgDark, width: 4),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(
+                        color: isLeader ? AppTheme.cyberGold : player.color.withOpacity(0.5),
+                        width: isLeader ? 2.5 : 1.5,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: (isLeader ? AppTheme.cyberGold : player.color).withOpacity(0.18),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    child: Stack(
-                      children: [
-                        // Tap anywhere on card to add points
-                        Positioned.fill(
-                          child: InkWell(
-                            onTap: () => _addPoints(player, _game.step),
-                            child: Center(
-                              child: Text(
-                                '${player.score}',
-                                style: TextStyle(
-                                  fontSize: 64,
-                                  fontWeight: FontWeight.w900,
-                                  color: isLeader ? AppTheme.cyberGold : Colors.white,
-                                  height: 1.0,
+                    clipBehavior: Clip.antiAlias,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => _addPoints(player, _game.step),
+                        splashColor: player.color.withOpacity(0.2),
+                        highlightColor: player.color.withOpacity(0.1),
+                        child: Container(
+                          height: 140,
+                          padding: const EdgeInsets.all(12),
+                          child: Stack(
+                            children: [
+                              // Top Colored accent bar
+                              Positioned(
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                child: Container(
+                                  height: 3,
+                                  decoration: BoxDecoration(
+                                    color: isLeader ? AppTheme.cyberGold : player.color,
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                        ),
 
-                        // Top Left Player Pill Badge (editable on tap)
-                        Positioned(
-                          top: 12,
-                          left: 16,
-                          child: GestureDetector(
-                            onTap: () async {
-                              final newName = await PlayerNameDialog.show(
-                                context,
-                                currentName: player.name,
-                                title: 'Editar Nombre',
-                              );
-                              if (newName != null && newName.isNotEmpty) {
-                                setState(() => player.name = newName);
-                                _saveState();
-                              }
-                            },
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black45,
-                                    borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(color: Colors.white12),
-                                  ),
-                                  child: Text(
-                                    'P${idx + 1} : ${player.name.toUpperCase()}',
-                                    style: TextStyle(
-                                      color: player.color,
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 11,
-                                      letterSpacing: 1.0,
-                                    ),
+                              // Big centered score
+                              Center(
+                                child: Text(
+                                  '${player.score}',
+                                  style: TextStyle(
+                                    fontSize: 64,
+                                    fontWeight: FontWeight.w900,
+                                    color: isLeader ? AppTheme.cyberGold : Colors.white,
+                                    height: 1.0,
                                   ),
                                 ),
-                                if (isLeader) ...[
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: AppTheme.cyberGold,
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: const Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(Icons.emoji_events, size: 12, color: Colors.black),
-                                        SizedBox(width: 4),
-                                        Text(
-                                          'LÍDER',
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.w900,
-                                            fontSize: 10,
-                                            letterSpacing: 0.8,
+                              ),
+
+                              // Top Left Player Pill Badge (editable on tap)
+                              Positioned(
+                                top: 8,
+                                left: 4,
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    final newName = await PlayerNameDialog.show(
+                                      context,
+                                      currentName: player.name,
+                                      title: 'Editar Nombre',
+                                    );
+                                    if (newName != null && newName.isNotEmpty) {
+                                      setState(() => player.name = newName);
+                                      _saveState();
+                                    }
+                                  },
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black54,
+                                          borderRadius: BorderRadius.circular(6),
+                                          border: Border.all(color: player.color.withOpacity(0.6)),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                              width: 8,
+                                              height: 8,
+                                              decoration: BoxDecoration(
+                                                color: player.color,
+                                                shape: BoxShape.circle,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              'P${idx + 1} : ${player.name.toUpperCase()}',
+                                              style: TextStyle(
+                                                color: player.color,
+                                                fontWeight: FontWeight.w900,
+                                                fontSize: 11,
+                                                letterSpacing: 1.0,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 4),
+                                            const Icon(Icons.edit, size: 11, color: Colors.white38),
+                                          ],
+                                        ),
+                                      ),
+                                      if (isLeader) ...[
+                                        const SizedBox(width: 8),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: AppTheme.cyberGold,
+                                            borderRadius: BorderRadius.circular(6),
+                                          ),
+                                          child: const Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(Icons.emoji_events, size: 12, color: Colors.black),
+                                              SizedBox(width: 4),
+                                              Text(
+                                                'LÍDER',
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.w900,
+                                                  fontSize: 10,
+                                                  letterSpacing: 0.8,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+                              // Bottom Left Subtract Button
+                              Positioned(
+                                bottom: 4,
+                                left: 4,
+                                child: GestureDetector(
+                                  onTap: () => _addPoints(player, -_game.step),
+                                  child: Container(
+                                    width: 42,
+                                    height: 42,
+                                    decoration: BoxDecoration(
+                                      color: Colors.black54,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: Colors.white24),
+                                    ),
+                                    child: const Center(
+                                      child: Icon(Icons.remove, color: Colors.white70, size: 22),
                                     ),
                                   ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ),
+                                ),
+                              ),
 
-                        // Bottom Left Subtract Button
-                        Positioned(
-                          bottom: 14,
-                          left: 16,
-                          child: GestureDetector(
-                            onTap: () => _addPoints(player, -_game.step),
-                            child: Container(
-                              width: 44,
-                              height: 44,
-                              decoration: BoxDecoration(
-                                color: Colors.black54,
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(color: Colors.white12),
+                              // Bottom Right Add Button Indicator
+                              Positioned(
+                                bottom: 4,
+                                right: 4,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: player.color.withOpacity(0.18),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: player.color.withOpacity(0.35)),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.touch_app, size: 13, color: player.color),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '+1',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w900,
+                                          color: player.color,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                              child: const Center(
-                                child: Icon(Icons.remove, color: Colors.white70, size: 22),
-                              ),
-                            ),
+                            ],
                           ),
                         ),
-                      ],
+                      ),
                     ),
                   );
                 },

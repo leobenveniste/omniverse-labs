@@ -329,7 +329,7 @@ class _BurakoScreenState extends State<BurakoScreen> {
             ),
             const SizedBox(width: 8),
             Text(
-              'BURAKO (${_game.targetScore} PTS)',
+              'BURAKO',
               style: const TextStyle(
                 color: AppTheme.cyberGold,
                 fontWeight: FontWeight.w900,

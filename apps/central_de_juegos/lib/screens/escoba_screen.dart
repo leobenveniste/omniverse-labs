@@ -298,7 +298,7 @@ class _EscobaScreenState extends State<EscobaScreen> {
             ),
             const SizedBox(width: 8),
             Text(
-              'ESCOBA_DEL_15 (${_game.targetScore} PTS)',
+              'ESCOBA_DEL_15',
               style: const TextStyle(
                 color: AppTheme.cyberGold,
                 fontWeight: FontWeight.w900,

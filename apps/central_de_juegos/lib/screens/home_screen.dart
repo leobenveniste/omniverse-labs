@@ -119,14 +119,18 @@ class _HomeScreenState extends State<HomeScreen> {
           builder: (_) => GameSetupScreen(
             gameTitle: type.displayName,
             maxPlayers: type == GameType.custom ? 12 : 8,
-            onStartGame: (configuredPlayers) {
+            onStartGame: (configuredPlayers, config) {
               Widget gameScreen;
               switch (type) {
                 case GameType.generala:
                   gameScreen = GeneralaScreen(configuredPlayers: configuredPlayers);
                   break;
                 case GameType.diezMil:
-                  gameScreen = DiezMilScreen(configuredPlayers: configuredPlayers);
+                  gameScreen = DiezMilScreen(
+                    configuredPlayers: configuredPlayers,
+                    entryScore: (config['entryScore'] as int?) ?? 750,
+                    minRoundScore: (config['minRoundScore'] as int?) ?? 350,
+                  );
                   break;
                 case GameType.escoba:
                   gameScreen = EscobaScreen(configuredPlayers: configuredPlayers);

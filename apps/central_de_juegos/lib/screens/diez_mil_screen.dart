@@ -14,11 +14,15 @@ import '../widgets/player_name_dialog.dart';
 class DiezMilScreen extends StatefulWidget {
   final GameSession? existingSession;
   final List<Player>? configuredPlayers;
+  final int entryScore;
+  final int minRoundScore;
 
   const DiezMilScreen({
     super.key,
     this.existingSession,
     this.configuredPlayers,
+    this.entryScore = 750,
+    this.minRoundScore = 350,
   });
 
   @override
@@ -54,7 +58,7 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
             .map((p) => Player(id: p.id, name: p.name, colorValue: p.colorValue, score: 0))
             .toList(),
         targetScore: 10000,
-        entryScore: 750,
+        entryScore: widget.entryScore,
       );
     } else {
       _sessionId = const Uuid().v4();
@@ -70,7 +74,7 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
         Player(id: 'p2', name: 'Jugador 2', colorValue: AppTheme.playerColors[1].value),
       ],
       targetScore: 10000,
-      entryScore: 750,
+      entryScore: widget.entryScore,
     );
   }
 
@@ -105,11 +109,22 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
     final currentPlayer = _game.players[_currentTurnIndex];
     final hasEntered = _game.hasPlayerEntered(currentPlayer.id);
 
-    // Rule: Must score >= 750 to enter
+    // Rule 1: Must score >= entryScore to enter
     if (!hasEntered && _turnPoints > 0 && _turnPoints < _game.entryScore) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Para entrar se requiere un mínimo de ${_game.entryScore} puntos en el tiro'),
+          content: Text('Para entrar se requiere un mínimo de ${_game.entryScore} puntos en la tirada'),
+          backgroundColor: Colors.orange.shade800,
+        ),
+      );
+      return;
+    }
+
+    // Rule 2: Minimum round points to plant
+    if (hasEntered && widget.minRoundScore > 0 && _turnPoints > 0 && _turnPoints < widget.minRoundScore) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('El mínimo para plantarse es de ${widget.minRoundScore} puntos (o 0 si perdiste)'),
           backgroundColor: Colors.orange.shade800,
         ),
       );
@@ -135,7 +150,7 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
       WinnerDialog.show(
         context,
         winnerName: currentPlayer.name,
-        gameTitle: 'Diez Mil (10.000)',
+        gameTitle: 'Diez Mil',
         scores: _game.players,
         onRematch: () {
           setState(() {
@@ -345,7 +360,7 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
-                                  entered ? 'ENTRÓ' : '0/750',
+                                  entered ? 'ENTRÓ' : '0/${_game.entryScore}',
                                   style: TextStyle(
                                     fontSize: 9,
                                     fontWeight: FontWeight.w900,
@@ -416,12 +431,29 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
                                 borderRadius: BorderRadius.circular(6),
                                 border: Border.all(color: Colors.orange, width: 1),
                               ),
-                              child: const Text(
-                                'Requiere 750+',
-                                style: TextStyle(
+                              child: Text(
+                                'Apertura: ${_game.entryScore}+',
+                                style: const TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.orangeAccent,
+                                ),
+                              ),
+                            )
+                          else if (widget.minRoundScore > 0)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: Colors.blue, width: 1),
+                              ),
+                              child: Text(
+                                'Mín: ${widget.minRoundScore}+',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.lightBlueAccent,
                                 ),
                               ),
                             ),
@@ -480,7 +512,7 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
 
                     const SizedBox(height: 12),
 
-                    // Quick Score Math Buttons
+                    // Clean Score Math Buttons without text explanations
                     Expanded(
                       child: GridView.count(
                         crossAxisCount: 3,
@@ -488,15 +520,15 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
                         mainAxisSpacing: 8,
                         childAspectRatio: 1.7,
                         children: [
-                          _buildMathBtn('+50 (1 As)', 50),
-                          _buildMathBtn('+100 (1 Cinco)', 100),
+                          _buildMathBtn('+50', 50),
+                          _buildMathBtn('+100', 100),
                           _buildMathBtn('+200', 200),
                           _buildMathBtn('+300', 300),
                           _buildMathBtn('+400', 400),
                           _buildMathBtn('+500', 500),
                           _buildMathBtn('+600', 600),
                           _buildMathBtn('+1.000', 1000),
-                          _buildMathBtn('+1.500 Escalera', 1500),
+                          _buildMathBtn('+1.500', 1500),
                         ],
                       ),
                     ),
@@ -553,7 +585,7 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
       child: Text(
         label,
         textAlign: TextAlign.center,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+        style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
       ),
     );
   }

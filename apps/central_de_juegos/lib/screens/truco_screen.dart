@@ -202,7 +202,7 @@ class _TrucoScreenState extends State<TrucoScreen> {
             ),
             const SizedBox(width: 8),
             const Text(
-              'TRUCO_A_30',
+              'TRUCO',
               style: TextStyle(
                 color: AppTheme.cyberGold,
                 fontWeight: FontWeight.w900,
@@ -299,96 +299,87 @@ class _TrucoScreenState extends State<TrucoScreen> {
     final isBuenas = _game.isBuenas(score);
     final scoreLabel = _game.getScoreLabel(score);
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      child: Column(
-        children: [
-          // Touchable Name for Renaming at Top
-          GestureDetector(
-            onTap: () => _renameTeam(teamIndex),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: color.withOpacity(0.4)),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Flexible(
-                    child: Text(
-                      name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: color,
+    return InkWell(
+      onTap: () => _addPoints(teamIndex, 1, '+1'),
+      splashColor: color.withOpacity(0.15),
+      highlightColor: color.withOpacity(0.08),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        child: Column(
+          children: [
+            // Touchable Name for Renaming at Top
+            GestureDetector(
+              onTap: () => _renameTeam(teamIndex),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: color.withOpacity(0.4)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(
+                        name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: color,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 4),
-                  Icon(Icons.edit, size: 13, color: color.withOpacity(0.8)),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          // Matchsticks displayed in a single vertical column
-          Expanded(
-            child: Center(
-              child: SingleChildScrollView(
-                child: MatchstickDisplayGrid(
-                  score: score,
-                  maxScore: _game.targetPoints,
-                  color: color,
-                  boxSize: 56.0,
+                    const SizedBox(width: 4),
+                    Icon(Icons.edit, size: 13, color: color.withOpacity(0.8)),
+                  ],
                 ),
               ),
             ),
-          ),
 
-          const SizedBox(height: 6),
+            const SizedBox(height: 8),
 
-          // Large Score Tag at the Bottom of the column
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              color: isBuenas ? Colors.green.shade900.withOpacity(0.4) : Colors.orange.shade900.withOpacity(0.4),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isBuenas ? Colors.green : Colors.orange,
-                width: 1.5,
+            // Matchsticks displayed in a single vertical column
+            Expanded(
+              child: Center(
+                child: SingleChildScrollView(
+                  child: MatchstickDisplayGrid(
+                    score: score,
+                    maxScore: _game.targetPoints,
+                    color: color,
+                    boxSize: 56.0,
+                  ),
+                ),
               ),
             ),
-            child: Column(
-              children: [
-                Text(
-                  '$score',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w900,
-                    color: isBuenas ? Colors.greenAccent : Colors.orangeAccent,
-                    height: 1.0,
-                  ),
+
+            const SizedBox(height: 6),
+
+            // Large Clean Score Tag at the Bottom of the column (without redundant number)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+              decoration: BoxDecoration(
+                color: isBuenas ? Colors.green.shade900.withOpacity(0.4) : Colors.orange.shade900.withOpacity(0.4),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isBuenas ? Colors.green : Colors.orange,
+                  width: 1.5,
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  scoreLabel.toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.0,
-                    color: isBuenas ? Colors.greenAccent : Colors.orangeAccent,
-                  ),
+              ),
+              child: Text(
+                scoreLabel.toUpperCase(),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.0,
+                  color: isBuenas ? Colors.greenAccent : Colors.orangeAccent,
                 ),
-              ],
+              ),
             ),
-          ),
 
           const SizedBox(height: 6),
 
@@ -428,8 +419,9 @@ class _TrucoScreenState extends State<TrucoScreen> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildQuickActionButtons(ThemeData theme) {
     return Container(
