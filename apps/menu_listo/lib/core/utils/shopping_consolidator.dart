@@ -29,7 +29,7 @@ class ShoppingConsolidator {
 
     return accumulators.values.map((acc) {
       return ShoppingItem(
-        id: DateTime.now().microsecondsSinceEpoch.toString() + '_' + acc.name.hashCode.toString(),
+        id: '${DateTime.now().microsecondsSinceEpoch}_${acc.name.hashCode}',
         name: acc.name,
         amount: acc.amount,
         unit: acc.unit,

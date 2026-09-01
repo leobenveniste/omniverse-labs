@@ -101,9 +101,11 @@ def deploy():
     # Step 3: Assign to Tracks (Internal & Beta)
     tracks_to_update = ["internal", "beta"]
     release_notes_text = (
-        "Actualización oficial: nombre de la aplicación Central de Juegos, iconos adaptativos corregidos, "
-        "animaciones independientes de dados, moneda en pantalla completa, ruleta rápida de inicio, "
-        "Truco a 30 puntos y contador libre con personalización de nombres y colores."
+        "Lanzamiento oficial de Central de Juegos por Omniverse Labs: Anotador digital todo en uno para juegos de mesa "
+        "(Truco argentino a 30 puntos, Generala con planilla oficial, Diez Mil con aperturas configurables, Burako a 3.000 puntos, "
+        "Escoba del 15 y Contador Libre multijugador interactivo con detección de líder). "
+        "Incluye herramientas de mesa: lanzador de dados 3D con física, ruleta táctil para definir quién empieza, "
+        "temporizador de turno con alerta sonora y lanzador de moneda 3D."
     )
 
     for track in tracks_to_update:

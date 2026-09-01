@@ -123,7 +123,7 @@ class AppDatabase {
     }
 
     if (conditions.isNotEmpty) {
-      whereClause = 'WHERE ' + conditions.join(' AND ');
+      whereClause = 'WHERE ${conditions.join(' AND ')}';
     }
 
     final recipeMaps = await db.rawQuery('SELECT * FROM recipes $whereClause ORDER BY createdAt DESC', whereArgs);

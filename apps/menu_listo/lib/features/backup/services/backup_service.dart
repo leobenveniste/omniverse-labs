@@ -4,9 +4,10 @@ import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:menu_listo/core/database/app_database.dart';
-import '../../meal_planner/models/meal_plan_model.dart';
-import '../../recipes/models/recipe_model.dart';
-import '../../shopping_list/models/shopping_item_model.dart';
+import 'package:menu_listo/features/recipes/models/ingredient_model.dart';
+import 'package:menu_listo/features/recipes/models/recipe_model.dart';
+import 'package:menu_listo/features/recipes/models/recipe_step_model.dart';
+import 'package:menu_listo/features/shopping_list/models/shopping_item_model.dart';
 
 class BackupService {
   final AppDatabase _db;
@@ -34,7 +35,7 @@ class BackupService {
 
       final tempDir = await getTemporaryDirectory();
       final dateStr = DateTime.now().toIso8601String().split('T').first;
-      final file = File('\${tempDir.path}/menu_listo_backup_\$dateStr.json');
+      final file = File('${tempDir.path}/menu_listo_backup_$dateStr.json');
       await file.writeAsString(jsonString, encoding: utf8);
 
       await Share.shareXFiles(

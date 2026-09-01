@@ -74,7 +74,7 @@ class AppTheme {
           color: colorScheme.onSurfaceVariant,
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -178,7 +178,7 @@ class AppTheme {
           color: colorScheme.onSurfaceVariant,
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -243,7 +243,7 @@ class AppTheme {
       textTheme: GoogleFonts.outfitTextTheme(
         isDark ? ThemeData.dark().textTheme : ThemeData.light().textTheme,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 1,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
