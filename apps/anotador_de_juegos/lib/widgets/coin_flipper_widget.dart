@@ -22,7 +22,7 @@ class _CoinFlipperWidgetState extends State<CoinFlipperWidget> with SingleTicker
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 900),
     );
 
     _animation = Tween<double>(begin: 0, end: 1).animate(
@@ -47,6 +47,7 @@ class _CoinFlipperWidgetState extends State<CoinFlipperWidget> with SingleTicker
     final targetHeads = _random.nextBool();
 
     _controller.forward(from: 0.0).then((_) {
+      if (!mounted) return;
       setState(() {
         _isHeads = targetHeads;
         _isFlipping = false;
@@ -59,90 +60,106 @@ class _CoinFlipperWidgetState extends State<CoinFlipperWidget> with SingleTicker
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        AnimatedBuilder(
-          animation: _animation,
-          builder: (context, child) {
-            final rotations = _animation.value * 6 * pi;
-            final isFront = (rotations % (2 * pi)) < (pi / 2) || (rotations % (2 * pi)) > (3 * pi / 2);
-            final showFace = _isFlipping ? isFront : _isHeads;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: _flipCoin,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedBuilder(
+              animation: _animation,
+              builder: (context, child) {
+                final rotations = _animation.value * 6 * pi;
+                final isFront = (rotations % (2 * pi)) < (pi / 2) || (rotations % (2 * pi)) > (3 * pi / 2);
+                final showFace = _isFlipping ? isFront : _isHeads;
 
-            return Transform(
-              transform: Matrix4.identity()
-                ..setEntry(3, 2, 0.002) // Perspective
-                ..rotateX(rotations),
-              alignment: Alignment.center,
-              child: Container(
-                width: 140,
-                height: 140,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    colors: showFace
-                        ? [const Color(0xFFFFD54F), const Color(0xFFFFA000), const Color(0xFFFF8F00)]
-                        : [const Color(0xFFE0E0E0), const Color(0xFF9E9E9E), const Color(0xFF757575)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: (showFace ? Colors.amber : Colors.grey).withOpacity(0.5),
-                      blurRadius: 20,
-                      spreadRadius: 4,
-                      offset: const Offset(0, 8),
-                    )
-                  ],
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.8),
-                    width: 4,
-                  ),
-                ),
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        showFace ? Icons.face : Icons.close,
-                        size: 48,
-                        color: Colors.white,
+                return Transform(
+                  transform: Matrix4.identity()
+                    ..setEntry(3, 2, 0.002) // Perspective
+                    ..rotateX(rotations),
+                  alignment: Alignment.center,
+                  child: Container(
+                    width: 160,
+                    height: 160,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: showFace
+                            ? [const Color(0xFFFFD54F), const Color(0xFFFFA000), const Color(0xFFFF8F00)]
+                            : [const Color(0xFFE0E0E0), const Color(0xFF9E9E9E), const Color(0xFF757575)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        showFace ? 'CARA' : 'CRUZ',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.white,
-                          letterSpacing: 2,
-                        ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: (showFace ? Colors.amber : Colors.grey).withOpacity(0.5),
+                          blurRadius: 24,
+                          spreadRadius: 6,
+                          offset: const Offset(0, 10),
+                        )
+                      ],
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.85),
+                        width: 5,
                       ),
-                    ],
+                    ),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            showFace ? Icons.face : Icons.close,
+                            size: 56,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            showFace ? 'CARA' : 'CRUZ',
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                              letterSpacing: 2.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                );
+              },
+            ),
+            const SizedBox(height: 36),
+            Text(
+              _isFlipping ? '¡Girando en el aire...!' : (_isHeads ? '¡Salió CARA!' : '¡Salió CRUZ!'),
+              style: theme.textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: _isHeads ? Colors.amber.shade800 : theme.colorScheme.primary,
               ),
-            );
-          },
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.touch_app, size: 18, color: Colors.grey),
+                  SizedBox(width: 6),
+                  Text(
+                    'Toca en cualquier parte de la pantalla para lanzar',
+                    style: TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 32),
-        Text(
-          _isFlipping ? 'Girando...' : (_isHeads ? '¡Salió CARA!' : '¡Salió CRUZ!'),
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: _isHeads ? Colors.amber.shade800 : theme.colorScheme.primary,
-          ),
-        ),
-        const SizedBox(height: 24),
-        FilledButton.icon(
-          onPressed: _isFlipping ? null : _flipCoin,
-          icon: const Icon(Icons.refresh),
-          label: const Text('Lanzar Moneda'),
-          style: FilledButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

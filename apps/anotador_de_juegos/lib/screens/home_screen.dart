@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 import '../models/game_type.dart';
 import '../models/game_session.dart';
 import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/about_dialog_widget.dart';
+import '../widgets/dice_roller_widget.dart';
+import '../widgets/finger_roulette_widget.dart';
+import '../widgets/turn_timer_widget.dart';
+import '../widgets/coin_flipper_widget.dart';
 import 'truco_screen.dart';
 import 'generala_screen.dart';
-import 'rounds_screen.dart';
 import 'burako_screen.dart';
 import 'escoba_screen.dart';
 import 'custom_counter_screen.dart';
-import 'tools_screen.dart';
 import 'history_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -30,6 +32,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   GameSession? _activeSession;
   bool _isLoading = true;
+  int _currentNavIndex = 0;
 
   @override
   void initState() {
@@ -47,6 +50,32 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _discardActiveSession() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Descartar Partida'),
+        content: const Text('¿Estás seguro de que deseas descartar la partida en curso?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Descartar'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      await StorageService.clearActiveSession();
+      _loadActiveSession();
+    }
+  }
+
   void _openGame(GameType type, {GameSession? existingSession}) async {
     Widget screen;
     switch (type) {
@@ -55,12 +84,6 @@ class _HomeScreenState extends State<HomeScreen> {
         break;
       case GameType.generala:
         screen = GeneralaScreen(existingSession: existingSession);
-        break;
-      case GameType.chinchon:
-        screen = RoundsScreen(gameType: GameType.chinchon, existingSession: existingSession);
-        break;
-      case GameType.uno:
-        screen = RoundsScreen(gameType: GameType.uno, existingSession: existingSession);
         break;
       case GameType.burako:
         screen = BurakoScreen(existingSession: existingSession);
@@ -83,33 +106,45 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final List<String> navTitles = [
+      'Central de Juegos',
+      'Tirador de Dados',
+      '¿Quién Empieza?',
+      'Temporizador',
+      'Lanzador de Moneda',
+    ];
 
     return Scaffold(
       appBar: AppBar(
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.scoreboard, color: theme.colorScheme.primary, size: 22),
+            Image.asset(
+              isDark ? 'assets/images/logo_dark.png' : 'assets/images/logo_light.png',
+              width: 30,
+              height: 30,
             ),
-            const SizedBox(width: 8),
-            const Text('Anotador de Juegos', style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(width: 10),
+            Text(
+              navTitles[_currentNavIndex],
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 19),
+            ),
           ],
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.info_outline),
+            tooltip: 'Acerca de Omniverse Labs',
+            onPressed: () => AboutDialogWidget.show(context),
+          ),
+          IconButton(
             icon: const Icon(Icons.history),
-            tooltip: 'Historial',
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const HistoryScreen()),
-              );
-            },
+            tooltip: 'Historial de Partidas',
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const HistoryScreen()),
+            ),
           ),
           IconButton(
             icon: Icon(widget.isDarkMode ? Icons.light_mode : Icons.dark_mode),
@@ -118,202 +153,216 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              children: [
-                // Active session banner
-                if (_activeSession != null) ...[
-                  _buildActiveSessionCard(theme),
-                  const SizedBox(height: 16),
-                ],
-
-                // Tools card (Quick Access)
-                _buildToolsBanner(theme),
-                const SizedBox(height: 20),
-
-                // Section Header
-                Text(
-                  'Elige un Juego',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 12),
-
-                // Game Catalog Grid
-                _buildGameCard(
-                  title: 'Truco',
-                  subtitle: '15, 24 o 30 pts • Fósforos y Números Gigantes',
-                  icon: Icons.style,
-                  color: AppTheme.trucoGreen,
-                  onTap: () => _openGame(GameType.truco),
-                ),
-                const SizedBox(height: 10),
-
-                _buildGameCard(
-                  title: 'Generala',
-                  subtitle: 'Planilla oficial • Cálculo automático y servidas',
-                  icon: Icons.casino,
-                  color: AppTheme.generalaBurgundy,
-                  onTap: () => _openGame(GameType.generala),
-                ),
-                const SizedBox(height: 10),
-
-                _buildGameCard(
-                  title: 'Contador Libre Multijugador',
-                  subtitle: '1 a 12 jugadores o equipos con sumas rápidas',
-                  icon: Icons.calculate,
-                  color: AppTheme.customPurple,
-                  onTap: () => _openGame(GameType.custom),
-                ),
-                const SizedBox(height: 10),
-
-                _buildGameCard(
-                  title: 'Chinchón / Rummy',
-                  subtitle: 'Rondas acumulativas, límite de eliminación y reenganche',
-                  icon: Icons.view_carousel,
-                  color: AppTheme.chinchonAmber,
-                  onTap: () => _openGame(GameType.chinchon),
-                ),
-                const SizedBox(height: 10),
-
-                _buildGameCard(
-                  title: 'Uno',
-                  subtitle: 'Conteo de cartas por rondas y límite de puntos',
-                  icon: Icons.filter_none,
-                  color: AppTheme.unoRed,
-                  onTap: () => _openGame(GameType.uno),
-                ),
-                const SizedBox(height: 10),
-
-                _buildGameCard(
-                  title: 'Burako / Canasta',
-                  subtitle: 'Canastas puras/impuras, bases, puntos y muertos',
-                  icon: Icons.grid_view,
-                  color: AppTheme.burakoBlue,
-                  onTap: () => _openGame(GameType.burako),
-                ),
-                const SizedBox(height: 10),
-
-                _buildGameCard(
-                  title: 'Escoba de 15 / Tute',
-                  subtitle: 'Escobas, 7 de oro, oros, setenta y cartas',
-                  icon: Icons.cleaning_services,
-                  color: AppTheme.escobaTeal,
-                  onTap: () => _openGame(GameType.escoba),
-                ),
-                const SizedBox(height: 24),
-              ],
+      body: IndexedStack(
+        index: _currentNavIndex,
+        children: [
+          _buildGamesCatalogTab(theme),
+          const Center(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(24.0),
+              child: DiceRollerWidget(),
             ),
+          ),
+          const FingerRouletteWidget(),
+          const Center(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(24.0),
+              child: TurnTimerWidget(),
+            ),
+          ),
+          const Center(
+            child: CoinFlipperWidget(),
+          ),
+        ],
+      ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentNavIndex,
+        onDestinationSelected: (idx) {
+          setState(() {
+            _currentNavIndex = idx;
+          });
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.grid_view_outlined),
+            selectedIcon: Icon(Icons.grid_view),
+            label: 'Juegos',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.casino_outlined),
+            selectedIcon: Icon(Icons.casino),
+            label: 'Dados',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.touch_app_outlined),
+            selectedIcon: Icon(Icons.touch_app),
+            label: 'Quién Empieza',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.timer_outlined),
+            selectedIcon: Icon(Icons.timer),
+            label: 'Temporizador',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.monetization_on_outlined),
+            selectedIcon: Icon(Icons.monetization_on),
+            label: 'Moneda',
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildActiveSessionCard(ThemeData theme) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            theme.colorScheme.primaryContainer,
-            theme.colorScheme.primary.withOpacity(0.15),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.3)),
+  Widget _buildGamesCatalogTab(ThemeData theme) {
+    return _isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            children: [
+              // Active Match Banner (if any) with Resume & Discard buttons
+              if (_activeSession != null) ...[
+                _buildActiveMatchCard(theme),
+                const SizedBox(height: 18),
+              ],
+
+              // Games Catalog Header
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                child: Text(
+                  'Catálogo de Juegos',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // Game Cards: Truco, Generala, Burako, Escoba del 15, Contador Libre
+              _buildGameCard(
+                type: GameType.truco,
+                title: 'Truco',
+                subtitle: 'Anotador oficial a 30 puntos con fósforos o números gigantes.',
+                icon: Icons.style,
+                color: const Color(0xFF2E7D32),
+                badge: '30 Puntos',
+              ),
+              const SizedBox(height: 12),
+
+              _buildGameCard(
+                type: GameType.generala,
+                title: 'Generala',
+                subtitle: 'Planilla oficial completa con cálculo automático y servidas.',
+                icon: Icons.casino,
+                color: const Color(0xFFE65100),
+                badge: '1-6 Jugadores',
+              ),
+              const SizedBox(height: 12),
+
+              _buildGameCard(
+                type: GameType.burako,
+                title: 'Burako / Canasta',
+                subtitle: 'Canastas puras e impuras, bases, cierre y cartas en mano.',
+                icon: Icons.grid_view,
+                color: const Color(0xFF6A1B9A),
+                badge: 'Por Rondas',
+              ),
+              const SizedBox(height: 12),
+
+              _buildGameCard(
+                type: GameType.escoba,
+                title: 'Escoba del 15',
+                subtitle: 'Anotador de escobas, cartas, oros, 7 de oro y la setenta.',
+                icon: Icons.cleaning_services,
+                color: const Color(0xFF00838F),
+                badge: 'Oficial',
+              ),
+              const SizedBox(height: 12),
+
+              _buildGameCard(
+                type: GameType.custom,
+                title: 'Contador Libre',
+                subtitle: 'Suma puntos tocando la tarjeta, personaliza nombres y colores.',
+                icon: Icons.calculate,
+                color: const Color(0xFF1565C0),
+                badge: '1-12 Jugadores',
+              ),
+              const SizedBox(height: 24),
+            ],
+          );
+  }
+
+  Widget _buildActiveMatchCard(ThemeData theme) {
+    final session = _activeSession!;
+
+    return Card(
+      color: theme.colorScheme.primaryContainer,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(color: theme.colorScheme.primary.withOpacity(0.4)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.play_arrow, color: Colors.white, size: 24),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.play_arrow, size: 14, color: Colors.white),
+                      SizedBox(width: 4),
+                      Text(
+                        'PARTIDA EN CURSO',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline, color: Colors.red),
+                  tooltip: 'Descartar Partida',
+                  onPressed: _discardActiveSession,
+                ),
+              ],
             ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Partida en Curso',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.primary,
-                      letterSpacing: 1,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    _activeSession!.title,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    _activeSession!.gameType.displayName,
-                    style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 13),
-                  ),
-                ],
-              ),
+            const SizedBox(height: 10),
+            Text(
+              session.title,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            FilledButton(
-              onPressed: () => _openGame(_activeSession!.gameType, existingSession: _activeSession),
-              child: const Text('Reanudar'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildToolsBanner(ThemeData theme) {
-    return InkWell(
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const ToolsScreen()),
-        );
-      },
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.6),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: theme.colorScheme.outlineVariant),
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.amber.shade700,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(Icons.handyman, color: Colors.white, size: 24),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Caja de Herramientas de Mesa',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    '🎲 Dados • 👆 Quién Empieza • ⏱️ Temporizador • 🪙 Moneda',
-                    style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
-                  ),
-                ],
+            const SizedBox(height: 4),
+            Text(
+              'Juego: ${session.gameType.displayName}',
+              style: TextStyle(
+                fontSize: 13,
+                color: theme.colorScheme.onPrimaryContainer.withOpacity(0.8),
               ),
             ),
-            const Icon(Icons.chevron_right),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                Expanded(
+                  child: FilledButton.icon(
+                    onPressed: () => _openGame(session.gameType, existingSession: session),
+                    icon: const Icon(Icons.play_arrow),
+                    label: const Text('Reanudar Partida'),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -321,18 +370,24 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildGameCard({
+    required GameType type,
     required String title,
     required String subtitle,
     required IconData icon,
     required Color color,
-    required VoidCallback onTap,
+    required String badge,
   }) {
     final theme = Theme.of(context);
 
     return Card(
-      clipBehavior: Clip.antiAlias,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(color: theme.colorScheme.outlineVariant.withOpacity(0.6)),
+      ),
       child: InkWell(
-        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        onTap: () => _openGame(type),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
@@ -346,30 +401,52 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Icon(icon, color: color, size: 28),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: color.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            badge,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: color,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 4),
                     Text(
                       subtitle,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 12,
                         color: theme.colorScheme.onSurfaceVariant,
+                        height: 1.3,
                       ),
                     ),
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+              const SizedBox(width: 8),
+              Icon(Icons.chevron_right, color: theme.disabledColor),
             ],
           ),
         ),

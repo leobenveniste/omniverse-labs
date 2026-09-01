@@ -49,6 +49,15 @@ class TrucoGame {
 
   int get halfTarget => targetPoints ~/ 2;
 
+  int calculateFaltaEnvido(int winnerTeamIndex) {
+    final leaderScore = team1Score > team2Score ? team1Score : team2Score;
+    if (leaderScore <= halfTarget) {
+      return targetPoints - (winnerTeamIndex == 0 ? team1Score : team2Score);
+    } else {
+      return targetPoints - leaderScore;
+    }
+  }
+
   bool isBuenas(int score) {
     if (targetPoints == 15) return true;
     return score > halfTarget;

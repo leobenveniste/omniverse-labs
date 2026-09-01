@@ -23,6 +23,10 @@ class SoundHapticsService {
     }
   }
 
+  static void undo() {
+    pointSubtracted();
+  }
+
   static void diceRolled() {
     if (hapticsEnabled) {
       HapticFeedback.heavyImpact();
@@ -40,5 +44,9 @@ class SoundHapticsService {
         HapticFeedback.heavyImpact();
       });
     }
+  }
+
+  static void victory() {
+    winnerCelebration();
   }
 }

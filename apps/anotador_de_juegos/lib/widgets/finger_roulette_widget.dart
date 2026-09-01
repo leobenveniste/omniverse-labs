@@ -82,10 +82,10 @@ class _FingerRouletteWidgetState extends State<FingerRouletteWidget> {
 
     if (_touches.length >= 2 && _selectedPointerId == null) {
       _isSelecting = true;
-      const totalSteps = 25;
+      const totalSteps = 15;
       int currentStep = 0;
 
-      _countdownTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+      _countdownTimer = Timer.periodic(const Duration(milliseconds: 80), (timer) {
         currentStep++;
         if (!mounted) {
           timer.cancel();
@@ -95,7 +95,7 @@ class _FingerRouletteWidgetState extends State<FingerRouletteWidget> {
           _progress = currentStep / totalSteps;
         });
 
-        if (currentStep % 5 == 0) {
+        if (currentStep % 4 == 0) {
           SoundHapticsService.click();
         }
 

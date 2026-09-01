@@ -7,11 +7,12 @@ void main() {
     SharedPreferences.setMockInitialValues({});
   });
 
-  testWidgets('ScorekeeperApp smoke test', (WidgetTester tester) async {
-    await tester.pumpWidget(const ScorekeeperApp());
+  testWidgets('CentralDeJuegosApp smoke test', (WidgetTester tester) async {
+    await tester.pumpWidget(const CentralDeJuegosApp());
     await tester.pumpAndSettle();
-    expect(find.text('Anotador de Juegos'), findsOneWidget);
+    expect(find.text('Central de Juegos'), findsOneWidget);
     expect(find.text('Truco'), findsOneWidget);
     expect(find.text('Generala'), findsOneWidget);
+    expect(find.text('Escoba del 15'), findsOneWidget);
   });
 }

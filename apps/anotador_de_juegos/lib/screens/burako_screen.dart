@@ -9,6 +9,7 @@ import '../services/storage_service.dart';
 import '../services/sound_haptics_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/winner_dialog.dart';
+import '../widgets/player_name_dialog.dart';
 
 class BurakoScreen extends StatefulWidget {
   final GameSession? existingSession;
@@ -289,22 +290,48 @@ class _BurakoScreenState extends State<BurakoScreen> {
             child: Row(
               children: _game.teams.map((t) {
                 return Expanded(
-                  child: Column(
-                    children: [
-                      Text(
-                        t.name,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: t.color,
+                  child: GestureDetector(
+                    onTap: () async {
+                      final newName = await PlayerNameDialog.show(
+                        context,
+                        currentName: t.name,
+                        title: 'Editar Equipo / Jugador',
+                      );
+                      if (newName != null && newName.isNotEmpty) {
+                        setState(() {
+                          t.name = newName;
+                        });
+                        _saveState();
+                      }
+                    },
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                t.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: t.color,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(Icons.edit, size: 14, color: t.color.withOpacity(0.8)),
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${t.score} pts',
-                        style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
-                      ),
-                    ],
+                        const SizedBox(height: 4),
+                        Text(
+                          '${t.score} pts',
+                          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }).toList(),

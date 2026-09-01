@@ -162,10 +162,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
         return Icons.style;
       case GameType.generala:
         return Icons.casino;
-      case GameType.chinchon:
-        return Icons.view_carousel;
-      case GameType.uno:
-        return Icons.filter_none;
       case GameType.burako:
         return Icons.grid_view;
       case GameType.escoba:

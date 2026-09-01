@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../services/sound_haptics_service.dart';
@@ -9,27 +10,40 @@ class DiceRollerWidget extends StatefulWidget {
   State<DiceRollerWidget> createState() => _DiceRollerWidgetState();
 }
 
-class _DiceRollerWidgetState extends State<DiceRollerWidget> with SingleTickerProviderStateMixin {
+class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProviderStateMixin {
   int _diceCount = 2;
   int _diceSides = 6; // 6, 10, 20
   List<int> _results = [3, 5];
   bool _isRolling = false;
-  late AnimationController _animController;
-
+  
+  late List<AnimationController> _controllers;
+  late List<double> _randomRotations;
   final Random _random = Random();
+  Timer? _diceJitterTimer;
 
   @override
   void initState() {
     super.initState();
-    _animController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
+    _initControllers();
+  }
+
+  void _initControllers() {
+    _controllers = List.generate(
+      6,
+      (i) => AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: 500 + i * 80),
+      ),
     );
+    _randomRotations = List.generate(6, (_) => (_random.nextDouble() - 0.5) * 4 * pi);
   }
 
   @override
   void dispose() {
-    _animController.dispose();
+    _diceJitterTimer?.cancel();
+    for (var c in _controllers) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -39,12 +53,32 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with SingleTickerPr
 
     setState(() {
       _isRolling = true;
+      _randomRotations = List.generate(6, (_) => (_random.nextDouble() - 0.5) * 4 * pi);
     });
 
-    _animController.forward(from: 0.0);
+    for (int i = 0; i < _diceCount; i++) {
+      _controllers[i].forward(from: 0.0);
+    }
 
-    Future.delayed(const Duration(milliseconds: 600), () {
+    // Jitter random numbers while rolling
+    int ticks = 0;
+    _diceJitterTimer = Timer.periodic(const Duration(milliseconds: 70), (t) {
+      ticks++;
+      if (!mounted) {
+        t.cancel();
+        return;
+      }
+      setState(() {
+        _results = List.generate(_diceCount, (_) => _random.nextInt(_diceSides) + 1);
+      });
+      if (ticks >= 8) {
+        t.cancel();
+      }
+    });
+
+    Future.delayed(const Duration(milliseconds: 750), () {
       if (!mounted) return;
+      _diceJitterTimer?.cancel();
       setState(() {
         _results = List.generate(_diceCount, (_) => _random.nextInt(_diceSides) + 1);
         _isRolling = false;
@@ -106,51 +140,64 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with SingleTickerPr
             ),
           ],
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 32),
 
-        // Dice Display
-        AnimatedBuilder(
-          animation: _animController,
-          builder: (context, child) {
-            final angle = _animController.value * 2 * pi;
-            return Transform.rotate(
-              angle: _isRolling ? angle : 0.0,
-              child: Wrap(
-                spacing: 16,
-                runSpacing: 16,
-                alignment: WrapAlignment.center,
-                children: _results.map((value) => _buildDiceFace(value)).toList(),
-              ),
+        // Individual Animated Dice Display
+        Wrap(
+          spacing: 18,
+          runSpacing: 18,
+          alignment: WrapAlignment.center,
+          children: List.generate(_diceCount, (index) {
+            final value = index < _results.length ? _results[index] : 1;
+            final controller = _controllers[index];
+            final rotMax = _randomRotations[index];
+
+            return AnimatedBuilder(
+              animation: controller,
+              builder: (context, child) {
+                final progress = controller.value;
+                final angle = _isRolling ? (1.0 - progress) * rotMax : 0.0;
+                final scale = _isRolling ? (1.0 + sin(progress * pi) * 0.25) : 1.0;
+
+                return Transform.scale(
+                  scale: scale,
+                  child: Transform.rotate(
+                    angle: angle,
+                    child: _buildDiceFace(value),
+                  ),
+                );
+              },
             );
-          },
+          }),
         ),
 
-        const SizedBox(height: 24),
+        const SizedBox(height: 32),
 
-        // Total Sum
+        // Total Sum Badge
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
           decoration: BoxDecoration(
             color: theme.colorScheme.primaryContainer,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: theme.colorScheme.primary.withOpacity(0.3)),
           ),
           child: Text(
             'Total: $_totalSum',
             style: TextStyle(
-              fontSize: 22,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
               color: theme.colorScheme.onPrimaryContainer,
             ),
           ),
         ),
 
-        const SizedBox(height: 24),
+        const SizedBox(height: 28),
         FilledButton.icon(
           onPressed: _isRolling ? null : _rollDice,
-          icon: const Icon(Icons.casino),
+          icon: const Icon(Icons.casino, size: 22),
           label: const Text('¡Tirar Dados!'),
           style: FilledButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 16),
             textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ),
@@ -164,12 +211,19 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with SingleTickerPr
     }
     // Polygon / badge for d10 or d20
     return Container(
-      width: 64,
-      height: 64,
+      width: 68,
+      height: 68,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.15),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
       ),
       child: Center(
         child: Text(
@@ -186,17 +240,17 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with SingleTickerPr
 
   Widget _buildD6(int value) {
     return Container(
-      width: 64,
-      height: 64,
-      padding: const EdgeInsets.all(8),
+      width: 68,
+      height: 68,
+      padding: const EdgeInsets.all(9),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
           )
         ],
         border: Border.all(color: Colors.grey.shade300, width: 1.5),
@@ -229,7 +283,7 @@ class _D6DotPainter extends CustomPainter {
 
     switch (value) {
       case 1:
-        canvas.drawCircle(center, dotRadius * 1.3, dotPaint..color = Colors.red.shade700);
+        canvas.drawCircle(center, dotRadius * 1.35, dotPaint..color = const Color(0xFFE53935));
         break;
       case 2:
         canvas.drawCircle(topLeft, dotRadius, dotPaint);

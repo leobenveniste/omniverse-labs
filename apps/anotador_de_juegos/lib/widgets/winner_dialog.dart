@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/player.dart';
 import '../services/sound_haptics_service.dart';
 
 class WinnerDialog extends StatefulWidget {
@@ -16,6 +17,27 @@ class WinnerDialog extends StatefulWidget {
     required this.onNewGame,
     required this.onExit,
   });
+
+  static Future<void> show(
+    BuildContext context, {
+    required String winnerName,
+    String? gameTitle,
+    List<Player>? scores,
+    required VoidCallback onRematch,
+    required VoidCallback onNewGame,
+  }) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => WinnerDialog(
+        winnerName: winnerName,
+        subtitle: gameTitle != null ? '¡Victoria en $gameTitle!' : null,
+        onRematch: onRematch,
+        onNewGame: onNewGame,
+        onExit: () => Navigator.of(context).pop(),
+      ),
+    );
+  }
 
   @override
   State<WinnerDialog> createState() => _WinnerDialogState();

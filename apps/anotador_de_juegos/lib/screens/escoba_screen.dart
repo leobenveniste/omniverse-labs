@@ -9,6 +9,7 @@ import '../services/storage_service.dart';
 import '../services/sound_haptics_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/winner_dialog.dart';
+import '../widgets/player_name_dialog.dart';
 
 class EscobaScreen extends StatefulWidget {
   final GameSession? existingSession;
@@ -247,7 +248,7 @@ class _EscobaScreenState extends State<EscobaScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Escoba de 15 a ${_game.targetScore} pts'),
+        title: Text('Escoba del 15 a ${_game.targetScore} pts'),
       ),
       body: Column(
         children: [
@@ -258,22 +259,48 @@ class _EscobaScreenState extends State<EscobaScreen> {
             child: Row(
               children: _game.players.map((p) {
                 return Expanded(
-                  child: Column(
-                    children: [
-                      Text(
-                        p.name,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: p.color,
+                  child: GestureDetector(
+                    onTap: () async {
+                      final newName = await PlayerNameDialog.show(
+                        context,
+                        currentName: p.name,
+                        title: 'Editar Jugador',
+                      );
+                      if (newName != null && newName.isNotEmpty) {
+                        setState(() {
+                          p.name = newName;
+                        });
+                        _saveState();
+                      }
+                    },
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                p.name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: p.color,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(Icons.edit, size: 14, color: p.color.withOpacity(0.8)),
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${p.score} pts',
-                        style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
-                      ),
-                    ],
+                        const SizedBox(height: 4),
+                        Text(
+                          '${p.score} pts',
+                          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }).toList(),

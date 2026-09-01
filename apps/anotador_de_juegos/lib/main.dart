@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
-import 'screens/home_screen.dart';
+import 'screens/splash_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const ScorekeeperApp());
+  runApp(const CentralDeJuegosApp());
 }
 
-class ScorekeeperApp extends StatefulWidget {
-  const ScorekeeperApp({super.key});
+class CentralDeJuegosApp extends StatefulWidget {
+  const CentralDeJuegosApp({super.key});
 
   @override
-  State<ScorekeeperApp> createState() => _ScorekeeperAppState();
+  State<CentralDeJuegosApp> createState() => _CentralDeJuegosAppState();
 }
 
-class _ScorekeeperAppState extends State<ScorekeeperApp> {
+class _CentralDeJuegosAppState extends State<CentralDeJuegosApp> {
   ThemeMode _themeMode = ThemeMode.dark;
 
   void _toggleTheme() {
@@ -26,12 +26,12 @@ class _ScorekeeperAppState extends State<ScorekeeperApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Anotador de Juegos',
+      title: 'Central de Juegos',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: _themeMode,
-      home: HomeScreen(
+      home: SplashScreen(
         onToggleTheme: _toggleTheme,
         isDarkMode: _themeMode == ThemeMode.dark,
       ),

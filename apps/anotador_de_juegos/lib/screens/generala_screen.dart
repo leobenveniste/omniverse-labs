@@ -9,6 +9,7 @@ import '../services/storage_service.dart';
 import '../services/sound_haptics_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/winner_dialog.dart';
+import '../widgets/player_name_dialog.dart';
 
 class GeneralaScreen extends StatefulWidget {
   final GameSession? existingSession;
@@ -335,23 +336,48 @@ class _GeneralaScreenState extends State<GeneralaScreen> {
                 ),
                 ..._game.players.map((p) {
                   return Expanded(
-                    child: Column(
-                      children: [
-                        Text(
-                          p.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: p.color,
-                            fontSize: 13,
+                    child: GestureDetector(
+                      onTap: () async {
+                        final newName = await PlayerNameDialog.show(
+                          context,
+                          currentName: p.name,
+                          title: 'Editar Jugador',
+                        );
+                        if (newName != null && newName.isNotEmpty) {
+                          setState(() {
+                            p.name = newName;
+                          });
+                          _saveState();
+                        }
+                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  p.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: p.color,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(Icons.edit, size: 12, color: p.color.withOpacity(0.7)),
+                            ],
                           ),
-                        ),
-                        Text(
-                          '${p.score} pts',
-                          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
-                        ),
-                      ],
+                          Text(
+                            '${p.score} pts',
+                            style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 }),

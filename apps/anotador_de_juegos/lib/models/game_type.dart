@@ -2,8 +2,6 @@ enum GameType {
   custom,
   truco,
   generala,
-  chinchon,
-  uno,
   burako,
   escoba,
 }
@@ -17,29 +15,21 @@ extension GameTypeExtension on GameType {
         return 'Truco';
       case GameType.generala:
         return 'Generala';
-      case GameType.chinchon:
-        return 'Chinchón';
-      case GameType.uno:
-        return 'Uno / Rummy';
       case GameType.burako:
         return 'Burako / Canasta';
       case GameType.escoba:
-        return 'Escoba de 15';
+        return 'Escoba del 15';
     }
   }
 
   String get description {
     switch (this) {
       case GameType.custom:
-        return 'De 1 a 12 jugadores o equipos con sumas rápidas';
+        return 'De 1 a 12 jugadores o equipos con sumas por toque y ajustes';
       case GameType.truco:
-        return '15, 24 o 30 pts con fósforos tradicionales o números gigantes';
+        return 'Anotador oficial a 30 puntos con fósforos o números';
       case GameType.generala:
         return 'Planilla oficial con cálculo automático de categorías y servidas';
-      case GameType.chinchon:
-        return 'Rondas acumulativas, límite de eliminación y reenganche';
-      case GameType.uno:
-        return 'Conteo de cartas en mano por rondas y límite de puntos';
       case GameType.burako:
         return 'Canastas puras/impuras, bases y fichas en mano';
       case GameType.escoba:
@@ -55,10 +45,6 @@ extension GameTypeExtension on GameType {
         return 'style';
       case GameType.generala:
         return 'casino';
-      case GameType.chinchon:
-        return 'view_carousel';
-      case GameType.uno:
-        return 'filter_none';
       case GameType.burako:
         return 'grid_view';
       case GameType.escoba:
