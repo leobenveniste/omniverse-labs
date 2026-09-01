@@ -209,53 +209,47 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 14),
               ],
 
-              // 1. Contador Libre Wide Banner Card (Full width)
+              // 1. Contador Libre Wide Banner Card (16:9 Aspect Ratio without tags)
               _buildWideBannerCard(
                 type: GameType.custom,
                 imageAsset: 'assets/images/cards/banner_custom.jpg',
                 color: const Color(0xFF1565C0),
-                badge: '1-12 Jugadores',
               ),
               const SizedBox(height: 14),
 
-              // 2. 2-Column Vertical Game Cards Grid (Borderless Art with Spanish Titles inside Image)
+              // 2. 2-Column Vertical Game Cards Grid (1:1 Ratio, Clean Full Artwork without tags)
               GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
-                childAspectRatio: 0.95, // Clean square-ish game art ratio
+                childAspectRatio: 1.0, // 1:1 square ratio matching generated art
                 children: [
                   _buildVerticalGameCard(
                     type: GameType.truco,
                     imageAsset: 'assets/images/cards/card_truco.jpg',
                     color: const Color(0xFF2E7D32),
-                    badge: '30 Pts',
                   ),
                   _buildVerticalGameCard(
                     type: GameType.generala,
                     imageAsset: 'assets/images/cards/card_generala.jpg',
                     color: const Color(0xFFE65100),
-                    badge: 'Oficial',
                   ),
                   _buildVerticalGameCard(
                     type: GameType.diezMil,
                     imageAsset: 'assets/images/cards/card_diez_mil.jpg',
                     color: const Color(0xFFF57F17),
-                    badge: '10.000 Pts',
                   ),
                   _buildVerticalGameCard(
                     type: GameType.burako,
                     imageAsset: 'assets/images/cards/card_burako.jpg',
                     color: const Color(0xFF7B1FA2),
-                    badge: '3000 Pts',
                   ),
                   _buildVerticalGameCard(
                     type: GameType.escoba,
                     imageAsset: 'assets/images/cards/card_escoba.jpg',
                     color: const Color(0xFF00838F),
-                    badge: 'Oficial',
                   ),
                 ],
               ),
@@ -334,7 +328,6 @@ class _HomeScreenState extends State<HomeScreen> {
     required GameType type,
     required String imageAsset,
     required Color color,
-    required String badge,
   }) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -342,7 +335,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         side: BorderSide(
           color: color.withOpacity(isDark ? 0.4 : 0.25),
           width: 1.5,
@@ -351,38 +344,11 @@ class _HomeScreenState extends State<HomeScreen> {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => _openGame(type),
-        child: SizedBox(
-          height: 140,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              // Background Banner Image with Spanish Title already inside
-              Image.asset(
-                imageAsset,
-                fit: BoxFit.cover,
-              ),
-              // Badge Top Right
-              Positioned(
-                top: 10,
-                right: 10,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.75),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.white.withOpacity(0.4)),
-                  ),
-                  child: Text(
-                    badge,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+        child: AspectRatio(
+          aspectRatio: 16 / 9, // Exact aspect ratio of generated banner image
+          child: Image.asset(
+            imageAsset,
+            fit: BoxFit.cover,
           ),
         ),
       ),
@@ -393,7 +359,6 @@ class _HomeScreenState extends State<HomeScreen> {
     required GameType type,
     required String imageAsset,
     required Color color,
-    required String badge,
   }) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -401,7 +366,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(22),
         side: BorderSide(
           color: color.withOpacity(isDark ? 0.4 : 0.25),
           width: 1.5,
@@ -410,36 +375,9 @@ class _HomeScreenState extends State<HomeScreen> {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => _openGame(type),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            // Full 3D Card Artwork with Spanish Title inside Image
-            Image.asset(
-              imageAsset,
-              fit: BoxFit.cover,
-            ),
-            // Badge Top Right
-            Positioned(
-              top: 8,
-              right: 8,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.75),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.white.withOpacity(0.4)),
-                ),
-                child: Text(
-                  badge,
-                  style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ],
+        child: Image.asset(
+          imageAsset,
+          fit: BoxFit.cover,
         ),
       ),
     );

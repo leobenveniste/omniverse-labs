@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
 import 'screens/splash_screen.dart';
+import 'services/timer_service.dart';
 import 'widgets/global_timer_banner.dart';
 
 void main() {
@@ -33,13 +34,30 @@ class _CentralDeJuegosAppState extends State<CentralDeJuegosApp> {
       darkTheme: AppTheme.darkTheme,
       themeMode: _themeMode,
       builder: (context, child) {
-        return Scaffold(
-          body: Column(
-            children: [
-              const SafeArea(bottom: false, child: GlobalTimerBanner()),
-              Expanded(child: child ?? const SizedBox.shrink()),
-            ],
-          ),
+        return AnimatedBuilder(
+          animation: TimerService(),
+          builder: (context, _) {
+            final hasTimer = TimerService().hasActiveTimer || TimerService().isFinished;
+            return Stack(
+              children: [
+                child ?? const SizedBox.shrink(),
+                if (hasTimer)
+                  const Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: SafeArea(
+                      bottom: false,
+                      child: Material(
+                        elevation: 8,
+                        color: Colors.transparent,
+                        child: GlobalTimerBanner(),
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
         );
       },
       home: SplashScreen(
