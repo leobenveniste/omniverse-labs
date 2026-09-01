@@ -317,8 +317,28 @@ class _BurakoScreenState extends State<BurakoScreen> {
     final t2 = _game.teams[1];
 
     return Scaffold(
+      backgroundColor: AppTheme.bgDark,
       appBar: AppBar(
-        title: Text('Burako a ${_game.targetScore} pts'),
+        backgroundColor: AppTheme.bgDark,
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/logo_dark.png',
+              width: 24,
+              height: 24,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'BURAKO (${_game.targetScore} PTS)',
+              style: const TextStyle(
+                color: AppTheme.cyberGold,
+                fontWeight: FontWeight.w900,
+                fontSize: 16,
+                letterSpacing: 1.2,
+              ),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.undo),

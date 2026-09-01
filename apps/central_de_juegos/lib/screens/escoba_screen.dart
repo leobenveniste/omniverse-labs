@@ -286,8 +286,28 @@ class _EscobaScreenState extends State<EscobaScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: AppTheme.bgDark,
       appBar: AppBar(
-        title: Text('Escoba del 15 a ${_game.targetScore} pts'),
+        backgroundColor: AppTheme.bgDark,
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/logo_dark.png',
+              width: 24,
+              height: 24,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'ESCOBA_DEL_15 (${_game.targetScore} PTS)',
+              style: const TextStyle(
+                color: AppTheme.cyberGold,
+                fontWeight: FontWeight.w900,
+                fontSize: 16,
+                letterSpacing: 1.2,
+              ),
+            ),
+          ],
+        ),
       ),
       body: Column(
         children: [

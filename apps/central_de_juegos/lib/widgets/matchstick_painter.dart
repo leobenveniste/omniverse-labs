@@ -7,22 +7,20 @@ class MatchstickBox extends StatelessWidget {
   const MatchstickBox({
     super.key,
     required this.count,
-    this.size = 52.0,
+    this.size = 64.0,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: isDark ? Colors.black.withOpacity(0.25) : Colors.black.withOpacity(0.04),
+        color: Colors.black.withOpacity(0.35),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: isDark ? Colors.white.withOpacity(0.08) : Colors.black.withOpacity(0.06),
-          width: 1,
+          color: Colors.white.withOpacity(0.12),
+          width: 1.2,
         ),
       ),
       child: CustomPaint(
@@ -44,13 +42,13 @@ class _RealisticMatchstickPainter extends CustomPainter {
     // Realistic wood stick paint
     final woodPaint = Paint()
       ..color = const Color(0xFFE8C59E) // Warm wood
-      ..strokeWidth = 4.2
+      ..strokeWidth = 4.8
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
 
     final woodShadowPaint = Paint()
       ..color = const Color(0xFFBD956F) // Wood shading
-      ..strokeWidth = 1.2
+      ..strokeWidth = 1.4
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
 
@@ -63,7 +61,7 @@ class _RealisticMatchstickPainter extends CustomPainter {
       ..color = const Color(0xFF8E0000)
       ..style = PaintingStyle.fill;
 
-    const pad = 8.0;
+    const pad = 9.0;
     final left = pad;
     final right = size.width - pad;
     final top = pad;
@@ -74,8 +72,8 @@ class _RealisticMatchstickPainter extends CustomPainter {
       canvas.drawLine(start, end, woodPaint);
       canvas.drawLine(start, end, woodShadowPaint);
       // Red match head
-      canvas.drawCircle(headPos, 3.8, headDarkPaint);
-      canvas.drawCircle(headPos, 3.2, headPaint);
+      canvas.drawCircle(headPos, 4.2, headDarkPaint);
+      canvas.drawCircle(headPos, 3.6, headPaint);
     }
 
     // 1. Top stick (head on left)
@@ -117,7 +115,7 @@ class MatchstickDisplayGrid extends StatelessWidget {
     required this.score,
     this.maxScore = 30,
     this.color,
-    this.boxSize = 52.0,
+    this.boxSize = 58.0,
   });
 
   @override
@@ -131,7 +129,7 @@ class MatchstickDisplayGrid extends StatelessWidget {
       remaining = (remaining - 5).clamp(0, 999);
       boxes.add(
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 6.0),
+          padding: const EdgeInsets.symmetric(vertical: 3.5),
           child: MatchstickBox(
             count: inThisBox,
             size: boxSize,
@@ -140,10 +138,10 @@ class MatchstickDisplayGrid extends StatelessWidget {
       );
     }
 
-    return Wrap(
-      alignment: WrapAlignment.center,
-      spacing: 6,
-      runSpacing: 4,
+    // Single vertical column layout
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: boxes,
     );
   }

@@ -325,8 +325,28 @@ class _GeneralaScreenState extends State<GeneralaScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: AppTheme.bgDark,
       appBar: AppBar(
-        title: const Text('Generala'),
+        backgroundColor: AppTheme.bgDark,
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/logo_dark.png',
+              width: 24,
+              height: 24,
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              'GENERALA',
+              style: TextStyle(
+                color: AppTheme.cyberGold,
+                fontWeight: FontWeight.w900,
+                fontSize: 16,
+                letterSpacing: 1.2,
+              ),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.group_add),

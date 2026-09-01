@@ -25,7 +25,6 @@ class _TrucoScreenState extends State<TrucoScreen> {
   late String _sessionId;
   late DateTime _dateStarted;
   late TrucoGame _game;
-  bool _showMatchsticks = true;
 
   @override
   void initState() {
@@ -70,7 +69,11 @@ class _TrucoScreenState extends State<TrucoScreen> {
 
   void _addPoints(int teamIndex, int pts, String label) {
     if (_game.isFinished) return;
-    SoundHapticsService.pointAdded();
+    if (pts > 0) {
+      SoundHapticsService.pointAdded();
+    } else {
+      SoundHapticsService.pointSubtracted();
+    }
     setState(() {
       _game.addPoints(teamIndex, pts, label: label);
     });
@@ -110,29 +113,29 @@ class _TrucoScreenState extends State<TrucoScreen> {
   }
 
   void _faltaEnvidoDialog() {
-    final t1 = _game.team1Score;
-    final t2 = _game.team2Score;
     final ptsForT1 = _game.calculateFaltaEnvido(0);
     final ptsForT2 = _game.calculateFaltaEnvido(1);
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Falta Envido'),
+        backgroundColor: AppTheme.surfaceDark,
+        title: const Text('Falta Envido', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
               'Puntos calculados según reglamento:',
-              style: TextStyle(fontWeight: FontWeight.w500),
+              style: TextStyle(fontWeight: FontWeight.w500, color: Colors.white70),
             ),
             const SizedBox(height: 16),
             ListTile(
               leading: CircleAvatar(backgroundColor: AppTheme.playerColors[0], radius: 14),
-              title: Text('Ganó ${_game.team1Name}'),
-              subtitle: Text('Suma +$ptsForT1 puntos'),
+              title: Text('Ganó ${_game.team1Name}', style: const TextStyle(color: Colors.white)),
+              subtitle: Text('Suma +$ptsForT1 puntos', style: const TextStyle(color: Colors.white54)),
               trailing: FilledButton(
+                style: FilledButton.styleFrom(backgroundColor: AppTheme.cyberGold, foregroundColor: Colors.black),
                 onPressed: () {
                   Navigator.of(ctx).pop();
                   _addPoints(0, ptsForT1, 'Falta Envido (+$ptsForT1)');
@@ -140,12 +143,13 @@ class _TrucoScreenState extends State<TrucoScreen> {
                 child: const Text('Asignar'),
               ),
             ),
-            const Divider(),
+            const Divider(color: AppTheme.borderDark),
             ListTile(
               leading: CircleAvatar(backgroundColor: AppTheme.playerColors[1], radius: 14),
-              title: Text('Ganó ${_game.team2Name}'),
-              subtitle: Text('Suma +$ptsForT2 puntos'),
+              title: Text('Ganó ${_game.team2Name}', style: const TextStyle(color: Colors.white)),
+              subtitle: Text('Suma +$ptsForT2 puntos', style: const TextStyle(color: Colors.white54)),
               trailing: FilledButton(
+                style: FilledButton.styleFrom(backgroundColor: AppTheme.cyberGold, foregroundColor: Colors.black),
                 onPressed: () {
                   Navigator.of(ctx).pop();
                   _addPoints(1, ptsForT2, 'Falta Envido (+$ptsForT2)');
@@ -156,7 +160,7 @@ class _TrucoScreenState extends State<TrucoScreen> {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancelar')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancelar', style: TextStyle(color: Colors.white70))),
         ],
       ),
     );
@@ -186,35 +190,51 @@ class _TrucoScreenState extends State<TrucoScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: AppTheme.bgDark,
       appBar: AppBar(
-        title: const Text('Truco a 30'),
+        backgroundColor: AppTheme.bgDark,
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/logo_dark.png',
+              width: 24,
+              height: 24,
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              'TRUCO_A_30',
+              style: TextStyle(
+                color: AppTheme.cyberGold,
+                fontWeight: FontWeight.w900,
+                fontSize: 16,
+                letterSpacing: 1.2,
+              ),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
-            icon: Icon(_showMatchsticks ? Icons.format_list_numbered : Icons.grid_view),
-            tooltip: _showMatchsticks ? 'Ver Números Gigantes' : 'Ver Fósforos',
-            onPressed: () {
-              setState(() {
-                _showMatchsticks = !_showMatchsticks;
-              });
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.undo),
+            icon: const Icon(Icons.undo, color: Colors.white70),
             tooltip: 'Deshacer',
             onPressed: _game.history.isEmpty ? null : _undo,
           ),
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh, color: Colors.white70),
             tooltip: 'Reiniciar Partida',
             onPressed: () async {
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (ctx) => AlertDialog(
-                  title: const Text('Reiniciar Partida'),
-                  content: const Text('¿Deseas reiniciar los puntajes de esta partida a 0?'),
+                  backgroundColor: AppTheme.surfaceDark,
+                  title: const Text('Reiniciar Partida', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  content: const Text('¿Deseas reiniciar los puntajes de esta partida a 0?', style: TextStyle(color: Colors.white70)),
                   actions: [
                     TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancelar')),
-                    FilledButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Reiniciar')),
+                    FilledButton(
+                      style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                      onPressed: () => Navigator.of(ctx).pop(true),
+                      child: const Text('Reiniciar'),
+                    ),
                   ],
                 ),
               );
@@ -244,7 +264,10 @@ class _TrucoScreenState extends State<TrucoScreen> {
                     color: AppTheme.playerColors[0],
                   ),
                 ),
-                const VerticalDivider(width: 1, thickness: 1),
+                Container(
+                  width: 1.5,
+                  color: AppTheme.borderDark,
+                ),
                 // Team 2
                 Expanded(
                   child: _buildTeamColumn(
@@ -274,123 +297,136 @@ class _TrucoScreenState extends State<TrucoScreen> {
     required Color color,
   }) {
     final isBuenas = _game.isBuenas(score);
-    final displayScore = _game.getDisplayScore(score);
     final scoreLabel = _game.getScoreLabel(score);
 
-    return InkWell(
-      onTap: () => _addPoints(teamIndex, 1, '+1'),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        child: Column(
-          children: [
-            // Touchable Name for Renaming
-            GestureDetector(
-              onTap: () => _renameTeam(teamIndex),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: color.withOpacity(0.3)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: color,
-                        ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      child: Column(
+        children: [
+          // Touchable Name for Renaming at Top
+          GestureDetector(
+            onTap: () => _renameTeam(teamIndex),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: color.withOpacity(0.4)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: color,
                       ),
                     ),
-                    const SizedBox(width: 6),
-                    Icon(Icons.edit, size: 14, color: color.withOpacity(0.8)),
-                  ],
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(Icons.edit, size: 13, color: color.withOpacity(0.8)),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          // Matchsticks displayed in a single vertical column
+          Expanded(
+            child: Center(
+              child: SingleChildScrollView(
+                child: MatchstickDisplayGrid(
+                  score: score,
+                  maxScore: _game.targetPoints,
+                  color: color,
+                  boxSize: 56.0,
                 ),
               ),
             ),
-            const SizedBox(height: 4),
+          ),
 
-            // Malas / Buenas label
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-              decoration: BoxDecoration(
-                color: isBuenas ? Colors.green.withOpacity(0.15) : Colors.orange.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(12),
+          const SizedBox(height: 6),
+
+          // Large Score Tag at the Bottom of the column
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              color: isBuenas ? Colors.green.shade900.withOpacity(0.4) : Colors.orange.shade900.withOpacity(0.4),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isBuenas ? Colors.green : Colors.orange,
+                width: 1.5,
               ),
-              child: Text(
-                scoreLabel,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: isBuenas ? Colors.green : Colors.orange,
+            ),
+            child: Column(
+              children: [
+                Text(
+                  '$score',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
+                    color: isBuenas ? Colors.greenAccent : Colors.orangeAccent,
+                    height: 1.0,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  scoreLabel.toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.0,
+                    color: isBuenas ? Colors.greenAccent : Colors.orangeAccent,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 6),
+
+          // Quick +/- buttons under score tag
+          Row(
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: 42,
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Colors.white24),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      padding: EdgeInsets.zero,
+                    ),
+                    onPressed: () => _addPoints(teamIndex, -1, '-1'),
+                    child: const Icon(Icons.remove, color: Colors.white70, size: 20),
+                  ),
                 ),
               ),
-            ),
-
-            const SizedBox(height: 12),
-
-            // Matchsticks or Giant Digits Display starting from top
-            Expanded(
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 16.0),
-                  child: _showMatchsticks
-                      ? MatchstickDisplayGrid(
-                          score: score,
-                          maxScore: _game.targetPoints,
-                          color: color,
-                        )
-                      : Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              '$score',
-                              style: TextStyle(
-                                fontSize: 72,
-                                fontWeight: FontWeight.w900,
-                                color: color,
-                                height: 1.0,
-                              ),
-                            ),
-                            Text(
-                              'de 30',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              '($displayScore ${isBuenas ? "Buenas" : "Malas"})',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: isBuenas ? Colors.green : Colors.orange,
-                              ),
-                            ),
-                          ],
-                        ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: SizedBox(
+                  height: 42,
+                  child: FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: color,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      padding: EdgeInsets.zero,
+                    ),
+                    onPressed: () => _addPoints(teamIndex, 1, '+1'),
+                    child: const Icon(Icons.add, color: Colors.white, size: 22),
+                  ),
                 ),
               ),
-            ),
-
-            // Tap hint
-            Text(
-              'Toca para sumar +1',
-              style: TextStyle(
-                fontSize: 11,
-                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.7),
-              ),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -398,41 +434,29 @@ class _TrucoScreenState extends State<TrucoScreen> {
   Widget _buildQuickActionButtons(ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, -2),
-          )
-        ],
+      decoration: const BoxDecoration(
+        color: AppTheme.surfaceDark,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        border: Border(top: BorderSide(color: AppTheme.borderDark, width: 1.2)),
       ),
       child: SafeArea(
         top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+        child: Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          alignment: WrapAlignment.center,
           children: [
-            // Quick Tantos Chips
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              alignment: WrapAlignment.center,
-              children: [
-                _buildTantoChip('Envido (+2)', 2),
-                _buildTantoChip('Real Envido (+3)', 3),
-                _buildTantoChip('Truco (+2)', 2),
-                _buildTantoChip('Retruco (+3)', 3),
-                _buildTantoChip('Vale 4 (+4)', 4),
-                ActionChip(
-                  avatar: const Icon(Icons.flash_on, size: 16, color: Colors.amber),
-                  label: const Text('Falta Envido', style: TextStyle(fontWeight: FontWeight.bold)),
-                  backgroundColor: Colors.amber.withOpacity(0.15),
-                  side: const BorderSide(color: Colors.amber),
-                  onPressed: _faltaEnvidoDialog,
-                ),
-              ],
+            _buildTantoChip('Envido (+2)', 2),
+            _buildTantoChip('Real Envido (+3)', 3),
+            _buildTantoChip('Truco (+2)', 2),
+            _buildTantoChip('Retruco (+3)', 3),
+            _buildTantoChip('Vale 4 (+4)', 4),
+            ActionChip(
+              avatar: const Icon(Icons.flash_on, size: 16, color: AppTheme.cyberGold),
+              label: const Text('Falta Envido', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+              backgroundColor: AppTheme.cyberGold.withOpacity(0.15),
+              side: const BorderSide(color: AppTheme.cyberGold),
+              onPressed: _faltaEnvidoDialog,
             ),
           ],
         ),
@@ -442,10 +466,13 @@ class _TrucoScreenState extends State<TrucoScreen> {
 
   Widget _buildTantoChip(String label, int points) {
     return ActionChip(
-      label: Text(label),
+      label: Text(label, style: const TextStyle(color: Colors.white)),
+      backgroundColor: AppTheme.surfaceElevated,
+      side: const BorderSide(color: AppTheme.borderDark),
       onPressed: () {
         showModalBottomSheet(
           context: context,
+          backgroundColor: AppTheme.surfaceDark,
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           ),
@@ -456,7 +483,7 @@ class _TrucoScreenState extends State<TrucoScreen> {
               children: [
                 Text(
                   '¿Quién ganó el $label?',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 const SizedBox(height: 16),
                 Row(

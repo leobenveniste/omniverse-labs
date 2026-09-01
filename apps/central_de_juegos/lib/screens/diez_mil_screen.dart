@@ -29,6 +29,8 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
   late String _sessionId;
   late DateTime _dateStarted;
   late DiezMilGame _game;
+  int _currentTurnIndex = 0;
+  int _turnPoints = 0;
 
   @override
   void initState() {
@@ -40,6 +42,7 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
       try {
         final map = jsonDecode(widget.existingSession!.stateJson) as Map<String, dynamic>;
         _game = DiezMilGame.fromJson(map);
+        _currentTurnIndex = (map['currentTurnIndex'] as int?) ?? 0;
       } catch (_) {
         _game = _defaultGame();
       }
@@ -76,6 +79,9 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
         ? _game.players.firstWhere((p) => p.id == _game.winnerId).name
         : null;
 
+    final stateMap = _game.toJson();
+    stateMap['currentTurnIndex'] = _currentTurnIndex;
+
     final session = GameSession(
       id: _sessionId,
       gameType: GameType.diezMil,
@@ -84,7 +90,7 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
       dateFinished: _game.isFinished ? DateTime.now() : null,
       isFinished: _game.isFinished,
       winnerName: winner,
-      stateJson: jsonEncode(_game.toJson()),
+      stateJson: jsonEncode(stateMap),
     );
 
     if (_game.isFinished) {
@@ -95,277 +101,145 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
     }
   }
 
-  void _addPlayer() {
-    if (_game.players.length >= 8) {
+  void _confirmTurn() {
+    final currentPlayer = _game.players[_currentTurnIndex];
+    final hasEntered = _game.hasPlayerEntered(currentPlayer.id);
+
+    // Rule: Must score >= 750 to enter
+    if (!hasEntered && _turnPoints > 0 && _turnPoints < _game.entryScore) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Máximo 8 jugadores permitidos')),
+        SnackBar(
+          content: Text('Para entrar se requiere un mínimo de ${_game.entryScore} puntos en el tiro'),
+          backgroundColor: Colors.orange.shade800,
+        ),
       );
       return;
     }
-    final nextIdx = _game.players.length;
+
+    final roundMap = <String, int>{};
+    for (var p in _game.players) {
+      roundMap[p.id] = (p.id == currentPlayer.id) ? _turnPoints : 0;
+    }
+
     setState(() {
-      _game.players.add(
-        Player(
-          id: const Uuid().v4(),
-          name: 'Jugador ${nextIdx + 1}',
-          colorValue: AppTheme.playerColors[nextIdx % AppTheme.playerColors.length].value,
-        ),
-      );
+      _game.addRound(roundMap);
+      _turnPoints = 0;
+      _currentTurnIndex = (_currentTurnIndex + 1) % _game.players.length;
     });
-    SoundHapticsService.click();
+
+    SoundHapticsService.pointAdded();
+    _saveState();
+
+    if (_game.isFinished) {
+      SoundHapticsService.victory();
+      WinnerDialog.show(
+        context,
+        winnerName: currentPlayer.name,
+        gameTitle: 'Diez Mil (10.000)',
+        scores: _game.players,
+        onRematch: () {
+          setState(() {
+            _game.rounds.clear();
+            for (var p in _game.players) {
+              p.score = 0;
+            }
+            _game.isFinished = false;
+            _game.winnerId = null;
+            _currentTurnIndex = 0;
+            _turnPoints = 0;
+            _sessionId = const Uuid().v4();
+            _dateStarted = DateTime.now();
+          });
+          _saveState();
+        },
+        onNewGame: () => Navigator.of(context).pop(),
+      );
+    }
+  }
+
+  void _undoTurn() {
+    if (_game.rounds.isEmpty) return;
+    setState(() {
+      _game.undoLastRound();
+      _currentTurnIndex = (_currentTurnIndex - 1 + _game.players.length) % _game.players.length;
+      _turnPoints = 0;
+    });
+    SoundHapticsService.undo();
     _saveState();
   }
 
-  void _openAddRoundDialog() {
-    final controllers = <String, TextEditingController>{};
-    for (var p in _game.players) {
-      controllers[p.id] = TextEditingController(text: '0');
-    }
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setModalState) => Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
-            left: 20,
-            right: 20,
-            top: 20,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Anotar Ronda #${_game.rounds.length + 1}',
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.of(ctx).pop(),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-
-                ..._game.players.map((p) {
-                  final entered = _game.hasPlayerEntered(p.id);
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: p.color.withOpacity(0.06),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: p.color.withOpacity(0.2)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            CircleAvatar(backgroundColor: p.color, radius: 12),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                p.name,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: p.color,
-                                ),
-                              ),
-                            ),
-                            if (!entered)
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: Colors.orange.withOpacity(0.15),
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  'Requiere ${_game.entryScore} para entrar',
-                                  style: const TextStyle(fontSize: 10, color: Colors.orange, fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: controllers[p.id],
-                                keyboardType: TextInputType.number,
-                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                                decoration: const InputDecoration(
-                                  labelText: 'Puntos del Tiro',
-                                  border: OutlineInputBorder(),
-                                  isDense: true,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            OutlinedButton(
-                              onPressed: () {
-                                setModalState(() {
-                                  controllers[p.id]!.text = '0';
-                                });
-                              },
-                              child: const Text('0 (Perdió)'),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        // Quick dice math chips
-                        Wrap(
-                          spacing: 6,
-                          runSpacing: 4,
-                          children: [
-                            _buildScoreChip('+50', 50, controllers[p.id]!, setModalState),
-                            _buildScoreChip('+100', 100, controllers[p.id]!, setModalState),
-                            _buildScoreChip('+200', 200, controllers[p.id]!, setModalState),
-                            _buildScoreChip('+300', 300, controllers[p.id]!, setModalState),
-                            _buildScoreChip('+400', 400, controllers[p.id]!, setModalState),
-                            _buildScoreChip('+500', 500, controllers[p.id]!, setModalState),
-                            _buildScoreChip('+600', 600, controllers[p.id]!, setModalState),
-                            _buildScoreChip('+1000', 1000, controllers[p.id]!, setModalState),
-                            _buildScoreChip('+1500 (Escalera)', 1500, controllers[p.id]!, setModalState),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                }),
-
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: () {
-                      final roundScores = <String, int>{};
-                      for (var p in _game.players) {
-                        int pts = int.tryParse(controllers[p.id]?.text.trim() ?? '0') ?? 0;
-                        final entered = _game.hasPlayerEntered(p.id);
-                        if (!entered && pts < _game.entryScore) {
-                          pts = 0; // Did not reach minimum entry
-                        }
-                        roundScores[p.id] = pts;
-                      }
-
-                      Navigator.of(ctx).pop();
-
-                      setState(() {
-                        _game.addRound(roundScores);
-                      });
-
-                      SoundHapticsService.pointAdded();
-                      _saveState();
-
-                      if (_game.isFinished) {
-                        SoundHapticsService.victory();
-                        final winner = _game.players.firstWhere((p) => p.id == _game.winnerId);
-                        WinnerDialog.show(
-                          context,
-                          winnerName: winner.name,
-                          gameTitle: 'Diez Mil',
-                          scores: _game.players,
-                          onRematch: () {
-                            setState(() {
-                              _game = _defaultGame();
-                              _sessionId = const Uuid().v4();
-                              _dateStarted = DateTime.now();
-                            });
-                            _saveState();
-                          },
-                          onNewGame: () => Navigator.of(context).pop(),
-                        );
-                      }
-                    },
-                    icon: const Icon(Icons.check),
-                    label: const Text('Guardar Ronda', style: TextStyle(fontSize: 16)),
-                    style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildScoreChip(
-    String label,
-    int val,
-    TextEditingController ctrl,
-    StateSetter setModalState,
-  ) {
-    return ActionChip(
-      visualDensity: VisualDensity.compact,
-      label: Text(label, style: const TextStyle(fontSize: 11)),
-      onPressed: () {
-        setModalState(() {
-          final cur = int.tryParse(ctrl.text) ?? 0;
-          ctrl.text = '${cur + val}';
-        });
-      },
-    );
+  void _addTurnPoints(int amount) {
+    setState(() {
+      _turnPoints += amount;
+      if (_turnPoints < 0) _turnPoints = 0;
+    });
+    SoundHapticsService.click();
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final currentPlayer = _game.players[_currentTurnIndex];
+    final hasEntered = _game.hasPlayerEntered(currentPlayer.id);
 
     return Scaffold(
+      backgroundColor: AppTheme.bgDark,
       appBar: AppBar(
-        title: Text('Diez Mil a ${_game.targetScore}'),
+        backgroundColor: AppTheme.bgDark,
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/logo_dark.png',
+              width: 24,
+              height: 24,
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              'DIEZ_MIL',
+              style: TextStyle(
+                color: AppTheme.cyberGold,
+                fontWeight: FontWeight.w900,
+                fontSize: 16,
+                letterSpacing: 1.2,
+              ),
+            ),
+          ],
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.person_add),
-            tooltip: 'Agregar Jugador',
-            onPressed: _game.rounds.isEmpty ? _addPlayer : null,
+            icon: const Icon(Icons.undo, color: Colors.white70),
+            tooltip: 'Deshacer Último Turno',
+            onPressed: _game.rounds.isEmpty ? null : _undoTurn,
           ),
           IconButton(
-            icon: const Icon(Icons.undo),
-            tooltip: 'Deshacer Última Ronda',
-            onPressed: _game.rounds.isEmpty
-                ? null
-                : () {
-                    setState(() {
-                      _game.undoLastRound();
-                    });
-                    SoundHapticsService.undo();
-                    _saveState();
-                  },
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh, color: Colors.white70),
             tooltip: 'Reiniciar Partida',
             onPressed: () async {
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (ctx) => AlertDialog(
-                  title: const Text('Reiniciar Partida'),
-                  content: const Text('¿Deseas reiniciar la planilla de Diez Mil a 0?'),
+                  backgroundColor: AppTheme.surfaceDark,
+                  title: const Text('Reiniciar Partida', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  content: const Text('¿Deseas reiniciar todos los puntajes a 0?', style: TextStyle(color: Colors.white70)),
                   actions: [
                     TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancelar')),
-                    FilledButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Reiniciar')),
+                    FilledButton(
+                      style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                      onPressed: () => Navigator.of(ctx).pop(true),
+                      child: const Text('Reiniciar'),
+                    ),
                   ],
                 ),
               );
               if (confirm == true) {
                 setState(() {
-                  _game = _defaultGame();
-                  _sessionId = const Uuid().v4();
-                  _dateStarted = DateTime.now();
+                  _game.rounds.clear();
+                  for (var p in _game.players) {
+                    p.score = 0;
+                  }
+                  _game.isFinished = false;
+                  _game.winnerId = null;
+                  _currentTurnIndex = 0;
+                  _turnPoints = 0;
                 });
                 _saveState();
               }
@@ -373,215 +247,313 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Top Player Scorecards Carousel
-          Container(
-            height: 120,
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
-              border: Border(bottom: BorderSide(color: theme.dividerColor)),
-            ),
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              itemCount: _game.players.length,
-              itemBuilder: (ctx, idx) {
-                final p = _game.players[idx];
-                final entered = _game.hasPlayerEntered(p.id);
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Top Players Score Strip
+            Container(
+              height: 105,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                itemCount: _game.players.length,
+                itemBuilder: (ctx, idx) {
+                  final p = _game.players[idx];
+                  final isTurn = idx == _currentTurnIndex;
+                  final entered = _game.hasPlayerEntered(p.id);
 
-                return Container(
-                  width: 155,
-                  margin: const EdgeInsets.only(right: 10),
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: theme.cardColor,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: p.color.withOpacity(0.4), width: 1.5),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.06),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
+                  return GestureDetector(
+                    onTap: () async {
+                      final newName = await PlayerNameDialog.show(
+                        context,
+                        currentName: p.name,
+                        title: 'Editar Nombre',
+                      );
+                      if (newName != null && newName.isNotEmpty) {
+                        setState(() => p.name = newName);
+                        _saveState();
+                      }
+                    },
+                    child: Container(
+                      width: 140,
+                      margin: const EdgeInsets.symmetric(horizontal: 5),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: isTurn ? AppTheme.surfaceElevated : AppTheme.surfaceDark,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isTurn ? AppTheme.cyberGold : p.color.withOpacity(0.4),
+                          width: isTurn ? 2.2 : 1.0,
+                        ),
+                        boxShadow: isTurn
+                            ? [
+                                BoxShadow(
+                                  color: AppTheme.cyberGold.withOpacity(0.3),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                )
+                              ]
+                            : null,
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      GestureDetector(
-                        onTap: () async {
-                          final newName = await PlayerNameDialog.show(
-                            context,
-                            currentName: p.name,
-                            title: 'Editar Jugador',
-                          );
-                          if (newName != null && newName.isNotEmpty) {
-                            setState(() => p.name = newName);
-                            _saveState();
-                          }
-                        },
-                        child: Row(
-                          children: [
-                            CircleAvatar(backgroundColor: p.color, radius: 6),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                p.name,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 8,
+                                height: 8,
+                                decoration: BoxDecoration(
                                   color: p.color,
+                                  shape: BoxShape.circle,
                                 ),
                               ),
-                            ),
-                            Icon(Icons.edit, size: 11, color: p.color),
-                          ],
-                        ),
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        children: [
-                          Text(
-                            '${p.score}',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w900,
-                              color: p.color,
-                            ),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  p.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: isTurn ? FontWeight.w900 : FontWeight.bold,
+                                    color: isTurn ? AppTheme.cyberGold : Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          Text(
-                            entered ? 'Entró' : 'Sin entrar',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                              color: entered ? Colors.green : Colors.orange,
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                '${p.score}',
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                  height: 1.0,
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: entered ? Colors.green.withOpacity(0.2) : Colors.red.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  entered ? 'ENTRÓ' : '0/750',
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w900,
+                                    color: entered ? Colors.greenAccent : Colors.redAccent,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(3),
-                        child: LinearProgressIndicator(
-                          value: (p.score / _game.targetScore).clamp(0.0, 1.0),
-                          minHeight: 5,
-                          backgroundColor: p.color.withOpacity(0.15),
-                          valueColor: AlwaysStoppedAnimation<Color>(p.color),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-
-          // Rounds Table
-          Expanded(
-            child: _game.rounds.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.casino, size: 56, color: theme.disabledColor),
-                        const SizedBox(height: 12),
-                        const Text(
-                          'No hay rondas anotadas',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'Toca "+ Anotar Ronda" para registrar tiros',
-                          style: TextStyle(fontSize: 13, color: Colors.grey),
-                        ),
-                      ],
                     ),
-                  )
-                : ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    itemCount: _game.rounds.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
-                    itemBuilder: (ctx, idx) {
-                      final round = _game.rounds[idx];
+                  );
+                },
+              ),
+            ),
 
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Row(
-                          children: [
+            const Divider(color: AppTheme.borderDark, height: 1),
+
+            // Active Turn Card & Calculator
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                child: Column(
+                  children: [
+                    // Turn Indicator Header
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: AppTheme.surfaceElevated,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppTheme.cyberGold, width: 1.5),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.casino, color: currentPlayer.color, size: 24),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'TURNO DE:',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 1.2,
+                                    color: Colors.white.withOpacity(0.6),
+                                  ),
+                                ),
+                                Text(
+                                  currentPlayer.name.toUpperCase(),
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w900,
+                                    color: currentPlayer.color,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (!hasEntered)
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: theme.colorScheme.surfaceContainerHighest,
-                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.orange.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: Colors.orange, width: 1),
                               ),
-                              child: Text(
-                                'R${round.roundNumber}',
-                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Wrap(
-                                spacing: 12,
-                                runSpacing: 6,
-                                children: _game.players.map((p) {
-                                  final pts = round.turnScores[p.id] ?? 0;
-                                  return Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      CircleAvatar(backgroundColor: p.color, radius: 5),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '${p.name}: ',
-                                        style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurfaceVariant),
-                                      ),
-                                      Text(
-                                        pts > 0 ? '+$pts' : '0',
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
-                                          color: pts > 0 ? p.color : Colors.grey,
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                }).toList(),
+                              child: const Text(
+                                'Requiere 750+',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.orangeAccent,
+                                ),
                               ),
                             ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Turn Points Display
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      decoration: BoxDecoration(
+                        color: AppTheme.surfaceDark,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppTheme.borderDark),
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            'PUNTOS DE ESTA TIRADA',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.0,
+                              color: Colors.white.withOpacity(0.5),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                '+$_turnPoints',
+                                style: const TextStyle(
+                                  fontSize: 48,
+                                  fontWeight: FontWeight.w900,
+                                  color: AppTheme.cyberGold,
+                                  height: 1.0,
+                                ),
+                              ),
+                              if (_turnPoints > 0) ...[
+                                const SizedBox(width: 12),
+                                IconButton(
+                                  icon: const Icon(Icons.backspace, color: Colors.white54, size: 22),
+                                  tooltip: 'Limpiar',
+                                  onPressed: () => setState(() => _turnPoints = 0),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 12),
+
+                    // Quick Score Math Buttons
+                    Expanded(
+                      child: GridView.count(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 8,
+                        mainAxisSpacing: 8,
+                        childAspectRatio: 1.7,
+                        children: [
+                          _buildMathBtn('+50 (1 As)', 50),
+                          _buildMathBtn('+100 (1 Cinco)', 100),
+                          _buildMathBtn('+200', 200),
+                          _buildMathBtn('+300', 300),
+                          _buildMathBtn('+400', 400),
+                          _buildMathBtn('+500', 500),
+                          _buildMathBtn('+600', 600),
+                          _buildMathBtn('+1.000', 1000),
+                          _buildMathBtn('+1.500 Escalera', 1500),
+                        ],
+                      ),
+                    ),
+
+                    // Confirm & Next Player Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 54,
+                      child: FilledButton(
+                        onPressed: _confirmTurn,
+                        style: FilledButton.styleFrom(
+                          backgroundColor: AppTheme.cyberGold,
+                          foregroundColor: Colors.black,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              _turnPoints == 0 ? '0 PUNTOS (PASAR TURNO)' : 'CONFIRMAR (+$_turnPoints PTS) Y SIGUIENTE',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.8,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            const Icon(Icons.arrow_forward, color: Colors.black, size: 20),
                           ],
                         ),
-                      );
-                    },
-                  ),
-          ),
-
-          // Bottom Action Button
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            child: SafeArea(
-              top: false,
-              child: SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  onPressed: _openAddRoundDialog,
-                  icon: const Icon(Icons.add),
-                  label: const Text('Anotar Ronda', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMathBtn(String label, int amount) {
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: Colors.white,
+        backgroundColor: AppTheme.surfaceDark,
+        side: const BorderSide(color: AppTheme.borderDark),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+      onPressed: () => _addTurnPoints(amount),
+      child: Text(
+        label,
+        textAlign: TextAlign.center,
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
       ),
     );
   }

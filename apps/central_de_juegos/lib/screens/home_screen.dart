@@ -179,8 +179,12 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.arrow_right_alt, color: AppTheme.cyberGold, size: 20),
-            const SizedBox(width: 4),
+            Image.asset(
+              'assets/images/logo_dark.png',
+              width: 26,
+              height: 26,
+            ),
+            const SizedBox(width: 8),
             Text(
               navTitles[_currentNavIndex],
               style: const TextStyle(
@@ -381,7 +385,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(18),
         side: const BorderSide(
           color: AppTheme.borderDark,
           width: 1.5,
@@ -391,7 +395,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: InkWell(
         onTap: () => _openGame(type),
         child: AspectRatio(
-          aspectRatio: 16 / 9,
+          aspectRatio: 3.2, // Half the height for sleek horizontal banner
           child: Image.asset(
             imageAsset,
             fit: BoxFit.cover,

@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 import '../models/player.dart';
 import '../theme/app_theme.dart';
 import '../services/sound_haptics_service.dart';
+import '../widgets/player_name_dialog.dart';
 
 class GameSetupScreen extends StatefulWidget {
   final String gameTitle;
@@ -40,12 +41,12 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
       _players = [
         Player(
           id: const Uuid().v4(),
-          name: 'Alex',
+          name: 'Jugador 1',
           colorValue: AppTheme.playerColors[0].value,
         ),
         Player(
           id: const Uuid().v4(),
-          name: 'Sam',
+          name: 'Jugador 2',
           colorValue: AppTheme.playerColors[1].value,
         ),
       ];
@@ -61,7 +62,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
 
   void _addPlayer() {
     final name = _nameController.text.trim();
-    if (name.isEmpty) return;
+    final effectiveName = name.isEmpty ? 'Jugador ${_players.length + 1}' : name;
 
     if (_players.length >= widget.maxPlayers) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -75,7 +76,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
       _players.add(
         Player(
           id: const Uuid().v4(),
-          name: name,
+          name: effectiveName,
           colorValue: AppTheme.playerColors[colorIdx].value,
         ),
       );
@@ -97,6 +98,20 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
       _players.removeAt(index);
     });
     SoundHapticsService.click();
+  }
+
+  void _editPlayerName(Player player) async {
+    final newName = await PlayerNameDialog.show(
+      context,
+      currentName: player.name,
+      title: 'Editar Nombre',
+    );
+    if (newName != null && newName.isNotEmpty) {
+      setState(() {
+        player.name = newName;
+      });
+      SoundHapticsService.click();
+    }
   }
 
   void _pickColor(Player player) async {
@@ -159,8 +174,12 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
         backgroundColor: AppTheme.bgDark,
         title: Row(
           children: [
-            const Icon(Icons.arrow_right_alt, color: AppTheme.cyberGold, size: 20),
-            const SizedBox(width: 4),
+            Image.asset(
+              'assets/images/logo_dark.png',
+              width: 24,
+              height: 24,
+            ),
+            const SizedBox(width: 8),
             Text(
               headerCode,
               style: const TextStyle(
@@ -179,9 +198,9 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Title & Subtitle
+              // Title & Subtitle in Spanish
               const Text(
-                'New Game',
+                'Nuevo Juego',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w900,
@@ -191,7 +210,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
               ),
               const SizedBox(height: 4),
               Text(
-                'Add players and assign colors.',
+                'Agrega jugadores y define el orden de turno.',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.white.withOpacity(0.6),
@@ -217,7 +236,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                           fontSize: 16,
                         ),
                         decoration: const InputDecoration(
-                          hintText: 'Enter player name...',
+                          hintText: 'Nombre del jugador...',
                           hintStyle: TextStyle(color: Colors.black38, fontSize: 15),
                           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                           border: InputBorder.none,
@@ -286,14 +305,25 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                             ),
                           ),
 
-                          // Player Name
+                          // Player Name (editable on tap)
                           Expanded(
-                            child: Text(
-                              player.name,
-                              style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                            child: GestureDetector(
+                              onTap: () => _editPlayerName(player),
+                              child: Row(
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      player.name,
+                                      style: const TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  const Icon(Icons.edit, size: 14, color: Colors.white38),
+                                ],
                               ),
                             ),
                           ),
@@ -332,7 +362,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
 
               const SizedBox(height: 12),
 
-              // Big full-width Golden "START GAME ▶" button
+              // Big full-width Golden "COMENZAR JUEGO ▶" button
               SizedBox(
                 width: double.infinity,
                 height: 56,
@@ -350,7 +380,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'START GAME',
+                        'COMENZAR JUEGO',
                         style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.w900,
