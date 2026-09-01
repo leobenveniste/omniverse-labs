@@ -346,17 +346,27 @@ switch ($Command) {
         }
 
         Write-Host "Publishing '$App' to Google Play Console track '$Track'..." -ForegroundColor Cyan
-        # If fastlane is present in the app, run fastlane supply
-        $fastlaneDir = Join-Path $targetAppPath "android\fastlane"
-        if (Test-Path $fastlaneDir) {
-            Push-Location (Join-Path $targetAppPath "android")
-            try {
-                fastlane deploy_playstore track:$Track
-            } finally {
-                Pop-Location
-            }
+        $deployPy = Join-Path $PSScriptRoot "deploy-playstore.py"
+        $pkgName = "com.omniverselabs.$App"
+        if ($App -eq "anotador_de_juegos" -or $App -eq "central_de_juegos") { 
+            $pkgName = "com.omniverselabs.anotadordejuegos" 
+        }
+
+        if (Test-Path $deployPy) {
+            python $deployPy --package $pkgName --aab $aabPath --track $Track
         } else {
-            Write-Host "Fastlane not initialized for '$App'. Bundle is ready at: $aabPath" -ForegroundColor Green
+            # Fallback to fastlane
+            $fastlaneDir = Join-Path $targetAppPath "android\fastlane"
+            if (Test-Path $fastlaneDir) {
+                Push-Location (Join-Path $targetAppPath "android")
+                try {
+                    fastlane deploy_playstore track:$Track
+                } finally {
+                    Pop-Location
+                }
+            } else {
+                Write-Host "Bundle is ready at: $aabPath" -ForegroundColor Green
+            }
         }
     }
 
