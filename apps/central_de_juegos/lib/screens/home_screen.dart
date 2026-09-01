@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import '../models/game_type.dart';
 import '../models/game_session.dart';
 import '../services/storage_service.dart';
-import '../theme/app_theme.dart';
 import '../widgets/about_dialog_widget.dart';
 import '../widgets/dice_roller_widget.dart';
 import '../widgets/finger_roulette_widget.dart';
 import '../widgets/turn_timer_widget.dart';
 import '../widgets/coin_flipper_widget.dart';
+import '../widgets/global_timer_banner.dart';
+import '../widgets/custom_bottom_nav_bar.dart';
 import 'truco_screen.dart';
 import 'generala_screen.dart';
 import 'burako_screen.dart';
@@ -32,7 +33,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   GameSession? _activeSession;
   bool _isLoading = true;
-  int _currentNavIndex = 0;
+  int _currentNavIndex = 2; // Default to central "Juegos" tab
 
   @override
   void initState() {
@@ -109,27 +110,29 @@ class _HomeScreenState extends State<HomeScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     final List<String> navTitles = [
-      'Central de Juegos',
       'Tirador de Dados',
       '¿Quién Empieza?',
+      'Central de Juegos',
       'Temporizador',
       'Lanzador de Moneda',
     ];
 
     return Scaffold(
       appBar: AppBar(
+        centerTitle: false,
+        titleSpacing: 16,
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Image.asset(
               isDark ? 'assets/images/logo_dark.png' : 'assets/images/logo_light.png',
-              width: 30,
-              height: 30,
+              width: 32,
+              height: 32,
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 12),
             Text(
               navTitles[_currentNavIndex],
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 19),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
           ],
         ),
@@ -153,62 +156,50 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: IndexedStack(
-        index: _currentNavIndex,
+      body: Column(
         children: [
-          _buildGamesCatalogTab(theme),
-          const Center(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(24.0),
-              child: DiceRollerWidget(),
+          // Persistent global timer banner below AppBar
+          const GlobalTimerBanner(),
+
+          // Main Tab contents
+          Expanded(
+            child: IndexedStack(
+              index: _currentNavIndex,
+              children: [
+                // 0: Dados
+                const Center(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.all(24.0),
+                    child: DiceRollerWidget(),
+                  ),
+                ),
+                // 1: Quién Empieza
+                const FingerRouletteWidget(),
+                // 2: Juegos (Home)
+                _buildGamesCatalogTab(theme),
+                // 3: Temporizador
+                const Center(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.all(24.0),
+                    child: TurnTimerWidget(),
+                  ),
+                ),
+                // 4: Moneda
+                const Center(
+                  child: CoinFlipperWidget(),
+                ),
+              ],
             ),
-          ),
-          const FingerRouletteWidget(),
-          const Center(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(24.0),
-              child: TurnTimerWidget(),
-            ),
-          ),
-          const Center(
-            child: CoinFlipperWidget(),
           ),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
+      bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: _currentNavIndex,
-        onDestinationSelected: (idx) {
+        onItemSelected: (idx) {
           setState(() {
             _currentNavIndex = idx;
           });
         },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.grid_view_outlined),
-            selectedIcon: Icon(Icons.grid_view),
-            label: 'Juegos',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.casino_outlined),
-            selectedIcon: Icon(Icons.casino),
-            label: 'Dados',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.touch_app_outlined),
-            selectedIcon: Icon(Icons.touch_app),
-            label: 'Quién Empieza',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.timer_outlined),
-            selectedIcon: Icon(Icons.timer),
-            label: 'Temporizador',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.monetization_on_outlined),
-            selectedIcon: Icon(Icons.monetization_on),
-            label: 'Moneda',
-          ),
-        ],
       ),
     );
   }
@@ -217,75 +208,59 @@ class _HomeScreenState extends State<HomeScreen> {
     return _isLoading
         ? const Center(child: CircularProgressIndicator())
         : ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             children: [
               // Active Match Banner (if any) with Resume & Discard buttons
               if (_activeSession != null) ...[
                 _buildActiveMatchCard(theme),
-                const SizedBox(height: 18),
+                const SizedBox(height: 14),
               ],
 
-              // Games Catalog Header
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-                child: Text(
-                  'Catálogo de Juegos',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
+              // 2-Column Vertical Card Layout for Games
+              GridView.count(
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 0.80, // Vertical playing card ratio
+                children: [
+                  _buildVerticalGameCard(
+                    type: GameType.truco,
+                    title: 'Truco',
+                    icon: Icons.style,
+                    color: const Color(0xFF2E7D32),
+                    badge: '30 Pts',
                   ),
-                ),
-              ),
-              const SizedBox(height: 8),
-
-              // Game Cards: Truco, Generala, Burako, Escoba del 15, Contador Libre
-              _buildGameCard(
-                type: GameType.truco,
-                title: 'Truco',
-                subtitle: 'Anotador oficial a 30 puntos con fósforos o números gigantes.',
-                icon: Icons.style,
-                color: const Color(0xFF2E7D32),
-                badge: '30 Puntos',
-              ),
-              const SizedBox(height: 12),
-
-              _buildGameCard(
-                type: GameType.generala,
-                title: 'Generala',
-                subtitle: 'Planilla oficial completa con cálculo automático y servidas.',
-                icon: Icons.casino,
-                color: const Color(0xFFE65100),
-                badge: '1-6 Jugadores',
-              ),
-              const SizedBox(height: 12),
-
-              _buildGameCard(
-                type: GameType.burako,
-                title: 'Burako / Canasta',
-                subtitle: 'Canastas puras e impuras, bases, cierre y cartas en mano.',
-                icon: Icons.grid_view,
-                color: const Color(0xFF6A1B9A),
-                badge: 'Por Rondas',
-              ),
-              const SizedBox(height: 12),
-
-              _buildGameCard(
-                type: GameType.escoba,
-                title: 'Escoba del 15',
-                subtitle: 'Anotador de escobas, cartas, oros, 7 de oro y la setenta.',
-                icon: Icons.cleaning_services,
-                color: const Color(0xFF00838F),
-                badge: 'Oficial',
-              ),
-              const SizedBox(height: 12),
-
-              _buildGameCard(
-                type: GameType.custom,
-                title: 'Contador Libre',
-                subtitle: 'Suma puntos tocando la tarjeta, personaliza nombres y colores.',
-                icon: Icons.calculate,
-                color: const Color(0xFF1565C0),
-                badge: '1-12 Jugadores',
+                  _buildVerticalGameCard(
+                    type: GameType.generala,
+                    title: 'Generala',
+                    icon: Icons.casino,
+                    color: const Color(0xFFE65100),
+                    badge: 'Oficial',
+                  ),
+                  _buildVerticalGameCard(
+                    type: GameType.burako,
+                    title: 'Burako',
+                    icon: Icons.grid_view,
+                    color: const Color(0xFF7B1FA2),
+                    badge: 'Canasta',
+                  ),
+                  _buildVerticalGameCard(
+                    type: GameType.escoba,
+                    title: 'Escoba del 15',
+                    icon: Icons.cleaning_services,
+                    color: const Color(0xFF00838F),
+                    badge: 'Oficial',
+                  ),
+                  _buildVerticalGameCard(
+                    type: GameType.custom,
+                    title: 'Contador Libre',
+                    icon: Icons.calculate,
+                    color: const Color(0xFF1565C0),
+                    badge: '1-12 Jugadores',
+                  ),
+                ],
               ),
               const SizedBox(height: 24),
             ],
@@ -302,7 +277,7 @@ class _HomeScreenState extends State<HomeScreen> {
         side: BorderSide(color: theme.colorScheme.primary.withOpacity(0.4)),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(14.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -338,30 +313,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             Text(
               session.title,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 4),
-            Text(
-              'Juego: ${session.gameType.displayName}',
-              style: TextStyle(
-                fontSize: 13,
-                color: theme.colorScheme.onPrimaryContainer.withOpacity(0.8),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () => _openGame(session.gameType, existingSession: session),
+                icon: const Icon(Icons.play_arrow),
+                label: const Text('Reanudar Partida'),
               ),
-            ),
-            const SizedBox(height: 14),
-            Row(
-              children: [
-                Expanded(
-                  child: FilledButton.icon(
-                    onPressed: () => _openGame(session.gameType, existingSession: session),
-                    icon: const Icon(Icons.play_arrow),
-                    label: const Text('Reanudar Partida'),
-                  ),
-                ),
-              ],
             ),
           ],
         ),
@@ -369,84 +333,102 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildGameCard({
+  Widget _buildVerticalGameCard({
     required GameType type,
     required String title,
-    required String subtitle,
     required IconData icon,
     required Color color,
     required String badge,
   }) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Card(
-      elevation: 0,
+      elevation: 3,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-        side: BorderSide(color: theme.colorScheme.outlineVariant.withOpacity(0.6)),
+        borderRadius: BorderRadius.circular(22),
+        side: BorderSide(
+          color: color.withOpacity(isDark ? 0.35 : 0.25),
+          width: 1.5,
+        ),
       ),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
-        borderRadius: BorderRadius.circular(18),
         onTap: () => _openGame(type),
-        child: Padding(
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                color.withOpacity(isDark ? 0.22 : 0.12),
+                theme.cardColor,
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
           padding: const EdgeInsets.all(16.0),
-          child: Row(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                width: 52,
-                height: 52,
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(icon, color: color, size: 28),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          title,
-                          style: const TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const Spacer(),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: color.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            badge,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: color,
-                            ),
-                          ),
-                        ),
-                      ],
+              // Top Badge
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: color.withOpacity(0.3)),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
+                    child: Text(
+                      badge,
                       style: TextStyle(
-                        fontSize: 12,
-                        color: theme.colorScheme.onSurfaceVariant,
-                        height: 1.3,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: color,
                       ),
                     ),
+                  ),
+                ],
+              ),
+
+              // Large Representative Icon / Emblem
+              Container(
+                width: 68,
+                height: 68,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: color.withOpacity(0.15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: color.withOpacity(0.2),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    )
                   ],
                 ),
+                child: Center(
+                  child: Icon(
+                    icon,
+                    size: 38,
+                    color: color,
+                  ),
+                ),
               ),
-              const SizedBox(width: 8),
-              Icon(Icons.chevron_right, color: theme.disabledColor),
+
+              // Game Title (without description)
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.3,
+                ),
+              ),
             ],
           ),
         ),

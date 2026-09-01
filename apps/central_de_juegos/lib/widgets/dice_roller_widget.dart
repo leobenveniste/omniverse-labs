@@ -283,7 +283,7 @@ class _D6DotPainter extends CustomPainter {
 
     switch (value) {
       case 1:
-        canvas.drawCircle(center, dotRadius * 1.35, dotPaint..color = const Color(0xFFE53935));
+        canvas.drawCircle(center, dotRadius * 1.35, dotPaint..color = const Color(0xFF1E2125));
         break;
       case 2:
         canvas.drawCircle(topLeft, dotRadius, dotPaint);

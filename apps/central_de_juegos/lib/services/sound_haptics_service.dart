@@ -49,4 +49,19 @@ class SoundHapticsService {
   static void victory() {
     winnerCelebration();
   }
+
+  static void timerAlarm() {
+    if (hapticsEnabled) {
+      SystemSound.play(SystemSoundType.alert);
+      HapticFeedback.vibrate();
+      Future.delayed(const Duration(milliseconds: 250), () {
+        SystemSound.play(SystemSoundType.alert);
+        HapticFeedback.vibrate();
+      });
+      Future.delayed(const Duration(milliseconds: 500), () {
+        SystemSound.play(SystemSoundType.alert);
+        HapticFeedback.vibrate();
+      });
+    }
+  }
 }
