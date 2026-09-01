@@ -10,6 +10,7 @@ import '../widgets/coin_flipper_widget.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import 'truco_screen.dart';
 import 'generala_screen.dart';
+import 'diez_mil_screen.dart';
 import 'burako_screen.dart';
 import 'escoba_screen.dart';
 import 'custom_counter_screen.dart';
@@ -84,6 +85,9 @@ class _HomeScreenState extends State<HomeScreen> {
         break;
       case GameType.generala:
         screen = GeneralaScreen(existingSession: existingSession);
+        break;
+      case GameType.diezMil:
+        screen = DiezMilScreen(existingSession: existingSession);
         break;
       case GameType.burako:
         screen = BurakoScreen(existingSession: existingSession);
@@ -205,49 +209,50 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 14),
               ],
 
-              // 1. Contador Libre Wide Banner Card (Spans full width across 2 columns)
+              // 1. Contador Libre Wide Banner Card (Full width)
               _buildWideBannerCard(
                 type: GameType.custom,
-                title: 'Contador Libre',
                 imageAsset: 'assets/images/cards/banner_custom.jpg',
                 color: const Color(0xFF1565C0),
                 badge: '1-12 Jugadores',
               ),
               const SizedBox(height: 14),
 
-              // 2. 2-Column Vertical Card Layout for the 4 Classic Games
+              // 2. 2-Column Vertical Game Cards Grid (Borderless Art with Spanish Titles inside Image)
               GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
-                childAspectRatio: 0.76, // Vertical playing card ratio
+                childAspectRatio: 0.95, // Clean square-ish game art ratio
                 children: [
                   _buildVerticalGameCard(
                     type: GameType.truco,
-                    title: 'Truco',
                     imageAsset: 'assets/images/cards/card_truco.jpg',
                     color: const Color(0xFF2E7D32),
                     badge: '30 Pts',
                   ),
                   _buildVerticalGameCard(
                     type: GameType.generala,
-                    title: 'Generala',
                     imageAsset: 'assets/images/cards/card_generala.jpg',
                     color: const Color(0xFFE65100),
                     badge: 'Oficial',
                   ),
                   _buildVerticalGameCard(
+                    type: GameType.diezMil,
+                    imageAsset: 'assets/images/cards/card_diez_mil.jpg',
+                    color: const Color(0xFFF57F17),
+                    badge: '10.000 Pts',
+                  ),
+                  _buildVerticalGameCard(
                     type: GameType.burako,
-                    title: 'Burako',
                     imageAsset: 'assets/images/cards/card_burako.jpg',
                     color: const Color(0xFF7B1FA2),
                     badge: '3000 Pts',
                   ),
                   _buildVerticalGameCard(
                     type: GameType.escoba,
-                    title: 'Escoba del 15',
                     imageAsset: 'assets/images/cards/card_escoba.jpg',
                     color: const Color(0xFF00838F),
                     badge: 'Oficial',
@@ -327,7 +332,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildWideBannerCard({
     required GameType type,
-    required String title,
     required String imageAsset,
     required Color color,
     required String badge,
@@ -348,30 +352,14 @@ class _HomeScreenState extends State<HomeScreen> {
       child: InkWell(
         onTap: () => _openGame(type),
         child: SizedBox(
-          height: 135,
+          height: 140,
           child: Stack(
             fit: StackFit.expand,
             children: [
-              // Background Banner Image
+              // Background Banner Image with Spanish Title already inside
               Image.asset(
                 imageAsset,
                 fit: BoxFit.cover,
-              ),
-              // Gradient scrim for contrast
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.black.withOpacity(0.8),
-                      Colors.black.withOpacity(0.3),
-                      Colors.transparent,
-                      Colors.black.withOpacity(0.65),
-                    ],
-                    stops: const [0.0, 0.4, 0.7, 1.0],
-                    begin: Alignment.bottomLeft,
-                    end: Alignment.topRight,
-                  ),
-                ),
               ),
               // Badge Top Right
               Positioned(
@@ -380,9 +368,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
+                    color: Colors.black.withOpacity(0.75),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.white.withOpacity(0.35)),
+                    border: Border.all(color: Colors.white.withOpacity(0.4)),
                   ),
                   child: Text(
                     badge,
@@ -394,50 +382,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              // Title & Details Bottom Left
-              Positioned(
-                bottom: 12,
-                left: 14,
-                right: 14,
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: color.withOpacity(0.9),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(Icons.calculate, color: Colors.white, size: 22),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            title,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white,
-                              letterSpacing: 0.3,
-                            ),
-                          ),
-                          const Text(
-                            'Anotador multijugador personalizable',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.white70,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 16),
-                  ],
-                ),
-              ),
             ],
           ),
         ),
@@ -447,7 +391,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildVerticalGameCard({
     required GameType type,
-    required String title,
     required String imageAsset,
     required Color color,
     required String badge,
@@ -467,56 +410,32 @@ class _HomeScreenState extends State<HomeScreen> {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => _openGame(type),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: Stack(
+          fit: StackFit.expand,
           children: [
-            // Top Representative Image with Badge overlay
-            Expanded(
-              flex: 5,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.asset(
-                    imageAsset,
-                    fit: BoxFit.cover,
-                  ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.7),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.white.withOpacity(0.3)),
-                      ),
-                      child: Text(
-                        badge,
-                        style: const TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            // Full 3D Card Artwork with Spanish Title inside Image
+            Image.asset(
+              imageAsset,
+              fit: BoxFit.cover,
             ),
-
-            // Bottom Title Bar
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-              color: theme.cardColor,
-              child: Text(
-                title,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 0.3,
+            // Badge Top Right
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.75),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.white.withOpacity(0.4)),
+                ),
+                child: Text(
+                  badge,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),

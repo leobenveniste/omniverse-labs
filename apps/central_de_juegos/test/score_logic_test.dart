@@ -3,6 +3,7 @@ import 'package:central_de_juegos/models/truco_game.dart';
 import 'package:central_de_juegos/models/generala_game.dart';
 import 'package:central_de_juegos/models/rounds_game.dart';
 import 'package:central_de_juegos/models/burako_game.dart';
+import 'package:central_de_juegos/models/diez_mil_game.dart';
 import 'package:central_de_juegos/models/player.dart';
 
 void main() {
@@ -106,6 +107,28 @@ void main() {
       expect(t2.score, 140);
       expect(game.rounds.first.starterTeamId, 't1');
       expect(game.isFinished, false);
+    });
+  });
+
+  group('DiezMilGame Logic Tests', () {
+    test('Calculates turn points, entry requirements, and reaches 10000 winner', () {
+      final p1 = Player(id: 'p1', name: 'Jugador 1', colorValue: 0xFF2196F3);
+      final p2 = Player(id: 'p2', name: 'Jugador 2', colorValue: 0xFFE53935);
+      final game = DiezMilGame(players: [p1, p2], targetScore: 10000, entryScore: 750);
+
+      expect(game.hasPlayerEntered('p1'), false);
+
+      // Round 1: p1 gets 800 (enters), p2 gets 400 (not entered yet)
+      game.addRound({'p1': 800, 'p2': 0});
+      expect(game.hasPlayerEntered('p1'), true);
+      expect(p1.score, 800);
+      expect(game.isFinished, false);
+
+      // Round 2: p1 scores 9200 and wins!
+      game.addRound({'p1': 9200, 'p2': 1000});
+      expect(p1.score, 10000);
+      expect(game.isFinished, true);
+      expect(game.winnerId, 'p1');
     });
   });
 }

@@ -161,6 +161,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       case GameType.truco:
         return Icons.style;
       case GameType.generala:
+      case GameType.diezMil:
         return Icons.casino;
       case GameType.burako:
         return Icons.grid_view;
