@@ -1,6 +1,13 @@
-# Omniverse Labs 🚀
+<p align="center">
+  <img src="assets/branding/omniverse_labs_logo.png" alt="Omniverse Labs Logo" width="130" />
+</p>
 
-An automated Flutter and Android development workspace by **Omniverse Labs**, configured for rapid app scaffolding, local testing, release keystore generation, and automated Google Play Console deployment.
+<h1 align="center">Omniverse Labs 🚀</h1>
+
+<p align="center">
+  <strong>Automated Flutter & Android Mobile Apps Hub</strong><br>
+  Built for rapid app scaffolding, local testing, release signing, and automated Google Play Console deployment.
+</p>
 
 ---
 
