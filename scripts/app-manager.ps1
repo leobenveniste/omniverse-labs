@@ -13,9 +13,9 @@
 
 [CmdletBinding()]
 param(
-    [Parameter(Position=0, Mandatory=$true)]
-    [ValidateSet("create", "list", "run", "build", "test", "install", "deploy-playstore", "doctor")]
-    [string]$Command,
+    [Parameter(Mandatory=$true, Position=0)]
+    [ValidateSet("doctor", "create", "list", "run", "build", "test", "install", "deploy-playstore", "status")]
+    [string]$Command = "list",
 
     [Parameter(Position=1, Mandatory=$false)]
     [string]$Name,
@@ -350,5 +350,16 @@ switch ($Command) {
         } else {
             Write-Host "Fastlane not initialized for '$App'. Bundle is ready at: $aabPath" -ForegroundColor Green
         }
+    }
+
+    "status" {
+        $targetAppPath = Get-AppPath -AppName $App
+        if (-not $targetAppPath) { return }
+
+        $checkerScript = Join-Path $PSScriptRoot "check-play-status.mjs"
+        $pkgName = "com.omniverselabs.$App"
+        if ($App -eq "anotador_de_juegos") { $pkgName = "com.omniverselabs.anotadordejuegos" }
+
+        & node $checkerScript $pkgName
     }
 }

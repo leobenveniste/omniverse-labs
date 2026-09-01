@@ -1,2 +1,2 @@
-json_key_file("service_account.json") # Path to the json secret file - Follow https://docs.fastlane.tools/actions/supply/#setup to get one
-package_name("com.company.app") # e.g. com.krausefx.app
+json_key_file(ENV["PLAY_CONSOLE_JSON_KEY_PATH"] || "service_account.json")
+package_name(ENV["PLAY_CONSOLE_PACKAGE"] || "com.omniverselabs.anotadordejuegos")
