@@ -223,40 +223,40 @@ class _HomeScreenState extends State<HomeScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
-                childAspectRatio: 0.80, // Vertical playing card ratio
+                childAspectRatio: 0.76, // Vertical playing card ratio
                 children: [
                   _buildVerticalGameCard(
                     type: GameType.truco,
                     title: 'Truco',
-                    icon: Icons.style,
+                    imageAsset: 'assets/images/cards/card_truco.jpg',
                     color: const Color(0xFF2E7D32),
                     badge: '30 Pts',
                   ),
                   _buildVerticalGameCard(
                     type: GameType.generala,
                     title: 'Generala',
-                    icon: Icons.casino,
+                    imageAsset: 'assets/images/cards/card_generala.jpg',
                     color: const Color(0xFFE65100),
                     badge: 'Oficial',
                   ),
                   _buildVerticalGameCard(
                     type: GameType.burako,
                     title: 'Burako',
-                    icon: Icons.grid_view,
+                    imageAsset: 'assets/images/cards/card_burako.jpg',
                     color: const Color(0xFF7B1FA2),
                     badge: '3000 Pts',
                   ),
                   _buildVerticalGameCard(
                     type: GameType.escoba,
                     title: 'Escoba del 15',
-                    icon: Icons.cleaning_services,
+                    imageAsset: 'assets/images/cards/card_escoba.jpg',
                     color: const Color(0xFF00838F),
                     badge: 'Oficial',
                   ),
                   _buildVerticalGameCard(
                     type: GameType.custom,
                     title: 'Contador Libre',
-                    icon: Icons.calculate,
+                    imageAsset: 'assets/images/cards/card_custom.jpg',
                     color: const Color(0xFF1565C0),
                     badge: '1-12 Jugadores',
                   ),
@@ -336,7 +336,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildVerticalGameCard({
     required GameType type,
     required String title,
-    required IconData icon,
+    required String imageAsset,
     required Color color,
     required String badge,
   }) {
@@ -344,93 +344,71 @@ class _HomeScreenState extends State<HomeScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     return Card(
-      elevation: 3,
+      elevation: 4,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(20),
         side: BorderSide(
-          color: color.withOpacity(isDark ? 0.35 : 0.25),
+          color: color.withOpacity(isDark ? 0.4 : 0.25),
           width: 1.5,
         ),
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => _openGame(type),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                color.withOpacity(isDark ? 0.22 : 0.12),
-                theme.cardColor,
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Top Badge
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Top Representative Image with Badge overlay
+            Expanded(
+              flex: 5,
+              child: Stack(
+                fit: StackFit.expand,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: color.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: color.withOpacity(0.3)),
-                    ),
-                    child: Text(
-                      badge,
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                        color: color,
+                  Image.asset(
+                    imageAsset,
+                    fit: BoxFit.cover,
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.white.withOpacity(0.3)),
+                      ),
+                      child: Text(
+                        badge,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
                 ],
               ),
+            ),
 
-              // Large Representative Icon / Emblem
-              Container(
-                width: 68,
-                height: 68,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: color.withOpacity(0.15),
-                  boxShadow: [
-                    BoxShadow(
-                      color: color.withOpacity(0.2),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    )
-                  ],
-                ),
-                child: Center(
-                  child: Icon(
-                    icon,
-                    size: 38,
-                    color: color,
-                  ),
-                ),
-              ),
-
-              // Game Title (without description)
-              Text(
+            // Bottom Title Bar
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+              color: theme.cardColor,
+              child: Text(
                 title,
                 textAlign: TextAlign.center,
-                maxLines: 2,
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 0.3,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
