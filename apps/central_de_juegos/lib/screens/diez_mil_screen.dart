@@ -13,8 +13,13 @@ import '../widgets/player_name_dialog.dart';
 
 class DiezMilScreen extends StatefulWidget {
   final GameSession? existingSession;
+  final List<Player>? configuredPlayers;
 
-  const DiezMilScreen({super.key, this.existingSession});
+  const DiezMilScreen({
+    super.key,
+    this.existingSession,
+    this.configuredPlayers,
+  });
 
   @override
   State<DiezMilScreen> createState() => _DiezMilScreenState();
@@ -38,6 +43,16 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
       } catch (_) {
         _game = _defaultGame();
       }
+    } else if (widget.configuredPlayers != null && widget.configuredPlayers!.isNotEmpty) {
+      _sessionId = const Uuid().v4();
+      _dateStarted = DateTime.now();
+      _game = DiezMilGame(
+        players: widget.configuredPlayers!
+            .map((p) => Player(id: p.id, name: p.name, colorValue: p.colorValue, score: 0))
+            .toList(),
+        targetScore: 10000,
+        entryScore: 750,
+      );
     } else {
       _sessionId = const Uuid().v4();
       _dateStarted = DateTime.now();

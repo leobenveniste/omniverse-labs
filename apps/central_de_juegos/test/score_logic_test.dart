@@ -4,6 +4,7 @@ import 'package:central_de_juegos/models/generala_game.dart';
 import 'package:central_de_juegos/models/rounds_game.dart';
 import 'package:central_de_juegos/models/burako_game.dart';
 import 'package:central_de_juegos/models/diez_mil_game.dart';
+import 'package:central_de_juegos/models/custom_game.dart';
 import 'package:central_de_juegos/models/player.dart';
 
 void main() {
@@ -129,6 +130,26 @@ void main() {
       expect(p1.score, 10000);
       expect(game.isFinished, true);
       expect(game.winnerId, 'p1');
+    });
+  });
+
+  group('CustomGame Logic Tests', () {
+    test('Adds points, subtracts points, and resets scores', () {
+      final p1 = Player(id: 'p1', name: 'RED', colorValue: 0xFFFF3B30);
+      final p2 = Player(id: 'p2', name: 'BLUE', colorValue: 0xFF007AFF);
+      final game = CustomGame(players: [p1, p2], step: 1);
+
+      game.addScore('p1', 5);
+      game.addScore('p2', 3);
+      expect(p1.score, 5);
+      expect(p2.score, 3);
+
+      game.addScore('p1', -2);
+      expect(p1.score, 3);
+
+      game.resetScores();
+      expect(p1.score, 0);
+      expect(p2.score, 0);
     });
   });
 }

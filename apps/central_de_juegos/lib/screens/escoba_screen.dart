@@ -13,8 +13,13 @@ import '../widgets/player_name_dialog.dart';
 
 class EscobaScreen extends StatefulWidget {
   final GameSession? existingSession;
+  final List<Player>? configuredPlayers;
 
-  const EscobaScreen({super.key, this.existingSession});
+  const EscobaScreen({
+    super.key,
+    this.existingSession,
+    this.configuredPlayers,
+  });
 
   @override
   State<EscobaScreen> createState() => _EscobaScreenState();
@@ -38,6 +43,15 @@ class _EscobaScreenState extends State<EscobaScreen> {
       } catch (_) {
         _game = _defaultGame();
       }
+    } else if (widget.configuredPlayers != null && widget.configuredPlayers!.isNotEmpty) {
+      _sessionId = const Uuid().v4();
+      _dateStarted = DateTime.now();
+      _game = EscobaGame(
+        players: widget.configuredPlayers!
+            .map((p) => Player(id: p.id, name: p.name, colorValue: p.colorValue, score: 0))
+            .toList(),
+        targetScore: 15,
+      );
     } else {
       _sessionId = const Uuid().v4();
       _dateStarted = DateTime.now();

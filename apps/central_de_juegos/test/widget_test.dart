@@ -10,6 +10,6 @@ void main() {
   testWidgets('CentralDeJuegosApp smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(const CentralDeJuegosApp());
     await tester.pumpAndSettle();
-    expect(find.text('Central de Juegos'), findsOneWidget);
+    expect(find.text('CENTRAL_DE_JUEGOS'), findsOneWidget);
   });
 }
