@@ -356,10 +356,10 @@ switch ($Command) {
         $targetAppPath = Get-AppPath -AppName $App
         if (-not $targetAppPath) { return }
 
-        $checkerScript = Join-Path $PSScriptRoot "check-play-status.mjs"
+        $checkerScript = Join-Path $PSScriptRoot "check-play-status.py"
         $pkgName = "com.omniverselabs.$App"
         if ($App -eq "anotador_de_juegos") { $pkgName = "com.omniverselabs.anotadordejuegos" }
 
-        & node $checkerScript $pkgName
+        & python $checkerScript $pkgName
     }
 }
