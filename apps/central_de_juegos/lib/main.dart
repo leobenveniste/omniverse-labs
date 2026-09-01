@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
 import 'screens/splash_screen.dart';
+import 'widgets/global_timer_banner.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +32,16 @@ class _CentralDeJuegosAppState extends State<CentralDeJuegosApp> {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: _themeMode,
+      builder: (context, child) {
+        return Scaffold(
+          body: Column(
+            children: [
+              const SafeArea(bottom: false, child: GlobalTimerBanner()),
+              Expanded(child: child ?? const SizedBox.shrink()),
+            ],
+          ),
+        );
+      },
       home: SplashScreen(
         onToggleTheme: _toggleTheme,
         isDarkMode: _themeMode == ThemeMode.dark,

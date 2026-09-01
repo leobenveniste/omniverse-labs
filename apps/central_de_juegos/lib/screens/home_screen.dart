@@ -7,7 +7,6 @@ import '../widgets/dice_roller_widget.dart';
 import '../widgets/finger_roulette_widget.dart';
 import '../widgets/turn_timer_widget.dart';
 import '../widgets/coin_flipper_widget.dart';
-import '../widgets/global_timer_banner.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
 import 'truco_screen.dart';
 import 'generala_screen.dart';
@@ -156,40 +155,30 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      body: Column(
+      body: IndexedStack(
+        index: _currentNavIndex,
         children: [
-          // Persistent global timer banner below AppBar
-          const GlobalTimerBanner(),
-
-          // Main Tab contents
-          Expanded(
-            child: IndexedStack(
-              index: _currentNavIndex,
-              children: [
-                // 0: Dados
-                const Center(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.all(24.0),
-                    child: DiceRollerWidget(),
-                  ),
-                ),
-                // 1: Quién Empieza
-                const FingerRouletteWidget(),
-                // 2: Juegos (Home)
-                _buildGamesCatalogTab(theme),
-                // 3: Temporizador
-                const Center(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.all(24.0),
-                    child: TurnTimerWidget(),
-                  ),
-                ),
-                // 4: Moneda
-                const Center(
-                  child: CoinFlipperWidget(),
-                ),
-              ],
+          // 0: Dados
+          const Center(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(24.0),
+              child: DiceRollerWidget(),
             ),
+          ),
+          // 1: Quién Empieza
+          const FingerRouletteWidget(),
+          // 2: Juegos (Home)
+          _buildGamesCatalogTab(theme),
+          // 3: Temporizador
+          const Center(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(24.0),
+              child: TurnTimerWidget(),
+            ),
+          ),
+          // 4: Moneda
+          const Center(
+            child: CoinFlipperWidget(),
           ),
         ],
       ),
@@ -216,7 +205,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 14),
               ],
 
-              // 2-Column Vertical Card Layout for Games
+              // 1. Contador Libre Wide Banner Card (Spans full width across 2 columns)
+              _buildWideBannerCard(
+                type: GameType.custom,
+                title: 'Contador Libre',
+                imageAsset: 'assets/images/cards/banner_custom.jpg',
+                color: const Color(0xFF1565C0),
+                badge: '1-12 Jugadores',
+              ),
+              const SizedBox(height: 14),
+
+              // 2. 2-Column Vertical Card Layout for the 4 Classic Games
               GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,
@@ -252,13 +251,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     imageAsset: 'assets/images/cards/card_escoba.jpg',
                     color: const Color(0xFF00838F),
                     badge: 'Oficial',
-                  ),
-                  _buildVerticalGameCard(
-                    type: GameType.custom,
-                    title: 'Contador Libre',
-                    imageAsset: 'assets/images/cards/card_custom.jpg',
-                    color: const Color(0xFF1565C0),
-                    badge: '1-12 Jugadores',
                   ),
                 ],
               ),
@@ -328,6 +320,126 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWideBannerCard({
+    required GameType type,
+    required String title,
+    required String imageAsset,
+    required Color color,
+    required String badge,
+  }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(
+          color: color.withOpacity(isDark ? 0.4 : 0.25),
+          width: 1.5,
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => _openGame(type),
+        child: SizedBox(
+          height: 135,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Background Banner Image
+              Image.asset(
+                imageAsset,
+                fit: BoxFit.cover,
+              ),
+              // Gradient scrim for contrast
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.black.withOpacity(0.8),
+                      Colors.black.withOpacity(0.3),
+                      Colors.transparent,
+                      Colors.black.withOpacity(0.65),
+                    ],
+                    stops: const [0.0, 0.4, 0.7, 1.0],
+                    begin: Alignment.bottomLeft,
+                    end: Alignment.topRight,
+                  ),
+                ),
+              ),
+              // Badge Top Right
+              Positioned(
+                top: 10,
+                right: 10,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white.withOpacity(0.35)),
+                  ),
+                  child: Text(
+                    badge,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              // Title & Details Bottom Left
+              Positioned(
+                bottom: 12,
+                left: 14,
+                right: 14,
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: color.withOpacity(0.9),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.calculate, color: Colors.white, size: 22),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            title,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                          const Text(
+                            'Anotador multijugador personalizable',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 16),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
