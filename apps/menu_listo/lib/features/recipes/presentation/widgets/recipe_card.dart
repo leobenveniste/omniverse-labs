@@ -44,58 +44,31 @@ class RecipeCard extends StatelessWidget {
                     child: _buildImage(theme),
                   ),
                 ),
-                // Time & Meal Time Tags (Bottom Left)
+                // Time Tag (Bottom Left)
                 Positioned(
                   bottom: 6,
                   left: 8,
-                  right: 40,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.75),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.schedule_rounded, size: 11, color: Colors.white),
-                            const SizedBox(width: 3),
-                            Text(
-                              '${recipe.totalTimeMinutes}m',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.75),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            recipe.category,
-                            softWrap: false,
-                            maxLines: 1,
-                            overflow: TextOverflow.clip,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.75),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.schedule_rounded, size: 11, color: Colors.white),
+                        const SizedBox(width: 3),
+                        Text(
+                          '${recipe.totalTimeMinutes}m',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 // Favorite Button (Top Right)
@@ -129,11 +102,12 @@ class RecipeCard extends StatelessWidget {
                 children: [
                   Text(
                     recipe.title,
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                      fontSize: 13,
+                      height: 1.25,
                     ),
                   ),
                   if (recipe.description.isNotEmpty) ...[

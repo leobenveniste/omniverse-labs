@@ -110,117 +110,120 @@ class MealSlotCard extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(14),
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: hasMeal
               ? theme.colorScheme.surface
               : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: hasMeal
                 ? theme.colorScheme.primary.withValues(alpha: 0.4)
                 : theme.colorScheme.outline.withValues(alpha: 0.2),
           ),
         ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: (hasMeal ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant)
-                    .withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(
-                mealIcon,
-                size: 18,
-                color: hasMeal ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        mealTitle,
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      if (isLeftover) ...[
-                        const SizedBox(width: 6),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: Colors.orange.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Text(
-                            '🍱 Tupper',
-                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.deepOrange),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    hasMeal ? item!.recipeTitle : strings.noRecipeAssigned,
+            Row(
+              children: [
+                Icon(
+                  mealIcon,
+                  size: 16,
+                  color: hasMeal ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: Text(
+                    mealTitle,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: hasMeal ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: hasMeal ? FontWeight.bold : FontWeight.normal,
-                      color: hasMeal ? theme.colorScheme.onSurface : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-                    ),
                   ),
-                  if (hasMeal && item!.servings > 0) ...[
-                    const SizedBox(height: 4),
-                    InkWell(
-                      onTap: onAdjustServings != null ? () => _showServingsSheet(context) : null,
-                      borderRadius: BorderRadius.circular(8),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.people_alt_outlined, size: 12, color: theme.colorScheme.primary),
-                            const SizedBox(width: 4),
-                            Text(
-                              '${item!.servings} ${strings.persons}',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: theme.colorScheme.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(width: 2),
-                            Icon(Icons.edit, size: 10, color: theme.colorScheme.primary),
-                          ],
-                        ),
-                      ),
+                ),
+                if (hasMeal)
+                  GestureDetector(
+                    onTap: onRemove,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 4),
+                      child: Icon(Icons.close_rounded, size: 16, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8)),
                     ),
-                  ],
-                ],
+                  )
+                else
+                  Icon(Icons.add_rounded, size: 16, color: theme.colorScheme.primary.withValues(alpha: 0.7)),
+              ],
+            ),
+            const SizedBox(height: 6),
+            SizedBox(
+              height: 32,
+              child: Text(
+                hasMeal ? item!.recipeTitle : strings.noRecipeAssigned,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontWeight: hasMeal ? FontWeight.w700 : FontWeight.normal,
+                  fontSize: 12,
+                  height: 1.25,
+                  color: hasMeal
+                      ? theme.colorScheme.onSurface
+                      : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                ),
               ),
             ),
-            if (hasMeal)
-              IconButton(
-                icon: const Icon(Icons.close, size: 18, color: Colors.grey),
-                onPressed: onRemove,
-                tooltip: strings.removeMealSlot,
-              )
-            else
-              Icon(Icons.add_circle_outline, size: 20, color: theme.colorScheme.primary),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                if (isLeftover)
+                  Container(
+                    margin: const EdgeInsets.only(right: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text(
+                      '🍱 Tupper',
+                      style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.deepOrange),
+                    ),
+                  ),
+                if (hasMeal && item!.servings > 0)
+                  InkWell(
+                    onTap: onAdjustServings != null ? () => _showServingsSheet(context) : null,
+                    borderRadius: BorderRadius.circular(6),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.people_alt_outlined, size: 11, color: theme.colorScheme.primary),
+                          const SizedBox(width: 3),
+                          Text(
+                            '${item!.servings}',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 10,
+                            ),
+                          ),
+                          const SizedBox(width: 2),
+                          Icon(Icons.edit, size: 9, color: theme.colorScheme.primary),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ],
         ),
       ),

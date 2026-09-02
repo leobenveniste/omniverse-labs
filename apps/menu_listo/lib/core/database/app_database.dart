@@ -162,7 +162,12 @@ class AppDatabase {
   }
 
   // --- RECIPES CRUD ---
-  Future<List<Recipe>> getAllRecipes({String? searchQuery, String? category, bool? onlyFavorites}) async {
+  Future<List<Recipe>> getAllRecipes({
+    String? searchQuery,
+    String? category,
+    Set<String>? categories,
+    bool? onlyFavorites,
+  }) async {
     final db = await database;
     String whereClause = '';
     List<dynamic> whereArgs = [];
@@ -173,7 +178,11 @@ class AppDatabase {
       final q = '%${searchQuery.trim()}%';
       whereArgs.addAll([q, q, q]);
     }
-    if (category != null && category.isNotEmpty && category != 'Todas' && category != 'All') {
+    if (categories != null && categories.isNotEmpty) {
+      final catOr = categories.map((_) => 'category LIKE ?').join(' OR ');
+      conditions.add('($catOr)');
+      whereArgs.addAll(categories.map((c) => '%$c%'));
+    } else if (category != null && category.isNotEmpty && category != 'Todas' && category != 'All') {
       conditions.add('category LIKE ?');
       whereArgs.add('%$category%');
     }

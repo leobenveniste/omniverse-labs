@@ -6,8 +6,13 @@ class RecipeRepository {
 
   RecipeRepository([AppDatabase? db]) : _db = db ?? AppDatabase.instance;
 
-  Future<List<Recipe>> getRecipes({String? searchQuery, String? category, bool? onlyFavorites}) {
-    return _db.getAllRecipes(searchQuery: searchQuery, category: category, onlyFavorites: onlyFavorites);
+  Future<List<Recipe>> getRecipes({String? searchQuery, String? category, Set<String>? categories, bool? onlyFavorites}) {
+    return _db.getAllRecipes(
+      searchQuery: searchQuery,
+      category: category,
+      categories: categories,
+      onlyFavorites: onlyFavorites,
+    );
   }
 
   Future<Recipe?> getRecipe(String id) {

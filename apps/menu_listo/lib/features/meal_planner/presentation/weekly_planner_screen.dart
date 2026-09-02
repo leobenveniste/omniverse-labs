@@ -62,6 +62,7 @@ class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final strings = AppStrings.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final weekStart = ref.watch(currentWeekStartProvider);
     final weekStartNotifier = ref.read(currentWeekStartProvider.notifier);
     final weekPlanAsync = ref.watch(weeklyMealPlanProvider);
@@ -80,8 +81,6 @@ class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
       {'name': strings.isSpanish ? 'Sábado' : 'Saturday', 'offset': 5},
       {'name': strings.isSpanish ? 'Domingo' : 'Sunday', 'offset': 6},
     ];
-
-    final mealSlots = ['breakfast', 'lunch', 'snack', 'dinner'];
 
     return Scaffold(
       appBar: AppBar(
@@ -160,8 +159,16 @@ class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton.filledTonal(
-                  icon: const Icon(Icons.chevron_left),
+                IconButton(
+                  style: IconButton.styleFrom(
+                    backgroundColor: isDark ? const Color(0xFF273423) : theme.colorScheme.surfaceContainerHighest,
+                    foregroundColor: isDark ? const Color(0xFFA5C18F) : theme.colorScheme.onSurface,
+                    side: BorderSide(
+                      color: isDark ? Colors.white.withValues(alpha: 0.15) : theme.colorScheme.outline.withValues(alpha: 0.2),
+                      width: 1,
+                    ),
+                  ),
+                  icon: const Icon(Icons.chevron_left_rounded),
                   onPressed: () => weekStartNotifier.previousWeek(),
                 ),
                 Column(
@@ -206,8 +213,16 @@ class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
                     ),
                   ],
                 ),
-                IconButton.filledTonal(
-                  icon: const Icon(Icons.chevron_right),
+                IconButton(
+                  style: IconButton.styleFrom(
+                    backgroundColor: isDark ? const Color(0xFF273423) : theme.colorScheme.surfaceContainerHighest,
+                    foregroundColor: isDark ? const Color(0xFFA5C18F) : theme.colorScheme.onSurface,
+                    side: BorderSide(
+                      color: isDark ? Colors.white.withValues(alpha: 0.15) : theme.colorScheme.outline.withValues(alpha: 0.2),
+                      width: 1,
+                    ),
+                  ),
+                  icon: const Icon(Icons.chevron_right_rounded),
                   onPressed: () => weekStartNotifier.nextWeek(),
                 ),
               ],
@@ -218,15 +233,86 @@ class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
             child: weekPlanAsync.when(
               data: (plans) {
                 return ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 130),
                   itemCount: days.length,
                   itemBuilder: (context, index) {
                     final day = days[index];
                     final dayDate = weekStart.add(Duration(days: day['offset'] as int));
                     final dateStr = DateFormat('yyyy-MM-dd').format(dayDate);
-                    final isToday = DateFormat('yyyy-MM-dd').format(DateTime.now()) == dateStr;
+                    final isToday = dateStr == DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+                    Widget buildSlotWidget(String slot) {
+                      final item = plans.cast<MealPlanItem?>().firstWhere(
+                            (p) => p?.dateString == dateStr && p?.mealType == slot,
+                            orElse: () => null,
+                          );
+
+                      return MealSlotCard(
+                        mealType: slot,
+                        item: item,
+                        onAdjustServings: item != null
+                            ? (servings) {
+                                weekPlanNotifier.assignMeal(
+                                  dateString: dateStr,
+                                  mealType: slot,
+                                  recipeId: item.recipeId,
+                                  recipeTitle: item.recipeTitle,
+                                  recipeCategory: item.recipeCategory,
+                                  servings: servings,
+                                  customNote: item.customNote,
+                                );
+                              }
+                            : null,
+                        onTap: () {
+                          String slotLabel;
+                          switch (slot) {
+                            case 'breakfast':
+                              slotLabel = strings.mealBreakfast;
+                              break;
+                            case 'lunch':
+                              slotLabel = strings.mealLunch;
+                              break;
+                            case 'snack':
+                              slotLabel = strings.mealSnack;
+                              break;
+                            case 'dinner':
+                              slotLabel = strings.mealDinner;
+                              break;
+                            default:
+                              slotLabel = slot;
+                          }
+
+                          RecipePickerSheet.show(
+                            context,
+                            slotTitle: '${day['name']} ($slotLabel)',
+                            onRecipeSelected: (recipe, servings) {
+                              weekPlanNotifier.assignMeal(
+                                dateString: dateStr,
+                                mealType: slot,
+                                recipeId: recipe.id,
+                                recipeTitle: recipe.title,
+                                recipeCategory: recipe.category,
+                                servings: servings,
+                              );
+                            },
+                            onCustomEntered: (customName, servings) {
+                              weekPlanNotifier.assignMeal(
+                                dateString: dateStr,
+                                mealType: slot,
+                                recipeTitle: customName,
+                                servings: servings,
+                              );
+                            },
+                          );
+                        },
+                        onRemove: () {
+                          weekPlanNotifier.removeMealSlot(dateStr, slot);
+                        },
+                      );
+                    }
 
                     return Card(
+                      elevation: 1.5,
                       margin: const EdgeInsets.only(bottom: 16),
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
@@ -265,76 +351,24 @@ class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
                               ],
                             ),
                             const Divider(height: 16),
-                            // 4 Meal Slots
-                            ...mealSlots.map((slot) {
-                              final item = plans.cast<MealPlanItem?>().firstWhere(
-                                    (p) => p?.dateString == dateStr && p?.mealType == slot,
-                                    orElse: () => null,
-                                  );
-
-                              return MealSlotCard(
-                                mealType: slot,
-                                item: item,
-                                onAdjustServings: item != null
-                                    ? (servings) {
-                                        weekPlanNotifier.assignMeal(
-                                          dateString: dateStr,
-                                          mealType: slot,
-                                          recipeId: item.recipeId,
-                                          recipeTitle: item.recipeTitle,
-                                          recipeCategory: item.recipeCategory,
-                                          servings: servings,
-                                          customNote: item.customNote,
-                                        );
-                                      }
-                                    : null,
-                                onTap: () {
-                                  String slotLabel;
-                                  switch (slot) {
-                                    case 'breakfast':
-                                      slotLabel = strings.mealBreakfast;
-                                      break;
-                                    case 'lunch':
-                                      slotLabel = strings.mealLunch;
-                                      break;
-                                    case 'snack':
-                                      slotLabel = strings.mealSnack;
-                                      break;
-                                    case 'dinner':
-                                      slotLabel = strings.mealDinner;
-                                      break;
-                                    default:
-                                      slotLabel = slot;
-                                  }
-
-                                  RecipePickerSheet.show(
-                                    context,
-                                    slotTitle: '${day['name']} ($slotLabel)',
-                                    onRecipeSelected: (recipe, servings) {
-                                      weekPlanNotifier.assignMeal(
-                                        dateString: dateStr,
-                                        mealType: slot,
-                                        recipeId: recipe.id,
-                                        recipeTitle: recipe.title,
-                                        recipeCategory: recipe.category,
-                                        servings: servings,
-                                      );
-                                    },
-                                    onCustomEntered: (customName, servings) {
-                                      weekPlanNotifier.assignMeal(
-                                        dateString: dateStr,
-                                        mealType: slot,
-                                        recipeTitle: customName,
-                                        servings: servings,
-                                      );
-                                    },
-                                  );
-                                },
-                                onRemove: () {
-                                  weekPlanNotifier.removeMealSlot(dateStr, slot);
-                                },
-                              );
-                            }),
+                            // 2 by 2 Grid of Meal Slots
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(child: buildSlotWidget('breakfast')),
+                                const SizedBox(width: 8),
+                                Expanded(child: buildSlotWidget('lunch')),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(child: buildSlotWidget('snack')),
+                                const SizedBox(width: 8),
+                                Expanded(child: buildSlotWidget('dinner')),
+                              ],
+                            ),
                           ],
                         ),
                       ),

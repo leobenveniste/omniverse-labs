@@ -8,23 +8,23 @@ final recipeRepositoryProvider = Provider<RecipeRepository>((ref) {
 
 class RecipeFilterState {
   final String searchQuery;
-  final String selectedCategory;
+  final Set<String> selectedCategories;
   final bool onlyFavorites;
 
   const RecipeFilterState({
     this.searchQuery = '',
-    this.selectedCategory = 'Todas',
+    this.selectedCategories = const {},
     this.onlyFavorites = false,
   });
 
   RecipeFilterState copyWith({
     String? searchQuery,
-    String? selectedCategory,
+    Set<String>? selectedCategories,
     bool? onlyFavorites,
   }) {
     return RecipeFilterState(
       searchQuery: searchQuery ?? this.searchQuery,
-      selectedCategory: selectedCategory ?? this.selectedCategory,
+      selectedCategories: selectedCategories ?? this.selectedCategories,
       onlyFavorites: onlyFavorites ?? this.onlyFavorites,
     );
   }
@@ -41,8 +41,18 @@ class RecipeFilterNotifier extends StateNotifier<RecipeFilterState> {
     state = state.copyWith(searchQuery: query);
   }
 
-  void setCategory(String category) {
-    state = state.copyWith(selectedCategory: category);
+  void toggleCategory(String category) {
+    final updated = Set<String>.from(state.selectedCategories);
+    if (updated.contains(category)) {
+      updated.remove(category);
+    } else {
+      updated.add(category);
+    }
+    state = state.copyWith(selectedCategories: updated);
+  }
+
+  void clearCategories() {
+    state = state.copyWith(selectedCategories: const {});
   }
 
   void toggleOnlyFavorites() {
@@ -73,14 +83,14 @@ class RecipesListNotifier extends StateNotifier<AsyncValue<List<Recipe>>> {
       state = const AsyncValue.loading();
       var recipes = await _repo.getRecipes(
         searchQuery: _filter.searchQuery,
-        category: _filter.selectedCategory,
+        categories: _filter.selectedCategories,
         onlyFavorites: _filter.onlyFavorites,
       );
-      if (recipes.isEmpty && _filter.searchQuery.isEmpty && (_filter.selectedCategory == 'Todas' || _filter.selectedCategory == 'All') && !_filter.onlyFavorites) {
+      if (recipes.isEmpty && _filter.searchQuery.isEmpty && _filter.selectedCategories.isEmpty && !_filter.onlyFavorites) {
         await _repo.reloadSampleRecipes();
         recipes = await _repo.getRecipes(
           searchQuery: _filter.searchQuery,
-          category: _filter.selectedCategory,
+          categories: _filter.selectedCategories,
           onlyFavorites: _filter.onlyFavorites,
         );
       }

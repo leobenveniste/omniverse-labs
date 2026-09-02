@@ -344,7 +344,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
 
                 if (!_isCategorizedView) {
                   return ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 130),
                     itemCount: items.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 8),
                     itemBuilder: (context, index) {
@@ -370,7 +370,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                 final groupKeys = grouped.keys.toList();
 
                 return ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 130),
                   itemCount: groupKeys.length,
                   itemBuilder: (context, gIndex) {
                     final category = groupKeys[gIndex];

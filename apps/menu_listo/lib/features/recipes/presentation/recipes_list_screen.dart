@@ -6,8 +6,6 @@ import 'package:menu_listo/core/localization/app_localizations.dart';
 import '../models/recipe_model.dart';
 import '../providers/recipe_provider.dart';
 import 'recipe_detail_screen.dart';
-import '../../premium/presentation/paywall_sheet.dart';
-import '../../premium/providers/premium_provider.dart';
 import 'widgets/pantry_matcher_dialog.dart';
 import 'widgets/recipe_creation_options_sheet.dart';
 
@@ -24,7 +22,6 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
   bool _isSearchOpen = false;
 
   final List<String> _categories = [
-    'Todas',
     'Desayuno',
     'Almuerzo',
     'Merienda',
@@ -89,28 +86,25 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                     child: Image.asset(
                       'assets/images/app_icon.png',
                       fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) => Icon(
-                        Icons.restaurant_menu_rounded,
-                        color: theme.colorScheme.primary,
-                      ),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 12),
+                  // Screen Title
                   Expanded(
                     child: Text(
-                      strings.appTitle,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w900,
+                      strings.tabRecipes,
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w800,
                         letterSpacing: -0.5,
                       ),
                     ),
                   ),
-
-                  // Search Toggle Button
+                  // Search Toggle
                   IconButton(
-                    tooltip: strings.isSpanish ? 'Buscar recetas' : 'Search recipes',
-                    icon: Icon(_isSearchOpen ? Icons.search_off_rounded : Icons.search_rounded),
+                    icon: Icon(_isSearchOpen ? Icons.close : Icons.search),
+                    tooltip: strings.searchRecipesHint,
                     onPressed: () {
+                      HapticFeedback.lightImpact();
                       setState(() {
                         _isSearchOpen = !_isSearchOpen;
                         if (!_isSearchOpen) {
@@ -120,97 +114,100 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                       });
                     },
                   ),
-
-                  // Grid / List Toggle
+                  // View Toggle (Grid / List)
                   IconButton(
-                    tooltip: _isGridView ? (strings.isSpanish ? 'Ver lista' : 'List view') : (strings.isSpanish ? 'Ver cuadrícula' : 'Grid view'),
-                    icon: Icon(_isGridView ? Icons.view_agenda_outlined : Icons.grid_view_rounded, size: 20),
-                    onPressed: () => setState(() => _isGridView = !_isGridView),
+                    icon: Icon(_isGridView ? Icons.view_agenda_outlined : Icons.grid_view_rounded),
+                    tooltip: _isGridView ? 'Vista lista' : 'Vista cuadrícula',
+                    onPressed: () {
+                      HapticFeedback.selectionClick();
+                      setState(() => _isGridView = !_isGridView);
+                    },
                   ),
-
-                  // Pro Crown Button (if not pro)
-                  if (!ref.watch(premiumProvider).isProUser) ...[
-                    IconButton(
-                      tooltip: strings.isSpanish ? 'Menú Listo Pro' : 'Menú Listo Pro',
-                      icon: const Icon(Icons.workspace_premium_rounded, color: Colors.amber, size: 24),
-                      onPressed: () => PaywallSheet.show(context),
-                    ),
-                  ],
                 ],
               ),
             ),
 
-            // Collapsible Search Bar & Favorites Filter
+            // Collapsible Search Bar
             if (_isSearchOpen)
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 6, 20, 6),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _searchController,
-                        autofocus: true,
-                        onChanged: (val) {
-                          ref.read(recipeFilterProvider.notifier).setSearchQuery(val);
-                        },
-                        decoration: InputDecoration(
-                          hintText: strings.searchRecipesHint,
-                          prefixIcon: const Icon(Icons.search, size: 20),
-                          suffixIcon: _searchController.text.isNotEmpty
-                              ? IconButton(
-                                  icon: const Icon(Icons.clear, size: 18),
-                                  onPressed: () {
-                                    _searchController.clear();
-                                    ref.read(recipeFilterProvider.notifier).setSearchQuery('');
-                                  },
-                                )
-                              : null,
-                          filled: true,
-                          isDense: true,
-                          fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                      ),
+                child: TextField(
+                  controller: _searchController,
+                  autofocus: true,
+                  onChanged: (val) {
+                    ref.read(recipeFilterProvider.notifier).setSearchQuery(val);
+                  },
+                  decoration: InputDecoration(
+                    hintText: strings.searchRecipesHint,
+                    prefixIcon: const Icon(Icons.search, size: 20),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear, size: 18),
+                            onPressed: () {
+                              _searchController.clear();
+                              ref.read(recipeFilterProvider.notifier).setSearchQuery('');
+                            },
+                          )
+                        : null,
+                    filled: true,
+                    isDense: true,
+                    fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
                     ),
-                    const SizedBox(width: 8),
-                    FilterChip(
-                      avatar: Icon(
-                        filterState.onlyFavorites ? Icons.favorite : Icons.favorite_border,
-                        size: 16,
-                        color: filterState.onlyFavorites ? Colors.redAccent : null,
-                      ),
-                      label: Text(strings.isSpanish ? 'Favoritos' : 'Favorites'),
-                      selected: filterState.onlyFavorites,
-                      onSelected: (val) {
-                        HapticFeedback.selectionClick();
-                        ref.read(recipeFilterProvider.notifier).toggleOnlyFavorites();
-                      },
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    ),
-                  ],
+                  ),
                 ),
               ),
 
-            // Category Chips Row
+            // Category Chips Row with Favorites button at the beginning
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
               child: Row(
                 children: [
+                  // Favorites Filter Button at the beginning
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(
+                      avatar: Icon(
+                        filterState.onlyFavorites ? Icons.favorite : Icons.favorite_border,
+                        size: 16,
+                        color: filterState.onlyFavorites ? Colors.redAccent : theme.colorScheme.onSurfaceVariant,
+                      ),
+                      label: Text(
+                        strings.isSpanish ? 'Favoritos' : 'Favorites',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                          color: filterState.onlyFavorites ? theme.colorScheme.primary : null,
+                        ),
+                      ),
+                      selected: filterState.onlyFavorites,
+                      showCheckmark: false,
+                      onSelected: (_) {
+                        HapticFeedback.selectionClick();
+                        ref.read(recipeFilterProvider.notifier).toggleOnlyFavorites();
+                      },
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                  ),
+                  // Meal Time Filters (Multi-select enabled, no "Todas")
                   ..._categories.map((cat) {
-                    final isSelected = filterState.selectedCategory == cat;
+                    final isSelected = filterState.selectedCategories.contains(cat);
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
-                      child: ChoiceChip(
-                        label: Text(cat),
+                      child: FilterChip(
+                        label: Text(
+                          cat,
+                          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                        ),
                         selected: isSelected,
+                        showCheckmark: false,
                         onSelected: (_) {
                           HapticFeedback.selectionClick();
-                          ref.read(recipeFilterProvider.notifier).setCategory(cat);
+                          ref.read(recipeFilterProvider.notifier).toggleCategory(cat);
                         },
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
@@ -238,19 +235,12 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                   ),
                   child: Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primaryContainer.withValues(alpha: 0.7),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.kitchen_rounded,
-                          size: 18,
-                          color: theme.colorScheme.primary,
-                        ),
+                      Icon(
+                        Icons.kitchen_rounded,
+                        size: 28,
+                        color: theme.colorScheme.primary,
                       ),
-                      const SizedBox(width: 10),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Text(
                           strings.isSpanish ? '¿Qué cocino hoy con mi heladera?' : 'What can I cook with my fridge?',
@@ -273,12 +263,12 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
               child: recipesAsync.when(
                 data: (recipes) {
                   if (recipes.isEmpty) {
-                    final isFiltering = _searchController.text.isNotEmpty || filterState.selectedCategory != 'Todas' || filterState.onlyFavorites;
+                    final isFiltering = _searchController.text.isNotEmpty || filterState.selectedCategories.isNotEmpty || filterState.onlyFavorites;
                     return isFiltering ? _buildNoResultsState(context, strings) : _buildEmptyState(context, strings);
                   }
 
                   return Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 4, 20, 95),
+                    padding: const EdgeInsets.fromLTRB(20, 4, 20, 130),
                     child: _isGridView ? _buildGridView(context, recipes) : _buildListView(context, recipes),
                   );
                 },
@@ -371,7 +361,7 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 1.08,
+        childAspectRatio: 1.15,
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
       ),
@@ -406,7 +396,7 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
             Stack(
               children: [
                 Container(
-                  height: 105,
+                  height: 96,
                   width: double.infinity,
                   color: theme.colorScheme.surfaceContainerHighest,
                   child: Hero(
@@ -424,60 +414,31 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                           ),
                   ),
                 ),
-                // Time & Meal Time Tags Overlay on Image
+                // Time Tag Overlay on Image
                 Positioned(
                   bottom: 6,
                   left: 6,
-                  right: 36,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Time Tag
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.75),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.schedule_rounded, size: 11, color: Colors.white),
-                            const SizedBox(width: 3),
-                            Text(
-                              '${recipe.totalTimeMinutes}m',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      // Meal Time Tag (displays entire word without fading)
-                      Flexible(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.75),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            recipe.category,
-                            softWrap: false,
-                            maxLines: 1,
-                            overflow: TextOverflow.clip,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.75),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.schedule_rounded, size: 11, color: Colors.white),
+                        const SizedBox(width: 3),
+                        Text(
+                          '${recipe.totalTimeMinutes}m',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 // Favorite Button Overlay
@@ -505,15 +466,18 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-              child: Text(
-                recipe.title,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 13,
-                  height: 1.2,
+              child: SizedBox(
+                height: 34,
+                child: Text(
+                  recipe.title,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 13,
+                    height: 1.25,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -592,52 +556,28 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        // Time Tag
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.schedule_rounded, size: 11, color: theme.colorScheme.onSurfaceVariant),
-                              const SizedBox(width: 3),
-                              Text(
-                                '${recipe.totalTimeMinutes}m',
-                                style: TextStyle(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        // Meal Time Tag
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primaryContainer.withValues(alpha: 0.7),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Text(
-                            recipe.category,
-                            softWrap: false,
-                            maxLines: 1,
-                            overflow: TextOverflow.clip,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.primary,
-                              fontWeight: FontWeight.w700,
+                    // Time Tag
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.schedule_rounded, size: 11, color: theme.colorScheme.onSurfaceVariant),
+                          const SizedBox(width: 3),
+                          Text(
+                            '${recipe.totalTimeMinutes}m',
+                            style: TextStyle(
+                              color: theme.colorScheme.onSurfaceVariant,
                               fontSize: 10,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),

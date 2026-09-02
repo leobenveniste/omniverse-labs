@@ -61,33 +61,35 @@ class _AppShellState extends ConsumerState<AppShell> {
         index: _currentIndex,
         children: _screens,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          HapticFeedback.lightImpact();
-          _onCenterActionPressed(context);
-        },
-        backgroundColor: theme.colorScheme.primary,
-        elevation: 4,
-        shape: const CircleBorder(),
-        child: Container(
-          width: 58,
-          height: 58,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [
-                theme.colorScheme.primary,
-                theme.colorScheme.primary.withValues(alpha: 0.88),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+      floatingActionButton: _currentIndex == 3
+          ? null
+          : FloatingActionButton(
+              onPressed: () {
+                HapticFeedback.lightImpact();
+                _onCenterActionPressed(context);
+              },
+              backgroundColor: theme.colorScheme.primary,
+              elevation: 4,
+              shape: const CircleBorder(),
+              child: Container(
+                width: 58,
+                height: 58,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: [
+                      theme.colorScheme.primary,
+                      theme.colorScheme.primary.withValues(alpha: 0.88),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: const Center(
+                  child: Icon(Icons.add_rounded, color: Colors.white, size: 32),
+                ),
+              ),
             ),
-          ),
-          child: const Center(
-            child: Icon(Icons.add_rounded, color: Colors.white, size: 32),
-          ),
-        ),
-      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: SafeArea(
         child: Padding(
@@ -101,7 +103,7 @@ class _AppShellState extends ConsumerState<AppShell> {
               itemCount: 4,
               tabBuilder: (int index, bool isActive) {
                 final icons = [
-                  isActive ? Icons.home_rounded : Icons.home_outlined,
+                  isActive ? Icons.menu_book_rounded : Icons.menu_book_outlined,
                   isActive ? Icons.calendar_month_rounded : Icons.calendar_month_outlined,
                   Icons.format_list_bulleted_rounded,
                   isActive ? Icons.settings_rounded : Icons.settings_outlined,
@@ -127,22 +129,25 @@ class _AppShellState extends ConsumerState<AppShell> {
                 );
               },
               activeIndex: _currentIndex,
-              gapLocation: GapLocation.center,
-              notchSmoothness: NotchSmoothness.verySmoothEdge,
+              gapLocation: _currentIndex == 3 ? GapLocation.none : GapLocation.center,
+              notchSmoothness: _currentIndex == 3 ? NotchSmoothness.sharpEdge : NotchSmoothness.verySmoothEdge,
+              notchMargin: 8,
               leftCornerRadius: 28,
               rightCornerRadius: 28,
               height: 64,
-              backgroundColor: isDark ? const Color(0xFF1E261C) : Colors.white,
+              backgroundColor: isDark ? const Color(0xFF232E20) : Colors.white,
               splashColor: theme.colorScheme.primary.withValues(alpha: 0.2),
               splashRadius: 26,
               splashSpeedInMilliseconds: 300,
               elevation: 8,
               shadow: Shadow(
-                color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.08),
+                color: Colors.black.withValues(alpha: isDark ? 0.6 : 0.08),
                 blurRadius: 20,
                 offset: const Offset(0, 6),
               ),
-              borderColor: theme.colorScheme.outline.withValues(alpha: isDark ? 0.3 : 0.5),
+              borderColor: isDark
+                  ? Colors.white.withValues(alpha: 0.16)
+                  : theme.colorScheme.outline.withValues(alpha: 0.4),
               borderWidth: 1.2,
               onTap: (index) {
                 HapticFeedback.selectionClick();
