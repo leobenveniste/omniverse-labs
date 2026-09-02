@@ -312,8 +312,8 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
                             fit: StackFit.expand,
                             children: [
                               _imagePath!.startsWith('http')
-                                  ? Image.network(_imagePath!, fit: BoxFit.cover)
-                                  : Image.file(File(_imagePath!), fit: BoxFit.cover),
+                                  ? Image.network(_imagePath!, cacheWidth: 800, fit: BoxFit.cover)
+                                  : Image.file(File(_imagePath!), cacheWidth: 800, fit: BoxFit.cover),
                               Positioned(
                                 bottom: 10,
                                 right: 10,

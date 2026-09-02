@@ -29,7 +29,7 @@ class AppDatabase {
 
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
@@ -42,6 +42,17 @@ class AppDatabase {
       } catch (_) {}
       try {
         await db.execute('ALTER TABLE recipe_steps ADD COLUMN isSectionHeader INTEGER NOT NULL DEFAULT 0');
+      } catch (_) {}
+    }
+
+    if (oldVersion < 3) {
+      try {
+        await db.execute('CREATE INDEX IF NOT EXISTS idx_ingredients_recipe ON ingredients (recipeId)');
+        await db.execute('CREATE INDEX IF NOT EXISTS idx_recipe_steps_recipe ON recipe_steps (recipeId)');
+        await db.execute('CREATE INDEX IF NOT EXISTS idx_meal_plans_date ON meal_plans (dateString)');
+        await db.execute('CREATE INDEX IF NOT EXISTS idx_recipes_category ON recipes (category)');
+        await db.execute('CREATE INDEX IF NOT EXISTS idx_recipes_favorite ON recipes (isFavorite)');
+        await db.execute('CREATE INDEX IF NOT EXISTS idx_shopping_completed ON shopping_items (isCompleted)');
       } catch (_) {}
     }
   }
@@ -125,6 +136,14 @@ class AppDatabase {
         itemsJson TEXT NOT NULL
       )
     ''');
+
+    // Performance Indexes
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_ingredients_recipe ON ingredients (recipeId)');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_recipe_steps_recipe ON recipe_steps (recipeId)');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_meal_plans_date ON meal_plans (dateString)');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_recipes_category ON recipes (category)');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_recipes_favorite ON recipes (isFavorite)');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_shopping_completed ON shopping_items (isCompleted)');
   }
 
   // --- RECIPES CRUD ---
