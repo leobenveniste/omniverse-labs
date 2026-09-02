@@ -93,7 +93,7 @@ class _RecipeImportUrlDialogState extends State<RecipeImportUrlDialog> {
             ),
             const SizedBox(height: 14),
             Text(
-              strings.importUrlDescription,
+              strings.importUrlSubtitle,
               style: theme.textTheme.bodyMedium?.copyWith(height: 1.4),
             ),
             const SizedBox(height: 20),
@@ -102,7 +102,7 @@ class _RecipeImportUrlDialogState extends State<RecipeImportUrlDialog> {
               keyboardType: TextInputType.url,
               autofocus: true,
               decoration: InputDecoration(
-                hintText: strings.pasteUrlHint,
+                hintText: strings.urlInputHint,
                 prefixIcon: const Icon(Icons.language),
                 suffixIcon: _urlController.text.isNotEmpty
                     ? IconButton(
@@ -134,7 +134,7 @@ class _RecipeImportUrlDialogState extends State<RecipeImportUrlDialog> {
                   icon: _isLoading
                       ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                       : const Icon(Icons.auto_awesome),
-                  label: Text(_isLoading ? strings.scrapingProgress : strings.extractRecipe),
+                  label: Text(_isLoading ? strings.importingProgress : strings.importButton),
                 ),
               ],
             ),

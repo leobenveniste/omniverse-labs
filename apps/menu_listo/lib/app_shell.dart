@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/localization/app_localizations.dart';
-import 'features/meal_planner/presentation/weekly_planner_screen.dart';
 import 'features/recipes/presentation/recipes_list_screen.dart';
-import 'features/settings/presentation/settings_screen.dart';
+import 'features/recipes/presentation/widgets/recipe_creation_options_sheet.dart';
+import 'features/meal_planner/presentation/weekly_planner_screen.dart';
 import 'features/shopping_list/presentation/shopping_list_screen.dart';
+import 'features/shopping_list/presentation/widgets/add_item_dialog.dart';
+import 'features/shopping_list/providers/shopping_provider.dart';
+import 'features/settings/presentation/settings_screen.dart';
 
-class AppShell extends StatefulWidget {
+class AppShell extends ConsumerStatefulWidget {
   const AppShell({super.key});
 
   @override
-  State<AppShell> createState() => _AppShellState();
+  ConsumerState<AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends State<AppShell> {
+class _AppShellState extends ConsumerState<AppShell> {
+  // Tabs: 0: Recipes (Home - first in list), 1: Planner, 2: Shopping, 3: Settings
   int _currentIndex = 0;
 
   final List<Widget> _screens = const [
@@ -22,40 +27,220 @@ class _AppShellState extends State<AppShell> {
     SettingsScreen(),
   ];
 
+  void _onCenterActionPressed(BuildContext context) {
+    if (_currentIndex == 2) {
+      AddShoppingItemDialog.show(
+        context,
+        onAdd: (name, amount, unit) {
+          ref.read(shoppingListProvider.notifier).addItem(
+                name: name,
+                amount: amount,
+                unit: unit,
+              );
+        },
+      );
+    } else {
+      showRecipeCreationOptions(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final strings = AppStrings.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
+      extendBody: true,
       body: IndexedStack(
         index: _currentIndex,
         children: _screens,
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (idx) => setState(() => _currentIndex = idx),
-        destinations: [
-          NavigationDestination(
-            icon: const Icon(Icons.menu_book_outlined),
-            selectedIcon: const Icon(Icons.menu_book),
-            label: strings.navRecipes,
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
+          child: SizedBox(
+            height: 72,
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.center,
+              children: [
+                // Floating Bar Container
+                Container(
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF1E261C) : Colors.white,
+                    borderRadius: BorderRadius.circular(36),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.08),
+                        blurRadius: 24,
+                        offset: const Offset(0, 8),
+                        spreadRadius: 2,
+                      ),
+                    ],
+                    border: Border.all(
+                      color: theme.colorScheme.outline.withValues(alpha: isDark ? 0.3 : 0.5),
+                      width: 1.2,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      // Left Section: 0: Recipes, 1: Planner
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _buildNavItem(
+                              index: 0,
+                              icon: Icons.home_outlined,
+                              activeIcon: Icons.home_rounded,
+                              tooltip: strings.tabRecipes,
+                              theme: theme,
+                            ),
+                            _buildNavItem(
+                              index: 1,
+                              icon: Icons.calendar_month_outlined,
+                              activeIcon: Icons.calendar_month_rounded,
+                              tooltip: strings.tabPlanner,
+                              theme: theme,
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Center Space for elevated button
+                      const SizedBox(width: 68),
+
+                      // Right Section: 2: Shopping, 3: Settings
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _buildNavItem(
+                              index: 2,
+                              icon: Icons.format_list_bulleted_rounded,
+                              activeIcon: Icons.format_list_bulleted_rounded,
+                              tooltip: strings.tabShopping,
+                              theme: theme,
+                            ),
+                            _buildNavItem(
+                              index: 3,
+                              icon: Icons.person_outline_rounded,
+                              activeIcon: Icons.person_rounded,
+                              tooltip: strings.tabSettings,
+                              theme: theme,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Center Notch Background Circle (cutout effect)
+                Positioned(
+                  top: -12,
+                  child: Container(
+                    width: 66,
+                    height: 66,
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF131912) : const Color(0xFFF7F8F7),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+
+                // Center Prominent Elevated Action Button (+)
+                Positioned(
+                  top: -8,
+                  child: GestureDetector(
+                    onTap: () => _onCenterActionPressed(context),
+                    child: Container(
+                      width: 58,
+                      height: 58,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            theme.colorScheme.primary,
+                            theme.colorScheme.primary.withValues(alpha: 0.88),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: theme.colorScheme.primary.withValues(alpha: 0.4),
+                            blurRadius: 14,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.add_rounded,
+                          color: Colors.white,
+                          size: 32,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.calendar_month_outlined),
-            selectedIcon: const Icon(Icons.calendar_month),
-            label: strings.navPlanner,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required int index,
+    required IconData icon,
+    required IconData activeIcon,
+    required String tooltip,
+    required ThemeData theme,
+  }) {
+    final isSelected = _currentIndex == index;
+    final primaryColor = theme.colorScheme.primary;
+    final unselectedColor = theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6);
+
+    return InkWell(
+      onTap: () => setState(() => _currentIndex = index),
+      borderRadius: BorderRadius.circular(24),
+      splashColor: primaryColor.withValues(alpha: 0.1),
+      highlightColor: Colors.transparent,
+      child: Tooltip(
+        message: tooltip,
+        child: SizedBox(
+          width: 52,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              AnimatedScale(
+                scale: isSelected ? 1.15 : 1.0,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOutBack,
+                child: Icon(
+                  isSelected ? activeIcon : icon,
+                  size: 26,
+                  color: isSelected ? primaryColor : unselectedColor,
+                ),
+              ),
+              const SizedBox(height: 3),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                height: 4,
+                width: isSelected ? 6 : 0,
+                decoration: BoxDecoration(
+                  color: isSelected ? primaryColor : Colors.transparent,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ],
           ),
-          NavigationDestination(
-            icon: const Icon(Icons.shopping_cart_outlined),
-            selectedIcon: const Icon(Icons.shopping_cart),
-            label: strings.navShopping,
-          ),
-          NavigationDestination(
-            icon: const Icon(Icons.settings_outlined),
-            selectedIcon: const Icon(Icons.settings),
-            label: strings.navSettings,
-          ),
-        ],
+        ),
       ),
     );
   }

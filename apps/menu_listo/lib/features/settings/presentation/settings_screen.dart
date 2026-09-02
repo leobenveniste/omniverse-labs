@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:menu_listo/core/localization/app_localizations.dart';
 import 'package:menu_listo/core/localization/locale_provider.dart';
+import 'package:menu_listo/core/theme/app_colors.dart';
 import 'package:menu_listo/core/theme/app_theme_types.dart';
 import 'package:menu_listo/core/theme/theme_provider.dart';
 import '../../backup/services/backup_service.dart';
-import '../../recipes/providers/recipe_provider.dart';
 import 'widgets/about_dialog_widget.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -15,9 +15,8 @@ class SettingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final strings = AppStrings.of(context);
-
-    final currentThemeMode = ref.watch(themeModeProvider);
     final currentDesignTheme = ref.watch(designThemeProvider);
+    final currentThemeMode = ref.watch(themeModeProvider);
     final currentLanguage = ref.watch(localeProvider);
 
     return Scaffold(
@@ -25,214 +24,216 @@ class SettingsScreen extends ConsumerWidget {
         title: Text(strings.settingsTitle),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.fromLTRB(20, 10, 20, 100),
         children: [
-          // Visual Design Style Selector
-          _buildSectionHeader(theme, strings.visualTheme),
-          Card(
-            child: Column(
-              children: [
-                RadioListTile<AppDesignTheme>(
-                  title: Text(strings.styleModernBotanical, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: const Text('Editorial botánica, verde oliva, salvia y crema'),
-                  value: AppDesignTheme.modernBotanical,
-                  groupValue: currentDesignTheme,
-                  onChanged: (val) {
-                    if (val != null) ref.read(designThemeProvider.notifier).setDesignTheme(val);
-                  },
-                ),
-                const Divider(height: 1),
-                RadioListTile<AppDesignTheme>(
-                  title: Text(strings.styleEditorialGourmet, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: const Text('Revista de lujo, tipografía serif refinada y líneas puras'),
-                  value: AppDesignTheme.editorialGourmet,
-                  groupValue: currentDesignTheme,
-                  onChanged: (val) {
-                    if (val != null) ref.read(designThemeProvider.notifier).setDesignTheme(val);
-                  },
-                ),
-                const Divider(height: 1),
-                RadioListTile<AppDesignTheme>(
-                  title: Text(strings.styleMaterialBento, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: const Text('Material You dinámico, tarjetas Bento y acentos de mostaza'),
-                  value: AppDesignTheme.materialYouBento,
-                  groupValue: currentDesignTheme,
-                  onChanged: (val) {
-                    if (val != null) ref.read(designThemeProvider.notifier).setDesignTheme(val);
-                  },
-                ),
-              ],
-            ),
+          // 1. Visual Theme
+          Text(
+            strings.visualThemeTitle,
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+
+          _buildThemeOptionCard(
+            context: context,
+            title: strings.themeBotanical,
+            colors: [AppColors.botanicalPrimaryLight, AppColors.botanicalSecondaryLight, AppColors.botanicalAccentLight],
+            isSelected: currentDesignTheme == AppDesignTheme.modernBotanical,
+            onTap: () => ref.read(designThemeProvider.notifier).setDesignTheme(AppDesignTheme.modernBotanical),
+          ),
+          const SizedBox(height: 8),
+
+          _buildThemeOptionCard(
+            context: context,
+            title: strings.themeGourmet,
+            colors: [AppColors.gourmetPrimaryLight, AppColors.gourmetSecondaryLight, AppColors.gourmetAccentLight],
+            isSelected: currentDesignTheme == AppDesignTheme.editorialGourmet,
+            onTap: () => ref.read(designThemeProvider.notifier).setDesignTheme(AppDesignTheme.editorialGourmet),
+          ),
+          const SizedBox(height: 8),
+
+          _buildThemeOptionCard(
+            context: context,
+            title: strings.themeBento,
+            colors: [AppColors.bentoPrimaryLight, AppColors.bentoSecondaryLight, AppColors.bentoAccentLight],
+            isSelected: currentDesignTheme == AppDesignTheme.materialYouBento,
+            onTap: () => ref.read(designThemeProvider.notifier).setDesignTheme(AppDesignTheme.materialYouBento),
           ),
           const SizedBox(height: 24),
 
-          // Color Mode (Light / Dark / System)
-          _buildSectionHeader(theme, strings.themeMode),
-          Card(
-            child: Column(
-              children: [
-                RadioListTile<ThemeMode>(
-                  title: Text(strings.themeSystem),
-                  value: ThemeMode.system,
-                  groupValue: currentThemeMode,
-                  onChanged: (val) {
-                    if (val != null) ref.read(themeModeProvider.notifier).setThemeMode(val);
-                  },
-                ),
-                const Divider(height: 1),
-                RadioListTile<ThemeMode>(
-                  title: Text(strings.themeLight),
-                  value: ThemeMode.light,
-                  groupValue: currentThemeMode,
-                  onChanged: (val) {
-                    if (val != null) ref.read(themeModeProvider.notifier).setThemeMode(val);
-                  },
-                ),
-                const Divider(height: 1),
-                RadioListTile<ThemeMode>(
-                  title: Text(strings.themeDark),
-                  value: ThemeMode.dark,
-                  groupValue: currentThemeMode,
-                  onChanged: (val) {
-                    if (val != null) ref.read(themeModeProvider.notifier).setThemeMode(val);
-                  },
-                ),
-              ],
-            ),
+          // 2. Color Mode
+          Text(
+            strings.appearanceTitle,
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          SegmentedButton<ThemeMode>(
+            segments: [
+              ButtonSegment(
+                value: ThemeMode.system,
+                icon: const Icon(Icons.brightness_auto),
+                label: Text(strings.modeSystem),
+              ),
+              ButtonSegment(
+                value: ThemeMode.light,
+                icon: const Icon(Icons.light_mode),
+                label: Text(strings.modeLight),
+              ),
+              ButtonSegment(
+                value: ThemeMode.dark,
+                icon: const Icon(Icons.dark_mode),
+                label: Text(strings.modeDark),
+              ),
+            ],
+            selected: {currentThemeMode},
+            onSelectionChanged: (newSelection) {
+              ref.read(themeModeProvider.notifier).setThemeMode(newSelection.first);
+            },
           ),
           const SizedBox(height: 24),
 
-          // Language Selector
-          _buildSectionHeader(theme, strings.languageTitle),
-          Card(
-            child: Column(
-              children: [
-                ...AppLanguage.values.map((lang) {
-                  return Column(
-                    children: [
-                      RadioListTile<AppLanguage>(
-                        title: Text(lang.displayName),
-                        value: lang,
-                        groupValue: currentLanguage,
-                        onChanged: (val) {
-                          if (val != null) ref.read(localeProvider.notifier).setLanguage(val);
-                        },
-                      ),
-                      if (lang != AppLanguage.values.last) const Divider(height: 1),
-                    ],
-                  );
-                }),
-              ],
-            ),
+          // 3. Language Selector
+          Text(
+            strings.languageTitle,
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          SegmentedButton<AppLanguage>(
+            segments: [
+              ButtonSegment(
+                value: AppLanguage.system,
+                label: Text(strings.langSystem),
+              ),
+              const ButtonSegment(
+                value: AppLanguage.es,
+                label: Text('Español'),
+              ),
+              const ButtonSegment(
+                value: AppLanguage.en,
+                label: Text('English'),
+              ),
+            ],
+            selected: {currentLanguage},
+            onSelectionChanged: (newSelection) {
+              ref.read(localeProvider.notifier).setLanguage(newSelection.first);
+            },
           ),
           const SizedBox(height: 24),
 
-          // Backup & Data
-          _buildSectionHeader(theme, strings.dataBackup),
+          // 4. Backup & Privacy
+          Text(
+            strings.backupTitle,
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
           Card(
             child: Column(
               children: [
                 ListTile(
-                  leading: Icon(Icons.file_upload_outlined, color: theme.colorScheme.primary),
+                  leading: const Icon(Icons.cloud_upload_outlined),
                   title: Text(strings.exportBackup),
-                  subtitle: const Text('Guarda todas tus recetas y listas en un archivo'),
                   onTap: () async {
-                    final path = await BackupService().exportBackupJson();
+                    final backup = BackupService();
+                    final path = await backup.exportBackupJson();
                     if (context.mounted && path != null) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(strings.backupExportSuccess)),
+                        SnackBar(content: Text(strings.isSpanish ? 'Copia exportada con éxito' : 'Backup exported successfully')),
                       );
                     }
                   },
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: Icon(Icons.file_download_outlined, color: theme.colorScheme.primary),
+                  leading: const Icon(Icons.cloud_download_outlined),
                   title: Text(strings.importBackup),
-                  subtitle: const Text('Restaura recetas desde una copia previa'),
                   onTap: () async {
-                    final success = await BackupService().importBackupJson();
-                    if (context.mounted) {
-                      if (success) {
-                        ref.read(recipesListProvider.notifier).loadRecipes();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(strings.backupImportSuccess)),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(strings.backupError)),
-                        );
-                      }
+                    final backup = BackupService();
+                    final ok = await backup.importBackupJson();
+                    if (context.mounted && ok) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(strings.isSpanish ? 'Copia restaurada con éxito' : 'Backup restored successfully')),
+                      );
                     }
                   },
-                ),
-                const Divider(height: 1),
-                ListTile(
-                  leading: Icon(Icons.refresh, color: theme.colorScheme.primary),
-                  title: Text(strings.restoreSampleRecipes),
-                  onTap: () => _confirmReloadSamples(context, ref),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 24),
 
-          // About Omniverse Labs
+          // 5. About Screen
           Card(
             child: ListTile(
-              leading: Icon(Icons.info_outline, color: theme.colorScheme.primary),
-              title: Text(strings.aboutOmniverseLabs, style: const TextStyle(fontWeight: FontWeight.bold)),
+              leading: const Icon(Icons.info_outline_rounded),
+              title: Text(strings.aboutApp),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () => AboutDialogWidget.show(context),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => const AboutDialogWidget(),
+                );
+              },
             ),
           ),
-          const SizedBox(height: 16),
-
-          // Privacy Statement
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text(
-              strings.privacyNotice,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-            ),
-          ),
-          const SizedBox(height: 40),
         ],
       ),
     );
   }
 
-  Widget _buildSectionHeader(ThemeData theme, String title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
-      child: Text(
-        title,
-        style: theme.textTheme.labelLarge?.copyWith(
-          color: theme.colorScheme.primary,
-          fontWeight: FontWeight.bold,
+  Widget _buildThemeOptionCard({
+    required BuildContext context,
+    required String title,
+    required List<Color> colors,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context);
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Card(
+        color: isSelected ? theme.colorScheme.primary.withValues(alpha: 0.1) : null,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: isSelected ? theme.colorScheme.primary : theme.colorScheme.outline.withValues(alpha: 0.5),
+            width: isSelected ? 2 : 1,
+          ),
         ),
-      ),
-    );
-  }
-
-  void _confirmReloadSamples(BuildContext context, WidgetRef ref) {
-    final strings = AppStrings.of(context);
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(strings.restoreSampleRecipes),
-        content: Text(strings.restoreSampleRecipesConfirm),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text(strings.cancel)),
-          FilledButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              ref.read(recipesListProvider.notifier).reloadSampleRecipes();
-            },
-            child: Text(strings.confirm),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              Row(
+                children: colors
+                    .map((c) => Container(
+                          width: 16,
+                          height: 16,
+                          margin: const EdgeInsets.only(right: 6),
+                          decoration: BoxDecoration(
+                            color: c,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 1.5),
+                          ),
+                        ))
+                    .toList(),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  title,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                  ),
+                ),
+              ),
+              if (isSelected)
+                Icon(Icons.check_circle, color: theme.colorScheme.primary, size: 20)
+              else
+                Icon(Icons.radio_button_unchecked, color: theme.colorScheme.outline, size: 20),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

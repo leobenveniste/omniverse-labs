@@ -2,9 +2,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 import 'package:menu_listo/core/localization/app_localizations.dart';
+import 'package:menu_listo/core/utils/culinary_catalog.dart';
+import 'package:menu_listo/core/utils/ingredient_parser.dart';
+import 'package:menu_listo/core/utils/portion_calculator.dart';
 import '../models/ingredient_model.dart';
 import '../models/recipe_model.dart';
 import '../models/recipe_step_model.dart';
@@ -26,51 +28,67 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
   late TextEditingController _descriptionController;
   late TextEditingController _prepTimeController;
   late TextEditingController _cookTimeController;
-  late TextEditingController _baseServingsController;
-  late TextEditingController _tagsController;
+  late TextEditingController _servingsController;
+  late TextEditingController _ingredientsTextController;
+  late TextEditingController _stepsTextController;
+  late String _selectedCategory;
+  String? _imagePath;
 
-  late String _category;
-  String _imageUrl = '';
-  late List<_IngredientFormEntry> _ingredientEntries;
-  late List<TextEditingController> _stepControllers;
+  List<Ingredient> _parsedIngredients = [];
+  List<RecipeStep> _parsedSteps = [];
+
+  final List<String> _categories = [
+    'Desayuno',
+    'Almuerzo',
+    'Merienda',
+    'Cena',
+    'Postres',
+  ];
 
   @override
   void initState() {
     super.initState();
-    final init = widget.initialRecipe;
+    final r = widget.initialRecipe;
+    _titleController = TextEditingController(text: r?.title ?? '');
+    _descriptionController = TextEditingController(text: r?.description ?? '');
+    _prepTimeController = TextEditingController(text: r != null ? r.prepTimeMinutes.toString() : '15');
+    _cookTimeController = TextEditingController(text: r != null ? r.cookTimeMinutes.toString() : '25');
+    _servingsController = TextEditingController(text: r != null ? r.baseServings.toString() : '4');
+    _selectedCategory = r?.category ?? 'Almuerzo';
+    _imagePath = r != null && r.imageUrl.isNotEmpty ? r.imageUrl : null;
 
-    _titleController = TextEditingController(text: init?.title ?? '');
-    _descriptionController = TextEditingController(text: init?.description ?? '');
-    _prepTimeController = TextEditingController(text: (init?.prepTimeMinutes ?? 15).toString());
-    _cookTimeController = TextEditingController(text: (init?.cookTimeMinutes ?? 20).toString());
-    _baseServingsController = TextEditingController(text: (init?.baseServings ?? 2).toString());
-    _tagsController = TextEditingController(text: init?.tags.join(', ') ?? '');
-    _category = init?.category ?? 'Almuerzo';
-    _imageUrl = init?.imageUrl ?? '';
-
-    if (init != null && init.ingredients.isNotEmpty) {
-      _ingredientEntries = init.ingredients.map((i) => _IngredientFormEntry(
-        amountCtrl: TextEditingController(text: i.amount > 0 ? i.amount.toString().replaceAll('.0', '') : ''),
-        unitCtrl: TextEditingController(text: i.unit),
-        nameCtrl: TextEditingController(text: i.name),
-        notesCtrl: TextEditingController(text: i.notes),
-      )).toList();
+    // Initialize ingredients text
+    if (r != null && r.ingredients.isNotEmpty) {
+      _ingredientsTextController = TextEditingController(
+        text: r.ingredients
+            .map((i) => PortionCalculator.formatIngredientDisplay(
+                  amount: i.amount,
+                  unit: i.unit,
+                  name: i.name,
+                  notes: i.notes,
+                ))
+            .join('\n'),
+      );
     } else {
-      _ingredientEntries = [
-        _IngredientFormEntry(
-          amountCtrl: TextEditingController(),
-          unitCtrl: TextEditingController(),
-          nameCtrl: TextEditingController(),
-          notesCtrl: TextEditingController(),
-        ),
-      ];
+      _ingredientsTextController = TextEditingController();
     }
 
-    if (init != null && init.steps.isNotEmpty) {
-      _stepControllers = init.steps.map((s) => TextEditingController(text: s.instruction)).toList();
+    // Initialize steps text
+    if (r != null && r.steps.isNotEmpty) {
+      _stepsTextController = TextEditingController(
+        text: r.steps.map((s) => '${s.stepNumber}. ${s.instruction}').join('\n\n'),
+      );
     } else {
-      _stepControllers = [TextEditingController()];
+      _stepsTextController = TextEditingController();
     }
+
+    // Initial parsing
+    _updateParsedIngredients();
+    _updateParsedSteps();
+
+    // Listeners for live preview update
+    _ingredientsTextController.addListener(_updateParsedIngredients);
+    _stepsTextController.addListener(_updateParsedSteps);
   }
 
   @override
@@ -79,141 +97,145 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
     _descriptionController.dispose();
     _prepTimeController.dispose();
     _cookTimeController.dispose();
-    _baseServingsController.dispose();
-    _tagsController.dispose();
-    for (var e in _ingredientEntries) {
-      e.dispose();
-    }
-    for (var s in _stepControllers) {
-      s.dispose();
-    }
+    _servingsController.dispose();
+    _ingredientsTextController.dispose();
+    _stepsTextController.dispose();
     super.dispose();
   }
 
-  Future<void> _pickImage(ImageSource source) async {
-    final picker = ImagePicker();
-    final picked = await picker.pickImage(source: source, imageQuality: 85);
-    if (picked != null) {
-      final appDir = await getApplicationDocumentsDirectory();
-      final fileName = 'recipe_${DateTime.now().millisecondsSinceEpoch}${p.extension(picked.path)}';
-      final savedImage = await File(picked.path).copy('${appDir.path}/$fileName');
-      setState(() {
-        _imageUrl = savedImage.path;
-      });
-    }
-  }
+  void _updateParsedIngredients() {
+    final text = _ingredientsTextController.text;
+    final lines = text.split(RegExp(r'\r?\n+'));
+    final List<Ingredient> parsed = [];
 
-  void _addIngredient() {
+    for (final rawLine in lines) {
+      final line = rawLine.trim();
+      if (line.isEmpty) continue;
+      final ing = IngredientParser.parseLine(line);
+      if (ing.name.trim().isNotEmpty) {
+        parsed.add(ing);
+      }
+    }
+
     setState(() {
-      _ingredientEntries.add(_IngredientFormEntry(
-        amountCtrl: TextEditingController(),
-        unitCtrl: TextEditingController(),
-        nameCtrl: TextEditingController(),
-        notesCtrl: TextEditingController(),
-      ));
+      _parsedIngredients = parsed;
     });
   }
 
-  void _removeIngredient(int index) {
-    if (_ingredientEntries.length > 1) {
-      setState(() {
-        _ingredientEntries[index].dispose();
-        _ingredientEntries.removeAt(index);
-      });
-    }
-  }
+  void _updateParsedSteps() {
+    final text = _stepsTextController.text;
+    final lines = text.split(RegExp(r'\r?\n+'));
+    final List<RecipeStep> parsed = [];
+    int stepNum = 1;
 
-  void _addStep() {
-    setState(() {
-      _stepControllers.add(TextEditingController());
-    });
-  }
+    for (final rawLine in lines) {
+      var line = rawLine.trim();
+      if (line.isEmpty) continue;
 
-  void _removeStep(int index) {
-    if (_stepControllers.length > 1) {
-      setState(() {
-        _stepControllers[index].dispose();
-        _stepControllers.removeAt(index);
-      });
-    }
-  }
+      if (line.endsWith(':') || line.startsWith('#')) {
+        final cleanHeader = line.replaceAll(RegExp(r'^[#\s]+'), '').trim();
+        parsed.add(RecipeStep(
+          stepNumber: 0,
+          instruction: cleanHeader,
+          isSectionHeader: true,
+        ));
+        continue;
+      }
 
-  Future<void> _saveRecipe() async {
-    if (!_formKey.currentState!.validate()) return;
+      // Clean leading step labels like "1.", "1)", "Paso 1:", "- ", "* ", "• "
+      line = line.replaceFirst(
+        RegExp(r'^(?:paso\s*\d+[\s:\.\-]*|\d+[\.\)\-:]*|[-*•])\s*', caseSensitive: false),
+        '',
+      ).trim();
 
-    final strings = AppStrings.of(context);
-
-    // Build ingredients
-    final ingredients = <Ingredient>[];
-    for (var e in _ingredientEntries) {
-      final name = e.nameCtrl.text.trim();
-      if (name.isNotEmpty) {
-        final amount = double.tryParse(e.amountCtrl.text.trim().replaceAll(',', '.')) ?? 0.0;
-        final unit = e.unitCtrl.text.trim();
-        final notes = e.notesCtrl.text.trim();
-        ingredients.add(Ingredient(
-          amount: amount,
-          unit: unit,
-          name: name,
-          notes: notes,
+      if (line.isNotEmpty) {
+        parsed.add(RecipeStep(
+          stepNumber: stepNum++,
+          instruction: line,
         ));
       }
     }
 
-    if (ingredients.isEmpty) {
+    setState(() {
+      _parsedSteps = parsed;
+    });
+  }
+
+  void _insertNextStepNumber() {
+    final currentText = _stepsTextController.text;
+    final nextNumber = _parsedSteps.where((s) => !s.isSectionHeader).length + 1;
+    final prefix = currentText.isEmpty || currentText.endsWith('\n') ? '' : '\n\n';
+    final addition = '$prefix$nextNumber. ';
+
+    _stepsTextController.text = '$currentText$addition';
+    _stepsTextController.selection = TextSelection.fromPosition(
+      TextPosition(offset: _stepsTextController.text.length),
+    );
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+    final file = await picker.pickImage(source: source, imageQuality: 85);
+    if (file != null) {
+      setState(() => _imagePath = file.path);
+    }
+  }
+
+  void _save() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final strings = AppStrings.of(context);
+
+    if (_parsedIngredients.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(strings.validationIngredientsRequired)),
+        SnackBar(
+          content: Text(
+            strings.isSpanish
+                ? 'Por favor, ingresa al menos un ingrediente'
+                : 'Please enter at least one ingredient',
+          ),
+          backgroundColor: Colors.orange.shade800,
+        ),
       );
       return;
     }
 
-    // Build steps
-    final steps = <RecipeStep>[];
-    int stepNum = 1;
-    for (var s in _stepControllers) {
-      final instruction = s.text.trim();
-      if (instruction.isNotEmpty) {
-        steps.add(RecipeStep(stepNumber: stepNum++, instruction: instruction));
-      }
-    }
-
-    if (steps.isEmpty) {
+    if (_parsedSteps.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(strings.validationStepsRequired)),
+        SnackBar(
+          content: Text(
+            strings.isSpanish
+                ? 'Por favor, ingresa al menos un paso de preparación'
+                : 'Please enter at least one step',
+          ),
+          backgroundColor: Colors.orange.shade800,
+        ),
       );
       return;
     }
 
-    final tags = _tagsController.text
-        .split(',')
-        .map((t) => t.trim())
-        .where((t) => t.isNotEmpty)
-        .toList();
+    final recipeId = widget.initialRecipe?.id ?? const Uuid().v4();
+    final now = DateTime.now();
 
     final recipe = Recipe(
-      id: widget.initialRecipe?.id ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      id: recipeId,
       title: _titleController.text.trim(),
       description: _descriptionController.text.trim(),
-      category: _category,
+      category: _selectedCategory,
       prepTimeMinutes: int.tryParse(_prepTimeController.text.trim()) ?? 15,
-      cookTimeMinutes: int.tryParse(_cookTimeController.text.trim()) ?? 20,
-      baseServings: int.tryParse(_baseServingsController.text.trim()) ?? 2,
-      tags: tags,
-      imageUrl: _imageUrl,
-      sourceUrl: widget.initialRecipe?.sourceUrl ?? '',
+      cookTimeMinutes: int.tryParse(_cookTimeController.text.trim()) ?? 25,
+      baseServings: int.tryParse(_servingsController.text.trim()) ?? 4,
+      imageUrl: _imagePath ?? '',
       isFavorite: widget.initialRecipe?.isFavorite ?? false,
-      ingredients: ingredients,
-      steps: steps,
-      createdAt: widget.initialRecipe?.createdAt ?? DateTime.now(),
+      ingredients: _parsedIngredients,
+      steps: _parsedSteps,
+      createdAt: widget.initialRecipe?.createdAt ?? now,
     );
 
     await ref.read(recipesListProvider.notifier).saveRecipe(recipe);
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(strings.recipeCreatedSuccess)),
-      );
-      Navigator.of(context).pop();
+      Navigator.pop(context);
     }
   }
 
@@ -223,91 +245,118 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
     final strings = AppStrings.of(context);
     final isEditing = widget.initialRecipe != null;
 
-    final categories = [
-      strings.catBreakfast,
-      strings.catLunch,
-      strings.catSnack,
-      strings.catDinner,
-      strings.catDessert,
-      strings.catOther,
-    ];
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? strings.formTitleEdit : strings.formTitleNew),
+        title: Text(isEditing ? strings.editRecipeTitle : strings.newRecipeTitle),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.check),
-            tooltip: strings.save,
-            onPressed: _saveRecipe,
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: FilledButton.icon(
+              onPressed: _save,
+              icon: const Icon(Icons.check_rounded, size: 18),
+              label: Text(strings.saveRecipe),
+            ),
           ),
         ],
       ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(20.0),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 80),
           children: [
-            // Image Picker Box
-            GestureDetector(
-              onTap: () => _showImageSourcePicker(context),
-              child: Container(
-                height: 180,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.4)),
+            // Image Picker Header Card
+            Center(
+              child: GestureDetector(
+                onTap: () => _showImageSourceDialog(context),
+                child: Container(
+                  height: 170,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.3)),
+                  ),
+                  child: _imagePath != null
+                      ? ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              _imagePath!.startsWith('http')
+                                  ? Image.network(_imagePath!, fit: BoxFit.cover)
+                                  : Image.file(File(_imagePath!), fit: BoxFit.cover),
+                              Positioned(
+                                bottom: 10,
+                                right: 10,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withValues(alpha: 0.65),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.photo_camera, size: 14, color: Colors.white),
+                                      const SizedBox(width: 6),
+                                      Text(strings.changePhoto, style: const TextStyle(color: Colors.white, fontSize: 12)),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.add_a_photo_outlined, size: 36, color: theme.colorScheme.primary),
+                            const SizedBox(height: 8),
+                            Text(
+                              strings.addPhoto,
+                              style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
                 ),
-                child: _imageUrl.isNotEmpty
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(20),
-                        child: _buildCoverPreview(),
-                      )
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.add_a_photo_outlined, size: 40, color: theme.colorScheme.primary),
-                          const SizedBox(height: 8),
-                          Text(strings.selectPhoto, style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold)),
-                        ],
-                      ),
               ),
             ),
-            const SizedBox(height: 20),
-            // Title
+            const SizedBox(height: 24),
+
+            // Section 1: Basic Info
+            Row(
+              children: [
+                Icon(Icons.info_outline_rounded, size: 20, color: theme.colorScheme.primary),
+                const SizedBox(width: 8),
+                Text(strings.basicInfoSection, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+              ],
+            ),
+            const SizedBox(height: 12),
+
             TextFormField(
               controller: _titleController,
               decoration: InputDecoration(
-                labelText: strings.fieldTitle,
-                prefixIcon: const Icon(Icons.restaurant),
+                labelText: strings.titleLabel,
+                prefixIcon: const Icon(Icons.restaurant_rounded, size: 20),
               ),
-              validator: (v) => v == null || v.trim().isEmpty ? strings.validationTitleRequired : null,
+              validator: (v) => v == null || v.trim().isEmpty ? strings.titleRequired : null,
             ),
-            const SizedBox(height: 14),
-            // Description
-            TextFormField(
-              controller: _descriptionController,
-              maxLines: 2,
-              decoration: InputDecoration(
-                labelText: strings.fieldDescription,
-                prefixIcon: const Icon(Icons.notes),
-              ),
-            ),
-            const SizedBox(height: 14),
-            // Category Selector
+            const SizedBox(height: 12),
+
             DropdownButtonFormField<String>(
-              value: categories.contains(_category) ? _category : categories.first,
+              initialValue: _selectedCategory,
               decoration: InputDecoration(
-                labelText: strings.fieldCategory,
-                prefixIcon: const Icon(Icons.category),
+                labelText: strings.categoryLabel,
+                prefixIcon: const Icon(Icons.category_outlined, size: 20),
               ),
-              items: categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
-              onChanged: (v) {
-                if (v != null) setState(() => _category = v);
+              items: _categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+              onChanged: (val) {
+                if (val != null) setState(() => _selectedCategory = val);
               },
             ),
-            const SizedBox(height: 14),
-            // Times and Servings Row
+            const SizedBox(height: 12),
+
+            // Compact 3-Column Metrics (Prep, Cook, Servings)
             Row(
               children: [
                 Expanded(
@@ -315,286 +364,365 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
                     controller: _prepTimeController,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      labelText: strings.fieldPrepTime,
-                      prefixIcon: const Icon(Icons.timer_outlined),
+                      prefixIcon: const Icon(Icons.timer_outlined, size: 18),
+                      labelText: strings.prepLabel,
+                      hintText: '15',
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 8),
                 Expanded(
                   child: TextFormField(
                     controller: _cookTimeController,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      labelText: strings.fieldCookTime,
-                      prefixIcon: const Icon(Icons.local_fire_department_outlined),
+                      prefixIcon: const Icon(Icons.soup_kitchen_outlined, size: 18),
+                      labelText: strings.cookLabel,
+                      hintText: '25',
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                     ),
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 14),
-            // Base Servings & Tags
-            Row(
-              children: [
+                const SizedBox(width: 8),
                 Expanded(
                   child: TextFormField(
-                    controller: _baseServingsController,
+                    controller: _servingsController,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      labelText: strings.fieldBaseServings,
-                      prefixIcon: const Icon(Icons.group_outlined),
-                    ),
-                    validator: (v) {
-                      final n = int.tryParse(v ?? '');
-                      if (n == null || n <= 0) return strings.validationServingsRequired;
-                      return null;
-                    },
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: TextFormField(
-                    controller: _tagsController,
-                    decoration: InputDecoration(
-                      labelText: strings.fieldTags,
-                      prefixIcon: const Icon(Icons.tag),
+                      prefixIcon: const Icon(Icons.people_outline, size: 18),
+                      labelText: strings.servingsLabel,
+                      hintText: '4',
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
                     ),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 28),
-            // --- INGREDIENTS SECTION ---
+
+            // Section 2: Unified Ingredients Input
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Icon(Icons.inventory_2_outlined, size: 20, color: theme.colorScheme.primary),
+                const SizedBox(width: 8),
                 Text(
                   strings.ingredientsTitle,
                   style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
-                TextButton.icon(
-                  onPressed: _addIngredient,
-                  icon: const Icon(Icons.add),
-                  label: Text(strings.addIngredient),
-                ),
+                const Spacer(),
+                if (_parsedIngredients.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${_parsedIngredients.length} ${strings.ingredientsDetected}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onPrimaryContainer,
+                      ),
+                    ),
+                  ),
               ],
             ),
             const SizedBox(height: 8),
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _ingredientEntries.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 10),
-              itemBuilder: (context, index) {
-                final entry = _ingredientEntries[index];
-                return Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.3)),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          // Amount
-                          SizedBox(
-                            width: 70,
-                            child: TextFormField(
-                              controller: entry.amountCtrl,
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                labelText: strings.ingredientAmount,
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          // Unit
-                          SizedBox(
-                            width: 100,
-                            child: TextFormField(
-                              controller: entry.unitCtrl,
-                              decoration: InputDecoration(
-                                labelText: strings.ingredientUnit,
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          // Name
-                          Expanded(
-                            child: TextFormField(
-                              controller: entry.nameCtrl,
-                              decoration: InputDecoration(
-                                labelText: strings.ingredientName,
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                              ),
-                            ),
-                          ),
-                          if (_ingredientEntries.length > 1)
-                            IconButton(
-                              icon: const Icon(Icons.close, color: Colors.redAccent, size: 20),
-                              onPressed: () => _removeIngredient(index),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      // Optional Notes
-                      TextFormField(
-                        controller: entry.notesCtrl,
-                        decoration: InputDecoration(
-                          hintText: strings.ingredientNotes,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          prefixIcon: const Icon(Icons.info_outline, size: 16),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
+
+            TextFormField(
+              controller: _ingredientsTextController,
+              minLines: 4,
+              maxLines: 10,
+              keyboardType: TextInputType.multiline,
+              decoration: InputDecoration(
+                hintText: strings.ingredientsQuickInputHint,
+                hintStyle: TextStyle(fontSize: 13, color: theme.colorScheme.outline.withValues(alpha: 0.8)),
+                alignLabelWithHint: true,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+              ),
             ),
-            const SizedBox(height: 28),
-            // --- STEPS SECTION ---
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  strings.instructionsTitle,
-                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            const SizedBox(height: 10),
+
+            // Live Ingredients Preview Chips
+            if (_parsedIngredients.isNotEmpty)
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
                 ),
-                TextButton.icon(
-                  onPressed: _addStep,
-                  icon: const Icon(Icons.add),
-                  label: Text(strings.addStep),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _stepControllers.length,
-              separatorBuilder: (_, _) => const SizedBox(height: 10),
-              itemBuilder: (context, index) {
-                final ctrl = _stepControllers[index];
-                return Row(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      margin: const EdgeInsets.only(top: 10),
-                      width: 28,
-                      height: 28,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Text(
-                        '${index + 1}',
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: TextFormField(
-                        controller: ctrl,
-                        maxLines: 3,
-                        decoration: InputDecoration(
-                          hintText: '${strings.step} ${index + 1}...',
+                    Row(
+                      children: [
+                        const Icon(Icons.visibility_outlined, size: 14, color: Colors.grey),
+                        const SizedBox(width: 6),
+                        Text(
+                          strings.isSpanish ? 'Vista previa detectada:' : 'Detected preview:',
+                          style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold),
                         ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _parsedIngredients.map((ing) {
+                        if (ing.isSectionHeader) {
+                          return Container(
+                            width: double.infinity,
+                            margin: const EdgeInsets.only(top: 6, bottom: 2),
+                            child: Row(
+                              children: [
+                                Icon(Icons.bookmark_outline, size: 15, color: theme.colorScheme.primary),
+                                const SizedBox(width: 4),
+                                Text(
+                                  ing.name.endsWith(':') ? ing.name : '${ing.name}:',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.colorScheme.primary,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+
+                        final emoji = CulinaryCatalog.getEmoji(ing.name);
+                        final display = PortionCalculator.formatIngredientDisplay(
+                          amount: ing.amount,
+                          unit: ing.unit,
+                          name: ing.name,
+                          notes: ing.notes,
+                        );
+
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surface,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.3)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(emoji, style: const TextStyle(fontSize: 15)),
+                              const SizedBox(width: 6),
+                              Text(
+                                display,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.onSurface,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ),
+
+            const SizedBox(height: 28),
+
+            // Section 3: Unified Steps Input
+            Row(
+              children: [
+                Icon(Icons.format_list_numbered_rounded, size: 20, color: theme.colorScheme.primary),
+                const SizedBox(width: 8),
+                Text(
+                  strings.stepsTitle,
+                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const Spacer(),
+                if (_parsedSteps.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${_parsedSteps.where((s) => !s.isSectionHeader).length} ${strings.stepsDetected}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onPrimaryContainer,
                       ),
                     ),
-                    if (_stepControllers.length > 1)
-                      IconButton(
-                        icon: const Icon(Icons.close, color: Colors.redAccent, size: 20),
-                        onPressed: () => _removeStep(index),
-                      ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+
+            TextFormField(
+              controller: _stepsTextController,
+              minLines: 5,
+              maxLines: 12,
+              keyboardType: TextInputType.multiline,
+              decoration: InputDecoration(
+                hintText: strings.stepsQuickInputHint,
+                hintStyle: TextStyle(fontSize: 13, color: theme.colorScheme.outline.withValues(alpha: 0.8)),
+                alignLabelWithHint: true,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            // Helper button: Insert next step
+            Align(
+              alignment: Alignment.centerLeft,
+              child: OutlinedButton.icon(
+                onPressed: _insertNextStepNumber,
+                icon: const Icon(Icons.add_circle_outline, size: 18),
+                label: Text(strings.insertNextStep),
+                style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            // Live Steps Preview
+            if (_parsedSteps.isNotEmpty)
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.visibility_outlined, size: 14, color: Colors.grey),
+                        const SizedBox(width: 6),
+                        Text(
+                          strings.isSpanish ? 'Pasos reconocidos para el Modo Cocina:' : 'Recognized Cook Mode steps:',
+                          style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    ..._parsedSteps.map((step) {
+                      if (step.isSectionHeader) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
+                          child: Row(
+                            children: [
+                              Icon(Icons.bookmark_outline, size: 16, color: theme.colorScheme.primary),
+                              const SizedBox(width: 6),
+                              Text(
+                                step.instruction.endsWith(':') ? step.instruction : '${step.instruction}:',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.colorScheme.primary,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      // Check for detected time in step
+                      final hasTimer = RegExp(r'\b\d+\s*(?:minutos?|mins?|min|horas?|hrs?)\b', caseSensitive: false)
+                          .hasMatch(step.instruction);
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CircleAvatar(
+                              radius: 12,
+                              backgroundColor: theme.colorScheme.primary,
+                              foregroundColor: Colors.white,
+                              child: Text(
+                                '${step.stepNumber}',
+                                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    step.instruction,
+                                    style: theme.textTheme.bodyMedium?.copyWith(height: 1.3),
+                                  ),
+                                  if (hasTimer) ...[
+                                    const SizedBox(height: 2),
+                                    Row(
+                                      children: [
+                                        Icon(Icons.timer_outlined, size: 12, color: theme.colorScheme.primary),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          strings.isSpanish ? 'Temporizador detectable' : 'Detectable timer',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.bold,
+                                            color: theme.colorScheme.primary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
                   ],
-                );
-              },
-            ),
-            const SizedBox(height: 40),
-            FilledButton.icon(
-              onPressed: _saveRecipe,
-              icon: const Icon(Icons.check),
-              label: Text(strings.save, style: const TextStyle(fontSize: 16)),
-              style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
-            ),
-            const SizedBox(height: 40),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCoverPreview() {
-    if (_imageUrl.startsWith('http')) {
-      return Image.network(_imageUrl, fit: BoxFit.cover, width: double.infinity);
-    } else {
-      return Image.file(File(_imageUrl), fit: BoxFit.cover, width: double.infinity);
-    }
-  }
-
-  void _showImageSourcePicker(BuildContext context) {
-    final strings = AppStrings.of(context);
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (ctx) => SafeArea(
-        child: Wrap(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.photo_library),
-              title: Text(strings.fromGallery),
-              onTap: () {
-                Navigator.of(ctx).pop();
-                _pickImage(ImageSource.gallery);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.camera_alt),
-              title: Text(strings.fromCamera),
-              onTap: () {
-                Navigator.of(ctx).pop();
-                _pickImage(ImageSource.camera);
-              },
-            ),
-            if (_imageUrl.isNotEmpty)
-              ListTile(
-                leading: const Icon(Icons.delete, color: Colors.redAccent),
-                title: Text(strings.removePhoto, style: const TextStyle(color: Colors.redAccent)),
-                onTap: () {
-                  Navigator.of(ctx).pop();
-                  setState(() => _imageUrl = '');
-                },
+                ),
               ),
           ],
         ),
       ),
     );
   }
-}
 
-class _IngredientFormEntry {
-  final TextEditingController amountCtrl;
-  final TextEditingController unitCtrl;
-  final TextEditingController nameCtrl;
-  final TextEditingController notesCtrl;
-
-  _IngredientFormEntry({
-    required this.amountCtrl,
-    required this.unitCtrl,
-    required this.nameCtrl,
-    required this.notesCtrl,
-  });
-
-  void dispose() {
-    amountCtrl.dispose();
-    unitCtrl.dispose();
-    nameCtrl.dispose();
-    notesCtrl.dispose();
+  void _showImageSourceDialog(BuildContext context) {
+    final strings = AppStrings.of(context);
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_camera),
+              title: Text(strings.takePhoto),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: Text(strings.chooseFromGallery),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

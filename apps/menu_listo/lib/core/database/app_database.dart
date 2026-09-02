@@ -7,6 +7,7 @@ import 'package:menu_listo/features/recipes/models/ingredient_model.dart';
 import 'package:menu_listo/features/recipes/models/recipe_model.dart';
 import 'package:menu_listo/features/recipes/models/recipe_step_model.dart';
 import 'package:menu_listo/features/meal_planner/models/meal_plan_model.dart';
+import 'package:menu_listo/features/meal_planner/models/meal_plan_template_model.dart';
 import 'package:menu_listo/features/shopping_list/models/shopping_item_model.dart';
 
 class AppDatabase {
@@ -98,6 +99,15 @@ class AppDatabase {
         category TEXT NOT NULL DEFAULT 'General',
         sourceRecipeTitle TEXT,
         createdAt TEXT NOT NULL
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS meal_plan_templates (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        createdAt TEXT NOT NULL,
+        itemsJson TEXT NOT NULL
       )
     ''');
   }
@@ -216,6 +226,39 @@ class AppDatabase {
     final db = await database;
     final placeholders = List.filled(dateStrings.length, '?').join(',');
     await db.rawDelete('DELETE FROM meal_plans WHERE dateString IN ($placeholders)', dateStrings);
+  }
+
+  // --- MEAL PLAN TEMPLATES CRUD ---
+  Future<List<MealPlanTemplate>> getAllMealPlanTemplates() async {
+    final db = await database;
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS meal_plan_templates (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        createdAt TEXT NOT NULL,
+        itemsJson TEXT NOT NULL
+      )
+    ''');
+    final maps = await db.query('meal_plan_templates', orderBy: 'createdAt DESC');
+    return maps.map((m) => MealPlanTemplate.fromMap(m)).toList();
+  }
+
+  Future<void> saveMealPlanTemplate(MealPlanTemplate template) async {
+    final db = await database;
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS meal_plan_templates (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        createdAt TEXT NOT NULL,
+        itemsJson TEXT NOT NULL
+      )
+    ''');
+    await db.insert('meal_plan_templates', template.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
+  }
+
+  Future<void> deleteMealPlanTemplate(String id) async {
+    final db = await database;
+    await db.delete('meal_plan_templates', where: 'id = ?', whereArgs: [id]);
   }
 
   // --- SHOPPING ITEMS CRUD ---

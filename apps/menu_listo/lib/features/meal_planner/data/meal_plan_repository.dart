@@ -1,5 +1,6 @@
 import 'package:menu_listo/core/database/app_database.dart';
 import '../models/meal_plan_model.dart';
+import '../models/meal_plan_template_model.dart';
 
 class MealPlanRepository {
   final AppDatabase _db;
@@ -20,5 +21,17 @@ class MealPlanRepository {
 
   Future<void> clearMealPlansForWeek(List<String> dateStrings) {
     return _db.clearMealPlansForWeek(dateStrings);
+  }
+
+  Future<List<MealPlanTemplate>> getAllTemplates() {
+    return _db.getAllMealPlanTemplates();
+  }
+
+  Future<void> saveTemplate(MealPlanTemplate template) {
+    return _db.saveMealPlanTemplate(template);
+  }
+
+  Future<void> deleteTemplate(String id) {
+    return _db.deleteMealPlanTemplate(id);
   }
 }

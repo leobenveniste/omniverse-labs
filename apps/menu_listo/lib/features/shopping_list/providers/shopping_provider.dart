@@ -1,9 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:menu_listo/core/utils/portion_calculator.dart';
 import 'package:menu_listo/core/utils/shopping_consolidator.dart';
 import 'package:menu_listo/features/meal_planner/providers/meal_planner_provider.dart';
-import 'package:menu_listo/features/recipes/data/recipe_repository.dart';
-import 'package:menu_listo/features/recipes/models/ingredient_model.dart';
 import 'package:menu_listo/features/recipes/providers/recipe_provider.dart';
 import '../data/shopping_repository.dart';
 import '../models/shopping_item_model.dart';
@@ -14,17 +13,14 @@ final shoppingRepositoryProvider = Provider<ShoppingRepository>((ref) {
 
 final shoppingListProvider = StateNotifierProvider<ShoppingListNotifier, AsyncValue<List<ShoppingItem>>>((ref) {
   final repo = ref.watch(shoppingRepositoryProvider);
-  final recipeRepo = ref.watch(recipeRepositoryProvider);
-  final mealPlanNotifier = ref.watch(weeklyMealPlanProvider.notifier);
-  return ShoppingListNotifier(repo, recipeRepo, mealPlanNotifier);
+  return ShoppingListNotifier(repo, ref);
 });
 
 class ShoppingListNotifier extends StateNotifier<AsyncValue<List<ShoppingItem>>> {
   final ShoppingRepository _repo;
-  final RecipeRepository _recipeRepo;
-  final WeeklyMealPlanNotifier _mealPlanNotifier;
+  final Ref _ref;
 
-  ShoppingListNotifier(this._repo, this._recipeRepo, this._mealPlanNotifier) : super(const AsyncValue.loading()) {
+  ShoppingListNotifier(this._repo, this._ref) : super(const AsyncValue.loading()) {
     loadItems();
   }
 
@@ -38,21 +34,34 @@ class ShoppingListNotifier extends StateNotifier<AsyncValue<List<ShoppingItem>>>
     }
   }
 
-  Future<void> toggleItem(ShoppingItem item) async {
-    final updated = item.copyWith(isCompleted: !item.isCompleted);
-    await _repo.updateItem(updated);
+  Future<void> addItem({required String name, double amount = 0.0, String? unit, String? category}) async {
+    final cleanName = name.trim();
+    if (cleanName.isEmpty) return;
+
+    final current = state.value ?? [];
+    final normalized = cleanName.toLowerCase();
+    final existingIdx = current.indexWhere((it) => it.name.toLowerCase() == normalized && it.unit == (unit ?? ''));
+
+    if (existingIdx != -1) {
+      final existing = current[existingIdx];
+      final updated = existing.copyWith(amount: existing.amount + (amount > 0 ? amount : 1.0));
+      await _repo.updateItem(updated);
+    } else {
+      final item = ShoppingItem(
+        id: DateTime.now().microsecondsSinceEpoch.toString(),
+        name: cleanName,
+        amount: amount,
+        unit: unit ?? '',
+        category: category ?? 'General',
+      );
+      await _repo.saveItem(item);
+    }
     await loadItems();
   }
 
-  Future<void> addItem({required String name, double amount = 0, String unit = '', String category = 'General'}) async {
-    final item = ShoppingItem(
-      id: DateTime.now().microsecondsSinceEpoch.toString(),
-      name: name.trim(),
-      amount: amount,
-      unit: unit.trim(),
-      category: category,
-    );
-    await _repo.saveItem(item);
+  Future<void> toggleItem(ShoppingItem item) async {
+    final updated = item.copyWith(isCompleted: !item.isCompleted);
+    await _repo.updateItem(updated);
     await loadItems();
   }
 
@@ -71,62 +80,73 @@ class ShoppingListNotifier extends StateNotifier<AsyncValue<List<ShoppingItem>>>
     await loadItems();
   }
 
-  Future<int> generateFromWeeklyMealPlan() async {
-    final weekPlans = await _mealPlanNotifier.loadWeek().then((_) {
-      final list = _mealPlanNotifier.state.value ?? [];
-      return list;
+  Future<List<ShoppingItem>> getWeeklyConsolidatedItems() async {
+    final weekStart = _ref.read(currentWeekStartProvider);
+    final weekDates = List.generate(7, (i) {
+      final day = weekStart.add(Duration(days: i));
+      return DateFormat('yyyy-MM-dd').format(day);
     });
 
-    List<MapEntry<String, Ingredient>> pairs = [];
+    final mealPlans = await _ref.read(mealPlanRepositoryProvider).getMealPlansForWeek(weekDates);
+    if (mealPlans.isEmpty) return [];
 
-    for (var plan in weekPlans) {
+    final recipeRepo = _ref.read(recipeRepositoryProvider);
+    List<ConsolidableRecipeIngredient> consolidableItems = [];
+
+    for (var plan in mealPlans) {
       if (plan.recipeId != null && plan.recipeId!.isNotEmpty) {
-        final recipe = await _recipeRepo.getRecipe(plan.recipeId!);
-        if (recipe != null) {
-          final factor = plan.servings / (recipe.baseServings > 0 ? recipe.baseServings : 2);
+        final recipe = await recipeRepo.getRecipe(plan.recipeId!);
+        if (recipe != null && recipe.ingredients.isNotEmpty) {
+          final factor = (plan.servings > 0 && recipe.baseServings > 0)
+              ? (plan.servings / recipe.baseServings).ceil()
+              : 1;
+
           for (var ing in recipe.ingredients) {
-            final scaled = ing.scale(factor);
-            pairs.add(MapEntry(recipe.title, scaled));
+            consolidableItems.add(ConsolidableRecipeIngredient(
+              ingredient: ing,
+              recipeTitle: recipe.title,
+              multiplier: factor,
+            ));
           }
         }
       }
     }
 
-    if (pairs.isEmpty) return 0;
+    return ShoppingConsolidator.consolidateIngredients(consolidableItems);
+  }
 
-    final consolidated = ShoppingConsolidator.consolidateIngredients(pairs);
-    await _repo.saveBatchItems(consolidated);
+  Future<void> addConsolidatedItems(List<ShoppingItem> items) async {
+    for (var item in items) {
+      await addItem(
+        name: item.name,
+        amount: item.amount,
+        unit: item.unit,
+        category: item.category,
+      );
+    }
     await loadItems();
+  }
+
+  Future<int> generateFromWeeklyMealPlan() async {
+    final consolidated = await getWeeklyConsolidatedItems();
+    if (consolidated.isEmpty) return 0;
+
+    await addConsolidatedItems(consolidated);
     return consolidated.length;
   }
 
-  String buildShareableText({required String header}) {
+  String buildShareableText({String header = '🛒 Lista de Compras - Menú Listo'}) {
     final items = state.value ?? [];
     if (items.isEmpty) return '';
 
-    final buffer = StringBuffer();
-    buffer.writeln(header);
-    buffer.writeln('');
-
-    final pending = items.where((i) => !i.isCompleted).toList();
-    final done = items.where((i) => i.isCompleted).toList();
-
-    if (pending.isNotEmpty) {
-      for (var item in pending) {
-        final amountStr = item.amount > 0 ? '${PortionCalculator.formatAmount(item.amount)} ' : '';
-        final unitStr = item.unit.isNotEmpty ? '${item.unit} ' : '';
-        buffer.writeln('▫️ $amountStr$unitStr${item.name}');
-      }
+    final buffer = StringBuffer('$header\n\n');
+    for (var item in items) {
+      final check = item.isCompleted ? '☑️' : '⬜';
+      final formattedAmount = item.amount > 0 ? PortionCalculator.formatAmount(item.amount) : '';
+      final unitStr = item.unit.isNotEmpty ? ' ${item.unit}' : '';
+      final amountPart = formattedAmount.isNotEmpty ? '$formattedAmount$unitStr ' : '';
+      buffer.writeln('$check $amountPart${item.name}');
     }
-
-    if (done.isNotEmpty) {
-      buffer.writeln('');
-      buffer.writeln('✅ *Comprados:*');
-      for (var item in done) {
-        buffer.writeln('~ ${item.name} ~');
-      }
-    }
-
     return buffer.toString();
   }
 }

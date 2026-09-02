@@ -1,8 +1,13 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:menu_listo/core/localization/app_localizations.dart';
+import 'package:menu_listo/core/utils/culinary_catalog.dart';
 import 'package:menu_listo/core/utils/portion_calculator.dart';
+import '../../meal_planner/providers/meal_planner_provider.dart';
 import '../models/recipe_model.dart';
 import '../providers/recipe_provider.dart';
 import 'recipe_cook_mode_screen.dart';
@@ -19,6 +24,311 @@ class RecipeDetailScreen extends ConsumerStatefulWidget {
 
 class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
   int? _currentServings;
+  final Set<String> _checkedIngredients = {};
+
+  // Floating Interactive Step Timer
+  Timer? _activeTimer;
+  int _timerSecondsRemaining = 0;
+  int _timerInitialSeconds = 0;
+  String _timerLabel = '';
+  bool _isTimerRunning = false;
+
+  @override
+  void dispose() {
+    _activeTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startStepTimer(String label, int seconds) {
+    _activeTimer?.cancel();
+    setState(() {
+      _timerLabel = label;
+      _timerInitialSeconds = seconds;
+      _timerSecondsRemaining = seconds;
+      _isTimerRunning = true;
+    });
+
+    _activeTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_timerSecondsRemaining > 1) {
+        setState(() => _timerSecondsRemaining--);
+      } else {
+        timer.cancel();
+        setState(() {
+          _timerSecondsRemaining = 0;
+          _isTimerRunning = false;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.deepOrange,
+              content: Row(
+                children: [
+                  const Icon(Icons.alarm_on, color: Colors.white),
+                  const SizedBox(width: 8),
+                  Text('⏰ ¡Tiempo cumplido para $_timerLabel!'),
+                ],
+              ),
+            ),
+          );
+        }
+      }
+    });
+  }
+
+  void _toggleActiveTimer() {
+    if (_isTimerRunning) {
+      _activeTimer?.cancel();
+      setState(() => _isTimerRunning = false);
+    } else {
+      if (_timerSecondsRemaining <= 0) return;
+      setState(() => _isTimerRunning = true);
+      _activeTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (_timerSecondsRemaining > 1) {
+          setState(() => _timerSecondsRemaining--);
+        } else {
+          timer.cancel();
+          setState(() {
+            _timerSecondsRemaining = 0;
+            _isTimerRunning = false;
+          });
+        }
+      });
+    }
+  }
+
+  void _resetActiveTimer() {
+    _activeTimer?.cancel();
+    setState(() {
+      _isTimerRunning = false;
+      _timerSecondsRemaining = _timerInitialSeconds;
+    });
+  }
+
+  void _addMinuteToActiveTimer() {
+    setState(() {
+      _timerSecondsRemaining += 60;
+      _timerInitialSeconds += 60;
+    });
+  }
+
+  void _closeActiveTimer() {
+    _activeTimer?.cancel();
+    setState(() {
+      _timerInitialSeconds = 0;
+      _timerSecondsRemaining = 0;
+      _isTimerRunning = false;
+    });
+  }
+
+  int _detectSeconds(String text) {
+    final minMatch = RegExp(r'(\d+)\s*(?:minutos?|mins?|min)\b', caseSensitive: false).firstMatch(text);
+    final hourMatch = RegExp(r'(\d+)\s*(?:horas?|hrs?|hs?|h)\b', caseSensitive: false).firstMatch(text);
+    final secMatch = RegExp(r'(\d+)\s*(?:segundos?|segs?|seg)\b', caseSensitive: false).firstMatch(text);
+
+    int total = 0;
+    if (minMatch != null) total += (int.tryParse(minMatch.group(1)!) ?? 0) * 60;
+    if (hourMatch != null) total += (int.tryParse(hourMatch.group(1)!) ?? 0) * 3600;
+    if (secMatch != null) total += (int.tryParse(secMatch.group(1)!) ?? 0);
+    return total;
+  }
+
+  String _formatTimerDisplay(int totalSeconds) {
+    final m = (totalSeconds ~/ 60).toString().padLeft(2, '0');
+    final s = (totalSeconds % 60).toString().padLeft(2, '0');
+    return '$m:$s';
+  }
+
+  String _formatTimerChip(int totalSeconds) {
+    final minutes = totalSeconds ~/ 60;
+    if (minutes > 0) return '$minutes min';
+    return '$totalSeconds seg';
+  }
+
+  void _showScheduleSheet(BuildContext context, Recipe recipe, int servings) {
+    final theme = Theme.of(context);
+    final strings = AppStrings.of(context);
+    final weekStart = ref.read(currentWeekStartProvider);
+
+    final days = List.generate(7, (i) {
+      final date = weekStart.add(Duration(days: i));
+      final dateStr = DateFormat('yyyy-MM-dd').format(date);
+      final dayName = DateFormat('EEEE', strings.isSpanish ? 'es' : 'en').format(date);
+      final capDayName = dayName[0].toUpperCase() + dayName.substring(1);
+      return {'dateStr': dateStr, 'label': '$capDayName (${DateFormat('d MMM', strings.isSpanish ? 'es' : 'en').format(date)})'};
+    });
+
+    String selectedDateStr = days[0]['dateStr']!;
+    String selectedSlot = 'lunch';
+    if (recipe.category.toLowerCase().contains('desayuno')) selectedSlot = 'breakfast';
+    if (recipe.category.toLowerCase().contains('merienda')) selectedSlot = 'snack';
+    if (recipe.category.toLowerCase().contains('cena')) selectedSlot = 'dinner';
+    int scheduleServings = servings;
+    bool batchCookForTomorrow = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setSheetState) {
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.calendar_month_rounded, color: theme.colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Text(
+                        strings.isSpanish ? 'Planificar en la Agenda' : 'Schedule in Meal Planner',
+                        style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    recipe.title,
+                    style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Day Dropdown
+                  Text(
+                    strings.isSpanish ? 'Día de la semana' : 'Day of the week',
+                    style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 6),
+                  DropdownButtonFormField<String>(
+                    initialValue: selectedDateStr,
+                    decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10)),
+                    items: days.map((d) => DropdownMenuItem(value: d['dateStr'], child: Text(d['label']!))).toList(),
+                    onChanged: (val) {
+                      if (val != null) setSheetState(() => selectedDateStr = val);
+                    },
+                  ),
+                  const SizedBox(height: 14),
+
+                  // Meal Slot Dropdown
+                  Text(
+                    strings.isSpanish ? 'Momento del día' : 'Meal Slot',
+                    style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 6),
+                  DropdownButtonFormField<String>(
+                    initialValue: selectedSlot,
+                    decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10)),
+                    items: [
+                      DropdownMenuItem(value: 'breakfast', child: Text(strings.mealBreakfast)),
+                      DropdownMenuItem(value: 'lunch', child: Text(strings.mealLunch)),
+                      DropdownMenuItem(value: 'snack', child: Text(strings.mealSnack)),
+                      DropdownMenuItem(value: 'dinner', child: Text(strings.mealDinner)),
+                    ],
+                    onChanged: (val) {
+                      if (val != null) setSheetState(() => selectedSlot = val);
+                    },
+                  ),
+                  const SizedBox(height: 14),
+
+                  // Servings Counter
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        strings.servings,
+                        style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      Row(
+                        children: [
+                          IconButton.filledTonal(
+                            icon: const Icon(Icons.remove),
+                            onPressed: scheduleServings > 1 ? () => setSheetState(() => scheduleServings--) : null,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                            child: Text(
+                              '$scheduleServings',
+                              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          IconButton.filled(
+                            icon: const Icon(Icons.add),
+                            onPressed: () => setSheetState(() => scheduleServings++),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Batch cook / Tupper toggle
+                  CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(
+                      strings.isSpanish ? '🍱 Cocinar doble y guardar tupper para mañana' : '🍱 Batch cook double for leftovers',
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
+                    value: batchCookForTomorrow,
+                    onChanged: (val) => setSheetState(() => batchCookForTomorrow = val ?? false),
+                  ),
+                  const SizedBox(height: 16),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      icon: const Icon(Icons.check_circle_outline),
+                      label: Text(strings.assignButton),
+                      onPressed: () {
+                        final plannerNotifier = ref.read(weeklyMealPlanProvider.notifier);
+                        plannerNotifier.assignMeal(
+                          dateString: selectedDateStr,
+                          mealType: selectedSlot,
+                          recipeId: recipe.id,
+                          recipeTitle: recipe.title,
+                          recipeCategory: recipe.category,
+                          servings: scheduleServings,
+                        );
+
+                        if (batchCookForTomorrow) {
+                          // Auto assign next day lunch
+                          final parsedDate = DateTime.parse(selectedDateStr);
+                          final nextDateStr = DateFormat('yyyy-MM-dd').format(parsedDate.add(const Duration(days: 1)));
+                          plannerNotifier.assignMeal(
+                            dateString: nextDateStr,
+                            mealType: 'lunch',
+                            recipeId: recipe.id,
+                            recipeTitle: recipe.title,
+                            recipeCategory: recipe.category,
+                            servings: scheduleServings,
+                            customNote: 'sobras',
+                          );
+                        }
+
+                        Navigator.of(ctx).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              strings.isSpanish
+                                  ? '¡Receta agendada con éxito!'
+                                  : 'Recipe scheduled successfully!',
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +364,11 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                   background: _buildHeaderImage(recipe, theme),
                 ),
                 actions: [
+                  IconButton(
+                    icon: const Icon(Icons.event_available, color: Colors.white),
+                    tooltip: strings.isSpanish ? 'Planificar en la Agenda' : 'Schedule in Planner',
+                    onPressed: () => _showScheduleSheet(context, recipe, servings),
+                  ),
                   IconButton(
                     icon: Icon(
                       recipe.isFavorite ? Icons.favorite : Icons.favorite_border,
@@ -141,16 +456,26 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                             Icon(Icons.group_outlined, color: theme.colorScheme.primary, size: 26),
                             const SizedBox(width: 12),
                             Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              child: Row(
                                 children: [
+                                  Icon(Icons.people_alt_outlined, color: theme.colorScheme.primary, size: 22),
+                                  const SizedBox(width: 10),
                                   Text(
-                                    strings.adjustServings,
-                                    style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                                    strings.servings,
+                                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
                                   ),
-                                  Text(
-                                    '$servings ${strings.persons}',
-                                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                                  const SizedBox(width: 8),
+                                  AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 250),
+                                    transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
+                                    child: Text(
+                                      '$servings',
+                                      key: ValueKey<int>(servings),
+                                      style: theme.textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.w900,
+                                        color: theme.colorScheme.primary,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -158,58 +483,127 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                             IconButton.filledTonal(
                               icon: const Icon(Icons.remove),
                               onPressed: servings > 1
-                                  ? () => setState(() => _currentServings = servings - 1)
+                                  ? () {
+                                      HapticFeedback.lightImpact();
+                                      setState(() => _currentServings = servings - 1);
+                                    }
                                   : null,
                             ),
                             const SizedBox(width: 6),
                             IconButton.filled(
                               icon: const Icon(Icons.add),
-                              onPressed: () => setState(() => _currentServings = servings + 1),
+                              onPressed: () {
+                                HapticFeedback.lightImpact();
+                                setState(() => _currentServings = servings + 1);
+                              },
                             ),
                           ],
                         ),
                       ),
                       const SizedBox(height: 28),
-                      // Ingredients List
-                      Text(
-                        strings.ingredientsTitle,
-                        style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      // Ingredients List Header
+                      Row(
+                        children: [
+                          Text(
+                            strings.ingredientsTitle,
+                            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          const Spacer(),
+                          Text(
+                            strings.isSpanish ? 'Toca para tachar' : 'Tap to strike',
+                            style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 12),
+                      // Ingredients List without dividers
                       ListView.separated(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: recipe.ingredients.length,
-                        separatorBuilder: (_, _) => const Divider(height: 16),
+                        separatorBuilder: (_, _) => const SizedBox(height: 8),
                         itemBuilder: (context, index) {
                           final ing = recipe.ingredients[index];
-                          final scaledIng = ing.scale(scalingFactor);
 
-                          return Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                margin: const EdgeInsets.only(top: 4),
-                                width: 8,
-                                height: 8,
-                                decoration: BoxDecoration(
-                                  color: theme.colorScheme.primary,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  PortionCalculator.formatIngredientDisplay(
-                                    amount: scaledIng.amount,
-                                    unit: scaledIng.unit,
-                                    name: scaledIng.name,
-                                    notes: scaledIng.notes,
+                          if (ing.isSectionHeader) {
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 12.0, bottom: 4.0),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.bookmark_rounded, size: 18, color: theme.colorScheme.primary),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    ing.name.endsWith(':') ? ing.name : '${ing.name}:',
+                                    style: theme.textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: theme.colorScheme.primary,
+                                      fontSize: 15,
+                                    ),
                                   ),
-                                  style: theme.textTheme.bodyLarge?.copyWith(fontSize: 15),
+                                ],
+                              ),
+                            );
+                          }
+
+                          final scaledIng = ing.scale(scalingFactor);
+                          final isChecked = _checkedIngredients.contains(ing.id);
+
+                          return InkWell(
+                            onTap: () {
+                              HapticFeedback.lightImpact();
+                              setState(() {
+                                if (isChecked) {
+                                  _checkedIngredients.remove(ing.id);
+                                } else {
+                                  _checkedIngredients.add(ing.id);
+                                }
+                              });
+                            },
+                            borderRadius: BorderRadius.circular(12),
+                            child: AnimatedOpacity(
+                              duration: const Duration(milliseconds: 200),
+                              opacity: isChecked ? 0.6 : 1.0,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: isChecked
+                                      ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
+                                      : theme.colorScheme.surface,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: isChecked
+                                        ? Colors.transparent
+                                        : theme.colorScheme.outline.withValues(alpha: 0.2),
+                                  ),
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(CulinaryCatalog.getEmoji(ing.name), style: const TextStyle(fontSize: 18)),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Text(
+                                        PortionCalculator.formatIngredientDisplay(
+                                          amount: scaledIng.amount,
+                                          unit: scaledIng.unit,
+                                          name: scaledIng.name,
+                                          notes: scaledIng.notes,
+                                        ),
+                                        style: theme.textTheme.bodyLarge?.copyWith(
+                                          fontSize: 15,
+                                          decoration: isChecked ? TextDecoration.lineThrough : null,
+                                          color: isChecked ? theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6) : null,
+                                        ),
+                                      ),
+                                    ),
+                                    if (isChecked)
+                                      const Icon(Icons.check_circle, size: 18, color: Colors.green)
+                                    else
+                                      Icon(Icons.radio_button_unchecked, size: 18, color: theme.colorScheme.outline.withValues(alpha: 0.5)),
+                                  ],
                                 ),
                               ),
-                            ],
+                            ),
                           );
                         },
                       ),
@@ -227,6 +621,29 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                         separatorBuilder: (_, _) => const SizedBox(height: 16),
                         itemBuilder: (context, index) {
                           final step = recipe.steps[index];
+
+                          if (step.isSectionHeader) {
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 14.0, bottom: 4.0),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.bookmark_rounded, size: 18, color: theme.colorScheme.primary),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    step.instruction.endsWith(':') ? step.instruction : '${step.instruction}:',
+                                    style: theme.textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: theme.colorScheme.primary,
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+
+                          final durationSec = _detectSeconds(step.instruction);
+
                           return Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -248,16 +665,37 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                               ),
                               const SizedBox(width: 14),
                               Expanded(
-                                child: Text(
-                                  step.instruction,
-                                  style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      step.instruction,
+                                      style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
+                                    ),
+                                    if (durationSec > 0) ...[
+                                      const SizedBox(height: 6),
+                                      ActionChip(
+                                        avatar: const Icon(Icons.timer_outlined, size: 14),
+                                        label: Text(
+                                          '⏱️ ${_formatTimerChip(durationSec)} (Tocar para iniciar)',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            color: theme.colorScheme.primary,
+                                          ),
+                                        ),
+                                        backgroundColor: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
+                                        onPressed: () => _startStepTimer('Paso ${step.stepNumber}', durationSec),
+                                      ),
+                                    ],
+                                  ],
                                 ),
                               ),
                             ],
                           );
                         },
                       ),
-                      const SizedBox(height: 100),
+                      const SizedBox(height: 140),
                     ],
                   ),
                 ),
@@ -265,7 +703,6 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
             ],
           ),
           bottomSheet: Container(
-            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: theme.colorScheme.surface,
               boxShadow: [
@@ -277,26 +714,98 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
               ],
             ),
             child: SafeArea(
-              child: SizedBox(
-                width: double.infinity,
-                height: 54,
-                child: FilledButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (ctx) => RecipeCookModeScreen(
-                          recipe: recipe,
-                          initialServings: servings,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Floating Active Timer Banner (if active)
+                  if (_timerInitialSeconds > 0)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      color: theme.colorScheme.primaryContainer,
+                      child: Row(
+                        children: [
+                          Icon(
+                            _isTimerRunning ? Icons.timer : Icons.timer_outlined,
+                            color: theme.colorScheme.onPrimaryContainer,
+                            size: 22,
+                          ),
+                          const SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                _timerLabel,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: theme.colorScheme.onPrimaryContainer,
+                                ),
+                              ),
+                              Text(
+                                _formatTimerDisplay(_timerSecondsRemaining),
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w900,
+                                  color: _timerSecondsRemaining == 0
+                                      ? Colors.red
+                                      : theme.colorScheme.onPrimaryContainer,
+                                  letterSpacing: 1.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const Spacer(),
+                          IconButton.filledTonal(
+                            icon: Icon(_isTimerRunning ? Icons.pause : Icons.play_arrow, size: 20),
+                            onPressed: _toggleActiveTimer,
+                          ),
+                          const SizedBox(width: 4),
+                          IconButton.filledTonal(
+                            icon: const Icon(Icons.more_time, size: 20),
+                            tooltip: '+1 min',
+                            onPressed: _addMinuteToActiveTimer,
+                          ),
+                          const SizedBox(width: 4),
+                          IconButton.filledTonal(
+                            icon: const Icon(Icons.refresh, size: 20),
+                            tooltip: 'Reiniciar',
+                            onPressed: _resetActiveTimer,
+                          ),
+                          const SizedBox(width: 4),
+                          IconButton(
+                            icon: const Icon(Icons.close, size: 18),
+                            onPressed: _closeActiveTimer,
+                          ),
+                        ],
+                      ),
+                    ),
+
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 54,
+                      child: FilledButton.icon(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (ctx) => RecipeCookModeScreen(
+                                recipe: recipe,
+                                initialServings: servings,
+                              ),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.outdoor_grill),
+                        label: Text(
+                          strings.startCooking,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ),
-                    );
-                  },
-                  icon: const Icon(Icons.outdoor_grill),
-                  label: Text(
-                    strings.startCooking,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ),
@@ -310,11 +819,17 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
   Widget _buildHeaderImage(Recipe recipe, ThemeData theme) {
     if (recipe.imageUrl.isNotEmpty) {
       if (recipe.imageUrl.startsWith('http')) {
-        return Image.network(recipe.imageUrl, fit: BoxFit.cover);
+        return Hero(
+          tag: 'recipe_image_${recipe.id}',
+          child: Image.network(recipe.imageUrl, cacheWidth: 1080, fit: BoxFit.cover),
+        );
       } else {
         final file = File(recipe.imageUrl);
         if (file.existsSync()) {
-          return Image.file(file, fit: BoxFit.cover);
+          return Hero(
+            tag: 'recipe_image_${recipe.id}',
+            child: Image.file(file, cacheWidth: 1080, fit: BoxFit.cover),
+          );
         }
       }
     }

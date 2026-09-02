@@ -1,35 +1,25 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 enum AppLanguage {
   system,
-  spanish,
-  english;
+  es,
+  en;
 
   Locale? get locale {
     switch (this) {
-      case AppLanguage.spanish:
+      case AppLanguage.es:
         return const Locale('es');
-      case AppLanguage.english:
+      case AppLanguage.en:
         return const Locale('en');
       case AppLanguage.system:
         return null;
-    }
-  }
-
-  String get displayName {
-    switch (this) {
-      case AppLanguage.spanish:
-        return 'Español';
-      case AppLanguage.english:
-        return 'English';
-      case AppLanguage.system:
-        return 'Automático (Sistema)';
     }
   }
 }
 
 class AppStrings {
   final Locale locale;
+
   AppStrings(this.locale);
 
   static AppStrings of(BuildContext context) {
@@ -37,168 +27,228 @@ class AppStrings {
     return AppStrings(loc);
   }
 
-  bool get isSpanish => locale.languageCode.startsWith('es');
+  bool get isSpanish => locale.languageCode == 'es';
 
-  // App General
-  String get appName => isSpanish ? 'Menú Listo' : 'Menu Listo';
-  String get appTagline => isSpanish ? 'Recetas y Planificador' : 'Recipes & Meal Planner';
 
-  // Navigation Tabs
-  String get navRecipes => isSpanish ? 'Recetas' : 'Recipes';
-  String get navPlanner => isSpanish ? 'Plan Semanal' : 'Meal Planner';
-  String get navShopping => isSpanish ? 'Compras' : 'Shopping List';
-  String get navSettings => isSpanish ? 'Ajustes' : 'Settings';
-
-  // Common
-  String get save => isSpanish ? 'Guardar' : 'Save';
-  String get cancel => isSpanish ? 'Cancelar' : 'Cancel';
-  String get delete => isSpanish ? 'Eliminar' : 'Delete';
-  String get edit => isSpanish ? 'Editar' : 'Edit';
-  String get close => isSpanish ? 'Cerrar' : 'Close';
+  // Meal slots getters
   String get confirm => isSpanish ? 'Confirmar' : 'Confirm';
-  String get search => isSpanish ? 'Buscar...' : 'Search...';
-  String get emptyTitle => isSpanish ? 'No hay elementos' : 'No items found';
-  String get retry => isSpanish ? 'Reintentar' : 'Retry';
-  String get servings => isSpanish ? 'porciones' : 'servings';
-  String get forPersons => isSpanish ? 'Para' : 'Serves';
-  String get persons => isSpanish ? 'personas' : 'people';
-  String get minutes => isSpanish ? 'min' : 'min';
-  String get totalTime => isSpanish ? 'Tiempo Total' : 'Total Time';
-
-  // Recipes Screen
-  String get searchRecipes => isSpanish ? 'Buscar recetas o ingredientes...' : 'Search recipes or ingredients...';
-  String get allCategories => isSpanish ? 'Todas' : 'All';
-  String get newRecipe => isSpanish ? 'Nueva Receta' : 'New Recipe';
-  String get importUrl => isSpanish ? 'Importar Web' : 'Import URL';
-  String get favoritesOnly => isSpanish ? 'Solo Favoritas' : 'Favorites Only';
-  String get noRecipesYet => isSpanish ? 'Aún no tienes recetas guardadas' : 'No recipes saved yet';
-  String get noRecipesSubtitle => isSpanish 
-      ? 'Crea tu primera receta o importa un enlace de tu blog de cocina favorito.' 
-      : 'Create your first recipe or import a link from your favorite food blog.';
-  String get recipeCreatedSuccess => isSpanish ? '¡Receta guardada con éxito!' : 'Recipe saved successfully!';
-  String get recipeUpdatedSuccess => isSpanish ? '¡Receta actualizada con éxito!' : 'Recipe updated successfully!';
-  String get recipeDeletedSuccess => isSpanish ? 'Receta eliminada' : 'Recipe deleted';
-  String get confirmDeleteRecipe => isSpanish ? '¿Estás seguro de eliminar esta receta?' : 'Are you sure you want to delete this recipe?';
-
-  // Categories
-  String get catBreakfast => isSpanish ? 'Desayuno' : 'Breakfast';
-  String get catLunch => isSpanish ? 'Almuerzo' : 'Lunch';
-  String get catSnack => isSpanish ? 'Merienda' : 'Snack';
-  String get catDinner => isSpanish ? 'Cena' : 'Dinner';
-  String get catDessert => isSpanish ? 'Postre' : 'Dessert';
-  String get catOther => isSpanish ? 'Otros' : 'Other';
-
-  // Recipe Detail & Cook Mode
-  String get ingredientsTitle => isSpanish ? 'Ingredientes' : 'Ingredients';
-  String get instructionsTitle => isSpanish ? 'Preparación paso a paso' : 'Instructions';
-  String get startCooking => isSpanish ? 'Comenzar a Cocinar' : 'Start Cooking';
-  String get cookModeTitle => isSpanish ? 'Modo Cocina' : 'Cook Mode';
-  String get cookModeWakeLockNotice => isSpanish ? 'Pantalla siempre activa' : 'Screen stay awake active';
-  String get step => isSpanish ? 'Paso' : 'Step';
-  String get ofSteps => isSpanish ? 'de' : 'of';
-  String get nextStep => isSpanish ? 'Siguiente' : 'Next';
-  String get previousStep => isSpanish ? 'Anterior' : 'Previous';
-  String get finishCooking => isSpanish ? '¡Listo, a comer!' : 'Finished Cooking!';
-  String get finishCookingMessage => isSpanish 
-      ? '¡Felicitaciones! Has completado todos los pasos de la receta.' 
-      : 'Congratulations! You completed all steps of the recipe.';
-  String get adjustServings => isSpanish ? 'Ajustar Porciones:' : 'Adjust Servings:';
-  String get viewOriginalSource => isSpanish ? 'Ver receta original' : 'View original source';
-
-  // Recipe Form
-  String get formTitleNew => isSpanish ? 'Crear Receta' : 'Create Recipe';
-  String get formTitleEdit => isSpanish ? 'Editar Receta' : 'Edit Recipe';
-  String get fieldTitle => isSpanish ? 'Título de la receta *' : 'Recipe Title *';
-  String get fieldDescription => isSpanish ? 'Breve descripción' : 'Short description';
-  String get fieldCategory => isSpanish ? 'Categoría' : 'Category';
-  String get fieldPrepTime => isSpanish ? 'Tiempo de preparación (min)' : 'Prep time (min)';
-  String get fieldCookTime => isSpanish ? 'Tiempo de cocción (min)' : 'Cook time (min)';
-  String get fieldBaseServings => isSpanish ? 'Comensales base (personas) *' : 'Base servings (people) *';
-  String get fieldTags => isSpanish ? 'Etiquetas (separadas por comas)' : 'Tags (comma separated)';
-  String get addIngredient => isSpanish ? '+ Agregar Ingrediente' : '+ Add Ingredient';
-  String get addStep => isSpanish ? '+ Agregar Paso' : '+ Add Step';
-  String get ingredientAmount => isSpanish ? 'Cant.' : 'Qty.';
-  String get ingredientUnit => isSpanish ? 'Unidad (g, ml, cda)' : 'Unit (g, ml, tbsp)';
-  String get ingredientName => isSpanish ? 'Nombre del ingrediente *' : 'Ingredient name *';
-  String get ingredientNotes => isSpanish ? 'Nota / detalle opcional' : 'Optional note';
-  String get selectPhoto => isSpanish ? 'Cambiar foto de portada' : 'Change cover photo';
-  String get fromGallery => isSpanish ? 'Galería' : 'Gallery';
-  String get fromCamera => isSpanish ? 'Cámara' : 'Camera';
-  String get removePhoto => isSpanish ? 'Quitar foto' : 'Remove photo';
-  String get validationTitleRequired => isSpanish ? 'Por favor ingresa un título' : 'Please enter a title';
-  String get validationServingsRequired => isSpanish ? 'Ingresa comensales válidos' : 'Enter valid servings';
-  String get validationIngredientsRequired => isSpanish ? 'Añade al menos un ingrediente' : 'Add at least one ingredient';
-  String get validationStepsRequired => isSpanish ? 'Añade al menos un paso' : 'Add at least one step';
-
-  // Import Dialog
-  String get importUrlTitle => isSpanish ? 'Importar Receta Web' : 'Import Web Recipe';
-  String get importUrlDescription => isSpanish 
-      ? 'Pega el enlace de cualquier blog de recetas. Menú Listo extraerá automáticamente ingredientes y pasos descartando anuncios.' 
-      : 'Paste the URL of any recipe blog. Menú Listo will automatically extract ingredients and steps.';
-  String get pasteUrlHint => isSpanish ? 'https://misrecetas.com/plato-delicioso' : 'https://recipes.com/delicious-dish';
-  String get extractRecipe => isSpanish ? 'Analizar Receta' : 'Extract Recipe';
-  String get scrapingProgress => isSpanish ? 'Extrayendo ingredientes y pasos...' : 'Extracting recipe content...';
-  String get scrapingFailed => isSpanish 
-      ? 'No pudimos extraer la receta completa automáticamente. Puedes completarla manualmente.' 
-      : 'Could not extract full recipe automatically. You can edit it manually.';
-  String get editAndSave => isSpanish ? 'Revisar y Guardar' : 'Review & Save';
-
-  // Meal Planner
-  String get plannerTitle => isSpanish ? 'Planificador Semanal' : 'Weekly Meal Planner';
-  String get today => isSpanish ? 'Hoy' : 'Today';
-  String get fillRandom => isSpanish ? 'Completar al Azar' : 'Random Fill';
-  String get clearWeek => isSpanish ? 'Vaciar Semana' : 'Clear Week';
-  String get clearWeekConfirm => isSpanish ? '¿Seguro que deseas vaciar todas las comidas de esta semana?' : 'Clear all meals for this week?';
-  String get selectRecipeForSlot => isSpanish ? 'Asignar Receta a:' : 'Assign Recipe to:';
-  String get noRecipeAssigned => isSpanish ? 'Toca para agregar comida' : 'Tap to add meal';
-  String get weekDays => isSpanish ? 'Lun,Mar,Mié,Jue,Vie,Sáb,Dom' : 'Mon,Tue,Wed,Thu,Fri,Sat,Sun';
+  String get noRecipeAssigned => isSpanish ? 'Sin receta asignada' : 'No recipe assigned';
+  String get removeMealSlot => isSpanish ? 'Quitar comida' : 'Remove meal';
   String get mealBreakfast => isSpanish ? 'Desayuno' : 'Breakfast';
   String get mealLunch => isSpanish ? 'Almuerzo' : 'Lunch';
   String get mealSnack => isSpanish ? 'Merienda' : 'Snack';
   String get mealDinner => isSpanish ? 'Cena' : 'Dinner';
-  String get removeMealSlot => isSpanish ? 'Quitar comida' : 'Remove meal';
 
-  // Shopping List
+  // Navigation Tabs
+  String get tabRecipes => isSpanish ? 'Recetas' : 'Recipes';
+  String get tabPlanner => isSpanish ? 'Planificador' : 'Meal Planner';
+  String get tabShopping => isSpanish ? 'Compras' : 'Shopping List';
+  String get tabSettings => isSpanish ? 'Ajustes' : 'Settings';
+
+  // App General
+  String get appTitle => 'Menú Listo';
+  String get appTagline => isSpanish 
+      ? 'Recetas, Planificador Semanal y Compras Inteligentes' 
+      : 'Recipes, Weekly Meal Planner & Smart Grocery';
+
+  // Common Actions & Badges
+  String get minutes => isSpanish ? 'min' : 'min';
+  String get persons => isSpanish ? 'porc.' : 'servings';
+  String get close => isSpanish ? 'Cerrar' : 'Close';
+  String get save => isSpanish ? 'Guardar' : 'Save';
+  String get cancel => isSpanish ? 'Cancelar' : 'Cancel';
+  String get delete => isSpanish ? 'Eliminar' : 'Delete';
+
+  // Empty States
+  String get emptyTitle => isSpanish ? 'Sin elementos' : 'No items';
+  String get emptyRecipesTitle => isSpanish ? '¡Bienvenido a tu cocina!' : 'Welcome to your kitchen!';
+  String get emptyRecipesSubtitle => isSpanish 
+      ? 'Aún no tienes recetas guardadas. Comienza agregando tu primera receta casera, escaneando una foto de un libro o importando desde la web.'
+      : 'You have no saved recipes yet. Start by creating a homemade dish, scanning a photo from a cookbook, or importing from a web link.';
+  String get createFirstRecipe => isSpanish ? 'Crear mi primera receta' : 'Create my first recipe';
+  String get scanRecipePhoto => isSpanish ? 'Escanear con Cámara / Foto' : 'Scan from Photo / Camera';
+  String get importWebRecipe => isSpanish ? 'Importar desde enlace web' : 'Import from web URL';
+
+  // Recipe List Screen
+  String get searchRecipes => isSpanish ? 'Buscar recetas...' : 'Search recipes...';
+  String get searchRecipesHint => isSpanish ? 'Buscar por título o ingrediente...' : 'Search by title or ingredient...';
+  String get filterAll => isSpanish ? 'Todas' : 'All';
+  String get filterBreakfast => isSpanish ? 'Desayuno' : 'Breakfast';
+  String get filterLunch => isSpanish ? 'Almuerzo' : 'Lunch';
+  String get filterSnack => isSpanish ? 'Merienda' : 'Snack';
+  String get filterDinner => isSpanish ? 'Cena' : 'Dinner';
+  String get filterDessert => isSpanish ? 'Postres' : 'Dessert';
+  String get onlyFavorites => isSpanish ? 'Solo Favoritas' : 'Only Favorites';
+  String get viewGrid => isSpanish ? 'Vista Cuadrícula' : 'Grid View';
+  String get viewList => isSpanish ? 'Vista Lista' : 'List View';
+  String get noResultsTitle => isSpanish ? 'Sin resultados' : 'No recipes found';
+  String get noResultsSubtitle => isSpanish ? 'Prueba con otra palabra clave o categoría.' : 'Try another search term or filter.';
+
+  // Recipe Detail Screen
+  String get servings => isSpanish ? 'Porciones' : 'Servings';
+  String get diners => isSpanish ? 'comensales' : 'diners';
+  String get adjustServings => isSpanish ? 'Ajustar porciones' : 'Adjust servings';
+  String get prepTime => isSpanish ? 'Preparación' : 'Prep';
+  String get cookTime => isSpanish ? 'Cocción' : 'Cook';
+  String get ingredientsTitle => isSpanish ? 'Ingredientes' : 'Ingredients';
+  String get instructionsTitle => isSpanish ? 'Instrucciones paso a paso' : 'Step-by-Step Instructions';
+  String get stepsTitle => isSpanish ? 'Instrucciones paso a paso' : 'Step-by-Step Instructions';
+  String get startCooking => isSpanish ? 'Comenzar a Cocinar (Modo Cocina)' : 'Start Cooking (Kitchen Mode)';
+  String get startCookingMode => isSpanish ? 'Comenzar a Cocinar (Modo Cocina)' : 'Start Cooking (Kitchen Mode)';
+  String get editRecipe => isSpanish ? 'Editar Receta' : 'Edit Recipe';
+  String get deleteRecipe => isSpanish ? 'Eliminar Receta' : 'Delete Recipe';
+  String get confirmDeleteRecipe => isSpanish ? '¿Estás seguro de que deseas eliminar esta receta?' : 'Are you sure you want to delete this recipe?';
+  String get deleteRecipeConfirm => isSpanish ? '¿Estás seguro de que deseas eliminar esta receta?' : 'Are you sure you want to delete this recipe?';
+
+  // Cook Mode Screen
+  String get cookModeTitle => isSpanish ? 'Modo Cocina' : 'Cook Mode';
+  String get cookModeWakeLockNotice => isSpanish ? 'Pantalla siempre encendida para cocinar cómodo' : 'Screen kept awake for cooking';
+  String get screenAwakeNotice => isSpanish ? 'Pantalla siempre encendida' : 'Screen kept awake';
+  String get step => isSpanish ? 'Paso' : 'Step';
+  String get stepOf => isSpanish ? 'Paso' : 'Step';
+  String get ofWord => isSpanish ? 'de' : 'of';
+  String get ofSteps => isSpanish ? 'de' : 'of';
+  String get viewIngredients => isSpanish ? 'Ver Ingredientes' : 'View Ingredients';
+  String get previousStep => isSpanish ? 'Anterior' : 'Previous';
+  String get nextStep => isSpanish ? 'Siguiente' : 'Next';
+  String get finishCooking => isSpanish ? '¡Terminar y Listo!' : 'Finish Cooking!';
+  String get finishCookingMessage => isSpanish ? '¡Felicitaciones! Has completado todos los pasos de la receta.' : 'Congratulations! You completed all steps of the recipe.';
+  String get allStepsCompleted => isSpanish ? '¡Felicitaciones! Has completado la receta.' : 'Congratulations! You completed the recipe.';
+
+  // Recipe Form Screen
+  String get newRecipeTitle => isSpanish ? 'Nueva Receta' : 'New Recipe';
+  String get editRecipeTitle => isSpanish ? 'Editar Receta' : 'Edit Recipe';
+  String get basicInfoSection => isSpanish ? 'Información Principal' : 'General Info';
+  String get titleLabel => isSpanish ? 'Nombre de la Receta *' : 'Recipe Title *';
+  String get titleRequired => isSpanish ? 'Por favor ingresa un título' : 'Please enter a title';
+  String get categoryLabel => isSpanish ? 'Categoría' : 'Category';
+  String get descriptionLabel => isSpanish ? 'Breve descripción o notas' : 'Short description or notes';
+  String get prepTimeMinutesLabel => isSpanish ? 'Tiempo de Prep. (min)' : 'Prep Time (mins)';
+  String get cookTimeMinutesLabel => isSpanish ? 'Tiempo de Cocción (min)' : 'Cook Time (mins)';
+  String get baseServingsLabel => isSpanish ? 'Porciones base (comensales)' : 'Base Servings (diners)';
+  String get prepLabel => isSpanish ? 'Prep (min)' : 'Prep (min)';
+  String get cookLabel => isSpanish ? 'Cocción (min)' : 'Cook (min)';
+  String get servingsLabel => isSpanish ? 'Porciones' : 'Servings';
+  String get addIngredient => isSpanish ? 'Agregar Ingrediente' : 'Add Ingredient';
+  String get addStep => isSpanish ? 'Agregar Paso' : 'Add Step';
+  String get amountHeader => isSpanish ? 'Cant.' : 'Qty';
+  String get unitHeader => isSpanish ? 'Unidad' : 'Unit';
+  String get nameHeader => isSpanish ? 'Ingrediente *' : 'Ingredient *';
+  String get notesHeader => isSpanish ? 'Notas (opc.)' : 'Notes (opt.)';
+  String get instructionHint => isSpanish ? 'Describe el paso de preparación...' : 'Describe this preparation step...';
+  String get ingredientsQuickInputHint => isSpanish 
+      ? 'Un ingrediente por línea, ej:\n500g pechuga de pollo\n2 cebollas picadas\n1/2 taza de leche\n1 pizca de sal' 
+      : 'One ingredient per line, e.g.:\n500g chicken breast\n2 onions, chopped\n1/2 cup milk\n1 pinch of salt';
+  String get ingredientsDetected => isSpanish ? 'ingredientes detectados' : 'ingredients detected';
+  String get stepsQuickInputHint => isSpanish 
+      ? 'Escribe o pega los pasos de preparación, ej:\n1. Picar la cebolla y dorar en sartén.\n2. Agregar el pollo y cocinar 15 minutos.\n3. Servir caliente con salsa.' 
+      : 'Write or paste preparation steps, e.g.:\n1. Chop onion and brown in pan.\n2. Add chicken and cook 15 minutes.\n3. Serve hot with sauce.';
+  String get stepsDetected => isSpanish ? 'pasos detectados' : 'steps detected';
+  String get insertNextStep => isSpanish ? '+ Siguiente paso' : '+ Next step';
+  String get saveRecipe => isSpanish ? 'Guardar Receta' : 'Save Recipe';
+  String get changePhoto => isSpanish ? 'Cambiar Foto' : 'Change Photo';
+  String get addPhoto => isSpanish ? 'Agregar Foto' : 'Add Cover Photo';
+  String get takePhoto => isSpanish ? 'Tomar Foto' : 'Take Photo';
+  String get chooseFromGallery => isSpanish ? 'Elegir de Galería' : 'Choose from Gallery';
+
+  // Photo OCR Scanner
+  String get scanningRecipe => isSpanish ? 'Escaneando receta...' : 'Scanning recipe...';
+  String get scanningSuccess => isSpanish ? '¡Receta escaneada con éxito!' : 'Recipe scanned successfully!';
+  String get scanningFailed => isSpanish ? 'No se detectó texto claro en la imagen. Intenta con mejor iluminación.' : 'No clear text detected. Try with better lighting.';
+
+  // URL Importer Dialog
+  String get importUrlTitle => isSpanish ? 'Importar Receta desde la Web' : 'Import Recipe from Web';
+  String get importUrlDescription => isSpanish ? 'Pega el enlace de cualquier blog o sitio gastronómico:' : 'Paste any food blog or recipe URL:';
+  String get importUrlSubtitle => isSpanish ? 'Pega el enlace de cualquier blog o sitio gastronómico:' : 'Paste any food blog or recipe URL:';
+  String get pasteUrlHint => 'https://...';
+  String get urlInputHint => 'https://...';
+  String get extractRecipe => isSpanish ? 'Extraer Receta' : 'Extract Recipe';
+  String get importButton => isSpanish ? 'Extraer Receta' : 'Extract Recipe';
+  String get scrapingProgress => isSpanish ? 'Extrayendo ingredientes y pasos limpios...' : 'Extracting ingredients & instructions...';
+  String get importingProgress => isSpanish ? 'Extrayendo ingredientes y pasos limpios...' : 'Extracting ingredients & instructions...';
+  String get scrapingFailed => isSpanish ? 'No se pudo extraer la receta automáticamente de este sitio.' : 'Could not automatically extract recipe from this site.';
+  String get importSuccess => isSpanish ? '¡Receta extraída con éxito!' : 'Recipe extracted successfully!';
+  String get importError => isSpanish ? 'No se pudo extraer la receta automáticamente de este sitio.' : 'Could not automatically extract recipe from this site.';
+
+  // Weekly Planner Screen
+  String get plannerTitle => isSpanish ? 'Planificador Semanal' : 'Weekly Meal Planner';
+  String get weeklyPlannerTitle => isSpanish ? 'Planificador Semanal' : 'Weekly Meal Planner';
+  String get fillRandom => isSpanish ? 'Completar al Azar' : 'Random Fill';
+  String get clearWeek => isSpanish ? 'Limpiar Semana' : 'Clear Week';
+  String get clearWeekConfirm => isSpanish ? '¿Deseas limpiar todos los menús de esta semana?' : 'Do you want to clear all meals for this week?';
+  String get thisWeek => isSpanish ? 'Esta Semana' : 'This Week';
+  String get today => isSpanish ? 'Hoy' : 'Today';
+  String get randomFill => isSpanish ? 'Completar al Azar' : 'Random Fill';
+  String get randomFillConfirm => isSpanish 
+      ? '¿Deseas autocompletar los espacios vacíos de esta semana con recetas de tu recetario?' 
+      : 'Do you want to fill empty slots this week with recipes from your library?';
+  String get fill => isSpanish ? 'Completar' : 'Fill';
+  String get clear => isSpanish ? 'Limpiar' : 'Clear';
+  String get monday => isSpanish ? 'Lunes' : 'Monday';
+  String get tuesday => isSpanish ? 'Martes' : 'Tuesday';
+  String get wednesday => isSpanish ? 'Miércoles' : 'Wednesday';
+  String get thursday => isSpanish ? 'Jueves' : 'Thursday';
+  String get friday => isSpanish ? 'Viernes' : 'Friday';
+  String get saturday => isSpanish ? 'Sábado' : 'Saturday';
+  String get sunday => isSpanish ? 'Domingo' : 'Sunday';
+  String get breakfast => isSpanish ? 'Desayuno' : 'Breakfast';
+  String get lunch => isSpanish ? 'Almuerzo' : 'Lunch';
+  String get snack => isSpanish ? 'Merienda' : 'Snack';
+  String get dinner => isSpanish ? 'Cena' : 'Dinner';
+  String get emptySlot => isSpanish ? '+ Asignar comida' : '+ Assign meal';
+  String get changeMeal => isSpanish ? 'Cambiar' : 'Change';
+  String get removeMeal => isSpanish ? 'Quitar' : 'Remove';
+  String get selectRecipeForSlot => isSpanish ? 'Seleccionar Receta para' : 'Select Recipe for';
+  String get customMealTitle => isSpanish ? 'O ingresar comida libre:' : 'Or enter custom meal:';
+  String get customMealHint => isSpanish ? 'ej. Pizza con amigos' : 'e.g. Pizza night';
+  String get assignButton => isSpanish ? 'Asignar' : 'Assign';
+
+  // Shopping List Screen
   String get shoppingTitle => isSpanish ? 'Lista de Compras' : 'Shopping List';
-  String get generateFromPlanner => isSpanish ? 'Generar desde el Menú Semanal' : 'Generate from Weekly Menu';
-  String get generateSuccess => isSpanish ? '¡Lista consolidada generada con éxito!' : 'Consolidated shopping list created!';
-  String get addCustomItem => isSpanish ? 'Agregar ítem manual' : 'Add custom item';
-  String get clearCompleted => isSpanish ? 'Limpiar tachados' : 'Clear completed';
-  String get clearAll => isSpanish ? 'Vaciar lista' : 'Clear all';
-  String get shareList => isSpanish ? 'Compartir Lista' : 'Share List';
-  String get shareListHeader => isSpanish ? '🛒 *Lista de Compras - Menú Listo*' : '🛒 *Shopping List - Menu Listo*';
-  String get shoppingEmpty => isSpanish ? 'Tu lista de compras está vacía' : 'Your shopping list is empty';
+  String get shoppingListTitle => isSpanish ? 'Lista de Compras' : 'Shopping List';
+  String get generateFromWeeklyPlan => isSpanish ? 'Generar desde el Menú Semanal' : 'Generate from Weekly Plan';
+  String get generateFromPlanner => isSpanish ? 'Generar desde el Menú Semanal' : 'Generate from Weekly Plan';
+  String get generateConfirm => isSpanish 
+      ? '¿Generar lista a partir de las recetas del plan semanal? Los ingredientes repetidos se consolidarán automáticamente.' 
+      : 'Generate grocery list from weekly plan? Matching ingredients will be automatically summed.';
+  String get generate => isSpanish ? 'Generar' : 'Generate';
+  String get generateSuccess => isSpanish ? 'Lista generada con éxito' : 'List generated successfully';
+  String get shareList => isSpanish ? 'Compartir en WhatsApp' : 'Share List';
+  String get shareListHeader => isSpanish ? '🛒 Lista de Compras - Menú Listo' : '🛒 Grocery Shopping List - Menú Listo';
+  String get addManualItem => isSpanish ? 'Agregar ítem manual' : 'Add manual item';
+  String get addCustomItem => isSpanish ? 'Agregar ítem manual' : 'Add manual item';
+  String get itemNameHint => isSpanish ? 'Nombre del producto (ej. Leche)' : 'Item name (e.g. Milk)';
+  String get itemAmountHint => isSpanish ? 'Cantidad (ej. 2)' : 'Amount (e.g. 2)';
+  String get itemUnitHint => isSpanish ? 'Unidad (ej. litros)' : 'Unit (e.g. liters)';
+  String get emptyShoppingTitle => isSpanish ? 'Tu lista está vacía' : 'Your shopping list is empty';
+  String get shoppingEmpty => isSpanish ? 'Tu lista está vacía' : 'Your shopping list is empty';
+  String get emptyShoppingSubtitle => isSpanish 
+      ? 'Toca "Generar desde el Menú Semanal" o agrega productos manualmente con el botón +' 
+      : 'Tap "Generate from Weekly Plan" or add items manually using the + button';
   String get shoppingEmptySubtitle => isSpanish 
-      ? 'Genera los ingredientes necesarios desde tu menú semanal o añade ítems manualmente.' 
-      : 'Generate needed ingredients from your weekly menu or add items manually.';
-  String get itemNameHint => isSpanish ? 'Ej. Leche descremada' : 'E.g. Skim milk';
-  String get itemAmountHint => isSpanish ? 'Cant. (ej. 2)' : 'Qty (e.g. 2)';
-  String get itemUnitHint => isSpanish ? 'Unidad (ej. l, kg)' : 'Unit (e.g. l, kg)';
-  String get swipeToDeleteNotice => isSpanish ? 'Desliza un elemento para eliminarlo' : 'Swipe an item to delete it';
+      ? 'Toca "Generar desde el Menú Semanal" o agrega productos manualmente con el botón +' 
+      : 'Tap "Generate from Weekly Plan" or add items manually using the + button';
+  String get clearCompleted => isSpanish ? 'Limpiar comprados' : 'Clear completed';
+  String get clearAll => isSpanish ? 'Vaciar lista' : 'Clear all';
 
-  // Settings & Theme
-  String get settingsTitle => isSpanish ? 'Ajustes y Personalización' : 'Settings & Preferences';
-  String get visualTheme => isSpanish ? 'Estilo de Diseño Visual' : 'Visual Design Style';
-  String get themeMode => isSpanish ? 'Modo de Color' : 'Color Mode';
-  String get themeSystem => isSpanish ? 'Automático (Sistema)' : 'System Default';
-  String get themeLight => isSpanish ? 'Modo Claro' : 'Light Mode';
-  String get themeDark => isSpanish ? 'Modo Oscuro' : 'Dark Mode';
-  String get styleModernBotanical => isSpanish ? '🌿 Modern Botanical Kitchen' : '🌿 Modern Botanical Kitchen';
-  String get styleEditorialGourmet => isSpanish ? '🏛️ Editorial Gourmet (Serif)' : '🏛️ Editorial Gourmet (Serif)';
-  String get styleMaterialBento => isSpanish ? '⚡ Material You Tech-Craft (Bento)' : '⚡ Material You Tech-Craft (Bento)';
-  String get languageTitle => isSpanish ? 'Idioma / Language' : 'Language / Idioma';
-  String get dataBackup => isSpanish ? 'Copia de Seguridad y Datos' : 'Backup & Data';
-  String get exportBackup => isSpanish ? 'Exportar Copia de Seguridad (.json)' : 'Export Full Backup (.json)';
-  String get importBackup => isSpanish ? 'Restaurar Copia de Seguridad (.json)' : 'Restore Backup (.json)';
-  String get restoreSampleRecipes => isSpanish ? 'Restablecer Recetas de Ejemplo' : 'Load Sample Recipes';
-  String get restoreSampleRecipesConfirm => isSpanish 
-      ? '¿Deseas recargar las recetas iniciales de ejemplo?' 
-      : 'Reload initial starter sample recipes?';
-  String get aboutOmniverseLabs => isSpanish ? 'Acerca de Omniverse Labs' : 'About Omniverse Labs';
-  String get privacyNotice => isSpanish 
-      ? '100% Offline y Privado: Tus recetas, planes y compras nunca salen de tu dispositivo.' 
-      : '100% Offline & Private: Your recipes, plans, and shopping list never leave your device.';
-  String get backupExportSuccess => isSpanish ? 'Copia de seguridad exportada con éxito' : 'Backup exported successfully';
-  String get backupImportSuccess => isSpanish ? 'Copia de seguridad restaurada con éxito' : 'Backup restored successfully';
-  String get backupError => isSpanish ? 'Error al procesar el archivo de copia de seguridad' : 'Error processing backup file';
+  // Settings Screen
+  String get settingsTitle => isSpanish ? 'Ajustes' : 'Settings';
+  String get visualThemeTitle => isSpanish ? 'Estilo Visual Culinario' : 'Visual Culinary Theme';
+  String get themeBotanical => 'Modern Botanical';
+  String get themeGourmet => 'Editorial Gourmet';
+  String get themeBento => 'Material Bento';
+  String get appearanceTitle => isSpanish ? 'Modo de Color' : 'Color Mode';
+  String get modeSystem => isSpanish ? 'Automático (Sistema)' : 'System Default';
+  String get modeLight => isSpanish ? 'Modo Claro' : 'Light Mode';
+  String get modeDark => isSpanish ? 'Modo Oscuro' : 'Dark Mode';
+  String get languageTitle => isSpanish ? 'Idioma de la Aplicación' : 'Language';
+  String get langSystem => isSpanish ? 'Automático (Sistema)' : 'System Language';
+  String get langSpanish => 'Español';
+  String get langEnglish => 'English';
+  String get backupTitle => isSpanish ? 'Copia de Seguridad y Privacidad' : 'Backup & Privacy';
+  String get exportBackup => isSpanish ? 'Exportar Copia de Seguridad (.json)' : 'Export Backup File (.json)';
+  String get importBackup => isSpanish ? 'Restaurar Copia de Seguridad (.json)' : 'Restore Backup File (.json)';
+  String get aboutApp => isSpanish ? 'Acerca de Menú Listo' : 'About Menú Listo';
+  String get privacyPolicy => isSpanish ? 'Política de Privacidad' : 'Privacy Policy';
+  String get version => isSpanish ? 'Versión' : 'Version';
 }

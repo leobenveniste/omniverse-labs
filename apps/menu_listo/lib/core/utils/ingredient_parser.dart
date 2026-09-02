@@ -12,6 +12,14 @@ class IngredientParser {
       return Ingredient(name: '');
     }
 
+    if (raw.endsWith(':') || raw.startsWith('#')) {
+      final cleanHeader = raw.replaceAll(RegExp(r'^[#\s]+'), '').trim();
+      return Ingredient(
+        name: cleanHeader,
+        isSectionHeader: true,
+      );
+    }
+
     raw = raw.replaceAll('½', '0.5')
              .replaceAll('¼', '0.25')
              .replaceAll('¾', '0.75')

@@ -4,6 +4,7 @@ class Ingredient {
   final String unit;
   final String name;
   final String notes;
+  final bool isSectionHeader;
 
   Ingredient({
     String? id,
@@ -11,10 +12,11 @@ class Ingredient {
     this.unit = '',
     required this.name,
     this.notes = '',
+    this.isSectionHeader = false,
   }) : id = id ?? DateTime.now().microsecondsSinceEpoch.toString();
 
   Ingredient scale(double factor) {
-    if (amount <= 0) return this;
+    if (isSectionHeader || amount <= 0) return this;
     return copyWith(amount: amount * factor);
   }
 
@@ -24,6 +26,7 @@ class Ingredient {
     String? unit,
     String? name,
     String? notes,
+    bool? isSectionHeader,
   }) {
     return Ingredient(
       id: id ?? this.id,
@@ -31,6 +34,7 @@ class Ingredient {
       unit: unit ?? this.unit,
       name: name ?? this.name,
       notes: notes ?? this.notes,
+      isSectionHeader: isSectionHeader ?? this.isSectionHeader,
     );
   }
 
@@ -41,6 +45,7 @@ class Ingredient {
       'unit': unit,
       'name': name,
       'notes': notes,
+      'isSectionHeader': isSectionHeader ? 1 : 0,
     };
   }
 
@@ -51,6 +56,7 @@ class Ingredient {
       unit: map['unit']?.toString() ?? '',
       name: map['name']?.toString() ?? '',
       notes: map['notes']?.toString() ?? '',
+      isSectionHeader: map['isSectionHeader'] == 1 || map['isSectionHeader'] == true || (map['name'] != null && map['name'].toString().trim().endsWith(':')),
     );
   }
 }

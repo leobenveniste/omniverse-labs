@@ -1,7 +1,11 @@
 import os
 import sys
 import json
+import socket
+import time
 import argparse
+
+socket.setdefaulttimeout(300)
 
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8")
@@ -43,49 +47,112 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
     print("============================================================")
     print("   Omniverse Labs - Google Play API Direct Uploader         ")
     print("============================================================")
-    print(f"📦 Package: {package_name}")
-    print(f"🎯 Target Track: {track}")
-    print(f"📁 AAB Path: {aab_path}\n")
+    print(f"Package: {package_name}")
+    print(f"Target Track: {track}")
+    print(f"AAB Path: {aab_path}\n")
 
     if not os.path.exists(aab_path):
-        print(f"❌ Error: AAB file not found at: {aab_path}")
+        print(f"Error: AAB file not found at: {aab_path}")
         return False
 
     service = get_oauth_service()
 
     try:
-        # 1. Create Edit
         edits = service.edits()
         edit_req = edits.insert(body={}, packageName=package_name)
         edit_res = edit_req.execute()
         edit_id = edit_res["id"]
-        print(f"✅ Edit Session Created: {edit_id}")
+        print(f"Edit Session Created: {edit_id}")
 
-        # 2. Upload Bundle
-        print(f"⏳ Uploading App Bundle ({os.path.getsize(aab_path) / (1024*1024):.2f} MB)...")
-        media = MediaFileUpload(aab_path, mimetype="application/octet-stream", resumable=True)
+        icon_path = r"C:\Users\leobe\.gemini\antigravity\brain\dc1a3d74-c6b8-4283-b258-23b841335b2e\scratch\app_icon_512x512.png"
+        feature_path = r"C:\Users\leobe\.gemini\antigravity\brain\dc1a3d74-c6b8-4283-b258-23b841335b2e\feature_graphic_1024x500.png"
+
+        try:
+            print("Updating Store Listing...")
+            edits.listings().update(
+                packageName=package_name,
+                editId=edit_id,
+                language="es-419",
+                body={
+                    "title": "Menú Listo: Recetas y Compras",
+                    "shortDescription": "Planificador semanal de comidas, recetario inteligente y lista de compras.",
+                    "fullDescription": "Menú Listo es tu asistente culinario integral para organizar tus comidas semanales, guardar tus recetas favoritas, escanear fotos de libros de cocina con OCR y generar tu lista de compras sin duplicados de forma 100% privada y offline.",
+                }
+            ).execute()
+
+            edits.listings().update(
+                packageName=package_name,
+                editId=edit_id,
+                language="en-US",
+                body={
+                    "title": "Menú Listo: Recipe & Grocery",
+                    "shortDescription": "Weekly meal planner, smart recipe book, and grocery shopping list.",
+                    "fullDescription": "Menú Listo is your all-in-one culinary assistant to organize your weekly meals, save recipes, scan cookbook photos with on-device OCR, and generate deduplicated grocery shopping lists.",
+                }
+            ).execute()
+            print("Store Listings Updated!")
+        except Exception as e:
+            print(f"Listing notice: {e}")
+
+        if os.path.exists(icon_path):
+            try:
+                print("Uploading App Icon (512x512)...")
+                icon_media = MediaFileUpload(icon_path, mimetype="image/png")
+                edits.images().upload(
+                    packageName=package_name,
+                    editId=edit_id,
+                    language="es-419",
+                    imageType="icon",
+                    media_body=icon_media
+                ).execute()
+                print("App Icon Uploaded!")
+            except Exception as e:
+                print(f"Icon notice: {e}")
+
+        if os.path.exists(feature_path):
+            try:
+                print("Uploading Feature Graphic (1024x500)...")
+                feat_media = MediaFileUpload(feature_path, mimetype="image/png")
+                edits.images().upload(
+                    packageName=package_name,
+                    editId=edit_id,
+                    language="es-419",
+                    imageType="featureGraphic",
+                    media_body=feat_media
+                ).execute()
+                print("Feature Graphic Uploaded!")
+            except Exception as e:
+                print(f"Feature Graphic notice: {e}")
+
+        print(f"Uploading App Bundle ({os.path.getsize(aab_path) / (1024*1024):.2f} MB)...")
+        media = MediaFileUpload(aab_path, mimetype="application/octet-stream", chunksize=10*1024*1024, resumable=True)
         bundle_req = edits.bundles().upload(packageName=package_name, editId=edit_id, media_body=media)
-        bundle_res = bundle_req.execute()
-        version_code = bundle_res["versionCode"]
-        print(f"✅ Bundle Uploaded Successfully! (Version Code: {version_code})")
+        
+        response = None
+        while response is None:
+            status, response = bundle_req.next_chunk(num_retries=5)
+            if status:
+                print(f"Uploaded {int(status.progress() * 100)}%...")
 
-        # 3. Update Track Release
-        print(f"🚀 Assigning Version Code {version_code} to track '{track}'...")
+        version_code = response["versionCode"]
+        print(f"Bundle Uploaded Successfully! (Version Code: {version_code})")
+
+        print(f"Assigning Version Code {version_code} to track '{track}'...")
         track_body = {
             "track": track,
             "releases": [
                 {
-                    "name": "1.0.0 (Release Initial)",
+                    "name": f"1.0.4 (Build {version_code})",
                     "versionCodes": [str(version_code)],
                     "status": "completed",
                     "releaseNotes": [
                         {
                             "language": "es-419",
-                            "text": "Lanzamiento inicial de Menú Listo: Recetas y Planificador."
+                            "text": "Secciones organizadas en ingredientes y pasos (ej. Para la masa), temporizadores interactivos en recetas, transiciones y animaciones fluidas, respuesta háptica, optimizaciones de rendimiento y plantillas de menú semanal guardadas ('Mis Menús')."
                         },
                         {
                             "language": "en-US",
-                            "text": "Initial release of Menú Listo: Recipes & Meal Planner."
+                            "text": "Organized section headers in ingredients and steps, interactive in-recipe timers, smooth hero animations and haptic feedback, app size optimizations, and reusable weekly meal plan templates."
                         }
                     ]
                 }
@@ -98,19 +165,16 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
             body=track_body
         ).execute()
 
-        # 4. Commit Edit
-        print(f"💾 Committing and Publishing Edit...")
+        print("Committing and Publishing Edit to Google Play...")
         commit_res = edits.commit(packageName=package_name, editId=edit_id).execute()
-        print(f"🎉 SUCCESS! Released to Google Play [{track.upper()}] track (Commit ID: {commit_res.get('id', edit_id)})")
+        print(f"SUCCESS! Released to Google Play [{track.upper()}] track (Commit ID: {commit_res.get('id', edit_id)})")
         return True
 
     except HttpError as e:
         error_content = json.loads(e.content.decode("utf-8"))
         error_msg = error_content.get("error", {}).get("message", str(e))
         error_code = e.resp.status
-        print(f"\n❌ Google Play API Error ({error_code}): {error_msg}")
-        if error_code == 404:
-            print("👉 El paquete debe ser creado primero en la consola web: https://play.google.com/console")
+        print(f"Google Play API Error ({error_code}): {error_msg}")
         return False
 
 def main():

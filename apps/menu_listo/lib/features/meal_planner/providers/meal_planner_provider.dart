@@ -5,6 +5,7 @@ import '../../recipes/data/recipe_repository.dart';
 import '../../recipes/providers/recipe_provider.dart';
 import '../data/meal_plan_repository.dart';
 import '../models/meal_plan_model.dart';
+import '../models/meal_plan_template_model.dart';
 
 final mealPlanRepositoryProvider = Provider<MealPlanRepository>((ref) {
   return MealPlanRepository();
@@ -115,7 +116,6 @@ class WeeklyMealPlanNotifier extends StateNotifier<AsyncValue<List<MealPlanItem>
       for (var mealType in mealTypes) {
         final existing = currentItems.any((item) => item.dateString == dateStr && item.mealType == mealType);
         if (!existing) {
-          // Find recipes matching category or pick any
           String targetCategory = 'Almuerzo';
           if (mealType == 'breakfast') targetCategory = 'Desayuno';
           if (mealType == 'snack') targetCategory = 'Merienda';
@@ -140,5 +140,122 @@ class WeeklyMealPlanNotifier extends StateNotifier<AsyncValue<List<MealPlanItem>
       }
     }
     await loadWeek();
+  }
+
+  Future<int> copyPreviousWeek() async {
+    final prevWeekDateStrings = List.generate(7, (i) {
+      final date = _weekStart.subtract(const Duration(days: 7)).add(Duration(days: i));
+      return DateFormat('yyyy-MM-dd').format(date);
+    });
+
+    final prevItems = await _repo.getMealPlansForWeek(prevWeekDateStrings);
+    if (prevItems.isEmpty) return 0;
+
+    int copied = 0;
+    for (int i = 0; i < 7; i++) {
+      final prevDate = prevWeekDateStrings[i];
+      final currDate = currentWeekDateStrings[i];
+      final dayItems = prevItems.where((it) => it.dateString == prevDate);
+
+      for (var item in dayItems) {
+        final newId = '${currDate}_${item.mealType}';
+        final newItem = MealPlanItem(
+          id: newId,
+          dateString: currDate,
+          mealType: item.mealType,
+          recipeId: item.recipeId,
+          recipeTitle: item.recipeTitle,
+          recipeCategory: item.recipeCategory,
+          servings: item.servings,
+          customNote: item.customNote,
+        );
+        await _repo.setMealPlan(newItem);
+        copied++;
+      }
+    }
+
+    await loadWeek();
+    return copied;
+  }
+
+  Future<void> applyTemplate(MealPlanTemplate template) async {
+    for (var tItem in template.items) {
+      if (tItem.dayOffset >= 0 && tItem.dayOffset < 7) {
+        final targetDateStr = currentWeekDateStrings[tItem.dayOffset];
+        final id = '${targetDateStr}_${tItem.mealType}';
+        final item = MealPlanItem(
+          id: id,
+          dateString: targetDateStr,
+          mealType: tItem.mealType,
+          recipeId: tItem.recipeId,
+          recipeTitle: tItem.recipeTitle,
+          recipeCategory: tItem.recipeCategory,
+          servings: tItem.servings,
+          customNote: tItem.customNote,
+        );
+        await _repo.setMealPlan(item);
+      }
+    }
+    await loadWeek();
+  }
+}
+
+// Templates State Notifier
+final mealPlanTemplatesProvider = StateNotifierProvider<MealPlanTemplatesNotifier, AsyncValue<List<MealPlanTemplate>>>((ref) {
+  final repo = ref.watch(mealPlanRepositoryProvider);
+  return MealPlanTemplatesNotifier(repo);
+});
+
+class MealPlanTemplatesNotifier extends StateNotifier<AsyncValue<List<MealPlanTemplate>>> {
+  final MealPlanRepository _repo;
+
+  MealPlanTemplatesNotifier(this._repo) : super(const AsyncValue.loading()) {
+    loadTemplates();
+  }
+
+  Future<void> loadTemplates() async {
+    try {
+      state = const AsyncValue.loading();
+      final list = await _repo.getAllTemplates();
+      state = AsyncValue.data(list);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
+  }
+
+  Future<void> saveCurrentWeekAsTemplate({
+    required String name,
+    required List<MealPlanItem> weekItems,
+    required List<String> currentWeekDateStrings,
+  }) async {
+    final List<MealPlanTemplateItem> templateItems = [];
+
+    for (var item in weekItems) {
+      final dayOffset = currentWeekDateStrings.indexOf(item.dateString);
+      if (dayOffset != -1) {
+        templateItems.add(MealPlanTemplateItem(
+          dayOffset: dayOffset,
+          mealType: item.mealType,
+          recipeId: item.recipeId,
+          recipeTitle: item.recipeTitle,
+          recipeCategory: item.recipeCategory,
+          servings: item.servings,
+          customNote: item.customNote,
+        ));
+      }
+    }
+
+    final template = MealPlanTemplate(
+      name: name,
+      items: templateItems,
+    );
+
+    await _repo.saveTemplate(template);
+    await loadTemplates();
+  }
+
+  Future<void> deleteTemplate(String id) async {
+    await _repo.deleteTemplate(id);
+    await loadTemplates();
   }
 }

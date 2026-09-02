@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import '../../../../core/localization/app_localizations.dart';
+import 'package:flutter/services.dart';
 import '../../models/recipe_model.dart';
 
 class RecipeCard extends StatelessWidget {
@@ -18,12 +18,16 @@ class RecipeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final strings = AppStrings.of(context);
 
     return Card(
       clipBehavior: Clip.antiAlias,
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
-        onTap: onTap,
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -34,7 +38,10 @@ class RecipeCard extends StatelessWidget {
                   height: 140,
                   width: double.infinity,
                   color: theme.colorScheme.surfaceContainerHighest,
-                  child: _buildImage(theme),
+                  child: Hero(
+                    tag: 'recipe_image_${recipe.id}',
+                    child: _buildImage(theme),
+                  ),
                 ),
                 // Category Chip
                 Positioned(
@@ -70,7 +77,10 @@ class RecipeCard extends StatelessWidget {
                       recipe.isFavorite ? Icons.favorite : Icons.favorite_border,
                       color: recipe.isFavorite ? Colors.redAccent : theme.colorScheme.onSurfaceVariant,
                     ),
-                    onPressed: onToggleFavorite,
+                    onPressed: () {
+                      HapticFeedback.lightImpact();
+                      onToggleFavorite();
+                    },
                     style: IconButton.styleFrom(
                       backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.8),
                     ),
@@ -107,14 +117,14 @@ class RecipeCard extends StatelessWidget {
                       Icon(Icons.schedule, size: 14, color: theme.colorScheme.primary),
                       const SizedBox(width: 4),
                       Text(
-                        '${recipe.totalTimeMinutes} ${strings.minutes}',
+                        '${recipe.totalTimeMinutes} ${'min'}',
                         style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(width: 12),
                       Icon(Icons.people_outline, size: 14, color: theme.colorScheme.primary),
                       const SizedBox(width: 4),
                       Text(
-                        '${recipe.baseServings} ${strings.persons}',
+                        '${recipe.baseServings} ${'porc.'}',
                         style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w600),
                       ),
                     ],
@@ -133,13 +143,18 @@ class RecipeCard extends StatelessWidget {
       if (recipe.imageUrl.startsWith('http')) {
         return Image.network(
           recipe.imageUrl,
+          cacheWidth: 600,
           fit: BoxFit.cover,
           errorBuilder: (_, _, _) => _buildPlaceholder(theme),
         );
       } else {
         final file = File(recipe.imageUrl);
         if (file.existsSync()) {
-          return Image.file(file, fit: BoxFit.cover);
+          return Image.file(
+            file,
+            cacheWidth: 600,
+            fit: BoxFit.cover,
+          );
         }
       }
     }

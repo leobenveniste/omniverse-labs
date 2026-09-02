@@ -30,6 +30,14 @@ Omniverse Labs/
 
 ---
 
+## 📱 Active Applications
+
+| App | Package Name | Version | Description |
+| :--- | :--- | :---: | :--- |
+| **Menú Listo** | `com.omniverselabs.menu_listo` | `1.0.4+5` | Asistente culinario integral, planificador de comidas, recetario con OCR, timers interactivos y lista de compras inteligente. |
+
+---
+
 ## ⚡ Quick Start & Common Commands
 
 All commands can be run directly via `.\scripts\app-manager.ps1`:
