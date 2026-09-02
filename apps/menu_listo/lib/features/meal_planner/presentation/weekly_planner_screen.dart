@@ -39,10 +39,49 @@ class WeeklyPlannerScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(strings.plannerTitle),
         actions: [
-          IconButton(
+          PopupMenuButton<String>(
             icon: const Icon(Icons.bookmarks_outlined),
             tooltip: strings.isSpanish ? 'Plantillas de Menú' : 'Meal Templates',
-            onPressed: () => _showTemplatesSheet(context, ref),
+            onSelected: (val) {
+              if (val == 'save_template') {
+                final currentWeekItems = weekPlanAsync.valueOrNull ?? [];
+                if (currentWeekItems.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(strings.isSpanish
+                          ? 'Agrega al menos una comida para guardar una plantilla'
+                          : 'Add at least one meal to save a template'),
+                    ),
+                  );
+                  return;
+                }
+                _showSaveTemplateDialog(context, ref, currentWeekItems, weekPlanNotifier.currentWeekDateStrings);
+              } else if (val == 'load_templates') {
+                _showTemplatesSheet(context, ref);
+              }
+            },
+            itemBuilder: (ctx) => [
+              PopupMenuItem(
+                value: 'save_template',
+                child: Row(
+                  children: [
+                    const Icon(Icons.bookmark_add_outlined, size: 20),
+                    const SizedBox(width: 12),
+                    Text(strings.isSpanish ? 'Guardar semana como plantilla' : 'Save week as template'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'load_templates',
+                child: Row(
+                  children: [
+                    const Icon(Icons.bookmarks_rounded, size: 20),
+                    const SizedBox(width: 12),
+                    Text(strings.isSpanish ? 'Ver mis plantillas guardadas' : 'View saved templates'),
+                  ],
+                ),
+              ),
+            ],
           ),
           IconButton(
             icon: const Icon(Icons.history_rounded),

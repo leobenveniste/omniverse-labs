@@ -27,7 +27,7 @@ class CulinaryCatalog {
     CulinaryIngredientItem(name: 'Papa / Patata', nameEn: 'Potato', emoji: '🥔', defaultUnit: 'u', category: 'Verduras'),
     CulinaryIngredientItem(name: 'Batata / Camote', nameEn: 'Sweet potato', emoji: '🍠', defaultUnit: 'u', category: 'Verduras'),
     CulinaryIngredientItem(name: 'Palta / Aguacate', nameEn: 'Avocado', emoji: '🥑', defaultUnit: 'u', category: 'Verduras'),
-    CulinaryIngredientItem(name: 'Morrón rojo / Pimiento rojo', nameEn: 'Red bell pepper', emoji: '🫑', defaultUnit: 'u', category: 'Verduras'),
+    CulinaryIngredientItem(name: 'Morrón rojo / Pimiento rojo', nameEn: 'Red bell pepper', emoji: '🌶️', defaultUnit: 'u', category: 'Verduras'),
     CulinaryIngredientItem(name: 'Morrón verde / Pimiento verde', nameEn: 'Green bell pepper', emoji: '🫑', defaultUnit: 'u', category: 'Verduras'),
     CulinaryIngredientItem(name: 'Morrón amarillo / Pimiento amarillo', nameEn: 'Yellow bell pepper', emoji: '🫑', defaultUnit: 'u', category: 'Verduras'),
     CulinaryIngredientItem(name: 'Morrón / Pimiento / Ají', nameEn: 'Bell pepper', emoji: '🫑', defaultUnit: 'u', category: 'Verduras'),
@@ -257,63 +257,78 @@ class CulinaryCatalog {
   }
 
   static bool isPantryStaple(String ingredientName) {
-    final lower = ingredientName.toLowerCase().trim();
+    final lower = removeDiacritics(ingredientName.toLowerCase().trim());
     return lower.contains('sal') ||
         lower.contains('pimienta') ||
         lower.contains('aceite') ||
         lower.contains('vinagre') ||
-        lower.contains('azúcar') ||
+        lower.contains('azucar') ||
         lower.contains('harina') ||
-        lower.contains('orégano') ||
+        lower.contains('oregano') ||
         lower.contains('comino') ||
-        lower.contains('pimentón') ||
+        lower.contains('pimenton') ||
         lower.contains('laurel') ||
         lower.contains('agua');
   }
 
+  static String removeDiacritics(String str) {
+    var withDia = 'ÀÁÂÃÄÅàáâãäåÒÓÔÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž';
+    var withoutDia = 'AAAAAAaaaaaaOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz';
+    for (int i = 0; i < withDia.length; i++) {
+      str = str.replaceAll(withDia[i], withoutDia[i]);
+    }
+    return str;
+  }
+
   static String getEmoji(String ingredientName) {
     if (ingredientName.trim().isEmpty) return '🥗';
-    final lower = ingredientName.toLowerCase();
+    final normalized = removeDiacritics(ingredientName.toLowerCase());
+
+    // Check specific red pepper first
+    if ((normalized.contains('morron') || normalized.contains('pimiento') || normalized.contains('aji')) &&
+        (normalized.contains('rojo') || normalized.contains('red'))) {
+      return '🌶️';
+    }
 
     for (var item in ingredients) {
-      final nameLower = item.name.toLowerCase();
-      final enLower = item.nameEn.toLowerCase();
+      final nameNorm = removeDiacritics(item.name.toLowerCase());
+      final enNorm = removeDiacritics(item.nameEn.toLowerCase());
 
-      final parts = nameLower.split('/');
+      final parts = nameNorm.split('/');
       for (var p in parts) {
         final cleanP = p.trim();
-        if (cleanP.length > 2 && lower.contains(cleanP)) {
+        if (cleanP.length > 2 && normalized.contains(cleanP)) {
           return item.emoji;
         }
       }
 
-      final enParts = enLower.split('/');
+      final enParts = enNorm.split('/');
       for (var p in enParts) {
         final cleanP = p.trim();
-        if (cleanP.length > 2 && lower.contains(cleanP)) {
+        if (cleanP.length > 2 && normalized.contains(cleanP)) {
           return item.emoji;
         }
       }
     }
 
     // Fallback based on keywords
-    if (lower.contains('morron') || lower.contains('morrón') || lower.contains('pimiento') || lower.contains('aji') || lower.contains('ají') || lower.contains('pepper')) return '🫑';
-    if (lower.contains('vino') || lower.contains('wine')) return '🍷';
-    if (lower.contains('cerveza') || lower.contains('beer')) return '🍺';
-    if (lower.contains('caldo') || lower.contains('broth') || lower.contains('sopa')) return '🍲';
-    if (lower.contains('carne') || lower.contains('beef') || lower.contains('bife') || lower.contains('lomo')) return '🥩';
-    if (lower.contains('pollo') || lower.contains('chicken') || lower.contains('ave')) return '🍗';
-    if (lower.contains('pescado') || lower.contains('fish') || lower.contains('salmon') || lower.contains('atun')) return '🐟';
-    if (lower.contains('queso') || lower.contains('cheese')) return '🧀';
-    if (lower.contains('huevo') || lower.contains('egg')) return '🥚';
-    if (lower.contains('leche') || lower.contains('milk') || lower.contains('crema')) return '🥛';
-    if (lower.contains('aceite') || lower.contains('oil')) return '🫒';
-    if (lower.contains('harina') || lower.contains('flour') || lower.contains('pan')) return '🌾';
-    if (lower.contains('fruta') || lower.contains('fruit') || lower.contains('manzana') || lower.contains('pera')) return '🍎';
-    if (lower.contains('pasta') || lower.contains('fideo') || lower.contains('spaghetti')) return '🍝';
-    if (lower.contains('arroz') || lower.contains('rice')) return '🍚';
-    if (lower.contains('sal') || lower.contains('pimienta') || lower.contains('especia') || lower.contains('laurel') || lower.contains('oregano') || lower.contains('orégano')) return '🧂';
-    if (lower.contains('albahaca') || lower.contains('perejil') || lower.contains('cilantro') || lower.contains('romero') || lower.contains('tomillo')) return '🌿';
+    if (normalized.contains('morron') || normalized.contains('pimiento') || normalized.contains('aji') || normalized.contains('pepper')) return '🫑';
+    if (normalized.contains('vino') || normalized.contains('wine')) return '🍷';
+    if (normalized.contains('cerveza') || normalized.contains('beer')) return '🍺';
+    if (normalized.contains('caldo') || normalized.contains('broth') || normalized.contains('sopa')) return '🍲';
+    if (normalized.contains('carne') || normalized.contains('beef') || normalized.contains('bife') || normalized.contains('lomo')) return '🥩';
+    if (normalized.contains('pollo') || normalized.contains('chicken') || normalized.contains('ave')) return '🍗';
+    if (normalized.contains('pescado') || normalized.contains('fish') || normalized.contains('salmon') || normalized.contains('atun')) return '🐟';
+    if (normalized.contains('queso') || normalized.contains('cheese')) return '🧀';
+    if (normalized.contains('huevo') || normalized.contains('egg')) return '🥚';
+    if (normalized.contains('leche') || normalized.contains('milk') || normalized.contains('crema')) return '🥛';
+    if (normalized.contains('aceite') || normalized.contains('oil')) return '🫒';
+    if (normalized.contains('harina') || normalized.contains('flour') || normalized.contains('pan')) return '🌾';
+    if (normalized.contains('fruta') || normalized.contains('fruit') || normalized.contains('manzana') || normalized.contains('pera')) return '🍎';
+    if (normalized.contains('pasta') || normalized.contains('fideo') || normalized.contains('spaghetti')) return '🍝';
+    if (normalized.contains('arroz') || normalized.contains('rice')) return '🍚';
+    if (normalized.contains('sal') || normalized.contains('pimienta') || normalized.contains('especia') || normalized.contains('laurel') || normalized.contains('oregano')) return '🧂';
+    if (normalized.contains('albahaca') || normalized.contains('perejil') || normalized.contains('cilantro') || normalized.contains('romero') || normalized.contains('tomillo')) return '🌿';
 
     return '🥗';
   }

@@ -32,30 +32,18 @@ class SettingsScreen extends ConsumerWidget {
           // 0. Pro Status Banner Card
           Container(
             decoration: BoxDecoration(
-              gradient: premiumState.isProUser
-                  ? LinearGradient(
-                      colors: [Colors.amber.shade700, Colors.orange.shade800],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    )
-                  : LinearGradient(
-                      colors: [theme.colorScheme.primaryContainer, theme.colorScheme.surfaceContainerHighest],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+              color: premiumState.isProUser
+                  ? (Theme.of(context).brightness == Brightness.dark
+                      ? Colors.amber.shade900.withValues(alpha: 0.25)
+                      : Colors.amber.shade50)
+                  : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: premiumState.isProUser ? Colors.amber.shade300 : theme.colorScheme.outline.withValues(alpha: 0.2),
+                color: premiumState.isProUser
+                    ? Colors.amber.shade600
+                    : theme.colorScheme.outline.withValues(alpha: 0.2),
+                width: premiumState.isProUser ? 1.5 : 1,
               ),
-              boxShadow: premiumState.isProUser
-                  ? [
-                      BoxShadow(
-                        color: Colors.orange.withValues(alpha: 0.25),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      )
-                    ]
-                  : null,
             ),
             child: Material(
               color: Colors.transparent,
@@ -63,19 +51,21 @@ class SettingsScreen extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(20),
                 onTap: premiumState.isProUser ? null : () => PaywallSheet.show(context),
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   child: Row(
                     children: [
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: premiumState.isProUser ? Colors.white.withValues(alpha: 0.2) : theme.colorScheme.primary.withValues(alpha: 0.1),
+                          color: premiumState.isProUser
+                              ? Colors.amber.shade600
+                              : Colors.amber.withValues(alpha: 0.18),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
                           premiumState.isProUser ? Icons.stars_rounded : Icons.workspace_premium_rounded,
-                          color: premiumState.isProUser ? Colors.white : theme.colorScheme.primary,
-                          size: 28,
+                          color: premiumState.isProUser ? Colors.white : Colors.amber.shade800,
+                          size: 26,
                         ),
                       ),
                       const SizedBox(width: 14),
@@ -86,30 +76,38 @@ class SettingsScreen extends ConsumerWidget {
                             Text(
                               premiumState.isProUser
                                   ? (strings.isSpanish ? 'Menú Listo Pro Activo' : 'Menú Listo Pro Active')
-                                  : (strings.isSpanish ? 'Desbloquear Menú Listo Pro' : 'Unlock Menú Listo Pro'),
+                                  : (strings.isSpanish ? 'Menú Listo Pro' : 'Menú Listo Pro'),
                               style: TextStyle(
-                                fontWeight: FontWeight.w900,
-                                fontSize: 16,
-                                color: premiumState.isProUser ? Colors.white : theme.colorScheme.onSurface,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 15,
+                                color: theme.colorScheme.onSurface,
                               ),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               premiumState.isProUser
                                   ? (strings.isSpanish ? 'Acceso de por vida a todas las funciones' : 'Lifetime access to all features')
-                                  : (strings.isSpanish ? 'Recetas ilimitadas, manos libres y más por \$2.99' : 'Unlimited recipes, hands-free & more for \$2.99'),
+                                  : (strings.isSpanish ? 'Recetas ilimitadas y manos libres por \$2.99' : 'Unlimited recipes & hands-free for \$2.99'),
                               style: TextStyle(
                                 fontSize: 12,
-                                color: premiumState.isProUser ? Colors.white.withValues(alpha: 0.9) : theme.colorScheme.onSurfaceVariant,
+                                color: theme.colorScheme.onSurfaceVariant,
                               ),
                             ),
                           ],
                         ),
                       ),
+                      const SizedBox(width: 8),
                       if (!premiumState.isProUser)
-                        FilledButton.tonal(
+                        FilledButton(
+                          style: FilledButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            visualDensity: VisualDensity.compact,
+                          ),
                           onPressed: () => PaywallSheet.show(context),
-                          child: Text(strings.isSpanish ? 'Ver Pro' : 'Upgrade'),
+                          child: Text(
+                            strings.isSpanish ? 'Ver Pro' : 'Upgrade',
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                          ),
                         ),
                     ],
                   ),
@@ -160,21 +158,24 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           SegmentedButton<ThemeMode>(
+            style: SegmentedButton.styleFrom(
+              visualDensity: VisualDensity.compact,
+            ),
             segments: [
               ButtonSegment(
                 value: ThemeMode.system,
-                icon: const Icon(Icons.brightness_auto),
-                label: Text(strings.modeSystem),
+                icon: const Icon(Icons.brightness_auto, size: 18),
+                label: Text(strings.modeSystem, style: const TextStyle(fontSize: 13)),
               ),
               ButtonSegment(
                 value: ThemeMode.light,
-                icon: const Icon(Icons.light_mode),
-                label: Text(strings.modeLight),
+                icon: const Icon(Icons.light_mode, size: 18),
+                label: Text(strings.modeLight, style: const TextStyle(fontSize: 13)),
               ),
               ButtonSegment(
                 value: ThemeMode.dark,
-                icon: const Icon(Icons.dark_mode),
-                label: Text(strings.modeDark),
+                icon: const Icon(Icons.dark_mode, size: 18),
+                label: Text(strings.modeDark, style: const TextStyle(fontSize: 13)),
               ),
             ],
             selected: {currentThemeMode},
@@ -191,18 +192,21 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 12),
           SegmentedButton<AppLanguage>(
+            style: SegmentedButton.styleFrom(
+              visualDensity: VisualDensity.compact,
+            ),
             segments: [
               ButtonSegment(
                 value: AppLanguage.system,
-                label: Text(strings.langSystem),
+                label: Text(strings.langSystem, style: const TextStyle(fontSize: 13)),
               ),
               const ButtonSegment(
                 value: AppLanguage.es,
-                label: Text('Español'),
+                label: Text('Español', style: TextStyle(fontSize: 13)),
               ),
               const ButtonSegment(
                 value: AppLanguage.en,
-                label: Text('English'),
+                label: Text('English', style: TextStyle(fontSize: 13)),
               ),
             ],
             selected: {currentLanguage},

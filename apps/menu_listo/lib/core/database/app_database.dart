@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -172,8 +173,12 @@ class AppDatabase {
       await txn.insert('recipes', recipe.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
 
       await txn.delete('ingredients', where: 'recipeId = ?', whereArgs: [recipe.id]);
+      int ingIndex = 0;
       for (var ing in recipe.ingredients) {
-        final ingMap = ing.toMap()..['recipeId'] = recipe.id;
+        final ingId = (ing.id.isNotEmpty) ? ing.id : '${recipe.id}_ing_${ingIndex++}';
+        final ingMap = ing.toMap()
+          ..['id'] = ingId
+          ..['recipeId'] = recipe.id;
         await txn.insert('ingredients', ingMap, conflictAlgorithm: ConflictAlgorithm.replace);
       }
 
@@ -326,8 +331,8 @@ class AppDatabase {
         final recipe = Recipe.fromMap(Map<String, dynamic>.from(rMap), ingredients: ings, steps: steps);
         await insertRecipe(recipe);
       }
-    } catch (e) {
-      // Ignored
+    } catch (e, st) {
+      debugPrint('Error loading sample recipes: $e\n$st');
     }
   }
 }

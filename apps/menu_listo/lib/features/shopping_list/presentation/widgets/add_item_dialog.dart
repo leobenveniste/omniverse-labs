@@ -86,9 +86,11 @@ class _AddShoppingItemDialogState extends State<AddShoppingItemDialog> {
               if (textEditingValue.text.trim().isEmpty) {
                 return const Iterable<CulinaryIngredientItem>.empty();
               }
-              final query = textEditingValue.text.toLowerCase();
+              final query = CulinaryCatalog.removeDiacritics(textEditingValue.text.toLowerCase().trim());
               return CulinaryCatalog.ingredients.where(
-                (ing) => ing.name.toLowerCase().contains(query) || ing.nameEn.toLowerCase().contains(query),
+                (ing) =>
+                    CulinaryCatalog.removeDiacritics(ing.name.toLowerCase()).contains(query) ||
+                    CulinaryCatalog.removeDiacritics(ing.nameEn.toLowerCase()).contains(query),
               );
             },
             onSelected: (selection) {

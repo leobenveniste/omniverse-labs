@@ -71,11 +71,19 @@ class RecipesListNotifier extends StateNotifier<AsyncValue<List<Recipe>>> {
   Future<void> loadRecipes() async {
     try {
       state = const AsyncValue.loading();
-      final recipes = await _repo.getRecipes(
+      var recipes = await _repo.getRecipes(
         searchQuery: _filter.searchQuery,
         category: _filter.selectedCategory,
         onlyFavorites: _filter.onlyFavorites,
       );
+      if (recipes.isEmpty && _filter.searchQuery.isEmpty && (_filter.selectedCategory == 'Todas' || _filter.selectedCategory == 'All') && !_filter.onlyFavorites) {
+        await _repo.reloadSampleRecipes();
+        recipes = await _repo.getRecipes(
+          searchQuery: _filter.searchQuery,
+          category: _filter.selectedCategory,
+          onlyFavorites: _filter.onlyFavorites,
+        );
+      }
       state = AsyncValue.data(recipes);
     } catch (e, st) {
       state = AsyncValue.error(e, st);

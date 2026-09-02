@@ -110,10 +110,15 @@ class Recipe {
     List<Ingredient> ingredients = const [],
     List<RecipeStep> steps = const [],
   }) {
-    final tagsRaw = map['tags']?.toString() ?? '';
-    final tagsList = tagsRaw.isEmpty 
-        ? <String>[] 
-        : tagsRaw.split(',').map((t) => t.trim()).where((t) => t.isNotEmpty).toList();
+    List<String> tagsList = [];
+    if (map['tags'] is List) {
+      tagsList = (map['tags'] as List).map((t) => t.toString().trim()).where((t) => t.isNotEmpty).toList();
+    } else if (map['tags'] != null) {
+      final tagsRaw = map['tags'].toString().replaceAll('[', '').replaceAll(']', '');
+      tagsList = tagsRaw.isEmpty 
+          ? <String>[] 
+          : tagsRaw.split(',').map((t) => t.trim()).where((t) => t.isNotEmpty).toList();
+    }
 
     List<String> categoriesList = [];
     if (map['categories'] is List) {
@@ -129,9 +134,9 @@ class Recipe {
     return Recipe(
       id: map['id']?.toString() ?? '',
       title: map['title']?.toString() ?? '',
-      titleEn: map['titleEn']?.toString(),
+      titleEn: map['titleEn']?.toString() ?? map['title_en']?.toString(),
       description: map['description']?.toString() ?? '',
-      descriptionEn: map['descriptionEn']?.toString(),
+      descriptionEn: map['descriptionEn']?.toString() ?? map['description_en']?.toString(),
       categories: categoriesList,
       prepTimeMinutes: (map['prepTimeMinutes'] is num) ? (map['prepTimeMinutes'] as num).toInt() : 15,
       cookTimeMinutes: (map['cookTimeMinutes'] is num) ? (map['cookTimeMinutes'] as num).toInt() : 20,

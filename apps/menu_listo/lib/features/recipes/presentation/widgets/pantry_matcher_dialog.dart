@@ -214,9 +214,11 @@ class _PantryMatcherDialogState extends ConsumerState<PantryMatcherDialog> {
                     List<String> missing = [];
 
                     for (var ing in actualIngredients) {
-                      final ingLower = ing.name.toLowerCase();
-                      final isMatched = _selectedIngredients.any((sel) =>
-                          ingLower.contains(sel.toLowerCase()) || sel.toLowerCase().contains(ingLower));
+                      final ingLower = CulinaryCatalog.removeDiacritics(ing.name.toLowerCase());
+                      final isMatched = _selectedIngredients.any((sel) {
+                        final selLower = CulinaryCatalog.removeDiacritics(sel.toLowerCase());
+                        return ingLower.contains(selLower) || selLower.contains(ingLower);
+                      });
 
                       if (isMatched) {
                         matches++;

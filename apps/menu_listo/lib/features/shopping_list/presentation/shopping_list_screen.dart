@@ -203,49 +203,54 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
     final itemsAsync = ref.watch(shoppingListProvider);
     final notifier = ref.read(shoppingListProvider.notifier);
 
+    final items = itemsAsync.valueOrNull ?? [];
+    final hasItems = items.isNotEmpty;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(strings.shoppingTitle),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart_checkout),
-            tooltip: strings.isSpanish ? 'Modo Súper' : 'Supermarket Mode',
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const SupermarketModeScreen()),
-              );
-            },
-          ),
-          IconButton(
-            icon: Icon(_isCategorizedView ? Icons.view_agenda_outlined : Icons.category_outlined),
-            tooltip: _isCategorizedView
-                ? (strings.isSpanish ? 'Ver lista plana' : 'View flat list')
-                : (strings.isSpanish ? 'Agrupar por góndola' : 'Group by aisle'),
-            onPressed: () => setState(() => _isCategorizedView = !_isCategorizedView),
-          ),
-          IconButton(
-            icon: const Icon(Icons.share_outlined),
-            tooltip: strings.shareList,
-            onPressed: () {
-              final text = notifier.buildShareableText(header: strings.shareListHeader);
-              if (text.isNotEmpty) {
-                Share.share(text);
-              }
-            },
-          ),
-          PopupMenuButton<String>(
-            onSelected: (val) {
-              if (val == 'clear_completed') {
-                notifier.clearCompleted();
-              } else if (val == 'clear_all') {
-                notifier.clearAll();
-              }
-            },
-            itemBuilder: (ctx) => [
-              PopupMenuItem(value: 'clear_completed', child: Text(strings.clearCompleted)),
-              PopupMenuItem(value: 'clear_all', child: Text(strings.clearAll)),
-            ],
-          ),
+          if (hasItems) ...[
+            IconButton(
+              icon: const Icon(Icons.shopping_cart_checkout),
+              tooltip: strings.isSpanish ? 'Modo Súper' : 'Supermarket Mode',
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const SupermarketModeScreen()),
+                );
+              },
+            ),
+            IconButton(
+              icon: Icon(_isCategorizedView ? Icons.view_agenda_outlined : Icons.category_outlined),
+              tooltip: _isCategorizedView
+                  ? (strings.isSpanish ? 'Ver lista plana' : 'View flat list')
+                  : (strings.isSpanish ? 'Agrupar por góndola' : 'Group by aisle'),
+              onPressed: () => setState(() => _isCategorizedView = !_isCategorizedView),
+            ),
+            IconButton(
+              icon: const Icon(Icons.share_outlined),
+              tooltip: strings.shareList,
+              onPressed: () {
+                final text = notifier.buildShareableText(header: strings.shareListHeader);
+                if (text.isNotEmpty) {
+                  Share.share(text);
+                }
+              },
+            ),
+            PopupMenuButton<String>(
+              onSelected: (val) {
+                if (val == 'clear_completed') {
+                  notifier.clearCompleted();
+                } else if (val == 'clear_all') {
+                  notifier.clearAll();
+                }
+              },
+              itemBuilder: (ctx) => [
+                PopupMenuItem(value: 'clear_completed', child: Text(strings.clearCompleted)),
+                PopupMenuItem(value: 'clear_all', child: Text(strings.clearAll)),
+              ],
+            ),
+          ],
         ],
       ),
       body: Column(

@@ -142,54 +142,56 @@ class _AppShellState extends ConsumerState<AppShell> {
                 ),
 
                 // Center Notch Background Circle (cutout effect)
-                Positioned(
-                  top: -12,
-                  child: Container(
-                    width: 66,
-                    height: 66,
-                    decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF131912) : const Color(0xFFF7F8F7),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-
-                // Center Prominent Elevated Action Button (+)
-                Positioned(
-                  top: -8,
-                  child: GestureDetector(
-                    onTap: () => _onCenterActionPressed(context),
+                if (_currentIndex != 3) ...[
+                  Positioned(
+                    top: -12,
                     child: Container(
-                      width: 58,
-                      height: 58,
+                      width: 66,
+                      height: 66,
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            theme.colorScheme.primary,
-                            theme.colorScheme.primary.withValues(alpha: 0.88),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
+                        color: isDark ? const Color(0xFF131912) : const Color(0xFFF7F8F7),
                         shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: theme.colorScheme.primary.withValues(alpha: 0.4),
-                            blurRadius: 14,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
                       ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.add_rounded,
-                          color: Colors.white,
-                          size: 32,
+                    ),
+                  ),
+
+                  // Center Prominent Elevated Action Button (+)
+                  Positioned(
+                    top: -8,
+                    child: GestureDetector(
+                      onTap: () => _onCenterActionPressed(context),
+                      child: Container(
+                        width: 58,
+                        height: 58,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              theme.colorScheme.primary,
+                              theme.colorScheme.primary.withValues(alpha: 0.88),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: theme.colorScheme.primary.withValues(alpha: 0.4),
+                              blurRadius: 14,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.add_rounded,
+                            color: Colors.white,
+                            size: 32,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
