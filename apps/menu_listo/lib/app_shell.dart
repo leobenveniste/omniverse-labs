@@ -4,6 +4,7 @@ import 'core/localization/app_localizations.dart';
 import 'features/recipes/presentation/recipes_list_screen.dart';
 import 'features/recipes/presentation/widgets/recipe_creation_options_sheet.dart';
 import 'features/meal_planner/presentation/weekly_planner_screen.dart';
+import 'features/meal_planner/presentation/widgets/quick_plan_meal_sheet.dart';
 import 'features/shopping_list/presentation/shopping_list_screen.dart';
 import 'features/shopping_list/presentation/widgets/add_item_dialog.dart';
 import 'features/shopping_list/providers/shopping_provider.dart';
@@ -28,7 +29,9 @@ class _AppShellState extends ConsumerState<AppShell> {
   ];
 
   void _onCenterActionPressed(BuildContext context) {
-    if (_currentIndex == 2) {
+    if (_currentIndex == 1) {
+      QuickPlanMealSheet.show(context);
+    } else if (_currentIndex == 2) {
       AddShoppingItemDialog.show(
         context,
         onAdd: (name, amount, unit) {
@@ -215,30 +218,18 @@ class _AppShellState extends ConsumerState<AppShell> {
         message: tooltip,
         child: SizedBox(
           width: 52,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AnimatedScale(
-                scale: isSelected ? 1.15 : 1.0,
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeOutBack,
-                child: Icon(
-                  isSelected ? activeIcon : icon,
-                  size: 26,
-                  color: isSelected ? primaryColor : unselectedColor,
-                ),
+          height: 64,
+          child: Center(
+            child: AnimatedScale(
+              scale: isSelected ? 1.15 : 1.0,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutBack,
+              child: Icon(
+                isSelected ? activeIcon : icon,
+                size: 26,
+                color: isSelected ? primaryColor : unselectedColor,
               ),
-              const SizedBox(height: 3),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                height: 4,
-                width: isSelected ? 6 : 0,
-                decoration: BoxDecoration(
-                  color: isSelected ? primaryColor : Colors.transparent,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

@@ -7,7 +7,7 @@ class Recipe {
   final String? titleEn;
   final String description;
   final String? descriptionEn;
-  final String category; // Desayuno, Almuerzo, Merienda, Cena, Postre, Otros
+  final List<String> categories; // e.g. ['Almuerzo', 'Cena', 'Desayuno']
   final int prepTimeMinutes;
   final int cookTimeMinutes;
   final int baseServings;
@@ -25,7 +25,8 @@ class Recipe {
     this.titleEn,
     this.description = '',
     this.descriptionEn,
-    this.category = 'Almuerzo',
+    List<String>? categories,
+    String? category,
     this.prepTimeMinutes = 15,
     this.cookTimeMinutes = 20,
     required this.baseServings,
@@ -36,7 +37,14 @@ class Recipe {
     this.ingredients = const [],
     this.steps = const [],
     DateTime? createdAt,
-  }) : createdAt = createdAt ?? DateTime.now();
+  })  : categories = (categories != null && categories.isNotEmpty)
+            ? categories
+            : (category != null && category.trim().isNotEmpty
+                ? category.split(',').map((c) => c.trim()).where((c) => c.isNotEmpty).toList()
+                : const ['Almuerzo']),
+        createdAt = createdAt ?? DateTime.now();
+
+  String get category => categories.isNotEmpty ? categories.first : 'Almuerzo';
 
   int get totalTimeMinutes => prepTimeMinutes + cookTimeMinutes;
 
@@ -46,6 +54,7 @@ class Recipe {
     String? titleEn,
     String? description,
     String? descriptionEn,
+    List<String>? categories,
     String? category,
     int? prepTimeMinutes,
     int? cookTimeMinutes,
@@ -64,7 +73,7 @@ class Recipe {
       titleEn: titleEn ?? this.titleEn,
       description: description ?? this.description,
       descriptionEn: descriptionEn ?? this.descriptionEn,
-      category: category ?? this.category,
+      categories: categories ?? (category != null ? [category] : this.categories),
       prepTimeMinutes: prepTimeMinutes ?? this.prepTimeMinutes,
       cookTimeMinutes: cookTimeMinutes ?? this.cookTimeMinutes,
       baseServings: baseServings ?? this.baseServings,
@@ -85,7 +94,7 @@ class Recipe {
       'titleEn': titleEn,
       'description': description,
       'descriptionEn': descriptionEn,
-      'category': category,
+      'category': categories.join(', '),
       'prepTimeMinutes': prepTimeMinutes,
       'cookTimeMinutes': cookTimeMinutes,
       'baseServings': baseServings,
@@ -106,13 +115,24 @@ class Recipe {
         ? <String>[] 
         : tagsRaw.split(',').map((t) => t.trim()).where((t) => t.isNotEmpty).toList();
 
+    List<String> categoriesList = [];
+    if (map['categories'] is List) {
+      categoriesList = (map['categories'] as List).map((c) => c.toString().trim()).where((c) => c.isNotEmpty).toList();
+    } else if (map['category'] != null) {
+      final rawCat = map['category'].toString();
+      categoriesList = rawCat.split(',').map((c) => c.trim()).where((c) => c.isNotEmpty).toList();
+    }
+    if (categoriesList.isEmpty) {
+      categoriesList = ['Almuerzo'];
+    }
+
     return Recipe(
       id: map['id']?.toString() ?? '',
       title: map['title']?.toString() ?? '',
       titleEn: map['titleEn']?.toString(),
       description: map['description']?.toString() ?? '',
       descriptionEn: map['descriptionEn']?.toString(),
-      category: map['category']?.toString() ?? 'Almuerzo',
+      categories: categoriesList,
       prepTimeMinutes: (map['prepTimeMinutes'] is num) ? (map['prepTimeMinutes'] as num).toInt() : 15,
       cookTimeMinutes: (map['cookTimeMinutes'] is num) ? (map['cookTimeMinutes'] as num).toInt() : 20,
       baseServings: (map['baseServings'] is num && (map['baseServings'] as num) > 0) 

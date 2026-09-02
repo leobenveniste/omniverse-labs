@@ -6,6 +6,8 @@ import 'package:menu_listo/core/theme/app_colors.dart';
 import 'package:menu_listo/core/theme/app_theme_types.dart';
 import 'package:menu_listo/core/theme/theme_provider.dart';
 import '../../backup/services/backup_service.dart';
+import '../../premium/presentation/paywall_sheet.dart';
+import '../../premium/providers/premium_provider.dart';
 import 'widgets/about_dialog_widget.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -18,6 +20,7 @@ class SettingsScreen extends ConsumerWidget {
     final currentDesignTheme = ref.watch(designThemeProvider);
     final currentThemeMode = ref.watch(themeModeProvider);
     final currentLanguage = ref.watch(localeProvider);
+    final premiumState = ref.watch(premiumProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -26,6 +29,96 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 10, 20, 100),
         children: [
+          // 0. Pro Status Banner Card
+          Container(
+            decoration: BoxDecoration(
+              gradient: premiumState.isProUser
+                  ? LinearGradient(
+                      colors: [Colors.amber.shade700, Colors.orange.shade800],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                  : LinearGradient(
+                      colors: [theme.colorScheme.primaryContainer, theme.colorScheme.surfaceContainerHighest],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: premiumState.isProUser ? Colors.amber.shade300 : theme.colorScheme.outline.withValues(alpha: 0.2),
+              ),
+              boxShadow: premiumState.isProUser
+                  ? [
+                      BoxShadow(
+                        color: Colors.orange.withValues(alpha: 0.25),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      )
+                    ]
+                  : null,
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(20),
+                onTap: premiumState.isProUser ? null : () => PaywallSheet.show(context),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: premiumState.isProUser ? Colors.white.withValues(alpha: 0.2) : theme.colorScheme.primary.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          premiumState.isProUser ? Icons.stars_rounded : Icons.workspace_premium_rounded,
+                          color: premiumState.isProUser ? Colors.white : theme.colorScheme.primary,
+                          size: 28,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              premiumState.isProUser
+                                  ? (strings.isSpanish ? 'Menú Listo Pro Activo' : 'Menú Listo Pro Active')
+                                  : (strings.isSpanish ? 'Desbloquear Menú Listo Pro' : 'Unlock Menú Listo Pro'),
+                              style: TextStyle(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 16,
+                                color: premiumState.isProUser ? Colors.white : theme.colorScheme.onSurface,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              premiumState.isProUser
+                                  ? (strings.isSpanish ? 'Acceso de por vida a todas las funciones' : 'Lifetime access to all features')
+                                  : (strings.isSpanish ? 'Recetas ilimitadas, manos libres y más por \$2.99' : 'Unlimited recipes, hands-free & more for \$2.99'),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: premiumState.isProUser ? Colors.white.withValues(alpha: 0.9) : theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (!premiumState.isProUser)
+                        FilledButton.tonal(
+                          onPressed: () => PaywallSheet.show(context),
+                          child: Text(strings.isSpanish ? 'Ver Pro' : 'Upgrade'),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+
           // 1. Visual Theme
           Text(
             strings.visualThemeTitle,

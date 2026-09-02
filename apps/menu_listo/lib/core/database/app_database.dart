@@ -125,8 +125,8 @@ class AppDatabase {
       whereArgs.addAll([q, q, q]);
     }
     if (category != null && category.isNotEmpty && category != 'Todas' && category != 'All') {
-      conditions.add('category = ?');
-      whereArgs.add(category);
+      conditions.add('category LIKE ?');
+      whereArgs.add('%$category%');
     }
     if (onlyFavorites == true) {
       conditions.add('isFavorite = 1');

@@ -64,6 +64,13 @@ class PortionCalculator {
     if (notes != null && notes.trim().isNotEmpty) {
       buffer.write(' (${notes.trim()})');
     }
-    return buffer.toString();
+    return buffer.toString().trim();
+  }
+
+  static String formatIngredientAmount(double amount, String unit) {
+    final formatted = formatAmount(amount);
+    if (formatted.isEmpty) return unit.trim();
+    if (unit.trim().isEmpty) return formatted;
+    return '$formatted ${unit.trim()}';
   }
 }

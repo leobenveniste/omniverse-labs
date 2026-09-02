@@ -24,7 +24,6 @@ class RecipeDetailScreen extends ConsumerStatefulWidget {
 
 class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
   int? _currentServings;
-  final Set<String> _checkedIngredients = {};
 
   // Floating Interactive Step Timer
   Timer? _activeTimer;
@@ -356,41 +355,85 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
         return Scaffold(
           body: CustomScrollView(
             slivers: [
-              // Sliver App Bar with Hero Image
+              // Sliver App Bar with Hero Image & contrast scrim
               SliverAppBar(
-                expandedHeight: 250,
+                expandedHeight: 260,
                 pinned: true,
+                systemOverlayStyle: SystemUiOverlayStyle.light,
+                leading: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CircleAvatar(
+                    backgroundColor: Colors.black.withValues(alpha: 0.45),
+                    child: const BackButton(color: Colors.white),
+                  ),
+                ),
                 flexibleSpace: FlexibleSpaceBar(
                   background: _buildHeaderImage(recipe, theme),
                 ),
                 actions: [
-                  IconButton(
-                    icon: const Icon(Icons.event_available, color: Colors.white),
-                    tooltip: strings.isSpanish ? 'Planificar en la Agenda' : 'Schedule in Planner',
-                    onPressed: () => _showScheduleSheet(context, recipe, servings),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      recipe.isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: recipe.isFavorite ? Colors.redAccent : Colors.white,
+                  Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: CircleAvatar(
+                      radius: 18,
+                      backgroundColor: Colors.black.withValues(alpha: 0.45),
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        iconSize: 20,
+                        icon: const Icon(Icons.event_available, color: Colors.white),
+                        tooltip: strings.isSpanish ? 'Planificar en la Agenda' : 'Schedule in Planner',
+                        onPressed: () => _showScheduleSheet(context, recipe, servings),
+                      ),
                     ),
-                    onPressed: () {
-                      ref.read(recipesListProvider.notifier).toggleFavorite(recipe.id, recipe.isFavorite);
-                    },
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.edit, color: Colors.white),
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (ctx) => RecipeFormScreen(initialRecipe: recipe),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: CircleAvatar(
+                      radius: 18,
+                      backgroundColor: Colors.black.withValues(alpha: 0.45),
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        iconSize: 20,
+                        icon: Icon(
+                          recipe.isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: recipe.isFavorite ? Colors.redAccent : Colors.white,
                         ),
-                      );
-                    },
+                        onPressed: () {
+                          ref.read(recipesListProvider.notifier).toggleFavorite(recipe.id, recipe.isFavorite);
+                        },
+                      ),
+                    ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.delete_outline, color: Colors.white),
-                    onPressed: () => _confirmDelete(context, recipe),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 6),
+                    child: CircleAvatar(
+                      radius: 18,
+                      backgroundColor: Colors.black.withValues(alpha: 0.45),
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        iconSize: 20,
+                        icon: const Icon(Icons.edit, color: Colors.white),
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (ctx) => RecipeFormScreen(initialRecipe: recipe),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: CircleAvatar(
+                      radius: 18,
+                      backgroundColor: Colors.black.withValues(alpha: 0.45),
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        iconSize: 20,
+                        icon: const Icon(Icons.delete_outline, color: Colors.white),
+                        onPressed: () => _confirmDelete(context, recipe),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -403,27 +446,42 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                     children: [
                       // Category and Time Badges
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primaryContainer,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              recipe.category,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.onPrimaryContainer,
-                              ),
+                          Expanded(
+                            child: Wrap(
+                              spacing: 6,
+                              runSpacing: 6,
+                              children: recipe.categories.map((cat) {
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.primaryContainer,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    cat,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                      color: theme.colorScheme.onPrimaryContainer,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
                             ),
                           ),
-                          const Spacer(),
-                          Icon(Icons.timer_outlined, size: 18, color: theme.colorScheme.primary),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${recipe.totalTimeMinutes} ${strings.minutes}',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          const SizedBox(width: 8),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.timer_outlined, size: 18, color: theme.colorScheme.primary),
+                              const SizedBox(width: 4),
+                              Text(
+                                '${recipe.totalTimeMinutes} ${strings.minutes}',
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -445,43 +503,17 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                       const SizedBox(height: 24),
                       // Dynamic Portion Scaler Box
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         decoration: BoxDecoration(
                           color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.3)),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
                         ),
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Icon(Icons.group_outlined, color: theme.colorScheme.primary, size: 26),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  Icon(Icons.people_alt_outlined, color: theme.colorScheme.primary, size: 22),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    strings.servings,
-                                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  AnimatedSwitcher(
-                                    duration: const Duration(milliseconds: 250),
-                                    transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
-                                    child: Text(
-                                      '$servings',
-                                      key: ValueKey<int>(servings),
-                                      style: theme.textTheme.titleMedium?.copyWith(
-                                        fontWeight: FontWeight.w900,
-                                        color: theme.colorScheme.primary,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
                             IconButton.filledTonal(
-                              icon: const Icon(Icons.remove),
+                              icon: const Icon(Icons.remove_rounded, size: 22),
                               onPressed: servings > 1
                                   ? () {
                                       HapticFeedback.lightImpact();
@@ -489,9 +521,34 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                                     }
                                   : null,
                             ),
-                            const SizedBox(width: 6),
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 200),
+                                  transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
+                                  child: Text(
+                                    '$servings',
+                                    key: ValueKey<int>(servings),
+                                    style: theme.textTheme.headlineMedium?.copyWith(
+                                      fontWeight: FontWeight.w900,
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  servings == 1
+                                      ? (strings.isSpanish ? 'porción' : 'serving')
+                                      : (strings.isSpanish ? 'porciones' : 'servings'),
+                                  style: theme.textTheme.labelMedium?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
                             IconButton.filled(
-                              icon: const Icon(Icons.add),
+                              icon: const Icon(Icons.add_rounded, size: 22),
                               onPressed: () {
                                 HapticFeedback.lightImpact();
                                 setState(() => _currentServings = servings + 1);
@@ -502,18 +559,9 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                       ),
                       const SizedBox(height: 28),
                       // Ingredients List Header
-                      Row(
-                        children: [
-                          Text(
-                            strings.ingredientsTitle,
-                            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                          ),
-                          const Spacer(),
-                          Text(
-                            strings.isSpanish ? 'Toca para tachar' : 'Tap to strike',
-                            style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-                          ),
-                        ],
+                      Text(
+                        strings.ingredientsTitle,
+                        style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 12),
                       // Ingredients List without dividers
@@ -546,63 +594,47 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                           }
 
                           final scaledIng = ing.scale(scalingFactor);
-                          final isChecked = _checkedIngredients.contains(ing.id);
+                          final emoji = CulinaryCatalog.getEmoji(ing.name);
 
-                          return InkWell(
-                            onTap: () {
-                              HapticFeedback.lightImpact();
-                              setState(() {
-                                if (isChecked) {
-                                  _checkedIngredients.remove(ing.id);
-                                } else {
-                                  _checkedIngredients.add(ing.id);
-                                }
-                              });
-                            },
-                            borderRadius: BorderRadius.circular(12),
-                            child: AnimatedOpacity(
-                              duration: const Duration(milliseconds: 200),
-                              opacity: isChecked ? 0.6 : 1.0,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                                decoration: BoxDecoration(
-                                  color: isChecked
-                                      ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
-                                      : theme.colorScheme.surface,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color: isChecked
-                                        ? Colors.transparent
-                                        : theme.colorScheme.outline.withValues(alpha: 0.2),
+                          return Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surface,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                              ),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(emoji, style: const TextStyle(fontSize: 20)),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    scaledIng.name,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 15,
+                                    ),
                                   ),
                                 ),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(CulinaryCatalog.getEmoji(ing.name), style: const TextStyle(fontSize: 18)),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: Text(
-                                        PortionCalculator.formatIngredientDisplay(
-                                          amount: scaledIng.amount,
-                                          unit: scaledIng.unit,
-                                          name: scaledIng.name,
-                                          notes: scaledIng.notes,
-                                        ),
-                                        style: theme.textTheme.bodyLarge?.copyWith(
-                                          fontSize: 15,
-                                          decoration: isChecked ? TextDecoration.lineThrough : null,
-                                          color: isChecked ? theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6) : null,
-                                        ),
-                                      ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    PortionCalculator.formatIngredientAmount(scaledIng.amount, scaledIng.unit),
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                      color: theme.colorScheme.primary,
                                     ),
-                                    if (isChecked)
-                                      const Icon(Icons.check_circle, size: 18, color: Colors.green)
-                                    else
-                                      Icon(Icons.radio_button_unchecked, size: 18, color: theme.colorScheme.outline.withValues(alpha: 0.5)),
-                                  ],
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
                           );
                         },
@@ -817,27 +849,62 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
   }
 
   Widget _buildHeaderImage(Recipe recipe, ThemeData theme) {
+    Widget imageWidget;
     if (recipe.imageUrl.isNotEmpty) {
       if (recipe.imageUrl.startsWith('http')) {
-        return Hero(
+        imageWidget = Hero(
           tag: 'recipe_image_${recipe.id}',
           child: Image.network(recipe.imageUrl, cacheWidth: 1080, fit: BoxFit.cover),
         );
       } else {
         final file = File(recipe.imageUrl);
         if (file.existsSync()) {
-          return Hero(
+          imageWidget = Hero(
             tag: 'recipe_image_${recipe.id}',
             child: Image.file(file, cacheWidth: 1080, fit: BoxFit.cover),
           );
+        } else {
+          imageWidget = Container(
+            color: theme.colorScheme.primaryContainer,
+            child: Center(
+              child: Icon(Icons.restaurant_menu, size: 72, color: theme.colorScheme.primary),
+            ),
+          );
         }
       }
+    } else {
+      imageWidget = Container(
+        color: theme.colorScheme.primaryContainer,
+        child: Center(
+          child: Icon(Icons.restaurant_menu, size: 72, color: theme.colorScheme.primary),
+        ),
+      );
     }
-    return Container(
-      color: theme.colorScheme.primaryContainer,
-      child: Center(
-        child: Icon(Icons.restaurant_menu, size: 72, color: theme.colorScheme.primary),
-      ),
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        imageWidget,
+        // Status bar & AppBar button contrast protection scrim
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 120,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withValues(alpha: 0.75),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

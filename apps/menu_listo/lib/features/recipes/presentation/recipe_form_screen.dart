@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
@@ -31,8 +32,9 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
   late TextEditingController _servingsController;
   late TextEditingController _ingredientsTextController;
   late TextEditingController _stepsTextController;
-  late String _selectedCategory;
+  late Set<String> _selectedCategories;
   String? _imagePath;
+  bool _isSaving = false;
 
   List<Ingredient> _parsedIngredients = [];
   List<RecipeStep> _parsedSteps = [];
@@ -43,6 +45,8 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
     'Merienda',
     'Cena',
     'Postres',
+    'Snack',
+    'Bebidas',
   ];
 
   @override
@@ -54,8 +58,19 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
     _prepTimeController = TextEditingController(text: r != null ? r.prepTimeMinutes.toString() : '15');
     _cookTimeController = TextEditingController(text: r != null ? r.cookTimeMinutes.toString() : '25');
     _servingsController = TextEditingController(text: r != null ? r.baseServings.toString() : '4');
-    _selectedCategory = r?.category ?? 'Almuerzo';
+    
+    if (r != null && r.categories.isNotEmpty) {
+      _selectedCategories = r.categories.toSet();
+    } else if (r != null && r.category.isNotEmpty) {
+      _selectedCategories = {r.category};
+    } else {
+      _selectedCategories = {'Almuerzo'};
+    }
+    
     _imagePath = r != null && r.imageUrl.isNotEmpty ? r.imageUrl : null;
+
+    // Listen to title for disabling/enabling save button
+    _titleController.addListener(() => setState(() {}));
 
     // Initialize ingredients text
     if (r != null && r.ingredients.isNotEmpty) {
@@ -214,28 +229,43 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
       return;
     }
 
-    final recipeId = widget.initialRecipe?.id ?? const Uuid().v4();
-    final now = DateTime.now();
+    if (_isSaving) return;
+    setState(() => _isSaving = true);
 
-    final recipe = Recipe(
-      id: recipeId,
-      title: _titleController.text.trim(),
-      description: _descriptionController.text.trim(),
-      category: _selectedCategory,
-      prepTimeMinutes: int.tryParse(_prepTimeController.text.trim()) ?? 15,
-      cookTimeMinutes: int.tryParse(_cookTimeController.text.trim()) ?? 25,
-      baseServings: int.tryParse(_servingsController.text.trim()) ?? 4,
-      imageUrl: _imagePath ?? '',
-      isFavorite: widget.initialRecipe?.isFavorite ?? false,
-      ingredients: _parsedIngredients,
-      steps: _parsedSteps,
-      createdAt: widget.initialRecipe?.createdAt ?? now,
-    );
+    try {
+      final recipeId = widget.initialRecipe?.id ?? const Uuid().v4();
+      final now = DateTime.now();
 
-    await ref.read(recipesListProvider.notifier).saveRecipe(recipe);
+      final recipe = Recipe(
+        id: recipeId,
+        title: _titleController.text.trim(),
+        description: _descriptionController.text.trim(),
+        categories: _selectedCategories.toList(),
+        prepTimeMinutes: int.tryParse(_prepTimeController.text.trim()) ?? 15,
+        cookTimeMinutes: int.tryParse(_cookTimeController.text.trim()) ?? 25,
+        baseServings: int.tryParse(_servingsController.text.trim()) ?? 4,
+        imageUrl: _imagePath ?? '',
+        isFavorite: widget.initialRecipe?.isFavorite ?? false,
+        ingredients: _parsedIngredients,
+        steps: _parsedSteps,
+        createdAt: widget.initialRecipe?.createdAt ?? now,
+      );
 
-    if (mounted) {
-      Navigator.pop(context);
+      await ref.read(recipesListProvider.notifier).saveRecipe(recipe);
+
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isSaving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al guardar: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -244,6 +274,7 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
     final theme = Theme.of(context);
     final strings = AppStrings.of(context);
     final isEditing = widget.initialRecipe != null;
+    final canSave = !_isSaving && _titleController.text.trim().isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(
@@ -252,9 +283,17 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: FilledButton.icon(
-              onPressed: _save,
-              icon: const Icon(Icons.check_rounded, size: 18),
-              label: Text(strings.saveRecipe),
+              onPressed: canSave ? _save : null,
+              icon: _isSaving
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    )
+                  : const Icon(Icons.check_rounded, size: 18),
+              label: Text(_isSaving
+                  ? (strings.isSpanish ? 'Guardando...' : 'Saving...')
+                  : strings.saveRecipe),
             ),
           ),
         ],
@@ -343,18 +382,57 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
             ),
             const SizedBox(height: 12),
 
-            DropdownButtonFormField<String>(
-              initialValue: _selectedCategory,
-              decoration: InputDecoration(
-                labelText: strings.categoryLabel,
-                prefixIcon: const Icon(Icons.category_outlined, size: 20),
+            // Category Multi-Select Chips
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.15)),
               ),
-              items: _categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
-              onChanged: (val) {
-                if (val != null) setState(() => _selectedCategory = val);
-              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.category_outlined, size: 18, color: theme.colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Text(
+                        strings.isSpanish ? 'Momentos de comida (selección múltiple):' : 'Meal times (multi-select):',
+                        style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _categories.map((c) {
+                      final isSelected = _selectedCategories.contains(c);
+                      return FilterChip(
+                        label: Text(c),
+                        selected: isSelected,
+                        showCheckmark: true,
+                        onSelected: (selected) {
+                          HapticFeedback.selectionClick();
+                          setState(() {
+                            if (selected) {
+                              _selectedCategories.add(c);
+                            } else {
+                              if (_selectedCategories.length > 1) {
+                                _selectedCategories.remove(c);
+                              }
+                            }
+                          });
+                        },
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
 
             // Compact 3-Column Metrics (Prep, Cook, Servings)
             Row(

@@ -6,6 +6,8 @@ import 'package:menu_listo/core/localization/app_localizations.dart';
 import '../models/recipe_model.dart';
 import '../providers/recipe_provider.dart';
 import 'recipe_detail_screen.dart';
+import '../../premium/presentation/paywall_sheet.dart';
+import '../../premium/providers/premium_provider.dart';
 import 'widgets/pantry_matcher_dialog.dart';
 import 'widgets/recipe_creation_options_sheet.dart';
 
@@ -92,17 +94,18 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                     ),
                   ),
 
-                  // Pantry Matcher Shortcut Button
-                  IconButton(
-                    tooltip: strings.isSpanish ? '¿Qué cocino hoy?' : 'Pantry Matcher',
-                    onPressed: () => PantryMatcherDialog.show(context),
-                    icon: const Icon(Icons.kitchen_outlined),
-                    style: IconButton.styleFrom(
-                      backgroundColor: theme.colorScheme.primaryContainer,
-                      foregroundColor: theme.colorScheme.onPrimaryContainer,
+                  // Pro Crown Button (if not pro)
+                  if (!ref.watch(premiumProvider).isProUser) ...[
+                    IconButton(
+                      tooltip: strings.isSpanish ? 'Menú Listo Pro' : 'Menú Listo Pro',
+                      onPressed: () => PaywallSheet.show(context),
+                      icon: const Icon(Icons.workspace_premium_rounded, color: Colors.amber, size: 24),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.amber.withValues(alpha: 0.15),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 6),
+                    const SizedBox(width: 8),
+                  ],
 
                   // Grid / List View Toggle
                   IconButton(
@@ -141,66 +144,50 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                                 },
                               )
                             : null,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                        filled: true,
+                        fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
                   FilterChip(
-                    selected: filterState.onlyFavorites,
-                    showCheckmark: false,
                     avatar: Icon(
                       filterState.onlyFavorites ? Icons.favorite : Icons.favorite_border,
-                      size: 18,
-                      color: filterState.onlyFavorites ? Colors.redAccent : theme.colorScheme.onSurfaceVariant,
+                      size: 16,
+                      color: filterState.onlyFavorites ? Colors.redAccent : null,
                     ),
-                    label: const SizedBox.shrink(),
-                    padding: const EdgeInsets.all(8),
+                    label: Text(strings.isSpanish ? 'Favoritos' : 'Favorites'),
+                    selected: filterState.onlyFavorites,
                     onSelected: (val) {
+                      HapticFeedback.selectionClick();
                       ref.read(recipeFilterProvider.notifier).toggleOnlyFavorites();
                     },
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                 ],
               ),
             ),
 
-            // Fixed Categories Filter Chips
-            SizedBox(
-              height: 48,
-              child: ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                scrollDirection: Axis.horizontal,
+            // Category Chips Row
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+              child: Row(
                 children: [
                   ..._categories.map((cat) {
-                    final isSelected = (cat == 'Todas' && filterState.selectedCategory == 'Todas') || (cat == filterState.selectedCategory);
-
-                    String catLabel;
-                    switch (cat) {
-                      case 'Desayuno':
-                        catLabel = strings.filterBreakfast;
-                        break;
-                      case 'Almuerzo':
-                        catLabel = strings.filterLunch;
-                        break;
-                      case 'Merienda':
-                        catLabel = strings.filterSnack;
-                        break;
-                      case 'Cena':
-                        catLabel = strings.filterDinner;
-                        break;
-                      case 'Postres':
-                        catLabel = strings.filterDessert;
-                        break;
-                      default:
-                        catLabel = strings.filterAll;
-                    }
-
+                    final isSelected = filterState.selectedCategory == cat;
                     return Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
+                      padding: const EdgeInsets.only(right: 8),
                       child: ChoiceChip(
-                        label: Text(catLabel),
+                        label: Text(cat),
                         selected: isSelected,
-                        onSelected: (val) {
+                        onSelected: (_) {
+                          HapticFeedback.selectionClick();
                           ref.read(recipeFilterProvider.notifier).setCategory(cat);
                         },
                       ),
@@ -209,49 +196,52 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
 
-            // Hero Pantry Matcher Card Banner
+            // High-contrast Pantry Matcher Card Banner
             InkWell(
               onTap: () => PantryMatcherDialog.show(context),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(18),
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      theme.colorScheme.primaryContainer.withValues(alpha: 0.8),
-                      theme.colorScheme.secondaryContainer.withValues(alpha: 0.5),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.2)),
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.7),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.35), width: 1.2),
                 ),
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(7),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.surface,
+                        color: theme.colorScheme.primaryContainer,
                         shape: BoxShape.circle,
                       ),
-                      child: const Text('🍳', style: TextStyle(fontSize: 20)),
+                      child: const Text('🍳', style: TextStyle(fontSize: 22)),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             strings.isSpanish ? '¿Qué cocino hoy con mi heladera?' : 'What can I cook with my fridge?',
-                            style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold, fontSize: 13),
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 14,
+                              color: theme.colorScheme.onSurface,
+                            ),
                           ),
+                          const SizedBox(height: 2),
                           Text(
                             strings.isSpanish
                                 ? 'Toca para buscar por ingredientes que ya tienes'
                                 : 'Tap to match recipes with ingredients on hand',
-                            style: theme.textTheme.bodySmall?.copyWith(fontSize: 11, color: theme.colorScheme.onSurfaceVariant),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontSize: 12,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
                           ),
                         ],
                       ),
@@ -397,7 +387,7 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
             Stack(
               children: [
                 Container(
-                  height: 112,
+                  height: 120,
                   width: double.infinity,
                   color: theme.colorScheme.surfaceContainerHighest,
                   child: Hero(
@@ -415,6 +405,34 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                           ),
                   ),
                 ),
+                // Time Tag Overlay on Image
+                Positioned(
+                  bottom: 6,
+                  left: 6,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.7),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.schedule_rounded, size: 12, color: Colors.white),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${recipe.totalTimeMinutes}m',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Favorite Button Overlay
                 Positioned(
                   top: 6,
                   right: 6,
@@ -439,7 +457,7 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
             ),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 14),
+                padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -453,38 +471,21 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      recipe.category,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 11,
-                      ),
-                    ),
                     const Spacer(),
-                    Row(
-                      children: [
-                        Icon(Icons.schedule_rounded, size: 13, color: theme.colorScheme.onSurfaceVariant),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${recipe.totalTimeMinutes}m',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                          ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        recipe.category,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 11,
                         ),
-                        const Spacer(),
-                        Icon(Icons.people_alt_outlined, size: 13, color: theme.colorScheme.onSurfaceVariant),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${recipe.baseServings}p',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),
@@ -525,27 +526,54 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  width: 72,
-                  height: 72,
-                  color: theme.colorScheme.surfaceContainerHighest,
-                  child: Hero(
-                    tag: 'recipe_image_${recipe.id}',
-                    child: recipe.imageUrl.isNotEmpty
-                        ? (recipe.imageUrl.startsWith('http')
-                            ? Image.network(recipe.imageUrl, cacheWidth: 300, fit: BoxFit.cover)
-                            : Image.file(File(recipe.imageUrl), cacheWidth: 300, fit: BoxFit.cover))
-                        : Center(
-                            child: Icon(
-                              Icons.restaurant_menu_rounded,
-                              size: 28,
-                              color: theme.colorScheme.primary.withValues(alpha: 0.3),
-                            ),
-                          ),
+              Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      width: 76,
+                      height: 76,
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      child: Hero(
+                        tag: 'recipe_image_${recipe.id}',
+                        child: recipe.imageUrl.isNotEmpty
+                            ? (recipe.imageUrl.startsWith('http')
+                                ? Image.network(recipe.imageUrl, cacheWidth: 300, fit: BoxFit.cover)
+                                : Image.file(File(recipe.imageUrl), cacheWidth: 300, fit: BoxFit.cover))
+                            : Center(
+                                child: Icon(
+                                  Icons.restaurant_menu_rounded,
+                                  size: 28,
+                                  color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                                ),
+                              ),
+                      ),
+                    ),
                   ),
-                ),
+                  Positioned(
+                    bottom: 3,
+                    left: 3,
+                    right: 3,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.7),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.schedule_rounded, size: 10, color: Colors.white),
+                          const SizedBox(width: 3),
+                          Text(
+                            '${recipe.totalTimeMinutes}m',
+                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -561,31 +589,21 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      recipe.category,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.w700,
+                    const SizedBox(height: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(6),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Icon(Icons.schedule_rounded, size: 14, color: theme.colorScheme.onSurfaceVariant),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${recipe.totalTimeMinutes} min',
-                          style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+                      child: Text(
+                        recipe.category,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 11,
                         ),
-                        const SizedBox(width: 16),
-                        Icon(Icons.people_alt_outlined, size: 14, color: theme.colorScheme.onSurfaceVariant),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${recipe.baseServings} porc.',
-                          style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
-                        ),
-                      ],
+                      ),
                     ),
                   ],
                 ),

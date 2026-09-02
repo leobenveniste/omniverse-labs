@@ -31,7 +31,7 @@ class RecipeCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Recipe Cover Image or Food Graphic Header
+            // Recipe Cover Image Header
             Stack(
               children: [
                 Container(
@@ -43,7 +43,7 @@ class RecipeCard extends StatelessWidget {
                     child: _buildImage(theme),
                   ),
                 ),
-                // Category Chip
+                // Category Chip (Top Left)
                 Positioned(
                   top: 10,
                   left: 10,
@@ -60,7 +60,7 @@ class RecipeCard extends StatelessWidget {
                       ],
                     ),
                     child: Text(
-                      recipe.category,
+                      recipe.categories.take(2).join(' • ') + (recipe.categories.length > 2 ? ' +' : ''),
                       style: theme.textTheme.labelMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: theme.colorScheme.primary,
@@ -68,7 +68,34 @@ class RecipeCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Favorite Button
+                // Time Tag (Bottom Left)
+                Positioned(
+                  bottom: 8,
+                  left: 10,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.7),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.schedule_rounded, size: 12, color: Colors.white),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${recipe.totalTimeMinutes}m',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // Favorite Button (Top Right)
                 Positioned(
                   top: 6,
                   right: 6,
@@ -111,24 +138,6 @@ class RecipeCard extends StatelessWidget {
                       style: theme.textTheme.bodyMedium?.copyWith(fontSize: 12),
                     ),
                   ],
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Icon(Icons.schedule, size: 14, color: theme.colorScheme.primary),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${recipe.totalTimeMinutes} ${'min'}',
-                        style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w600),
-                      ),
-                      const SizedBox(width: 12),
-                      Icon(Icons.people_outline, size: 14, color: theme.colorScheme.primary),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${recipe.baseServings} ${'porc.'}',
-                        style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w600),
-                      ),
-                    ],
-                  ),
                 ],
               ),
             ),

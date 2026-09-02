@@ -2,13 +2,16 @@ import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:menu_listo/core/localization/app_localizations.dart';
 import 'package:menu_listo/core/utils/culinary_catalog.dart';
 import 'package:menu_listo/core/utils/portion_calculator.dart';
+import '../../premium/presentation/paywall_sheet.dart';
+import '../../premium/providers/premium_provider.dart';
 import '../models/recipe_model.dart';
 
-class RecipeCookModeScreen extends StatefulWidget {
+class RecipeCookModeScreen extends ConsumerStatefulWidget {
   final Recipe recipe;
   final int initialServings;
 
@@ -19,16 +22,15 @@ class RecipeCookModeScreen extends StatefulWidget {
   });
 
   @override
-  State<RecipeCookModeScreen> createState() => _RecipeCookModeScreenState();
+  ConsumerState<RecipeCookModeScreen> createState() => _RecipeCookModeScreenState();
 }
 
-class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
+class _RecipeCookModeScreenState extends ConsumerState<RecipeCookModeScreen> {
   late int _servings;
   int _currentStepIndex = 0;
   final Set<int> _completedSteps = {};
   final Set<String> _checkedIngredients = {};
 
-  bool _isLargeFont = false;
   bool _isHandsFree = false;
   String _gestureFeedback = '';
   Timer? _gestureFeedbackTimer;
@@ -39,8 +41,8 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
   DateTime _lastGestureTime = DateTime.now();
   List<double>? _prevLeftBrightness;
   List<double>? _prevRightBrightness;
-  DateTime? _firstHalfTriggerTime;
-  String? _firstHalfTriggerSide; // 'left' or 'right'
+  DateTime? _firstTriggerTime;
+  String? _firstTriggerSide; // 'sideA' or 'sideB'
 
   // Embedded Step Timer
   Timer? _stepTimer;
@@ -79,24 +81,23 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
     final instruction = steps[_currentStepIndex].instruction.toLowerCase();
     int detectedSeconds = 0;
 
-    // Detect minutes: e.g. "15 minutos", "10 min", "20 mins", "1/2 hora"
-    final minMatch = RegExp(r'(\d+)\s*(?:minutos?|mins?|min)\b').firstMatch(instruction);
-    final hourMatch = RegExp(r'(\d+)\s*(?:horas?|hrs?|hs?|h)\b').firstMatch(instruction);
-    final secMatch = RegExp(r'(\d+)\s*(?:segundos?|segs?|seg)\b').firstMatch(instruction);
+    final hourMatch = RegExp(r'(\d+)\s*(?:hora|horas|hr|hrs|h)\b').firstMatch(instruction);
+    final minMatch = RegExp(r'(\d+)\s*(?:minuto|minutos|min|mins|m)\b').firstMatch(instruction);
+    final secMatch = RegExp(r'(\d+)\s*(?:segundo|segundos|seg|segs|s)\b').firstMatch(instruction);
 
-    if (minMatch != null) {
-      detectedSeconds += (int.tryParse(minMatch.group(1)!) ?? 0) * 60;
-    }
     if (hourMatch != null) {
       detectedSeconds += (int.tryParse(hourMatch.group(1)!) ?? 0) * 3600;
     }
+    if (minMatch != null) {
+      detectedSeconds += (int.tryParse(minMatch.group(1)!) ?? 0) * 60;
+    }
     if (secMatch != null) {
-      detectedSeconds += int.tryParse(secMatch.group(1)!) ?? 0;
+      detectedSeconds += (int.tryParse(secMatch.group(1)!) ?? 0);
     }
 
     setState(() {
-      _timerSecondsRemaining = detectedSeconds;
       _timerInitialSeconds = detectedSeconds;
+      _timerSecondsRemaining = detectedSeconds;
     });
   }
 
@@ -108,6 +109,7 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
       if (_timerSecondsRemaining <= 0) return;
       setState(() => _isTimerRunning = true);
       _stepTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (!mounted) return;
         if (_timerSecondsRemaining > 1) {
           setState(() => _timerSecondsRemaining--);
         } else {
@@ -116,6 +118,7 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
             _timerSecondsRemaining = 0;
             _isTimerRunning = false;
           });
+          HapticFeedback.heavyImpact();
           _showTimerAlert();
         }
       });
@@ -133,20 +136,24 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
   void _addMinuteToTimer() {
     setState(() {
       _timerSecondsRemaining += 60;
-      _timerInitialSeconds += 60;
+      if (_timerInitialSeconds == 0) _timerInitialSeconds = 60;
     });
   }
 
   void _showTimerAlert() {
-    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        backgroundColor: Colors.deepOrange,
-        duration: const Duration(seconds: 5),
+        backgroundColor: Colors.deepOrange.shade800,
+        duration: const Duration(seconds: 6),
+        action: SnackBarAction(
+          label: 'OK',
+          textColor: Colors.white,
+          onPressed: () {},
+        ),
         content: const Row(
           children: [
-            Icon(Icons.alarm_on, color: Colors.white, size: 28),
-            SizedBox(width: 12),
+            Icon(Icons.alarm_on, color: Colors.white),
+            SizedBox(width: 10),
             Expanded(
               child: Text(
                 '⏰ ¡Tiempo cumplido para este paso!',
@@ -161,7 +168,6 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
 
   Future<void> _toggleHandsFreeMode() async {
     if (_isHandsFree) {
-      // Turn off
       await _cameraController?.dispose();
       _cameraController = null;
       setState(() {
@@ -169,7 +175,12 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
         _gestureFeedback = '';
       });
     } else {
-      // Turn on
+      final isPro = ref.read(premiumProvider).isProUser;
+      if (!isPro) {
+        PaywallSheet.show(context);
+        return;
+      }
+
       setState(() => _isCameraInitializing = true);
       try {
         final cameras = await availableCameras();
@@ -212,7 +223,7 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
 
     final now = DateTime.now();
     if (now.difference(_lastGestureTime).inMilliseconds < 1200) {
-      return; // Cooldown between gesture steps
+      return;
     }
 
     final plane = image.planes[0];
@@ -220,74 +231,73 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
     final width = image.width;
     final height = image.height;
 
-    // Sample pixels across left and right halves
-    double leftSum = 0;
-    int leftCount = 0;
-    double rightSum = 0;
-    int rightCount = 0;
+    // Portrait mode front-camera frame analysis:
+    // In portrait, rows (y) map to the screen's horizontal sweep.
+    final midY = height ~/ 2;
+    double sideA = 0;
+    int countA = 0;
+    double sideB = 0;
+    int countB = 0;
 
-    final midX = width ~/ 2;
-    // Step by 4 for fast zero-lag optical difference
     for (int y = 0; y < height; y += 4) {
       for (int x = 0; x < width; x += 4) {
         final idx = y * width + x;
         if (idx < bytes.length) {
           final val = bytes[idx].toDouble();
-          if (x < midX) {
-            leftSum += val;
-            leftCount++;
+          if (y < midY) {
+            sideA += val;
+            countA++;
           } else {
-            rightSum += val;
-            rightCount++;
+            sideB += val;
+            countB++;
           }
         }
       }
     }
 
-    final leftAvg = leftCount > 0 ? leftSum / leftCount : 0.0;
-    final rightAvg = rightCount > 0 ? rightSum / rightCount : 0.0;
+    final avgA = countA > 0 ? sideA / countA : 0.0;
+    final avgB = countB > 0 ? sideB / countB : 0.0;
 
     if (_prevLeftBrightness == null || _prevRightBrightness == null) {
-      _prevLeftBrightness = [leftAvg];
-      _prevRightBrightness = [rightAvg];
+      _prevLeftBrightness = [avgA];
+      _prevRightBrightness = [avgB];
       return;
     }
 
-    final leftDiff = (leftAvg - _prevLeftBrightness!.last).abs();
-    final rightDiff = (rightAvg - _prevRightBrightness!.last).abs();
+    final diffA = (avgA - _prevLeftBrightness!.last).abs();
+    final diffB = (avgB - _prevRightBrightness!.last).abs();
 
-    _prevLeftBrightness!.add(leftAvg);
+    _prevLeftBrightness!.add(avgA);
     if (_prevLeftBrightness!.length > 5) _prevLeftBrightness!.removeAt(0);
 
-    _prevRightBrightness!.add(rightAvg);
+    _prevRightBrightness!.add(avgB);
     if (_prevRightBrightness!.length > 5) _prevRightBrightness!.removeAt(0);
 
-    const threshold = 18.0;
+    const threshold = 14.0;
 
-    // Optical wave state machine
-    if (_firstHalfTriggerSide == null) {
-      if (rightDiff > threshold && rightDiff > leftDiff * 1.5) {
-        _firstHalfTriggerSide = 'right';
-        _firstHalfTriggerTime = now;
-      } else if (leftDiff > threshold && leftDiff > rightDiff * 1.5) {
-        _firstHalfTriggerSide = 'left';
-        _firstHalfTriggerTime = now;
+    // Optical directional swipe state machine
+    if (_firstTriggerSide == null) {
+      if (diffB > threshold && diffB > diffA * 1.25) {
+        _firstTriggerSide = 'sideB';
+        _firstTriggerTime = now;
+      } else if (diffA > threshold && diffA > diffB * 1.25) {
+        _firstTriggerSide = 'sideA';
+        _firstTriggerTime = now;
       }
     } else {
-      final elapsed = now.difference(_firstHalfTriggerTime!).inMilliseconds;
-      if (elapsed > 700) {
-        // Timed out
-        _firstHalfTriggerSide = null;
-      } else if (elapsed > 100) {
-        // Check if other side swept
-        if (_firstHalfTriggerSide == 'right' && leftDiff > threshold) {
-          // Right-to-Left sweep ➔ Next Step!
+      final elapsed = now.difference(_firstTriggerTime!).inMilliseconds;
+      if (elapsed > 750) {
+        // Timed out, reset trigger
+        _firstTriggerSide = null;
+      } else if (elapsed > 70) {
+        if (_firstTriggerSide == 'sideB' && diffA > threshold) {
+          // Right-to-Left sweep ➔ Siguiente Paso
+          _firstTriggerSide = null;
           _triggerGesture(isNext: true);
-          _firstHalfTriggerSide = null;
-        } else if (_firstHalfTriggerSide == 'left' && rightDiff > threshold) {
-          // Left-to-Right sweep ➔ Previous Step!
+        } else if (_firstTriggerSide == 'sideA' && diffB > threshold) {
+          // Left-to-Right sweep ➔ Paso Anterior
+          _firstTriggerSide = null;
           _triggerGesture(isNext: false);
-          _firstHalfTriggerSide = null;
         }
       }
     }
@@ -295,6 +305,7 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
 
   void _triggerGesture({required bool isNext}) {
     _lastGestureTime = DateTime.now();
+    HapticFeedback.mediumImpact();
     setState(() {
       _gestureFeedback = isNext ? '👉 Siguiente Paso (Gesto detectado)' : '👈 Paso Anterior (Gesto detectado)';
       if (isNext) {
@@ -303,7 +314,7 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
           _currentStepIndex++;
           _initTimerForCurrentStep();
         } else {
-          _showFinishedDialog(context);
+          _finishCooking();
         }
       } else {
         if (_currentStepIndex > 0) {
@@ -319,6 +330,36 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
     });
   }
 
+  void _finishCooking() {
+    WakelockPlus.disable();
+    _cameraController?.dispose();
+    final strings = AppStrings.of(context);
+    final title = widget.recipe.title;
+
+    Navigator.of(context).popUntil((route) => route.isFirst);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.green.shade800,
+        duration: const Duration(seconds: 4),
+        content: Row(
+          children: [
+            const Text('🎉', style: TextStyle(fontSize: 24)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                strings.isSpanish
+                    ? '¡Felicitaciones! Terminaste de cocinar "$title". ¡A disfrutar!'
+                    : 'Congratulations! You finished cooking "$title"!',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -331,27 +372,8 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(strings.cookModeTitle, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            Row(
-              children: [
-                Icon(Icons.lock_clock, size: 12, color: theme.colorScheme.primary),
-                const SizedBox(width: 4),
-                Text(strings.cookModeWakeLockNotice, style: theme.textTheme.labelSmall),
-              ],
-            ),
-          ],
-        ),
+        title: Text(strings.cookModeTitle, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         actions: [
-          // Font size toggle
-          IconButton(
-            icon: Icon(_isLargeFont ? Icons.text_decrease : Icons.text_increase),
-            tooltip: _isLargeFont ? 'Tamaño normal' : 'Letra grande (Modo mostrador)',
-            onPressed: () => setState(() => _isLargeFont = !_isLargeFont),
-          ),
-          // Hands-free motion toggle
           IconButton(
             icon: _isCameraInitializing
                 ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
@@ -368,7 +390,6 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Progress Bar with smooth tween animation
             TweenAnimationBuilder<double>(
               duration: const Duration(milliseconds: 350),
               curve: Curves.easeOutCubic,
@@ -384,7 +405,6 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
               ),
             ),
 
-            // Hands-free gesture feedback banner
             if (_gestureFeedback.isNotEmpty)
               Container(
                 width: double.infinity,
@@ -395,140 +415,11 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                 ),
-              )
-            else if (_isHandsFree)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
-                color: Colors.green.withValues(alpha: 0.15),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(Icons.back_hand, size: 14, color: Colors.green),
-                    const SizedBox(width: 6),
-                    Text(
-                      strings.isSpanish
-                          ? 'Manos Libres Activo: Pasa la mano frente a la pantalla'
-                          : 'Hands-Free Active: Wave hand in front of camera',
-                      style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 11),
-                    ),
-                  ],
-                ),
               ),
 
-            // FIXED ALWAYS-VISIBLE INGREDIENT LIST (WITHOUT DIVIDERS)
-            Container(
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surface,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Row(
-                    children: [
-                      Icon(Icons.inventory_2_outlined, size: 16, color: theme.colorScheme.primary),
-                      const SizedBox(width: 6),
-                      Text(
-                        '${strings.ingredientsTitle} ($_servings ${strings.persons})',
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: theme.colorScheme.onSurface,
-                        ),
-                      ),
-                      const Spacer(),
-                      Text(
-                        '${_checkedIngredients.length}/${widget.recipe.ingredients.length} listos',
-                        style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.primary),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  SizedBox(
-                    height: 48,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: widget.recipe.ingredients.length,
-                      separatorBuilder: (_, _) => const SizedBox(width: 8),
-                      itemBuilder: (context, index) {
-                        final ing = widget.recipe.ingredients[index];
-                        final scaledIng = ing.scale(scalingFactor);
-                        final isChecked = _checkedIngredients.contains(ing.id);
-                        final emoji = CulinaryCatalog.getEmoji(ing.name);
-
-                        return InkWell(
-                          onTap: () {
-                            HapticFeedback.lightImpact();
-                            setState(() {
-                              if (isChecked) {
-                                _checkedIngredients.remove(ing.id);
-                              } else {
-                                _checkedIngredients.add(ing.id);
-                              }
-                            });
-                          },
-                          borderRadius: BorderRadius.circular(12),
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 150),
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: isChecked
-                                  ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3)
-                                  : theme.colorScheme.primaryContainer.withValues(alpha: 0.35),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(
-                                color: isChecked
-                                    ? Colors.transparent
-                                    : theme.colorScheme.primary.withValues(alpha: 0.3),
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(emoji, style: const TextStyle(fontSize: 16)),
-                                const SizedBox(width: 6),
-                                Text(
-                                  PortionCalculator.formatIngredientDisplay(
-                                    amount: scaledIng.amount,
-                                    unit: scaledIng.unit,
-                                    name: scaledIng.name,
-                                  ),
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                    decoration: isChecked ? TextDecoration.lineThrough : null,
-                                    color: isChecked
-                                        ? theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4)
-                                        : theme.colorScheme.onSurface,
-                                  ),
-                                ),
-                                if (isChecked) ...[
-                                  const SizedBox(width: 4),
-                                  const Icon(Icons.check_circle, size: 14, color: Colors.green),
-                                ],
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // STEP INSTRUCTION & TIMER BODY
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20.0),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 280),
                   transitionBuilder: (child, animation) => FadeTransition(
@@ -545,7 +436,6 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
                     key: ValueKey<int>(_currentStepIndex),
                     children: [
                       if (currentStep != null) ...[
-                        // Step Number Badge
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                           decoration: BoxDecoration(
@@ -563,21 +453,20 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
                         ),
                         const SizedBox(height: 16),
 
-                        // Step Instruction Card (without dividers)
                         Card(
                           elevation: 1,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                           child: Padding(
-                            padding: const EdgeInsets.all(20.0),
+                            padding: const EdgeInsets.all(22.0),
                             child: Column(
                               children: [
                                 Text(
                                   currentStep.instruction,
                                   textAlign: TextAlign.center,
                                   style: theme.textTheme.headlineSmall?.copyWith(
-                                    fontSize: _isLargeFont ? 26 : 20,
+                                    fontSize: 24,
                                     fontWeight: FontWeight.w600,
-                                    height: 1.5,
+                                    height: 1.45,
                                   ),
                                 ),
                                 const SizedBox(height: 16),
@@ -609,7 +498,6 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
                           ),
                         ),
 
-                        // Embedded Step Timer (if duration detected)
                         if (_timerInitialSeconds > 0) ...[
                           const SizedBox(height: 16),
                           AnimatedContainer(
@@ -689,14 +577,129 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
                             ),
                           ),
                         ],
+
+                        const SizedBox(height: 20),
+
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surface,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.25)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.03),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.inventory_2_outlined, size: 18, color: theme.colorScheme.primary),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    '${strings.ingredientsTitle} ($_servings ${strings.persons})',
+                                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                  const Spacer(),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      '${_checkedIngredients.length}/${widget.recipe.ingredients.length} listos',
+                                      style: theme.textTheme.labelSmall?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: theme.colorScheme.primary,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              ...widget.recipe.ingredients.map((ing) {
+                                if (ing.isSectionHeader) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 10, bottom: 4),
+                                    child: Text(
+                                      ing.name.endsWith(':') ? ing.name : '${ing.name}:',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: theme.colorScheme.primary,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                final scaledIng = ing.scale(scalingFactor);
+                                final isChecked = _checkedIngredients.contains(ing.id);
+                                final emoji = CulinaryCatalog.getEmoji(ing.name);
+
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 4),
+                                  child: InkWell(
+                                    onTap: () {
+                                      HapticFeedback.lightImpact();
+                                      setState(() {
+                                        if (isChecked) {
+                                          _checkedIngredients.remove(ing.id);
+                                        } else {
+                                          _checkedIngredients.add(ing.id);
+                                        }
+                                      });
+                                    },
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            isChecked ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+                                            color: isChecked ? Colors.green : theme.colorScheme.outline,
+                                            size: 20,
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Text(emoji, style: const TextStyle(fontSize: 18)),
+                                          const SizedBox(width: 8),
+                                          Expanded(
+                                            child: Text(
+                                              PortionCalculator.formatIngredientDisplay(
+                                                amount: scaledIng.amount,
+                                                unit: scaledIng.unit,
+                                                name: scaledIng.name,
+                                              ),
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w600,
+                                                decoration: isChecked ? TextDecoration.lineThrough : null,
+                                                color: isChecked
+                                                    ? theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)
+                                                    : theme.colorScheme.onSurface,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
+                        ),
                       ],
                     ],
                   ),
                 ),
               ),
             ),
-
-            // NAVIGATION BUTTONS
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -719,7 +722,7 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
                               });
                             }
                           : null,
-                      icon: const Icon(Icons.arrow_back),
+                      icon: const Icon(Icons.arrow_back_rounded),
                       label: Text(strings.previousStep),
                     ),
                   ),
@@ -738,12 +741,14 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
                             _initTimerForCurrentStep();
                           } else {
                             HapticFeedback.heavyImpact();
-                            _showFinishedDialog(context);
+                            _finishCooking();
                           }
                         });
                       },
-                      icon: Icon(_currentStepIndex == totalSteps - 1 ? Icons.check_circle : Icons.arrow_forward),
-                      label: Text(_currentStepIndex == totalSteps - 1 ? strings.finishCooking : strings.nextStep),
+                      icon: Icon(_currentStepIndex == totalSteps - 1 ? Icons.check_circle_rounded : Icons.arrow_forward_rounded),
+                      label: Text(_currentStepIndex == totalSteps - 1
+                          ? (strings.isSpanish ? '¡Listo!' : 'Done!')
+                          : strings.nextStep),
                     ),
                   ),
                 ],
@@ -768,37 +773,5 @@ class _RecipeCookModeScreenState extends State<RecipeCookModeScreen> {
       return '$hStr:$mStr:$sStr';
     }
     return '$mStr:$sStr';
-  }
-
-  void _showFinishedDialog(BuildContext context) {
-    final strings = AppStrings.of(context);
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: Row(
-          children: [
-            const Text('🎉', style: TextStyle(fontSize: 28)),
-            const SizedBox(width: 10),
-            Text(strings.isSpanish ? '¡Felicitaciones!' : 'Congratulations!'),
-          ],
-        ),
-        content: Text(
-          strings.isSpanish
-              ? '¡Has completado todos los pasos de ${widget.recipe.title}! ¡A disfrutar tu comida!'
-              : 'You completed all steps for ${widget.recipe.title}! Enjoy your meal!',
-        ),
-        actions: [
-          FilledButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              Navigator.of(context).pop();
-            },
-            child: Text(strings.finishCooking),
-          ),
-        ],
-      ),
-    );
   }
 }

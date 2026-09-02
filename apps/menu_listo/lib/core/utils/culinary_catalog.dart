@@ -27,9 +27,10 @@ class CulinaryCatalog {
     CulinaryIngredientItem(name: 'Papa / Patata', nameEn: 'Potato', emoji: '🥔', defaultUnit: 'u', category: 'Verduras'),
     CulinaryIngredientItem(name: 'Batata / Camote', nameEn: 'Sweet potato', emoji: '🍠', defaultUnit: 'u', category: 'Verduras'),
     CulinaryIngredientItem(name: 'Palta / Aguacate', nameEn: 'Avocado', emoji: '🥑', defaultUnit: 'u', category: 'Verduras'),
-    CulinaryIngredientItem(name: 'Pimiento rojo', nameEn: 'Red bell pepper', emoji: '🫑', defaultUnit: 'u', category: 'Verduras'),
-    CulinaryIngredientItem(name: 'Pimiento verde', nameEn: 'Green bell pepper', emoji: '🫑', defaultUnit: 'u', category: 'Verduras'),
-    CulinaryIngredientItem(name: 'Pimiento amarillo', nameEn: 'Yellow bell pepper', emoji: '🫑', defaultUnit: 'u', category: 'Verduras'),
+    CulinaryIngredientItem(name: 'Morrón rojo / Pimiento rojo', nameEn: 'Red bell pepper', emoji: '🫑', defaultUnit: 'u', category: 'Verduras'),
+    CulinaryIngredientItem(name: 'Morrón verde / Pimiento verde', nameEn: 'Green bell pepper', emoji: '🫑', defaultUnit: 'u', category: 'Verduras'),
+    CulinaryIngredientItem(name: 'Morrón amarillo / Pimiento amarillo', nameEn: 'Yellow bell pepper', emoji: '🫑', defaultUnit: 'u', category: 'Verduras'),
+    CulinaryIngredientItem(name: 'Morrón / Pimiento / Ají', nameEn: 'Bell pepper', emoji: '🫑', defaultUnit: 'u', category: 'Verduras'),
     CulinaryIngredientItem(name: 'Champiñones / Hongos', nameEn: 'Mushrooms', emoji: '🍄', defaultUnit: 'g', category: 'Verduras'),
     CulinaryIngredientItem(name: 'Portobellos', nameEn: 'Portobello mushrooms', emoji: '🍄', defaultUnit: 'g', category: 'Verduras'),
     CulinaryIngredientItem(name: 'Espinaca', nameEn: 'Spinach', emoji: '🥬', defaultUnit: 'g', category: 'Verduras'),
@@ -47,6 +48,7 @@ class CulinaryCatalog {
     CulinaryIngredientItem(name: 'Puerro', nameEn: 'Leek', emoji: '🧅', defaultUnit: 'u', category: 'Verduras'),
     CulinaryIngredientItem(name: 'Apio', nameEn: 'Celery', emoji: '🥬', defaultUnit: 'tallos', category: 'Verduras'),
     CulinaryIngredientItem(name: 'Remolacha', nameEn: 'Beetroot', emoji: '🥕', defaultUnit: 'u', category: 'Verduras'),
+    CulinaryIngredientItem(name: 'Ciboulette / Cebollino', nameEn: 'Chives', emoji: '🌿', defaultUnit: 'cda', category: 'Verduras'),
 
     // Frutas
     CulinaryIngredientItem(name: 'Limón', nameEn: 'Lemon', emoji: '🍋', defaultUnit: 'u', category: 'Frutas'),
@@ -98,12 +100,13 @@ class CulinaryCatalog {
     CulinaryIngredientItem(name: 'Leche de coco', nameEn: 'Coconut milk', emoji: '🥥', defaultUnit: 'ml', category: 'Lácteos'),
     CulinaryIngredientItem(name: 'Crema de leche / Nata', nameEn: 'Heavy cream', emoji: '🥛', defaultUnit: 'ml', category: 'Lácteos'),
     CulinaryIngredientItem(name: 'Manteca / Mantequilla', nameEn: 'Butter', emoji: '🧈', defaultUnit: 'g', category: 'Lácteos'),
-    CulinaryIngredientItem(name: 'Queso Parmesano', nameEn: 'Parmesan cheese', emoji: '🧀', defaultUnit: 'g', category: 'Lácteos'),
+    CulinaryIngredientItem(name: 'Queso Parmesano / Rallado', nameEn: 'Parmesan cheese', emoji: '🧀', defaultUnit: 'g', category: 'Lácteos'),
     CulinaryIngredientItem(name: 'Queso Mozzarella', nameEn: 'Mozzarella cheese', emoji: '🧀', defaultUnit: 'g', category: 'Lácteos'),
     CulinaryIngredientItem(name: 'Queso Cheddar', nameEn: 'Cheddar cheese', emoji: '🧀', defaultUnit: 'g', category: 'Lácteos'),
     CulinaryIngredientItem(name: 'Queso crema / Philadelphia', nameEn: 'Cream cheese', emoji: '🧀', defaultUnit: 'g', category: 'Lácteos'),
     CulinaryIngredientItem(name: 'Queso Ricotta', nameEn: 'Ricotta cheese', emoji: '🧀', defaultUnit: 'g', category: 'Lácteos'),
     CulinaryIngredientItem(name: 'Queso Feta', nameEn: 'Feta cheese', emoji: '🧀', defaultUnit: 'g', category: 'Lácteos'),
+    CulinaryIngredientItem(name: 'Queso Azul / Roquefort', nameEn: 'Blue cheese', emoji: '🧀', defaultUnit: 'g', category: 'Lácteos'),
     CulinaryIngredientItem(name: 'Yogur natural / Griego', nameEn: 'Greek yogurt', emoji: '🥛', defaultUnit: 'g', category: 'Lácteos'),
 
     // Granos, Cereales & Pastas
@@ -127,22 +130,32 @@ class CulinaryCatalog {
     CulinaryIngredientItem(name: 'Arvejas / Guisantes', nameEn: 'Green peas', emoji: '🟢', defaultUnit: 'g', category: 'Legumbres'),
     CulinaryIngredientItem(name: 'Tofu', nameEn: 'Tofu', emoji: '🧊', defaultUnit: 'g', category: 'Legumbres'),
 
-    // Aceites, Vinagres & Condimentos
+    // Aceites, Vinagres, Líquidos & Condimentos
     CulinaryIngredientItem(name: 'Aceite de oliva virgen extra', nameEn: 'Extra virgin olive oil', emoji: '🫒', defaultUnit: 'cda', category: 'Despensa'),
     CulinaryIngredientItem(name: 'Aceite de girasol / vegetal', nameEn: 'Vegetable oil', emoji: '🌻', defaultUnit: 'cda', category: 'Despensa'),
     CulinaryIngredientItem(name: 'Aceite de sésamo', nameEn: 'Sesame oil', emoji: '🫒', defaultUnit: 'cdta', category: 'Despensa'),
+    CulinaryIngredientItem(name: 'Vino tinto', nameEn: 'Red wine', emoji: '🍷', defaultUnit: 'ml', category: 'Despensa'),
+    CulinaryIngredientItem(name: 'Vino blanco', nameEn: 'White wine', emoji: '🍷', defaultUnit: 'ml', category: 'Despensa'),
+    CulinaryIngredientItem(name: 'Vino / Vino de cocina', nameEn: 'Wine / Cooking wine', emoji: '🍷', defaultUnit: 'ml', category: 'Despensa'),
+    CulinaryIngredientItem(name: 'Cerveza', nameEn: 'Beer', emoji: '🍺', defaultUnit: 'ml', category: 'Despensa'),
+    CulinaryIngredientItem(name: 'Caldo de verduras / verdura', nameEn: 'Vegetable broth', emoji: '🍲', defaultUnit: 'ml', category: 'Despensa'),
+    CulinaryIngredientItem(name: 'Caldo de carne / pollo', nameEn: 'Chicken / Beef broth', emoji: '🍲', defaultUnit: 'ml', category: 'Despensa'),
+    CulinaryIngredientItem(name: 'Agua', nameEn: 'Water', emoji: '💧', defaultUnit: 'ml', category: 'Despensa'),
     CulinaryIngredientItem(name: 'Vinagre de manzana', nameEn: 'Apple cider vinegar', emoji: '🍶', defaultUnit: 'cda', category: 'Despensa'),
+    CulinaryIngredientItem(name: 'Vinagre de vino / alcohol', nameEn: 'White / Wine vinegar', emoji: '🍶', defaultUnit: 'cda', category: 'Despensa'),
     CulinaryIngredientItem(name: 'Vinagre balsámico / Aceto', nameEn: 'Balsamic vinegar', emoji: '🍶', defaultUnit: 'cda', category: 'Despensa'),
     CulinaryIngredientItem(name: 'Salsa de soja', nameEn: 'Soy sauce', emoji: '🍶', defaultUnit: 'cda', category: 'Despensa'),
     CulinaryIngredientItem(name: 'Salsa de tomate / Passata', nameEn: 'Tomato sauce', emoji: '🥫', defaultUnit: 'g', category: 'Despensa'),
     CulinaryIngredientItem(name: 'Mostaza Dijon / Antigua', nameEn: 'Mustard', emoji: '🥫', defaultUnit: 'cda', category: 'Despensa'),
     CulinaryIngredientItem(name: 'Mayonesa', nameEn: 'Mayonnaise', emoji: '🥫', defaultUnit: 'cda', category: 'Despensa'),
+    CulinaryIngredientItem(name: 'Ketchup', nameEn: 'Ketchup', emoji: '🥫', defaultUnit: 'cda', category: 'Despensa'),
     CulinaryIngredientItem(name: 'Miel', nameEn: 'Honey', emoji: '🍯', defaultUnit: 'cda', category: 'Despensa'),
     CulinaryIngredientItem(name: 'Jarabe de arce / Maple', nameEn: 'Maple syrup', emoji: '🍁', defaultUnit: 'cda', category: 'Despensa'),
 
     // Especias & Hierbas
     CulinaryIngredientItem(name: 'Sal fina / marina', nameEn: 'Salt', emoji: '🧂', defaultUnit: 'pizca', category: 'Especias'),
     CulinaryIngredientItem(name: 'Pimienta negra molida', nameEn: 'Black pepper', emoji: '🧂', defaultUnit: 'pizca', category: 'Especias'),
+    CulinaryIngredientItem(name: 'Laurel (hojas)', nameEn: 'Bay leaves', emoji: '🌿', defaultUnit: 'hojas', category: 'Especias'),
     CulinaryIngredientItem(name: 'Orégano seco', nameEn: 'Oregano', emoji: '🌿', defaultUnit: 'cdta', category: 'Especias'),
     CulinaryIngredientItem(name: 'Albahaca fresca', nameEn: 'Fresh basil', emoji: '🌿', defaultUnit: 'hojas', category: 'Especias'),
     CulinaryIngredientItem(name: 'Romero fresco', nameEn: 'Rosemary', emoji: '🌿', defaultUnit: 'ramita', category: 'Especias'),
@@ -152,9 +165,11 @@ class CulinaryCatalog {
     CulinaryIngredientItem(name: 'Pimentón dulce / Ahumado', nameEn: 'Paprika', emoji: '🌶️', defaultUnit: 'cdta', category: 'Especias'),
     CulinaryIngredientItem(name: 'Comino molido', nameEn: 'Cumin', emoji: '🧂', defaultUnit: 'cdta', category: 'Especias'),
     CulinaryIngredientItem(name: 'Curry en polvo', nameEn: 'Curry powder', emoji: '🍛', defaultUnit: 'cda', category: 'Especias'),
+    CulinaryIngredientItem(name: 'Cúrcuma', nameEn: 'Turmeric', emoji: '🫚', defaultUnit: 'cdta', category: 'Especias'),
     CulinaryIngredientItem(name: 'Jengibre fresco / en polvo', nameEn: 'Ginger', emoji: '🫚', defaultUnit: 'g', category: 'Especias'),
     CulinaryIngredientItem(name: 'Canela en polvo / en rama', nameEn: 'Cinnamon', emoji: '🪵', defaultUnit: 'cdta', category: 'Especias'),
     CulinaryIngredientItem(name: 'Nuez moscada', nameEn: 'Nutmeg', emoji: '🌰', defaultUnit: 'pizca', category: 'Especias'),
+    CulinaryIngredientItem(name: 'Clavo de olor', nameEn: 'Cloves', emoji: '🪵', defaultUnit: 'u', category: 'Especias'),
     CulinaryIngredientItem(name: 'Ají molido / Chili flakes', nameEn: 'Chili flakes', emoji: '🌶️', defaultUnit: 'pizca', category: 'Especias'),
 
     // Repostería & Frutos Secos
@@ -162,11 +177,13 @@ class CulinaryCatalog {
     CulinaryIngredientItem(name: 'Harina de almendras', nameEn: 'Almond flour', emoji: '🌰', defaultUnit: 'g', category: 'Repostería'),
     CulinaryIngredientItem(name: 'Polvo para hornear / Levadura química', nameEn: 'Baking powder', emoji: '🥄', defaultUnit: 'cdta', category: 'Repostería'),
     CulinaryIngredientItem(name: 'Bicarbonato de sodio', nameEn: 'Baking soda', emoji: '🥄', defaultUnit: 'cdta', category: 'Repostería'),
+    CulinaryIngredientItem(name: 'Levadura fresca / seca', nameEn: 'Yeast', emoji: '🍞', defaultUnit: 'g', category: 'Repostería'),
     CulinaryIngredientItem(name: 'Azúcar blanco', nameEn: 'Sugar', emoji: '🍬', defaultUnit: 'g', category: 'Repostería'),
     CulinaryIngredientItem(name: 'Azúcar mascabo / morena', nameEn: 'Brown sugar', emoji: '🍬', defaultUnit: 'g', category: 'Repostería'),
     CulinaryIngredientItem(name: 'Esencia de vainilla', nameEn: 'Vanilla extract', emoji: '🌼', defaultUnit: 'cdta', category: 'Repostería'),
     CulinaryIngredientItem(name: 'Chocolate amargo / Chips', nameEn: 'Dark chocolate', emoji: '🍫', defaultUnit: 'g', category: 'Repostería'),
     CulinaryIngredientItem(name: 'Cacao amargo en polvo', nameEn: 'Cocoa powder', emoji: '🍫', defaultUnit: 'cda', category: 'Repostería'),
+    CulinaryIngredientItem(name: 'Dulce de leche', nameEn: 'Dulce de leche / Caramel', emoji: '🍯', defaultUnit: 'g', category: 'Repostería'),
     CulinaryIngredientItem(name: 'Nueces', nameEn: 'Walnuts', emoji: '🥜', defaultUnit: 'g', category: 'Frutos Secos'),
     CulinaryIngredientItem(name: 'Almendras', nameEn: 'Almonds', emoji: '🌰', defaultUnit: 'g', category: 'Frutos Secos'),
     CulinaryIngredientItem(name: 'Castañas de cajú / Anacardos', nameEn: 'Cashews', emoji: '🥜', defaultUnit: 'g', category: 'Frutos Secos'),
@@ -230,12 +247,12 @@ class CulinaryCatalog {
     if (lower.contains('carne') || lower.contains('pollo') || lower.contains('bife') || lower.contains('cerdo') || lower.contains('panceta') || lower.contains('jamón')) return 'Carnes';
     if (lower.contains('pescado') || lower.contains('salmón') || lower.contains('atún') || lower.contains('merluza') || lower.contains('langostino')) return 'Pescados';
     if (lower.contains('queso') || lower.contains('leche') || lower.contains('crema') || lower.contains('yogur') || lower.contains('manteca') || lower.contains('huevo')) return 'Lácteos';
-    if (lower.contains('cebolla') || lower.contains('tomate') || lower.contains('papa') || lower.contains('zanahoria') || lower.contains('lechuga') || lower.contains('ajo') || lower.contains('espinaca') || lower.contains('palta')) return 'Verduras';
+    if (lower.contains('cebolla') || lower.contains('tomate') || lower.contains('papa') || lower.contains('zanahoria') || lower.contains('lechuga') || lower.contains('ajo') || lower.contains('espinaca') || lower.contains('palta') || lower.contains('morron') || lower.contains('morrón') || lower.contains('pimiento')) return 'Verduras';
     if (lower.contains('manzana') || lower.contains('banana') || lower.contains('limón') || lower.contains('naranja') || lower.contains('frutilla')) return 'Frutas';
     if (lower.contains('arroz') || lower.contains('fideo') || lower.contains('pasta') || lower.contains('pan') || lower.contains('avena')) return 'Granos';
     if (lower.contains('harina') || lower.contains('azúcar') || lower.contains('chocolate') || lower.contains('vainilla') || lower.contains('polvo para hornear')) return 'Repostería';
-    if (lower.contains('sal') || lower.contains('pimienta') || lower.contains('orégano') || lower.contains('pimentón') || lower.contains('comino')) return 'Especias';
-    if (lower.contains('aceite') || lower.contains('vinagre') || lower.contains('soja') || lower.contains('salsa') || lower.contains('mostaza') || lower.contains('mayonesa')) return 'Despensa';
+    if (lower.contains('sal') || lower.contains('pimienta') || lower.contains('orégano') || lower.contains('pimentón') || lower.contains('comino') || lower.contains('laurel') || lower.contains('tomillo') || lower.contains('romero') || lower.contains('albahaca') || lower.contains('perejil') || lower.contains('cilantro')) return 'Especias';
+    if (lower.contains('aceite') || lower.contains('vinagre') || lower.contains('vino') || lower.contains('caldo') || lower.contains('soja') || lower.contains('salsa') || lower.contains('mostaza') || lower.contains('mayonesa')) return 'Despensa';
     return 'General';
   }
 
@@ -250,6 +267,7 @@ class CulinaryCatalog {
         lower.contains('orégano') ||
         lower.contains('comino') ||
         lower.contains('pimentón') ||
+        lower.contains('laurel') ||
         lower.contains('agua');
   }
 
@@ -279,6 +297,10 @@ class CulinaryCatalog {
     }
 
     // Fallback based on keywords
+    if (lower.contains('morron') || lower.contains('morrón') || lower.contains('pimiento') || lower.contains('aji') || lower.contains('ají') || lower.contains('pepper')) return '🫑';
+    if (lower.contains('vino') || lower.contains('wine')) return '🍷';
+    if (lower.contains('cerveza') || lower.contains('beer')) return '🍺';
+    if (lower.contains('caldo') || lower.contains('broth') || lower.contains('sopa')) return '🍲';
     if (lower.contains('carne') || lower.contains('beef') || lower.contains('bife') || lower.contains('lomo')) return '🥩';
     if (lower.contains('pollo') || lower.contains('chicken') || lower.contains('ave')) return '🍗';
     if (lower.contains('pescado') || lower.contains('fish') || lower.contains('salmon') || lower.contains('atun')) return '🐟';
@@ -290,7 +312,8 @@ class CulinaryCatalog {
     if (lower.contains('fruta') || lower.contains('fruit') || lower.contains('manzana') || lower.contains('pera')) return '🍎';
     if (lower.contains('pasta') || lower.contains('fideo') || lower.contains('spaghetti')) return '🍝';
     if (lower.contains('arroz') || lower.contains('rice')) return '🍚';
-    if (lower.contains('sal') || lower.contains('pimienta') || lower.contains('especia')) return '🧂';
+    if (lower.contains('sal') || lower.contains('pimienta') || lower.contains('especia') || lower.contains('laurel') || lower.contains('oregano') || lower.contains('orégano')) return '🧂';
+    if (lower.contains('albahaca') || lower.contains('perejil') || lower.contains('cilantro') || lower.contains('romero') || lower.contains('tomillo')) return '🌿';
 
     return '🥗';
   }

@@ -5,32 +5,110 @@
     "title_en": "Creamy Mushroom & Parmesan Risotto",
     "description": "Un clásico italiano reconfortante con textura aterciopelada y sabor profundo a hongos salteados.",
     "description_en": "A comforting Italian classic with velvety texture and deep sautéed mushroom flavor.",
-    "category": "Almuerzo",
+    "category": "Almuerzo, Cena",
     "prepTimeMinutes": 15,
     "cookTimeMinutes": 30,
     "baseServings": 4,
-    "tags": ["Italiana", "Vegetariano", "Gourmet"],
-    "imageUrl": "",
+    "tags": [
+      "Italiana",
+      "Vegetariano",
+      "Gourmet"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1633964913295-ceb43826e7c9?w=800&auto=format&fit=crop",
     "isFavorite": 1,
     "ingredients": [
-      {"amount": 320.0, "unit": "g", "name": "Arroz Carnaroli o Arborio", "notes": ""},
-      {"amount": 300.0, "unit": "g", "name": "Champiñones y Portobellos", "notes": "fileteados"},
-      {"amount": 1.0, "unit": "l", "name": "Caldo de verduras caliente", "notes": ""},
-      {"amount": 1.0, "unit": "unidad", "name": "Cebolla mediana", "notes": "picada fina"},
-      {"amount": 2.0, "unit": "dientes", "name": "Ajo", "notes": "picados"},
-      {"amount": 100.0, "unit": "ml", "name": "Vino blanco seco", "notes": ""},
-      {"amount": 50.0, "unit": "g", "name": "Manteca fría", "notes": "en cubos"},
-      {"amount": 60.0, "unit": "g", "name": "Queso Parmesano", "notes": "rallado fresco"},
-      {"amount": 2.0, "unit": "cda", "name": "Aceite de oliva virgen extra", "notes": ""},
-      {"amount": 0.0, "unit": "", "name": "Sal y pimienta negra", "notes": "a gusto"}
+      {
+        "amount": 320.0,
+        "unit": "g",
+        "name": "Arroz Carnaroli / Arborio",
+        "notes": ""
+      },
+      {
+        "amount": 300.0,
+        "unit": "g",
+        "name": "Champiñones / Hongos",
+        "notes": "fileteados"
+      },
+      {
+        "amount": 1000.0,
+        "unit": "ml",
+        "name": "Caldo de verduras / verdura",
+        "notes": "caliente"
+      },
+      {
+        "amount": 1.0,
+        "unit": "unidades",
+        "name": "Cebolla",
+        "notes": "picada fina"
+      },
+      {
+        "amount": 2.0,
+        "unit": "dientes",
+        "name": "Ajo",
+        "notes": "picados"
+      },
+      {
+        "amount": 100.0,
+        "unit": "ml",
+        "name": "Vino blanco",
+        "notes": ""
+      },
+      {
+        "amount": 50.0,
+        "unit": "g",
+        "name": "Manteca / Mantequilla",
+        "notes": "en cubos fríos"
+      },
+      {
+        "amount": 60.0,
+        "unit": "g",
+        "name": "Queso Parmesano / Rallado",
+        "notes": "rallado fresco"
+      },
+      {
+        "amount": 2.0,
+        "unit": "cda",
+        "name": "Aceite de oliva virgen extra",
+        "notes": ""
+      },
+      {
+        "amount": 1.0,
+        "unit": "pizca",
+        "name": "Sal fina / marina",
+        "notes": "a gusto"
+      },
+      {
+        "amount": 1.0,
+        "unit": "pizca",
+        "name": "Pimienta negra molida",
+        "notes": "a gusto"
+      }
     ],
     "steps": [
-      {"stepNumber": 1, "instruction": "En una sartén grande, calentar una cucharada de aceite de oliva y saltear los hongos a fuego alto hasta que doren. Salpimentar y reservar."},
-      {"stepNumber": 2, "instruction": "En una cacerola amplia, rehogar la cebolla y el ajo con el resto del aceite hasta que estén transparentes."},
-      {"stepNumber": 3, "instruction": "Incorporar el arroz y tostar (nacarar) durante 2 minutos revolviendo constantemente."},
-      {"stepNumber": 4, "instruction": "Verter el vino blanco y dejar evaporar el alcohol por completo."},
-      {"stepNumber": 5, "instruction": "Agregar el caldo caliente cucharón a cucharón, revolviendo con cuchara de madera, esperando que el arroz absorba el líquido antes de añadir más (unos 18 minutos)."},
-      {"stepNumber": 6, "instruction": "Retirar del fuego, incorporar los hongos salteados, la manteca fría y el parmesano. Emulsionar enérgicamente (mantecatura) y servir de inmediato."}
+      {
+        "stepNumber": 1,
+        "instruction": "En una sartén grande, calentar una cucharada de aceite de oliva y saltear los hongos a fuego alto durante 5 minutos hasta que doren. Salpimentar y reservar."
+      },
+      {
+        "stepNumber": 2,
+        "instruction": "En una cacerola amplia, rehogar la cebolla y el ajo con el resto del aceite durante 4 minutos hasta que estén transparentes."
+      },
+      {
+        "stepNumber": 3,
+        "instruction": "Incorporar el arroz y tostar (nacarar) durante 2 minutos revolviendo constantemente."
+      },
+      {
+        "stepNumber": 4,
+        "instruction": "Verter el vino blanco y dejar evaporar el alcohol por completo durante 2 minutos."
+      },
+      {
+        "stepNumber": 5,
+        "instruction": "Agregar el caldo caliente cucharón a cucharón, revolviendo con cuchara de madera, esperando que el arroz absorba el líquido antes de añadir más (unos 18 minutos)."
+      },
+      {
+        "stepNumber": 6,
+        "instruction": "Retirar del fuego, incorporar los hongos salteados, la manteca fría y el parmesano. Emulsionar enérgicamente (mantecatura) y servir de inmediato."
+      }
     ]
   },
   {
@@ -39,28 +117,84 @@
     "title_en": "Mediterranean Quinoa & Avocado Bowl",
     "description": "Almuerzo fresco, nutritivo y lleno de colores con aderezo de limón y hierbas.",
     "description_en": "Fresh, nutritious, and colorful lunch with lemon herb dressing.",
-    "category": "Almuerzo",
+    "category": "Almuerzo, Cena",
     "prepTimeMinutes": 15,
     "cookTimeMinutes": 15,
     "baseServings": 2,
-    "tags": ["Saludable", "Vegano", "Rápido"],
-    "imageUrl": "",
+    "tags": [
+      "Saludable",
+      "Vegano",
+      "Rápido"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&auto=format&fit=crop",
     "isFavorite": 1,
     "ingredients": [
-      {"amount": 160.0, "unit": "g", "name": "Quinoa tricolor o blanca", "notes": "enjuagada"},
-      {"amount": 1.0, "unit": "unidad", "name": "Palta / Aguacate", "notes": "en láminas"},
-      {"amount": 150.0, "unit": "g", "name": "Tomates cherry", "notes": "cortados al medio"},
-      {"amount": 1.0, "unit": "unidad", "name": "Pepino", "notes": "en cubitos"},
-      {"amount": 50.0, "unit": "g", "name": "Aceitunas negras", "notes": "descarozadas"},
-      {"amount": 3.0, "unit": "cda", "name": "Aceite de oliva virgen extra", "notes": ""},
-      {"amount": 1.0, "unit": "unidad", "name": "Limón", "notes": "jugo exprimido"},
-      {"amount": 0.0, "unit": "", "name": "Hojas de menta fresca y orégano", "notes": "a gusto"}
+      {
+        "amount": 160.0,
+        "unit": "g",
+        "name": "Quinoa",
+        "notes": "enjuagada"
+      },
+      {
+        "amount": 1.0,
+        "unit": "unidades",
+        "name": "Palta / Aguacate",
+        "notes": "en láminas"
+      },
+      {
+        "amount": 150.0,
+        "unit": "g",
+        "name": "Tomates cherry",
+        "notes": "cortados al medio"
+      },
+      {
+        "amount": 1.0,
+        "unit": "unidades",
+        "name": "Pepino",
+        "notes": "en cubitos"
+      },
+      {
+        "amount": 3.0,
+        "unit": "cda",
+        "name": "Aceite de oliva virgen extra",
+        "notes": ""
+      },
+      {
+        "amount": 1.0,
+        "unit": "unidades",
+        "name": "Limón",
+        "notes": "jugo exprimido"
+      },
+      {
+        "amount": 1.0,
+        "unit": "cdta",
+        "name": "Orégano seco",
+        "notes": "a gusto"
+      },
+      {
+        "amount": 1.0,
+        "unit": "pizca",
+        "name": "Sal fina / marina",
+        "notes": "a gusto"
+      }
     ],
     "steps": [
-      {"stepNumber": 1, "instruction": "Cocinar la quinoa en el doble de agua hirviendo con sal durante 15 minutos. Escurrir y dejar enfriar."},
-      {"stepNumber": 2, "instruction": "En dos bowls amplios, colocar la base de quinoa."},
-      {"stepNumber": 3, "instruction": "Distribuir en secciones los tomates cherry, el pepino, las aceitunas y la palta."},
-      {"stepNumber": 4, "instruction": "Emulsionar el aceite de oliva con el jugo de limón, sal, pimienta y hierbas frescas. Rociar sobre el bowl y disfrutar."}
+      {
+        "stepNumber": 1,
+        "instruction": "Cocinar la quinoa en 350 ml de agua hirviendo con una pizca de sal durante 15 minutos a fuego medio. Escurrir y dejar enfriar."
+      },
+      {
+        "stepNumber": 2,
+        "instruction": "En dos bowls amplios, colocar la base de quinoa cocida."
+      },
+      {
+        "stepNumber": 3,
+        "instruction": "Distribuir en secciones los tomates cherry, el pepino y las láminas de palta."
+      },
+      {
+        "stepNumber": 4,
+        "instruction": "Emulsionar en un frasco el aceite de oliva, el jugo de limón, sal, pimienta y orégano. Rociar sobre el bowl y disfrutar."
+      }
     ]
   },
   {
@@ -69,29 +203,88 @@
     "title_en": "Oatmeal & Blueberry Pancakes",
     "description": "Desayuno esponjoso, saludable y sin harinas refinadas.",
     "description_en": "Fluffy, healthy breakfast pancakes made with whole oats.",
-    "category": "Desayuno",
+    "category": "Desayuno, Merienda",
     "prepTimeMinutes": 10,
     "cookTimeMinutes": 10,
     "baseServings": 2,
-    "tags": ["Desayuno", "Saludable", "Fácil"],
-    "imageUrl": "",
+    "tags": [
+      "Desayuno",
+      "Saludable",
+      "Fácil"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&auto=format&fit=crop",
     "isFavorite": 0,
     "ingredients": [
-      {"amount": 120.0, "unit": "g", "name": "Avena en copos o harina de avena", "notes": ""},
-      {"amount": 1.0, "unit": "unidad", "name": "Banana madura", "notes": "pisada"},
-      {"amount": 2.0, "unit": "unidades", "name": "Huevos", "notes": ""},
-      {"amount": 80.0, "unit": "ml", "name": "Leche o bebida vegetal", "notes": ""},
-      {"amount": 1.0, "unit": "cdta", "name": "Polvo de hornear", "notes": ""},
-      {"amount": 1.0, "unit": "cdta", "name": "Extracto de vainilla", "notes": ""},
-      {"amount": 80.0, "unit": "g", "name": "Arándanos frescos", "notes": ""},
-      {"amount": 1.0, "unit": "cda", "name": "Miel o jarabe de arce", "notes": "para servir"}
+      {
+        "amount": 120.0,
+        "unit": "g",
+        "name": "Avena en copos",
+        "notes": ""
+      },
+      {
+        "amount": 1.0,
+        "unit": "unidades",
+        "name": "Banana / Plátano",
+        "notes": "madura"
+      },
+      {
+        "amount": 2.0,
+        "unit": "unidades",
+        "name": "Huevo / Huevos",
+        "notes": ""
+      },
+      {
+        "amount": 80.0,
+        "unit": "ml",
+        "name": "Leche entera",
+        "notes": "o vegetal"
+      },
+      {
+        "amount": 1.0,
+        "unit": "cdta",
+        "name": "Polvo para hornear / Levadura química",
+        "notes": ""
+      },
+      {
+        "amount": 1.0,
+        "unit": "cdta",
+        "name": "Esencia de vainilla",
+        "notes": ""
+      },
+      {
+        "amount": 80.0,
+        "unit": "g",
+        "name": "Arándanos",
+        "notes": "frescos"
+      },
+      {
+        "amount": 1.0,
+        "unit": "cda",
+        "name": "Miel",
+        "notes": "para servir"
+      }
     ],
     "steps": [
-      {"stepNumber": 1, "instruction": "Licuar o procesar la avena, la banana, los huevos, la leche, el polvo de hornear y la vainilla hasta obtener una mezcla homogénea."},
-      {"stepNumber": 2, "instruction": "Calentar una sartén antiadherente a fuego medio y engrasar ligeramente con unas gotas de aceite o manteca."},
-      {"stepNumber": 3, "instruction": "Verter porciones de masa y colocar 4 o 5 arándanos por encima de cada panqueque."},
-      {"stepNumber": 4, "instruction": "Cocinar 2 minutos hasta que aparezcan burbujas en la superficie, dar vuelta con espátula y dorar 1 minuto más del otro lado."},
-      {"stepNumber": 5, "instruction": "Servir apilados con un hilo de miel y arándanos frescos extras."}
+      {
+        "stepNumber": 1,
+        "instruction": "Licuar o procesar la avena, la banana, los huevos, la leche, el polvo de hornear y la vainilla durante 1 minuto hasta obtener una masa suave."
+      },
+      {
+        "stepNumber": 2,
+        "instruction": "Calentar una sartén antiadherente a fuego medio y pincelar con unas gotas de aceite."
+      },
+      {
+        "stepNumber": 3,
+        "instruction": "Verter porciones de masa formando discos y colocar 4 o 5 arándanos por encima."
+      },
+      {
+        "stepNumber": 4,
+        "instruction": "Cocinar 2 minutos hasta que aparezcan burbujas en la superficie, dar vuelta con espátula y dorar 1 minuto más del otro lado."
+      },
+      {
+        "stepNumber": 5,
+        "instruction": "Servir apilados con un hilo de miel y arándanos frescos extras."
+      }
     ]
   },
   {
@@ -100,28 +293,640 @@
     "title_en": "Baked Salmon with Lemon & Asparagus",
     "description": "Cena gourmet ligera lista en menos de 25 minutos con aromas cítricos y hierbas.",
     "description_en": "Light gourmet dinner ready in under 25 minutes with citrus aromas and herbs.",
-    "category": "Cena",
+    "category": "Almuerzo, Cena",
     "prepTimeMinutes": 10,
     "cookTimeMinutes": 15,
     "baseServings": 2,
-    "tags": ["Cena", "Pescado", "Keto", "Rápido"],
-    "imageUrl": "",
+    "tags": [
+      "Cena",
+      "Pescado",
+      "Keto",
+      "Rápido"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&auto=format&fit=crop",
     "isFavorite": 1,
     "ingredients": [
-      {"amount": 400.0, "unit": "g", "name": "Filetes de salmón fresco", "notes": "con piel"},
-      {"amount": 1.0, "unit": "atado", "name": "Espárragos verdes", "notes": "sin el tallo duro"},
-      {"amount": 1.0, "unit": "unidad", "name": "Limón", "notes": "en rodajas finas"},
-      {"amount": 2.0, "unit": "cda", "name": "Aceite de oliva virgen extra", "notes": ""},
-      {"amount": 2.0, "unit": "dientes", "name": "Ajo", "notes": "rallado"},
-      {"amount": 1.0, "unit": "cda", "name": "Eneldo fresco o perejil", "notes": "picado"},
-      {"amount": 0.0, "unit": "", "name": "Sal marina y pimienta negra", "notes": "a gusto"}
+      {
+        "amount": 400.0,
+        "unit": "g",
+        "name": "Salmón fresco",
+        "notes": "con piel"
+      },
+      {
+        "amount": 1.0,
+        "unit": "atado",
+        "name": "Espárragos",
+        "notes": "sin el tallo duro"
+      },
+      {
+        "amount": 1.0,
+        "unit": "unidades",
+        "name": "Limón",
+        "notes": "en rodajas finas"
+      },
+      {
+        "amount": 2.0,
+        "unit": "cda",
+        "name": "Aceite de oliva virgen extra",
+        "notes": ""
+      },
+      {
+        "amount": 2.0,
+        "unit": "dientes",
+        "name": "Ajo",
+        "notes": "rallado"
+      },
+      {
+        "amount": 1.0,
+        "unit": "cda",
+        "name": "Perejil fresco",
+        "notes": "picado"
+      },
+      {
+        "amount": 1.0,
+        "unit": "pizca",
+        "name": "Sal fina / marina",
+        "notes": "a gusto"
+      },
+      {
+        "amount": 1.0,
+        "unit": "pizca",
+        "name": "Pimienta negra molida",
+        "notes": "a gusto"
+      }
     ],
     "steps": [
-      {"stepNumber": 1, "instruction": "Precalentar el horno a 200°C y forrar una bandeja con papel manteca o aluminio."},
-      {"stepNumber": 2, "instruction": "Colocar los espárragos en un lateral y los filetes de salmón en el centro con la piel hacia abajo."},
-      {"stepNumber": 3, "instruction": "Pincelar el salmón y los espárragos con la mezcla de aceite de oliva, ajo rallado, sal y pimienta."},
-      {"stepNumber": 4, "instruction": "Disponer las rodajas de limón sobre el salmón."},
-      {"stepNumber": 5, "instruction": "Hornear de 12 a 15 minutos hasta que el salmón esté tierno y los espárragos crujientes. Espolvorear eneldo fresco y servir."}
+      {
+        "stepNumber": 1,
+        "instruction": "Precalentar el horno a 200°C y forrar una bandeja con papel manteca o aluminio."
+      },
+      {
+        "stepNumber": 2,
+        "instruction": "Colocar los espárragos en un lateral y los filetes de salmón en el centro con la piel hacia abajo."
+      },
+      {
+        "stepNumber": 3,
+        "instruction": "Pincelar el salmón y los espárragos con la mezcla de aceite de oliva, ajo rallado, sal y pimienta."
+      },
+      {
+        "stepNumber": 4,
+        "instruction": "Disponer las rodajas de limón sobre el salmón."
+      },
+      {
+        "stepNumber": 5,
+        "instruction": "Hornear durante 14 minutos hasta que el salmón esté tierno y los espárragos crujientes. Espolvorear perejil fresco y servir."
+      }
+    ]
+  },
+  {
+    "id": "recipe_5",
+    "title": "Pollo al Curry con Leche de Coco",
+    "title_en": "Creamy Coconut Chicken Curry",
+    "description": "Cena reconfortante llena de especias, aromas exóticos y salsa sedosa.",
+    "description_en": "Comforting dinner packed with spices, exotic aromas, and a silky coconut sauce.",
+    "category": "Almuerzo, Cena",
+    "prepTimeMinutes": 15,
+    "cookTimeMinutes": 25,
+    "baseServings": 4,
+    "tags": [
+      "Cena",
+      "Pollo",
+      "Especias",
+      "Gourmet"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=800&auto=format&fit=crop",
+    "isFavorite": 1,
+    "ingredients": [
+      {
+        "amount": 600.0,
+        "unit": "g",
+        "name": "Pechuga de pollo",
+        "notes": "en cubos medianos"
+      },
+      {
+        "amount": 400.0,
+        "unit": "ml",
+        "name": "Leche de coco",
+        "notes": "en lata"
+      },
+      {
+        "amount": 1.0,
+        "unit": "unidades",
+        "name": "Cebolla",
+        "notes": "picada"
+      },
+      {
+        "amount": 2.0,
+        "unit": "dientes",
+        "name": "Ajo",
+        "notes": "picados"
+      },
+      {
+        "amount": 10.0,
+        "unit": "g",
+        "name": "Jengibre fresco / en polvo",
+        "notes": "rallado"
+      },
+      {
+        "amount": 1.0,
+        "unit": "unidades",
+        "name": "Morrón rojo / Pimiento rojo",
+        "notes": "en tiras"
+      },
+      {
+        "amount": 2.0,
+        "unit": "cda",
+        "name": "Curry en polvo",
+        "notes": ""
+      },
+      {
+        "amount": 1.0,
+        "unit": "cdta",
+        "name": "Cúrcuma",
+        "notes": ""
+      },
+      {
+        "amount": 2.0,
+        "unit": "cda",
+        "name": "Aceite de oliva virgen extra",
+        "notes": ""
+      },
+      {
+        "amount": 200.0,
+        "unit": "g",
+        "name": "Arroz blanco",
+        "notes": "para acompañar"
+      },
+      {
+        "amount": 1.0,
+        "unit": "pizca",
+        "name": "Sal fina / marina",
+        "notes": "a gusto"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "instruction": "En una sartén o wok grande, calentar el aceite y dorar el pollo a fuego fuerte durante 6 minutos. Retirar y reservar."
+      },
+      {
+        "stepNumber": 2,
+        "instruction": "En la misma sartén, rehogar la cebolla, el ajo, el jengibre y el morrón durante 5 minutos hasta tiernizar."
+      },
+      {
+        "stepNumber": 3,
+        "instruction": "Agregar el curry y la cúrcuma, tostando las especias 1 minuto para liberar los aromas."
+      },
+      {
+        "stepNumber": 4,
+        "instruction": "Reincorporar el pollo, verter la leche de coco y salpimentar. Cocinar a fuego medio-bajo durante 12 minutos hasta que la salsa espese."
+      },
+      {
+        "stepNumber": 5,
+        "instruction": "Servir caliente sobre un colchón de arroz blanco recién hecho y espolvorear cilantro o perejil."
+      }
+    ]
+  },
+  {
+    "id": "recipe_6",
+    "title": "Pasta al Pesto Casero y Tomates Cherry",
+    "title_en": "Homemade Basil Pesto Pasta with Cherry Tomatoes",
+    "description": "Almuerzo italiano clásico listo en 15 minutos con albahaca fresca y parmesano.",
+    "description_en": "Classic Italian lunch ready in 15 minutes with fresh basil and parmesan.",
+    "category": "Almuerzo, Cena",
+    "prepTimeMinutes": 10,
+    "cookTimeMinutes": 10,
+    "baseServings": 4,
+    "tags": [
+      "Italiana",
+      "Vegetariano",
+      "Rápido"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=800&auto=format&fit=crop",
+    "isFavorite": 0,
+    "ingredients": [
+      {
+        "amount": 400.0,
+        "unit": "g",
+        "name": "Pasta / Fideos / Spaghetti",
+        "notes": ""
+      },
+      {
+        "amount": 50.0,
+        "unit": "g",
+        "name": "Albahaca fresca",
+        "notes": "hojas limpias"
+      },
+      {
+        "amount": 40.0,
+        "unit": "g",
+        "name": "Nueces",
+        "notes": "o piñones"
+      },
+      {
+        "amount": 60.0,
+        "unit": "g",
+        "name": "Queso Parmesano / Rallado",
+        "notes": "rallado"
+      },
+      {
+        "amount": 1.0,
+        "unit": "dientes",
+        "name": "Ajo",
+        "notes": ""
+      },
+      {
+        "amount": 80.0,
+        "unit": "ml",
+        "name": "Aceite de oliva virgen extra",
+        "notes": ""
+      },
+      {
+        "amount": 200.0,
+        "unit": "g",
+        "name": "Tomates cherry",
+        "notes": "cortados al medio"
+      },
+      {
+        "amount": 1.0,
+        "unit": "pizca",
+        "name": "Sal fina / marina",
+        "notes": "a gusto"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "instruction": "Poner a hervir abundante agua con sal y cocinar la pasta según el tiempo del paquete (unos 9 minutos al dente)."
+      },
+      {
+        "stepNumber": 2,
+        "instruction": "Procesar la albahaca con las nueces, el ajo, el queso parmesano, la sal y el aceite de oliva hasta lograr un pesto cremoso."
+      },
+      {
+        "stepNumber": 3,
+        "instruction": "En una sartén con unas gotas de aceite, saltear los tomates cherry durante 3 minutos hasta que comiencen a dorarse."
+      },
+      {
+        "stepNumber": 4,
+        "instruction": "Escurrir la pasta reservando 3 cucharadas de agua de cocción. Mezclar la pasta caliente con el pesto, los tomates cherry y el agua reservada. Servir de inmediato."
+      }
+    ]
+  },
+  {
+    "id": "recipe_7",
+    "title": "Tostadas Francesas con Frutillas y Miel",
+    "title_en": "Classic French Toast with Strawberries & Honey",
+    "description": "Desayuno o merienda dorada, crujiente por fuera y tierna por dentro con aroma a canela.",
+    "description_en": "Golden, crispy outside and tender inside french toast with cinnamon aroma.",
+    "category": "Desayuno, Merienda",
+    "prepTimeMinutes": 5,
+    "cookTimeMinutes": 10,
+    "baseServings": 2,
+    "tags": [
+      "Desayuno",
+      "Merienda",
+      "Dulce"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=800&auto=format&fit=crop",
+    "isFavorite": 0,
+    "ingredients": [
+      {
+        "amount": 4.0,
+        "unit": "rebanadas",
+        "name": "Pan / Tostadas",
+        "notes": "tipo brioche o lactal grueso"
+      },
+      {
+        "amount": 2.0,
+        "unit": "unidades",
+        "name": "Huevo / Huevos",
+        "notes": ""
+      },
+      {
+        "amount": 60.0,
+        "unit": "ml",
+        "name": "Leche entera",
+        "notes": ""
+      },
+      {
+        "amount": 1.0,
+        "unit": "cdta",
+        "name": "Canela en polvo / en rama",
+        "notes": ""
+      },
+      {
+        "amount": 1.0,
+        "unit": "cdta",
+        "name": "Esencia de vainilla",
+        "notes": ""
+      },
+      {
+        "amount": 20.0,
+        "unit": "g",
+        "name": "Manteca / Mantequilla",
+        "notes": "para dorar"
+      },
+      {
+        "amount": 100.0,
+        "unit": "g",
+        "name": "Frutillas / Fresas",
+        "notes": "fileteadas"
+      },
+      {
+        "amount": 2.0,
+        "unit": "cda",
+        "name": "Miel",
+        "notes": "para servir"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "instruction": "En un plato hondo, batir los huevos con la leche, la canela y la vainilla."
+      },
+      {
+        "stepNumber": 2,
+        "instruction": "Derretir la manteca en una sartén a fuego medio."
+      },
+      {
+        "stepNumber": 3,
+        "instruction": "Sumergir cada rebanada de pan en la mezcla 10 segundos por lado para que absorba bien el líquido."
+      },
+      {
+        "stepNumber": 4,
+        "instruction": "Dorar en la sartén durante 3 minutos por lado hasta que adquieran un color dorado caramelizado."
+      },
+      {
+        "stepNumber": 5,
+        "instruction": "Servir calientes con las frutillas frescas y un abundante hilo de miel."
+      }
+    ]
+  },
+  {
+    "id": "recipe_8",
+    "title": "Tacos de Carne con Guacamole Casero",
+    "title_en": "Beef Tacos with Homemade Guacamole",
+    "description": "Cena mexicana irresistible con carne jugosa, especias y guacamole cremoso.",
+    "description_en": "Irresistible Mexican dinner with juicy spiced beef and creamy guacamole.",
+    "category": "Almuerzo, Cena",
+    "prepTimeMinutes": 15,
+    "cookTimeMinutes": 15,
+    "baseServings": 3,
+    "tags": [
+      "Mexicana",
+      "Cena",
+      "Amigos"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&auto=format&fit=crop",
+    "isFavorite": 1,
+    "ingredients": [
+      {
+        "amount": 500.0,
+        "unit": "g",
+        "name": "Carne picada / Molida",
+        "notes": ""
+      },
+      {
+        "amount": 6.0,
+        "unit": "unidades",
+        "name": "Tortillas de trigo / maíz",
+        "notes": ""
+      },
+      {
+        "amount": 1.0,
+        "unit": "unidades",
+        "name": "Cebolla",
+        "notes": "picada fina"
+      },
+      {
+        "amount": 1.0,
+        "unit": "unidades",
+        "name": "Morrón rojo / Pimiento rojo",
+        "notes": "en cubitos"
+      },
+      {
+        "amount": 1.0,
+        "unit": "cdta",
+        "name": "Comino molido",
+        "notes": ""
+      },
+      {
+        "amount": 1.0,
+        "unit": "cdta",
+        "name": "Pimentón dulce / Ahumado",
+        "notes": ""
+      },
+      {
+        "amount": 2.0,
+        "unit": "unidades",
+        "name": "Palta / Aguacate",
+        "notes": "maduras"
+      },
+      {
+        "amount": 1.0,
+        "unit": "unidades",
+        "name": "Limón",
+        "notes": ""
+      },
+      {
+        "amount": 1.0,
+        "unit": "unidades",
+        "name": "Tomate",
+        "notes": "en cubitos"
+      },
+      {
+        "amount": 1.0,
+        "unit": "pizca",
+        "name": "Sal fina / marina",
+        "notes": "a gusto"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "instruction": "En una sartén grande con aceite, saltear la cebolla y el morrón durante 4 minutos. Agregar la carne picada, comino, pimentón, sal y cocinar durante 10 minutos."
+      },
+      {
+        "stepNumber": 2,
+        "instruction": "Para el guacamole: pisar la palta con un tenedor, mezclar con el tomate en cubitos, jugo de limón y sal."
+      },
+      {
+        "stepNumber": 3,
+        "instruction": "Calentar las tortillas en una sartén seca 30 segundos por lado."
+      },
+      {
+        "stepNumber": 4,
+        "instruction": "Armar los tacos rellenando con la carne jugosa y coronar con una generosa cucharada de guacamole fresco."
+      }
+    ]
+  },
+  {
+    "id": "recipe_9",
+    "title": "Mousse de Chocolate Amargo 70%",
+    "title_en": "Dark Chocolate Mousse with Berries",
+    "description": "Postre sofisticado, aireado y con el equilibrio perfecto entre dulzura e intensidad.",
+    "description_en": "Sophisticated, airy dessert with the perfect balance of sweetness and intensity.",
+    "category": "Postres, Merienda",
+    "prepTimeMinutes": 20,
+    "cookTimeMinutes": 5,
+    "baseServings": 4,
+    "tags": [
+      "Postre",
+      "Chocolate",
+      "Gourmet"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=800&auto=format&fit=crop",
+    "isFavorite": 0,
+    "ingredients": [
+      {
+        "amount": 200.0,
+        "unit": "g",
+        "name": "Chocolate amargo / Chips",
+        "notes": "70% cacao"
+      },
+      {
+        "amount": 4.0,
+        "unit": "unidades",
+        "name": "Huevo / Huevos",
+        "notes": "separadas yemas y claras"
+      },
+      {
+        "amount": 40.0,
+        "unit": "g",
+        "name": "Manteca / Mantequilla",
+        "notes": ""
+      },
+      {
+        "amount": 40.0,
+        "unit": "g",
+        "name": "Azúcar blanco",
+        "notes": ""
+      },
+      {
+        "amount": 1.0,
+        "unit": "cdta",
+        "name": "Esencia de vainilla",
+        "notes": ""
+      },
+      {
+        "amount": 60.0,
+        "unit": "g",
+        "name": "Frutillas / Fresas",
+        "notes": "para decorar"
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "instruction": "Derretir el chocolate junto con la manteca a baño maría o en microondas a potencia media en intervalos de 30 segundos. Dejar entibiar."
+      },
+      {
+        "stepNumber": 2,
+        "instruction": "Batir las yemas de huevo con la esencia de vainilla e incorporarlas al chocolate tibio mezclando bien."
+      },
+      {
+        "stepNumber": 3,
+        "instruction": "En un bowl limpio, batir las claras a punto nieve, agregando el azúcar en forma de lluvia hasta lograr un merengue firme (unos 4 minutos)."
+      },
+      {
+        "stepNumber": 4,
+        "instruction": "Incorporar las claras al chocolate en 3 tandas con movimientos envolventes suaves para no perder el aire."
+      },
+      {
+        "stepNumber": 5,
+        "instruction": "Repartir en copas o vasos individuales y refrigerar al menos 2 horas antes de servir decorado con frutillas."
+      }
+    ]
+  },
+  {
+    "id": "recipe_10",
+    "title": "Tarta Rústica de Calabaza, Espinaca y Feta",
+    "title_en": "Rustic Pumpkin, Spinach & Feta Galette",
+    "description": "Tarta crujiente y colorida con relleno cremoso de calabaza asada y queso feta.",
+    "description_en": "Crispy, colorful galette with a creamy roasted pumpkin and feta filling.",
+    "category": "Almuerzo, Cena",
+    "prepTimeMinutes": 20,
+    "cookTimeMinutes": 35,
+    "baseServings": 4,
+    "tags": [
+      "Vegetariano",
+      "Cena",
+      "Saludable"
+    ],
+    "imageUrl": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&auto=format&fit=crop",
+    "isFavorite": 1,
+    "ingredients": [
+      {
+        "amount": 400.0,
+        "unit": "g",
+        "name": "Calabaza / Zapallo",
+        "notes": "en cubitos asados"
+      },
+      {
+        "amount": 150.0,
+        "unit": "g",
+        "name": "Espinaca",
+        "notes": "salteada y escurrida"
+      },
+      {
+        "amount": 100.0,
+        "unit": "g",
+        "name": "Queso Feta",
+        "notes": "desgranado"
+      },
+      {
+        "amount": 2.0,
+        "unit": "unidades",
+        "name": "Huevo / Huevos",
+        "notes": ""
+      },
+      {
+        "amount": 1.0,
+        "unit": "unidades",
+        "name": "Cebolla",
+        "notes": "caramelizada"
+      },
+      {
+        "amount": 200.0,
+        "unit": "g",
+        "name": "Harina 0000 / de trigo",
+        "notes": "para la masa"
+      },
+      {
+        "amount": 80.0,
+        "unit": "g",
+        "name": "Manteca / Mantequilla",
+        "notes": "fría"
+      },
+      {
+        "amount": 1.0,
+        "unit": "pizca",
+        "name": "Nuez moscada",
+        "notes": ""
+      }
+    ],
+    "steps": [
+      {
+        "stepNumber": 1,
+        "instruction": "Asar los cubos de calabaza en el horno a 200°C durante 20 minutos con sal y aceite hasta que estén tiernos."
+      },
+      {
+        "stepNumber": 2,
+        "instruction": "Preparar la masa uniendo la harina, la manteca fría en cubos y 4 cucharadas de agua helada. Estirar en forma redonda sobre papel manteca."
+      },
+      {
+        "stepNumber": 3,
+        "instruction": "En un bowl mezclar la calabaza asada, la espinaca, la cebolla caramelizada, los huevos batidos, sal y nuez moscada."
+      },
+      {
+        "stepNumber": 4,
+        "instruction": "Colocar el relleno en el centro de la masa dejando 4 cm de borde libre. Espolvorear el queso feta y doblar los bordes hacia adentro formando un marco rústico."
+      },
+      {
+        "stepNumber": 5,
+        "instruction": "Hornear a 190°C durante 30 minutos hasta que la masa esté dorada y crocante. Servir tibia."
+      }
     ]
   }
 ]

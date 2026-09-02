@@ -206,9 +206,8 @@ class _RecipePickerSheetState extends ConsumerState<RecipePickerSheet> {
               child: recipesAsync.when(
                 data: (recipes) {
                   final filtered = recipes.where((r) {
-                    if (_query.isEmpty) return true;
                     return r.title.toLowerCase().contains(_query) ||
-                        r.category.toLowerCase().contains(_query);
+                        r.categories.any((c) => c.toLowerCase().contains(_query));
                   }).toList();
 
                   if (filtered.isEmpty) {

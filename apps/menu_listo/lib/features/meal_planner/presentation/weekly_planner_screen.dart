@@ -179,9 +179,27 @@ class WeeklyPlannerScreen extends ConsumerWidget {
                                       }
                                     : null,
                                 onTap: () {
+                                  String slotLabel;
+                                  switch (slot) {
+                                    case 'breakfast':
+                                      slotLabel = strings.mealBreakfast;
+                                      break;
+                                    case 'lunch':
+                                      slotLabel = strings.mealLunch;
+                                      break;
+                                    case 'snack':
+                                      slotLabel = strings.mealSnack;
+                                      break;
+                                    case 'dinner':
+                                      slotLabel = strings.mealDinner;
+                                      break;
+                                    default:
+                                      slotLabel = slot;
+                                  }
+
                                   RecipePickerSheet.show(
                                     context,
-                                    slotTitle: '${day['name']} - $slot',
+                                    slotTitle: '${day['name']} ($slotLabel)',
                                     onRecipeSelected: (recipe, servings) {
                                       weekPlanNotifier.assignMeal(
                                         dateString: dateStr,

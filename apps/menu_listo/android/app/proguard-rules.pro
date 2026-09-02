@@ -16,3 +16,10 @@
 -dontwarn io.flutter.embedding.**
 -keep class com.tekartik.sqflite.** { *; }
 -dontwarn com.tekartik.sqflite.**
+
+# In-App Purchase / Google Play Billing Keep Rules
+-keep class com.android.vending.billing.** { *; }
+-keep class com.android.billingclient.** { *; }
+-keep class io.flutter.plugins.inapppurchase.** { *; }
+-dontwarn com.android.billingclient.**
+
