@@ -11,18 +11,7 @@ import 'widgets/recipe_picker_sheet.dart';
 class WeeklyPlannerScreen extends ConsumerStatefulWidget {
   const WeeklyPlannerScreen({super.key});
 
-  @override
-  ConsumerState<WeeklyPlannerScreen> createState() => _WeeklyPlannerScreenState();
-}
-
-class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _checkFirstTimeGuide());
-  }
-
-  Future<void> _checkFirstTimeGuide() async {
+  static Future<void> showGuideIfFirstTime(BuildContext context) async {
     final strings = AppStrings.of(context);
     await FeatureGuideDialog.showIfFirstTime(
       context: context,
@@ -61,6 +50,12 @@ class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
       ],
     );
   }
+
+  @override
+  ConsumerState<WeeklyPlannerScreen> createState() => _WeeklyPlannerScreenState();
+}
+
+class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
 
   @override
   Widget build(BuildContext context) {

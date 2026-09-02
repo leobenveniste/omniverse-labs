@@ -212,7 +212,20 @@ class _AppShellState extends ConsumerState<AppShell> {
     final unselectedColor = theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6);
 
     return InkWell(
-      onTap: () => setState(() => _currentIndex = index),
+      onTap: () {
+        if (_currentIndex != index) {
+          setState(() => _currentIndex = index);
+          if (index == 1) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) WeeklyPlannerScreen.showGuideIfFirstTime(context);
+            });
+          } else if (index == 2) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) ShoppingListScreen.showGuideIfFirstTime(context);
+            });
+          }
+        }
+      },
       borderRadius: BorderRadius.circular(24),
       splashColor: primaryColor.withValues(alpha: 0.1),
       highlightColor: Colors.transparent,

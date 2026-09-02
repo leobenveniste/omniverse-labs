@@ -32,6 +32,17 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final recipes = ref.read(recipesListProvider).valueOrNull ?? [];
+      if (recipes.isEmpty) {
+        await ref.read(recipesListProvider.notifier).loadRecipes();
+      }
+    });
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     super.dispose();

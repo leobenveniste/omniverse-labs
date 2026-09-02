@@ -96,19 +96,40 @@ class PremiumNotifier extends StateNotifier<PremiumState> {
   Future<void> buyPro() async {
     if (state.isProUser) return;
 
-    if (state.proProduct == null) {
-      // In offline / simulator / test mode, allow direct simulated unlock
+    state = state.copyWith(isLoading: true, errorMessage: null);
+
+    ProductDetails? product = state.proProduct;
+    if (product == null) {
+      try {
+        final available = await _iap.isAvailable();
+        if (available) {
+          final response = await _iap.queryProductDetails({kProLifetimeProductId});
+          if (response.productDetails.isNotEmpty) {
+            product = response.productDetails.firstWhere(
+              (p) => p.id == kProLifetimeProductId,
+              orElse: () => response.productDetails.first,
+            );
+            state = state.copyWith(proProduct: product);
+          }
+        }
+      } catch (_) {}
+    }
+
+    if (product == null) {
+      // If store is offline or product is still propagating in Google Play Console
       if (kDebugMode || !state.isStoreAvailable) {
         await setProUser(true);
         return;
       }
-      state = state.copyWith(errorMessage: 'Producto no disponible en la tienda');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'El producto de Google Play se está sincronizando. Intenta de nuevo en unos momentos.',
+      );
       return;
     }
 
-    state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      final purchaseParam = PurchaseParam(productDetails: state.proProduct!);
+      final purchaseParam = PurchaseParam(productDetails: product);
       await _iap.buyNonConsumable(purchaseParam: purchaseParam);
     } catch (e) {
       state = state.copyWith(errorMessage: e.toString(), isLoading: false);

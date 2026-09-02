@@ -14,20 +14,7 @@ import 'widgets/shopping_item_tile.dart';
 class ShoppingListScreen extends ConsumerStatefulWidget {
   const ShoppingListScreen({super.key});
 
-  @override
-  ConsumerState<ShoppingListScreen> createState() => _ShoppingListScreenState();
-}
-
-class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
-  bool _isCategorizedView = true;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _checkFirstTimeGuide());
-  }
-
-  Future<void> _checkFirstTimeGuide() async {
+  static Future<void> showGuideIfFirstTime(BuildContext context) async {
     final strings = AppStrings.of(context);
     await FeatureGuideDialog.showIfFirstTime(
       context: context,
@@ -66,6 +53,13 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
       ],
     );
   }
+
+  @override
+  ConsumerState<ShoppingListScreen> createState() => _ShoppingListScreenState();
+}
+
+class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
+  bool _isCategorizedView = true;
 
   void _showPantryReviewModal(BuildContext context, List<ShoppingItem> items) {
     final theme = Theme.of(context);

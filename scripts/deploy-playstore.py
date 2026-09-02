@@ -137,37 +137,41 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
         version_code = response["versionCode"]
         print(f"Bundle Uploaded Successfully! (Version Code: {version_code})")
 
-        print(f"Assigning Version Code {version_code} to track '{track}'...")
-        track_body = {
-            "track": track,
-            "releases": [
-                {
-                    "name": f"1.0.4 (Build {version_code})",
-                    "versionCodes": [str(version_code)],
-                    "status": "completed",
-                    "releaseNotes": [
-                        {
-                            "language": "es-419",
-                            "text": "Secciones organizadas en ingredientes y pasos (ej. Para la masa), temporizadores interactivos en recetas, transiciones y animaciones fluidas, respuesta háptica, optimizaciones de rendimiento y plantillas de menú semanal guardadas ('Mis Menús')."
-                        },
-                        {
-                            "language": "en-US",
-                            "text": "Organized section headers in ingredients and steps, interactive in-recipe timers, smooth hero animations and haptic feedback, app size optimizations, and reusable weekly meal plan templates."
-                        }
-                    ]
-                }
-            ]
-        }
-        edits.tracks().update(
-            packageName=package_name,
-            editId=edit_id,
-            track=track,
-            body=track_body
-        ).execute()
+        # Deploy to specified track(s)
+        tracks_to_deploy = [t.strip() for t in track.split(",") if t.strip()]
+        for t in tracks_to_deploy:
+            print(f"Assigning Version Code {version_code} to track '{t}'...")
+            track_body = {
+                "track": t,
+                "releases": [
+                    {
+                        "name": f"1.1.3 (Build {version_code})",
+                        "versionCodes": [str(version_code)],
+                        "status": "completed",
+                        "releaseNotes": [
+                            {
+                                "language": "es-419",
+                                "text": "Guías de bienvenida interactivas al ingresar por primera vez a cada sección (Agenda, Modo Cocina, Lista de Compras, Modo Súper). Recetas precargadas aseguradas, plantillas de menú en la agenda, autocompletado sin distinción de tildes y mejoras de interfaz."
+                            },
+                            {
+                                "language": "en-US",
+                                "text": "Interactive contextual welcome guides for first-time visits (Planner, Cook Mode, Shopping List, Supermarket Mode). Guaranteed starter recipes on fresh install, weekly menu templates, accent-insensitive autocomplete, and UI polish."
+                            }
+                        ]
+                    }
+                ]
+            }
+            edits.tracks().update(
+                packageName=package_name,
+                editId=edit_id,
+                track=t,
+                body=track_body
+            ).execute()
+            print(f"Track '{t}' configured successfully!")
 
         print("Committing and Publishing Edit to Google Play...")
         commit_res = edits.commit(packageName=package_name, editId=edit_id).execute()
-        print(f"SUCCESS! Released to Google Play [{track.upper()}] track (Commit ID: {commit_res.get('id', edit_id)})")
+        print(f"SUCCESS! Released to Google Play [{', '.join(tracks_to_deploy).upper()}] tracks (Commit ID: {commit_res.get('id', edit_id)})")
         return True
 
     except HttpError as e:
@@ -181,7 +185,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--package", default="com.omniverselabs.menu_listo")
     parser.add_argument("--aab", default=r"apps/menu_listo/build/app/outputs/bundle/release/app-release.aab")
-    parser.add_argument("--track", default="internal")
+    parser.add_argument("--track", default="internal,alpha")
     args = parser.parse_args()
 
     deploy_to_playstore(args.package, args.aab, args.track)

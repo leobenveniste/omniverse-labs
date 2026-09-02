@@ -29,9 +29,21 @@ class AppDatabase {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _createDB,
+      onUpgrade: _onUpgrade,
     );
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      try {
+        await db.execute('ALTER TABLE ingredients ADD COLUMN isSectionHeader INTEGER NOT NULL DEFAULT 0');
+      } catch (_) {}
+      try {
+        await db.execute('ALTER TABLE recipe_steps ADD COLUMN isSectionHeader INTEGER NOT NULL DEFAULT 0');
+      } catch (_) {}
+    }
   }
 
   Future<void> _createDB(Database db, int version) async {
@@ -62,6 +74,7 @@ class AppDatabase {
         unit TEXT,
         name TEXT NOT NULL,
         notes TEXT,
+        isSectionHeader INTEGER NOT NULL DEFAULT 0,
         FOREIGN KEY (recipeId) REFERENCES recipes (id) ON DELETE CASCADE
       )
     ''');
@@ -73,6 +86,7 @@ class AppDatabase {
         stepNumber INTEGER NOT NULL,
         instruction TEXT NOT NULL,
         instructionEn TEXT,
+        isSectionHeader INTEGER NOT NULL DEFAULT 0,
         FOREIGN KEY (recipeId) REFERENCES recipes (id) ON DELETE CASCADE
       )
     ''');

@@ -148,27 +148,37 @@ class PaywallSheet extends ConsumerWidget {
                   : () async {
                       HapticFeedback.mediumImpact();
                       await ref.read(premiumProvider.notifier).buyPro();
-                      if (context.mounted && ref.read(premiumProvider).isProUser) {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            backgroundColor: Colors.green.shade700,
-                            content: Row(
-                              children: [
-                                const Icon(Icons.stars_rounded, color: Colors.amber),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    strings.isSpanish
-                                        ? '¡Felicitaciones! Menú Listo Pro está desbloqueado.'
-                                        : 'Congratulations! Menú Listo Pro is unlocked.',
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                      final currentPremium = ref.read(premiumProvider);
+                      if (context.mounted) {
+                        if (currentPremium.isProUser) {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: Colors.green.shade700,
+                              content: Row(
+                                children: [
+                                  const Icon(Icons.stars_rounded, color: Colors.amber),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      strings.isSpanish
+                                          ? '¡Felicitaciones! Menú Listo Pro está desbloqueado.'
+                                          : 'Congratulations! Menú Listo Pro is unlocked.',
+                                      style: const TextStyle(fontWeight: FontWeight.bold),
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        );
+                          );
+                        } else if (currentPremium.errorMessage != null && currentPremium.errorMessage!.isNotEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: Colors.red.shade800,
+                              content: Text(currentPremium.errorMessage!),
+                            ),
+                          );
+                        }
                       }
                     },
               child: premiumState.isLoading
