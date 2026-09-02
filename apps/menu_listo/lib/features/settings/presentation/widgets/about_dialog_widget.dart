@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class AboutDialogWidget extends StatelessWidget {
   const AboutDialogWidget({super.key});
@@ -72,11 +73,30 @@ class AboutDialogWidget extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 6),
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Versión:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                Text('1.0.0 (Build 1)', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                const Text('Versión:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                FutureBuilder<PackageInfo>(
+                  future: PackageInfo.fromPlatform(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      final info = snapshot.data!;
+                      return Text(
+                        '${info.version} (Build ${info.buildNumber})',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.primary,
+                        ),
+                      );
+                    }
+                    return const Text(
+                      'Cargando...',
+                      style: TextStyle(fontSize: 13, color: Colors.grey),
+                    );
+                  },
+                ),
               ],
             ),
             const SizedBox(height: 6),
