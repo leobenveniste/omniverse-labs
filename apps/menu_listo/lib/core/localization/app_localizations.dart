@@ -93,8 +93,8 @@ class AppStrings {
   String get ingredientsTitle => isSpanish ? 'Ingredientes' : 'Ingredients';
   String get instructionsTitle => isSpanish ? 'Instrucciones paso a paso' : 'Step-by-Step Instructions';
   String get stepsTitle => isSpanish ? 'Instrucciones paso a paso' : 'Step-by-Step Instructions';
-  String get startCooking => isSpanish ? 'Comenzar a Cocinar (Modo Cocina)' : 'Start Cooking (Kitchen Mode)';
-  String get startCookingMode => isSpanish ? 'Comenzar a Cocinar (Modo Cocina)' : 'Start Cooking (Kitchen Mode)';
+  String get startCooking => isSpanish ? 'Comenzar a Cocinar' : 'Start Cooking';
+  String get startCookingMode => isSpanish ? 'Comenzar a Cocinar' : 'Start Cooking';
   String get editRecipe => isSpanish ? 'Editar Receta' : 'Edit Recipe';
   String get deleteRecipe => isSpanish ? 'Eliminar Receta' : 'Delete Recipe';
   String get confirmDeleteRecipe => isSpanish ? '¿Estás seguro de que deseas eliminar esta receta?' : 'Are you sure you want to delete this recipe?';

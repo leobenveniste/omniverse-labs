@@ -367,8 +367,36 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                     child: const BackButton(color: Colors.white),
                   ),
                 ),
-                flexibleSpace: FlexibleSpaceBar(
-                  background: _buildHeaderImage(recipe, theme),
+                flexibleSpace: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final top = constraints.biggest.height;
+                    final statusBarHeight = MediaQuery.of(context).padding.top;
+                    final isCollapsed = top <= kToolbarHeight + statusBarHeight + 25;
+
+                    return FlexibleSpaceBar(
+                      titlePadding: const EdgeInsetsDirectional.only(
+                        start: 56,
+                        end: 145,
+                        bottom: 15,
+                      ),
+                      title: AnimatedOpacity(
+                        duration: const Duration(milliseconds: 200),
+                        opacity: isCollapsed ? 1.0 : 0.0,
+                        child: Text(
+                          recipe.title,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.2,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      background: _buildHeaderImage(recipe, theme),
+                    );
+                  },
                 ),
                 actions: [
                   Padding(

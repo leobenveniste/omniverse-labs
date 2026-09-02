@@ -264,7 +264,7 @@ class _RecipeCookModeScreenState extends ConsumerState<RecipeCookModeScreen> {
     if (!_isHandsFree || image.planes.isEmpty) return;
 
     final now = DateTime.now();
-    if (now.difference(_lastGestureTime).inMilliseconds < 1200) {
+    if (now.difference(_lastGestureTime).inMilliseconds < 1600) {
       return;
     }
 
@@ -315,28 +315,32 @@ class _RecipeCookModeScreenState extends ConsumerState<RecipeCookModeScreen> {
     _prevRightBrightness!.add(avgB);
     if (_prevRightBrightness!.length > 5) _prevRightBrightness!.removeAt(0);
 
-    const threshold = 14.0;
+    // Filter out global uniform ambient shifts (flicker, walking past)
+    final diffDiff = (diffA - diffB).abs();
+    if (diffDiff < 10.0) return;
+
+    const threshold = 25.0;
 
     // Optical directional swipe state machine
     if (_firstTriggerSide == null) {
-      if (diffB > threshold && diffB > diffA * 1.25) {
+      if (diffB > threshold && diffB > diffA * 1.5) {
         _firstTriggerSide = 'sideB';
         _firstTriggerTime = now;
-      } else if (diffA > threshold && diffA > diffB * 1.25) {
+      } else if (diffA > threshold && diffA > diffB * 1.5) {
         _firstTriggerSide = 'sideA';
         _firstTriggerTime = now;
       }
     } else {
       final elapsed = now.difference(_firstTriggerTime!).inMilliseconds;
-      if (elapsed > 750) {
+      if (elapsed > 700) {
         // Timed out, reset trigger
         _firstTriggerSide = null;
-      } else if (elapsed > 70) {
-        if (_firstTriggerSide == 'sideB' && diffA > threshold) {
+      } else if (elapsed > 100) {
+        if (_firstTriggerSide == 'sideB' && diffA > threshold && diffA > diffB * 1.3) {
           // Right-to-Left sweep ➔ Siguiente Paso
           _firstTriggerSide = null;
           _triggerGesture(isNext: true);
-        } else if (_firstTriggerSide == 'sideA' && diffB > threshold) {
+        } else if (_firstTriggerSide == 'sideA' && diffB > threshold && diffB > diffA * 1.3) {
           // Left-to-Right sweep ➔ Paso Anterior
           _firstTriggerSide = null;
           _triggerGesture(isNext: false);

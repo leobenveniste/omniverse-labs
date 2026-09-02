@@ -238,7 +238,18 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Text('🧊', style: TextStyle(fontSize: 20)),
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primaryContainer.withValues(alpha: 0.7),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.kitchen_rounded,
+                          size: 18,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(

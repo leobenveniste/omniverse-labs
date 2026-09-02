@@ -101,8 +101,17 @@ class RecipesListNotifier extends StateNotifier<AsyncValue<List<Recipe>>> {
   }
 
   Future<void> toggleFavorite(String id, bool isFavorite) async {
+    final currentList = state.valueOrNull;
+    if (currentList != null) {
+      final updated = currentList.map((r) {
+        if (r.id == id) {
+          return r.copyWith(isFavorite: !isFavorite);
+        }
+        return r;
+      }).toList();
+      state = AsyncValue.data(updated);
+    }
     await _repo.toggleFavorite(id, !isFavorite);
-    await loadRecipes();
   }
 
   Future<void> reloadSampleRecipes() async {

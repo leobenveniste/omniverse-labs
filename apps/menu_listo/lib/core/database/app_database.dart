@@ -29,7 +29,7 @@ class AppDatabase {
 
     return await openDatabase(
       path,
-      version: 3,
+      version: 4,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
@@ -53,6 +53,21 @@ class AppDatabase {
         await db.execute('CREATE INDEX IF NOT EXISTS idx_recipes_category ON recipes (category)');
         await db.execute('CREATE INDEX IF NOT EXISTS idx_recipes_favorite ON recipes (isFavorite)');
         await db.execute('CREATE INDEX IF NOT EXISTS idx_shopping_completed ON shopping_items (isCompleted)');
+      } catch (_) {}
+    }
+
+    if (oldVersion < 4) {
+      try {
+        await db.execute('''
+          UPDATE recipes 
+          SET imageUrl = 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=800&auto=format&fit=crop'
+          WHERE id = 'recipe_9' AND imageUrl LIKE '%1541781774459%';
+        ''');
+        await db.execute('''
+          UPDATE recipes 
+          SET imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/3/37/Spanakopita.jpg'
+          WHERE id = 'recipe_10' AND imageUrl LIKE '%1565557623262%';
+        ''');
       } catch (_) {}
     }
   }

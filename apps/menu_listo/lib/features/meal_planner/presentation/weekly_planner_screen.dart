@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:menu_listo/core/localization/app_localizations.dart';
@@ -169,14 +170,37 @@ class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
                       weekRangeTitle,
                       style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                     ),
+                    const SizedBox(height: 4),
                     InkWell(
-                      onTap: () => weekStartNotifier.goToToday(),
-                      child: Text(
-                        strings.today,
-                        style: TextStyle(
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 12,
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        weekStartNotifier.goToToday();
+                      },
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3.5),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primaryContainer.withValues(alpha: 0.65),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.today_rounded, size: 13, color: theme.colorScheme.primary),
+                            const SizedBox(width: 4),
+                            Text(
+                              strings.today,
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
