@@ -4,6 +4,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:menu_listo/core/localization/app_localizations.dart';
 import 'package:menu_listo/core/utils/culinary_catalog.dart';
 import 'package:menu_listo/core/utils/portion_calculator.dart';
+import 'package:menu_listo/core/widgets/feature_guide_dialog.dart';
 import '../providers/shopping_provider.dart';
 
 class SupermarketModeScreen extends ConsumerStatefulWidget {
@@ -18,6 +19,47 @@ class _SupermarketModeScreenState extends ConsumerState<SupermarketModeScreen> {
   void initState() {
     super.initState();
     WakelockPlus.enable();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkFirstTimeGuide());
+  }
+
+  Future<void> _checkFirstTimeGuide() async {
+    final strings = AppStrings.of(context);
+    await FeatureGuideDialog.showIfFirstTime(
+      context: context,
+      prefKey: 'has_seen_guide_supermarket',
+      headerIcon: Icons.shopping_cart_checkout,
+      headerColor: Colors.deepOrange,
+      title: strings.isSpanish ? '¡Bienvenido al Modo Súper!' : 'Welcome to Supermarket Mode!',
+      subtitle: strings.isSpanish
+          ? 'Tu asistente de compras en tienda: rápido, claro y sin bloqueos.'
+          : 'Your in-store shopping assistant: fast, clear, and distraction-free.',
+      features: [
+        FeatureGuideItem(
+          icon: Icons.touch_app_outlined,
+          iconColor: Colors.green,
+          title: strings.isSpanish ? 'Tachado con 1 Toque' : '1-Tap Strike-Through',
+          description: strings.isSpanish
+              ? 'Toca cualquier producto para marcarlo como comprado y enviarlo al final de la lista con vibración suave.'
+              : 'Tap any product to mark it as purchased and move it to the bottom with gentle haptic feedback.',
+        ),
+        FeatureGuideItem(
+          icon: Icons.lightbulb_outline,
+          iconColor: Colors.amber,
+          title: strings.isSpanish ? 'Pantalla Siempre Encendida' : 'Screen Always On',
+          description: strings.isSpanish
+              ? 'El teléfono no se apagará mientras recorres las góndolas para que no tengas que desbloquearlo constantemente.'
+              : 'Your phone screen will stay on while walking through the aisles so you never have to unlock it.',
+        ),
+        FeatureGuideItem(
+          icon: Icons.format_size_rounded,
+          iconColor: Colors.blueAccent,
+          title: strings.isSpanish ? 'Tipografía de Alto Contraste' : 'High-Contrast Typography',
+          description: strings.isSpanish
+              ? 'Diseñado con letras grandes e iconos claros para leer fácilmente con el celular en una mano o en el carrito.'
+              : 'Designed with large text and clear emojis for easy one-handed reading in the store.',
+        ),
+      ],
+    );
   }
 
   @override

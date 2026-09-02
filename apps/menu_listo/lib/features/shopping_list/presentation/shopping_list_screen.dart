@@ -4,6 +4,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:menu_listo/core/localization/app_localizations.dart';
 import 'package:menu_listo/core/utils/culinary_catalog.dart';
 import 'package:menu_listo/core/widgets/empty_state_view.dart';
+import 'package:menu_listo/core/widgets/feature_guide_dialog.dart';
 import '../models/shopping_item_model.dart';
 import '../providers/shopping_provider.dart';
 import 'supermarket_mode_screen.dart';
@@ -19,6 +20,52 @@ class ShoppingListScreen extends ConsumerStatefulWidget {
 
 class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
   bool _isCategorizedView = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkFirstTimeGuide());
+  }
+
+  Future<void> _checkFirstTimeGuide() async {
+    final strings = AppStrings.of(context);
+    await FeatureGuideDialog.showIfFirstTime(
+      context: context,
+      prefKey: 'has_seen_guide_shopping',
+      headerIcon: Icons.shopping_cart_rounded,
+      headerColor: Colors.teal,
+      title: strings.isSpanish ? '¡Tu Lista de Compras Inteligente!' : 'Your Smart Shopping List!',
+      subtitle: strings.isSpanish
+          ? 'Todo lo que necesitas comprar organizado automáticamente.'
+          : 'Everything you need to buy organized automatically.',
+      features: [
+        FeatureGuideItem(
+          icon: Icons.sync_alt_rounded,
+          iconColor: Colors.green,
+          title: strings.isSpanish ? 'Generación desde la Agenda' : 'Generate from Planner',
+          description: strings.isSpanish
+              ? 'Toca el botón "Generar desde el Menú Semanal" para traer todos los ingredientes y sumar cantidades repetidas.'
+              : 'Tap "Generate from Weekly Plan" to import ingredients and consolidate duplicates.',
+        ),
+        FeatureGuideItem(
+          icon: Icons.shopping_cart_checkout,
+          iconColor: Colors.deepOrangeAccent,
+          title: strings.isSpanish ? 'Modo Súper para Comprar' : 'Supermarket Mode',
+          description: strings.isSpanish
+              ? 'Cuando vayas al supermercado, toca el icono del carrito arriba para abrir la vista enfocada con letra grande y pantalla encendida.'
+              : 'When shopping, tap the cart icon on top for a distraction-free, large-text checklist.',
+        ),
+        FeatureGuideItem(
+          icon: Icons.category_outlined,
+          iconColor: Colors.indigoAccent,
+          title: strings.isSpanish ? 'Organizado por Góndolas' : 'Aisle Categorization',
+          description: strings.isSpanish
+              ? 'Los productos se dividen en Verdulería, Carnicería, Lácteos, Almacén y más para ahorrarte vueltas.'
+              : 'Items are sorted into Produce, Meat, Dairy, and Pantry aisles to save you walking back and forth.',
+        ),
+      ],
+    );
+  }
 
   void _showPantryReviewModal(BuildContext context, List<ShoppingItem> items) {
     final theme = Theme.of(context);

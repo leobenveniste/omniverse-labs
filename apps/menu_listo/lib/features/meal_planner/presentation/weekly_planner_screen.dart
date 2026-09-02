@@ -2,16 +2,68 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:menu_listo/core/localization/app_localizations.dart';
+import 'package:menu_listo/core/widgets/feature_guide_dialog.dart';
 import '../models/meal_plan_model.dart';
 import '../providers/meal_planner_provider.dart';
 import 'widgets/meal_slot_card.dart';
 import 'widgets/recipe_picker_sheet.dart';
 
-class WeeklyPlannerScreen extends ConsumerWidget {
+class WeeklyPlannerScreen extends ConsumerStatefulWidget {
   const WeeklyPlannerScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<WeeklyPlannerScreen> createState() => _WeeklyPlannerScreenState();
+}
+
+class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkFirstTimeGuide());
+  }
+
+  Future<void> _checkFirstTimeGuide() async {
+    final strings = AppStrings.of(context);
+    await FeatureGuideDialog.showIfFirstTime(
+      context: context,
+      prefKey: 'has_seen_guide_planner',
+      headerIcon: Icons.calendar_month_rounded,
+      headerColor: Colors.deepOrangeAccent,
+      title: strings.isSpanish ? '¡Bienvenido a tu Agenda Semanal!' : 'Welcome to your Meal Planner!',
+      subtitle: strings.isSpanish
+          ? 'Organiza tus comidas de la semana y ahorra tiempo y dinero.'
+          : 'Plan your meals for the week and save time and money.',
+      features: [
+        FeatureGuideItem(
+          icon: Icons.grid_view_rounded,
+          iconColor: Colors.orange,
+          title: strings.isSpanish ? 'Planificación por Momentos' : 'Slot Planning',
+          description: strings.isSpanish
+              ? 'Toca cualquier momento (Desayuno, Almuerzo, Merienda, Cena) para asignar una receta o comida libre.'
+              : 'Tap any slot (Breakfast, Lunch, Snack, Dinner) to schedule a recipe or custom meal.',
+        ),
+        FeatureGuideItem(
+          icon: Icons.bookmarks_outlined,
+          iconColor: Colors.purpleAccent,
+          title: strings.isSpanish ? 'Plantillas de Menú' : 'Menu Templates',
+          description: strings.isSpanish
+              ? 'Usa el botón de marcadores arriba para guardar semanas exitosas y reutilizarlas con un toque.'
+              : 'Use the bookmarks button on top to save your best weeks and reuse them anytime.',
+        ),
+        FeatureGuideItem(
+          icon: Icons.shopping_cart_outlined,
+          iconColor: Colors.green,
+          title: strings.isSpanish ? 'Lista de Compras Automática' : 'Automatic Grocery List',
+          description: strings.isSpanish
+              ? 'Ve a la pestaña de Lista de Compras para consolidar todos los ingredientes de la semana al instante.'
+              : 'Go to the Shopping List tab to automatically consolidate all weekly ingredients.',
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final strings = AppStrings.of(context);
     final weekStart = ref.watch(currentWeekStartProvider);

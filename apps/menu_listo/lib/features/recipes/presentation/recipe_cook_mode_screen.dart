@@ -7,6 +7,7 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:menu_listo/core/localization/app_localizations.dart';
 import 'package:menu_listo/core/utils/culinary_catalog.dart';
 import 'package:menu_listo/core/utils/portion_calculator.dart';
+import 'package:menu_listo/core/widgets/feature_guide_dialog.dart';
 import '../../premium/presentation/paywall_sheet.dart';
 import '../../premium/providers/premium_provider.dart';
 import '../models/recipe_model.dart';
@@ -56,6 +57,47 @@ class _RecipeCookModeScreenState extends ConsumerState<RecipeCookModeScreen> {
     _servings = widget.initialServings;
     WakelockPlus.enable();
     _initTimerForCurrentStep();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkFirstTimeGuide());
+  }
+
+  Future<void> _checkFirstTimeGuide() async {
+    final strings = AppStrings.of(context);
+    await FeatureGuideDialog.showIfFirstTime(
+      context: context,
+      prefKey: 'has_seen_guide_cook_mode',
+      headerIcon: Icons.soup_kitchen_rounded,
+      headerColor: Colors.orangeAccent,
+      title: strings.isSpanish ? '¡Bienvenido al Modo Cocina!' : 'Welcome to Cook Mode!',
+      subtitle: strings.isSpanish
+          ? 'Cocina cómodamente paso a paso con letra grande y manos libres.'
+          : 'Cook comfortably step by step with large text and hands-free control.',
+      features: [
+        FeatureGuideItem(
+          icon: Icons.pan_tool_outlined,
+          iconColor: Colors.green,
+          title: strings.isSpanish ? 'Control Manos Libres por Gestos' : 'Hands-Free Gesture Control',
+          description: strings.isSpanish
+              ? 'Toca el botón de la mano arriba para activar la cámara: pasa la mano de derecha a izquierda para avanzar de paso, y al revés para retroceder sin manchar la pantalla.'
+              : 'Tap the hand icon on top to activate the camera: wave right-to-left for next step, and left-to-right for previous step without touching your screen.',
+        ),
+        FeatureGuideItem(
+          icon: Icons.timer_outlined,
+          iconColor: Colors.blueAccent,
+          title: strings.isSpanish ? 'Temporizadores Inteligentes' : 'Smart Step Timers',
+          description: strings.isSpanish
+              ? 'Si un paso requiere tiempo (ej. 15 minutos), el temporizador se configura automáticamente.'
+              : 'If a step has a cooking duration (e.g. 15 minutes), the timer configures automatically.',
+        ),
+        FeatureGuideItem(
+          icon: Icons.people_outline_rounded,
+          iconColor: Colors.purpleAccent,
+          title: strings.isSpanish ? 'Ajuste de Porciones en Vivo' : 'Live Portion Scaling',
+          description: strings.isSpanish
+              ? 'Usa los botones + y - para ajustar comensales y los ingredientes se recalculan al instante.'
+              : 'Use + and - buttons to adjust servings and ingredients will scale on the fly.',
+        ),
+      ],
+    );
   }
 
   @override
