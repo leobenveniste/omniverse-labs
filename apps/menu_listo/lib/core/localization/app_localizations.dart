@@ -251,4 +251,14 @@ class AppStrings {
   String get aboutApp => isSpanish ? 'Acerca de Menú Listo' : 'About Menú Listo';
   String get privacyPolicy => isSpanish ? 'Política de Privacidad' : 'Privacy Policy';
   String get version => isSpanish ? 'Versión' : 'Version';
+
+  // Testing & QA Mode
+  String get testingSectionTitle => isSpanish ? 'Modo de Pruebas (Testing)' : 'Testing & QA Mode';
+  String get testProToggleTitle => isSpanish ? 'Versión Pro de Prueba' : 'Test Pro Version';
+  String get testProToggleSubtitle => isSpanish
+      ? 'Alternar entre Pro y Gratuito para validar límites de recetas y modo manos libres'
+      : 'Toggle between Pro and Free to test recipe limits and hands-free mode';
+  String get testProActivated => isSpanish ? '✨ Menú Listo Pro activado en modo de pruebas' : '✨ Menú Listo Pro activated for testing';
+  String get testProDeactivated => isSpanish ? 'Modo gratuito restablecido' : 'Free mode restored';
+  String get activateTestPro => isSpanish ? '🧪 Activar versión Pro de prueba' : '🧪 Activate Test Pro Version';
 }

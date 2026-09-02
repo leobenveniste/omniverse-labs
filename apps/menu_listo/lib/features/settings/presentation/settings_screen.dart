@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:menu_listo/core/localization/app_localizations.dart';
 import 'package:menu_listo/core/localization/locale_provider.dart';
@@ -50,7 +51,7 @@ class SettingsScreen extends ConsumerWidget {
               color: Colors.transparent,
               child: InkWell(
                 borderRadius: BorderRadius.circular(20),
-                onTap: premiumState.isProUser ? null : () => PaywallSheet.show(context),
+                onTap: () => PaywallSheet.show(context),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   child: Row(
@@ -285,7 +286,109 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
-          // 5. About Screen
+          // 5. Testing & QA Mode
+          Text(
+            strings.testingSectionTitle,
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            clipBehavior: Clip.antiAlias,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(
+                color: premiumState.isProUser
+                    ? Colors.amber.shade600.withValues(alpha: 0.5)
+                    : theme.colorScheme.outline.withValues(alpha: 0.2),
+                width: 1,
+              ),
+            ),
+            child: SwitchListTile.adaptive(
+              secondary: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: premiumState.isProUser
+                      ? Colors.amber.withValues(alpha: 0.2)
+                      : theme.colorScheme.surfaceContainerHighest,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.science_rounded,
+                  color: premiumState.isProUser ? Colors.amber.shade800 : theme.colorScheme.primary,
+                  size: 22,
+                ),
+              ),
+              title: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      strings.testProToggleTitle,
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: premiumState.isProUser ? Colors.amber.shade700 : theme.colorScheme.outlineVariant,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      premiumState.isProUser ? 'PRO' : 'FREE',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        color: premiumState.isProUser ? Colors.white : theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              subtitle: Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(
+                  strings.testProToggleSubtitle,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              value: premiumState.isProUser,
+              activeTrackColor: Colors.amber.shade600,
+              activeThumbColor: Colors.amber.shade900,
+              onChanged: (bool value) async {
+                HapticFeedback.mediumImpact();
+                await ref.read(premiumProvider.notifier).setProUser(value);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      duration: const Duration(seconds: 2),
+                      backgroundColor: value ? Colors.green.shade700 : Colors.blueGrey.shade800,
+                      content: Row(
+                        children: [
+                          Icon(
+                            value ? Icons.stars_rounded : Icons.info_outline,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              value ? strings.testProActivated : strings.testProDeactivated,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // 6. About Screen
           Card(
             child: ListTile(
               leading: const Icon(Icons.info_outline_rounded),

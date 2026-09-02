@@ -190,12 +190,14 @@ class PaywallSheet extends ConsumerWidget {
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.lock_open_rounded, size: 20),
+                        Icon(premiumState.isProUser ? Icons.stars_rounded : Icons.lock_open_rounded, size: 20),
                         const SizedBox(width: 10),
                         Text(
-                          strings.isSpanish
-                              ? 'Desbloquear Pro por $priceText'
-                              : 'Unlock Pro for $priceText',
+                          premiumState.isProUser
+                              ? (strings.isSpanish ? '¡Ya eres usuario Pro!' : 'You already have Pro!')
+                              : (strings.isSpanish
+                                  ? 'Desbloquear Pro por $priceText'
+                                  : 'Unlock Pro for $priceText'),
                           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ],
@@ -230,6 +232,55 @@ class PaywallSheet extends ConsumerWidget {
               style: TextStyle(
                 color: theme.colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+
+          // Testing Mode Toggle Button
+          TextButton.icon(
+            onPressed: () async {
+              HapticFeedback.mediumImpact();
+              final isCurrentlyPro = premiumState.isProUser;
+              await ref.read(premiumProvider.notifier).setProUser(!isCurrentlyPro);
+              if (context.mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    backgroundColor: !isCurrentlyPro ? Colors.green.shade700 : Colors.blueGrey.shade800,
+                    content: Row(
+                      children: [
+                        Icon(
+                          !isCurrentlyPro ? Icons.stars_rounded : Icons.info_outline,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            !isCurrentlyPro ? strings.testProActivated : strings.testProDeactivated,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+            },
+            icon: Icon(
+              Icons.science_outlined,
+              size: 16,
+              color: theme.colorScheme.tertiary,
+            ),
+            label: Text(
+              premiumState.isProUser
+                  ? (strings.isSpanish ? '🧪 Desactivar Pro (Testing)' : '🧪 Disable Pro (Testing)')
+                  : strings.activateTestPro,
+              style: TextStyle(
+                color: theme.colorScheme.tertiary,
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
               ),
             ),
           ),

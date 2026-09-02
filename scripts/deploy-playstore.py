@@ -43,7 +43,7 @@ def get_oauth_service():
 
     return build("androidpublisher", "v3", credentials=creds, cache_discovery=False)
 
-def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal"):
+def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal,beta", release_name: str = None, notes_es: str = None, notes_en: str = None):
     print("============================================================")
     print("   Omniverse Labs - Google Play API Direct Uploader         ")
     print("============================================================")
@@ -137,6 +137,10 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
         version_code = response["versionCode"]
         print(f"Bundle Uploaded Successfully! (Version Code: {version_code})")
 
+        rel_name = release_name or f"1.1.7 (Build {version_code})"
+        rel_notes_es = notes_es or "Modo de pruebas para versión Pro en Ajustes y Paywall. Mejoras en la validación de funciones avanzadas y modo cocina."
+        rel_notes_en = notes_en or "In-app testing mode for Pro version in Settings and Paywall. Enhanced testing controls for advanced features and cook mode."
+
         # Deploy to specified track(s)
         tracks_to_deploy = [t.strip() for t in track.split(",") if t.strip()]
         for t in tracks_to_deploy:
@@ -145,17 +149,17 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
                 "track": t,
                 "releases": [
                     {
-                        "name": f"1.1.3 (Build {version_code})",
+                        "name": rel_name,
                         "versionCodes": [str(version_code)],
                         "status": "completed",
                         "releaseNotes": [
                             {
                                 "language": "es-419",
-                                "text": "Guías de bienvenida interactivas al ingresar por primera vez a cada sección (Agenda, Modo Cocina, Lista de Compras, Modo Súper). Recetas precargadas aseguradas, plantillas de menú en la agenda, autocompletado sin distinción de tildes y mejoras de interfaz."
+                                "text": rel_notes_es
                             },
                             {
                                 "language": "en-US",
-                                "text": "Interactive contextual welcome guides for first-time visits (Planner, Cook Mode, Shopping List, Supermarket Mode). Guaranteed starter recipes on fresh install, weekly menu templates, accent-insensitive autocomplete, and UI polish."
+                                "text": rel_notes_en
                             }
                         ]
                     }
@@ -185,10 +189,20 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--package", default="com.omniverselabs.menu_listo")
     parser.add_argument("--aab", default=r"apps/menu_listo/build/app/outputs/bundle/release/app-release.aab")
-    parser.add_argument("--track", default="internal,alpha")
+    parser.add_argument("--track", default="internal,beta")
+    parser.add_argument("--name", default=None)
+    parser.add_argument("--notes-es", default=None)
+    parser.add_argument("--notes-en", default=None)
     args = parser.parse_args()
 
-    deploy_to_playstore(args.package, args.aab, args.track)
+    deploy_to_playstore(
+        package_name=args.package,
+        aab_path=args.aab,
+        track=args.track,
+        release_name=args.name,
+        notes_es=args.notes_es,
+        notes_en=args.notes_en,
+    )
 
 if __name__ == "__main__":
     main()
