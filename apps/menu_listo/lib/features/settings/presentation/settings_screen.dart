@@ -5,7 +5,6 @@ import 'package:menu_listo/core/localization/app_localizations.dart';
 import 'package:menu_listo/core/localization/locale_provider.dart';
 import 'package:menu_listo/core/theme/app_colors.dart';
 import 'package:menu_listo/core/theme/app_theme_types.dart';
-import 'package:menu_listo/core/theme/icon_style_provider.dart';
 import 'package:menu_listo/core/theme/theme_provider.dart';
 import '../../backup/services/backup_service.dart';
 import '../../premium/presentation/paywall_sheet.dart';
@@ -187,34 +186,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
-          // 3. Icon Style (Emojis vs Icons)
-          Text(
-            strings.isSpanish ? 'Estilo de Iconos' : 'Icon Style',
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-          SegmentedButton<AppIconStyle>(
-            style: SegmentedButton.styleFrom(
-              visualDensity: VisualDensity.compact,
-            ),
-            segments: [
-              ButtonSegment(
-                value: AppIconStyle.emojis,
-                label: Text(strings.isSpanish ? '✨ Emojis' : '✨ Emojis', style: const TextStyle(fontSize: 13)),
-              ),
-              ButtonSegment(
-                value: AppIconStyle.icons,
-                label: Text(strings.isSpanish ? '📱 Iconos' : '📱 Icons', style: const TextStyle(fontSize: 13)),
-              ),
-            ],
-            selected: {ref.watch(iconStyleProvider)},
-            onSelectionChanged: (newSelection) {
-              ref.read(iconStyleProvider.notifier).setIconStyle(newSelection.first);
-            },
-          ),
-          const SizedBox(height: 24),
-
-          // 4. Language Selector
+          // 3. Language Selector
           Text(
             strings.languageTitle,
             style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),

@@ -38,6 +38,8 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
 
   List<Ingredient> _parsedIngredients = [];
   List<RecipeStep> _parsedSteps = [];
+  bool _showIngredientsPreview = false;
+  bool _showStepsPreview = false;
 
   final List<String> _categories = [
     'Desayuno',
@@ -174,18 +176,6 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
     setState(() {
       _parsedSteps = parsed;
     });
-  }
-
-  void _insertNextStepNumber() {
-    final currentText = _stepsTextController.text;
-    final nextNumber = _parsedSteps.where((s) => !s.isSectionHeader).length + 1;
-    final prefix = currentText.isEmpty || currentText.endsWith('\n') ? '' : '\n\n';
-    final addition = '$prefix$nextNumber. ';
-
-    _stepsTextController.text = '$currentText$addition';
-    _stepsTextController.selection = TextSelection.fromPosition(
-      TextPosition(offset: _stepsTextController.text.length),
-    );
   }
 
   Future<void> _pickImage(ImageSource source) async {
@@ -434,7 +424,7 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
             ),
             const SizedBox(height: 14),
 
-            // Compact 3-Column Metrics (Prep, Cook, Servings)
+            // 2-Row Spacious Metrics (Prep, Cook, Servings) - Prevents Label Cutoff
             Row(
               children: [
                 Expanded(
@@ -442,40 +432,38 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
                     controller: _prepTimeController,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.timer_outlined, size: 18),
+                      prefixIcon: const Icon(Icons.timer_outlined, size: 20),
                       labelText: strings.prepLabel,
                       hintText: '15',
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                     ),
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 12),
                 Expanded(
                   child: TextFormField(
                     controller: _cookTimeController,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.soup_kitchen_outlined, size: 18),
+                      prefixIcon: const Icon(Icons.soup_kitchen_outlined, size: 20),
                       labelText: strings.cookLabel,
                       hintText: '25',
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: TextFormField(
-                    controller: _servingsController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.people_outline, size: 18),
-                      labelText: strings.servingsLabel,
-                      hintText: '4',
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                     ),
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _servingsController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                prefixIcon: const Icon(Icons.people_outline, size: 20),
+                labelText: strings.baseServingsLabel,
+                hintText: '4',
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+              ),
             ),
             const SizedBox(height: 28),
 
@@ -490,18 +478,42 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
                 ),
                 const Spacer(),
                 if (_parsedIngredients.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '${_parsedIngredients.length} ${strings.ingredientsDetected}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.onPrimaryContainer,
+                  InkWell(
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      setState(() => _showIngredientsPreview = !_showIngredientsPreview);
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: _showIngredientsPreview
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '${_parsedIngredients.length} ${strings.ingredientsDetected}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: _showIngredientsPreview
+                                  ? theme.colorScheme.onPrimary
+                                  : theme.colorScheme.onPrimaryContainer,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            _showIngredientsPreview ? Icons.expand_less : Icons.expand_more,
+                            size: 16,
+                            color: _showIngredientsPreview
+                                ? theme.colorScheme.onPrimary
+                                : theme.colorScheme.onPrimaryContainer,
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -523,8 +535,8 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
             ),
             const SizedBox(height: 10),
 
-            // Live Ingredients Preview Chips
-            if (_parsedIngredients.isNotEmpty)
+            // Live Ingredients Preview Chips (Foldable behind detected tag)
+            if (_showIngredientsPreview && _parsedIngredients.isNotEmpty)
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -621,18 +633,42 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
                 ),
                 const Spacer(),
                 if (_parsedSteps.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '${_parsedSteps.where((s) => !s.isSectionHeader).length} ${strings.stepsDetected}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.onPrimaryContainer,
+                  InkWell(
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      setState(() => _showStepsPreview = !_showStepsPreview);
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: _showStepsPreview
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.primaryContainer,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            '${_parsedSteps.where((s) => !s.isSectionHeader).length} ${strings.stepsDetected}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: _showStepsPreview
+                                  ? theme.colorScheme.onPrimary
+                                  : theme.colorScheme.onPrimaryContainer,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            _showStepsPreview ? Icons.expand_less : Icons.expand_more,
+                            size: 16,
+                            color: _showStepsPreview
+                                ? theme.colorScheme.onPrimary
+                                : theme.colorScheme.onPrimaryContainer,
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -652,24 +688,10 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
               ),
             ),
-            const SizedBox(height: 8),
-
-            // Helper button: Insert next step
-            Align(
-              alignment: Alignment.centerLeft,
-              child: OutlinedButton.icon(
-                onPressed: _insertNextStepNumber,
-                icon: const Icon(Icons.add_circle_outline, size: 18),
-                label: Text(strings.insertNextStep),
-                style: OutlinedButton.styleFrom(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-            ),
             const SizedBox(height: 10),
 
-            // Live Steps Preview
-            if (_parsedSteps.isNotEmpty)
+            // Live Steps Preview (Foldable behind detected tag)
+            if (_showStepsPreview && _parsedSteps.isNotEmpty)
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(

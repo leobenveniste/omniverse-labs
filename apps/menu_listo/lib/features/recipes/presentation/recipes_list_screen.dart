@@ -360,7 +360,7 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 1.06,
+        childAspectRatio: 1.08,
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
       ),
@@ -386,6 +386,8 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
       borderRadius: BorderRadius.circular(16),
       child: Card(
         clipBehavior: Clip.antiAlias,
+        elevation: 2,
+        shadowColor: Colors.black.withValues(alpha: 0.15),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -411,31 +413,60 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                           ),
                   ),
                 ),
-                // Time Tag Overlay on Image
+                // Time & Meal Time Tags Overlay on Image
                 Positioned(
-                  bottom: 5,
+                  bottom: 6,
                   left: 6,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.7),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.schedule_rounded, size: 11, color: Colors.white),
-                        const SizedBox(width: 3),
-                        Text(
-                          '${recipe.totalTimeMinutes}m',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
+                  right: 36,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Time Tag
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.75),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.schedule_rounded, size: 11, color: Colors.white),
+                            const SizedBox(width: 3),
+                            Text(
+                              '${recipe.totalTimeMinutes}m',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      // Meal Time Tag (displays entire word without fading)
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.75),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            recipe.category,
+                            softWrap: false,
+                            maxLines: 1,
+                            overflow: TextOverflow.clip,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
                 // Favorite Button Overlay
@@ -462,38 +493,16 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(10, 6, 10, 6),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    recipe.title,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 13,
-                      height: 1.2,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 3),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Text(
-                      recipe.category,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 10,
-                      ),
-                    ),
-                  ),
-                ],
+              padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+              child: Text(
+                recipe.title,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 13,
+                  height: 1.2,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -527,59 +536,34 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
       },
       borderRadius: BorderRadius.circular(12),
       child: Card(
+        elevation: 2,
+        shadowColor: Colors.black.withValues(alpha: 0.12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           child: Row(
             children: [
-              Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                      width: 54,
-                      height: 54,
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      child: Hero(
-                        tag: 'recipe_image_${recipe.id}',
-                        child: recipe.imageUrl.isNotEmpty
-                            ? (recipe.imageUrl.startsWith('http')
-                                ? Image.network(recipe.imageUrl, cacheWidth: 300, fit: BoxFit.cover)
-                                : Image.file(File(recipe.imageUrl), cacheWidth: 300, fit: BoxFit.cover))
-                            : Center(
-                                child: Icon(
-                                  Icons.restaurant_menu_rounded,
-                                  size: 24,
-                                  color: theme.colorScheme.primary.withValues(alpha: 0.3),
-                                ),
-                              ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 2,
-                    left: 2,
-                    right: 2,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.75),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.schedule_rounded, size: 9, color: Colors.white),
-                          const SizedBox(width: 2),
-                          Text(
-                            '${recipe.totalTimeMinutes}m',
-                            style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  width: 52,
+                  height: 52,
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  child: Hero(
+                    tag: 'recipe_image_${recipe.id}',
+                    child: recipe.imageUrl.isNotEmpty
+                        ? (recipe.imageUrl.startsWith('http')
+                            ? Image.network(recipe.imageUrl, cacheWidth: 300, fit: BoxFit.cover)
+                            : Image.file(File(recipe.imageUrl), cacheWidth: 300, fit: BoxFit.cover))
+                        : Center(
+                            child: Icon(
+                              Icons.restaurant_menu_rounded,
+                              size: 24,
+                              color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                            ),
                           ),
-                        ],
-                      ),
-                    ),
                   ),
-                ],
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -596,21 +580,53 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 3),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Text(
-                        recipe.category,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 10,
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        // Time Tag
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.schedule_rounded, size: 11, color: theme.colorScheme.onSurfaceVariant),
+                              const SizedBox(width: 3),
+                              Text(
+                                '${recipe.totalTimeMinutes}m',
+                                style: TextStyle(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 6),
+                        // Meal Time Tag
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primaryContainer.withValues(alpha: 0.7),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Text(
+                            recipe.category,
+                            softWrap: false,
+                            maxLines: 1,
+                            overflow: TextOverflow.clip,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

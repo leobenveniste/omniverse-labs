@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/localization/app_localizations.dart';
-import 'core/theme/icon_style_provider.dart';
 import 'features/recipes/presentation/recipes_list_screen.dart';
 import 'features/recipes/presentation/widgets/recipe_creation_options_sheet.dart';
 import 'features/meal_planner/presentation/weekly_planner_screen.dart';
@@ -186,10 +185,8 @@ class _AppShellState extends ConsumerState<AppShell> {
                             ),
                           ],
                         ),
-                        child: Center(
-                          child: ref.watch(iconStyleProvider) == AppIconStyle.emojis
-                              ? const Text('➕', style: TextStyle(fontSize: 24))
-                              : const Icon(Icons.add_rounded, color: Colors.white, size: 32),
+                        child: const Center(
+                          child: Icon(Icons.add_rounded, color: Colors.white, size: 32),
                         ),
                       ),
                     ),
@@ -214,7 +211,6 @@ class _AppShellState extends ConsumerState<AppShell> {
     final isSelected = _currentIndex == index;
     final primaryColor = theme.colorScheme.primary;
     final unselectedColor = theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6);
-    final useEmojis = ref.watch(iconStyleProvider) == AppIconStyle.emojis;
 
     return InkWell(
       onTap: () {
@@ -244,18 +240,11 @@ class _AppShellState extends ConsumerState<AppShell> {
               scale: isSelected ? 1.18 : 1.0,
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeOutBack,
-              child: useEmojis
-                  ? Text(
-                      emoji,
-                      style: TextStyle(
-                        fontSize: isSelected ? 24 : 20,
-                      ),
-                    )
-                  : Icon(
-                      isSelected ? activeIcon : icon,
-                      size: 26,
-                      color: isSelected ? primaryColor : unselectedColor,
-                    ),
+              child: Icon(
+                isSelected ? activeIcon : icon,
+                size: 26,
+                color: isSelected ? primaryColor : unselectedColor,
+              ),
             ),
           ),
         ),
