@@ -360,7 +360,7 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 0.82,
+        childAspectRatio: 1.06,
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
       ),
