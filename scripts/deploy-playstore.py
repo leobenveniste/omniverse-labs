@@ -189,7 +189,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--package", default="com.omniverselabs.menu_listo")
     parser.add_argument("--aab", default=r"apps/menu_listo/build/app/outputs/bundle/release/app-release.aab")
-    parser.add_argument("--track", default="beta")
+    parser.add_argument("--track", default="internal")
     parser.add_argument("--name", default=None)
     parser.add_argument("--notes-es", default=None)
     parser.add_argument("--notes-en", default=None)
