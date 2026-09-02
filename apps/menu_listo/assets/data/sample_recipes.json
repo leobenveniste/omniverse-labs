@@ -15,7 +15,7 @@
       "Gourmet"
     ],
     "imageUrl": "https://images.unsplash.com/photo-1633964913295-ceb43826e7c9?w=800&auto=format&fit=crop",
-    "isFavorite": 1,
+    "isFavorite": 0,
     "ingredients": [
       {
         "amount": 320.0,
@@ -127,7 +127,7 @@
       "Rápido"
     ],
     "imageUrl": "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&auto=format&fit=crop",
-    "isFavorite": 1,
+    "isFavorite": 0,
     "ingredients": [
       {
         "amount": 160.0,
@@ -304,7 +304,7 @@
       "Rápido"
     ],
     "imageUrl": "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=800&auto=format&fit=crop",
-    "isFavorite": 1,
+    "isFavorite": 0,
     "ingredients": [
       {
         "amount": 400.0,
@@ -395,7 +395,7 @@
       "Gourmet"
     ],
     "imageUrl": "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=800&auto=format&fit=crop",
-    "isFavorite": 1,
+    "isFavorite": 0,
     "ingredients": [
       {
         "amount": 600.0,
@@ -679,7 +679,7 @@
       "Amigos"
     ],
     "imageUrl": "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&auto=format&fit=crop",
-    "isFavorite": 1,
+    "isFavorite": 0,
     "ingredients": [
       {
         "amount": 500.0,
@@ -855,7 +855,7 @@
       "Saludable"
     ],
     "imageUrl": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&auto=format&fit=crop",
-    "isFavorite": 1,
+    "isFavorite": 0,
     "ingredients": [
       {
         "amount": 400.0,

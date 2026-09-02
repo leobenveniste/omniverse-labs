@@ -328,29 +328,58 @@ class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
   }
 
   void _confirmCopyPreviousWeek(BuildContext context, WeeklyMealPlanNotifier notifier) {
+    final theme = Theme.of(context);
     final strings = AppStrings.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(strings.isSpanish ? 'Repetir semana anterior' : 'Repeat previous week'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.blue.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: const Text('🗓️', style: TextStyle(fontSize: 22)),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                strings.isSpanish ? 'Repetir semana anterior' : 'Repeat previous week',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+              ),
+            ),
+          ],
+        ),
         content: Text(
           strings.isSpanish
               ? '¿Deseas copiar todas las comidas planificadas de la semana pasada en la semana actual?'
               : 'Do you want to copy all planned meals from last week into this week?',
+          style: theme.textTheme.bodyMedium?.copyWith(height: 1.4),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text(strings.cancel)),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(strings.cancel),
+          ),
           FilledButton(
+            style: FilledButton.styleFrom(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
             onPressed: () async {
               Navigator.of(ctx).pop();
               final count = await notifier.copyPreviousWeek();
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
+                    backgroundColor: theme.colorScheme.primary,
                     content: Text(
                       count > 0
-                          ? (strings.isSpanish ? 'Se copiaron $count comidas con éxito' : 'Copied $count meals successfully')
+                          ? (strings.isSpanish ? '✨ ¡Se copiaron $count comidas con éxito!' : '✨ Copied $count meals successfully!')
                           : (strings.isSpanish ? 'No se encontraron comidas en la semana anterior' : 'No meals found in previous week'),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                 );
@@ -364,15 +393,48 @@ class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
   }
 
   void _confirmFillRandom(BuildContext context, WeeklyMealPlanNotifier notifier) {
+    final theme = Theme.of(context);
     final strings = AppStrings.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(strings.fillRandom),
-        content: const Text('¿Deseas rellenar automáticamente los espacios vacíos con recetas de tu recetario?'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.amber.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
+              child: const Text('🎲', style: TextStyle(fontSize: 22)),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                strings.fillRandom,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          strings.isSpanish
+              ? '¿Deseas que Menú Listo rellene automáticamente los espacios vacíos con recetas de tu recetario?'
+              : 'Would you like Menú Listo to automatically fill empty slots with recipes from your book?',
+          style: theme.textTheme.bodyMedium?.copyWith(height: 1.4),
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text(strings.cancel)),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(strings.cancel),
+          ),
           FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.amber.shade700,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
             onPressed: () {
               Navigator.of(ctx).pop();
               notifier.fillRandomSlots();
@@ -385,20 +447,49 @@ class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
   }
 
   void _confirmClearWeek(BuildContext context, WeeklyMealPlanNotifier notifier) {
+    final theme = Theme.of(context);
     final strings = AppStrings.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(strings.clearWeek),
-        content: Text(strings.clearWeekConfirm),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.redAccent.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: const Text('🧹', style: TextStyle(fontSize: 22)),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                strings.clearWeek,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          strings.clearWeekConfirm,
+          style: theme.textTheme.bodyMedium?.copyWith(height: 1.4),
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text(strings.cancel)),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(strings.cancel),
+          ),
           FilledButton(
             onPressed: () {
               Navigator.of(ctx).pop();
               notifier.clearCurrentWeek();
             },
-            style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
             child: Text(strings.clearAll),
           ),
         ],
@@ -614,13 +705,33 @@ class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
     List<MealPlanItem> weekItems,
     List<String> currentWeekDateStrings,
   ) {
+    final theme = Theme.of(context);
     final strings = AppStrings.of(context);
     final ctrl = TextEditingController();
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(strings.isSpanish ? 'Guardar como Plantilla' : 'Save as Template'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.purpleAccent.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: const Text('📑', style: TextStyle(fontSize: 22)),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                strings.isSpanish ? 'Guardar como Plantilla' : 'Save as Template',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+              ),
+            ),
+          ],
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -629,14 +740,16 @@ class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
               strings.isSpanish
                   ? 'Ingresa un nombre descriptivo para esta semana:'
                   : 'Enter a descriptive name for this week:',
-              style: const TextStyle(fontSize: 13),
+              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: ctrl,
               autofocus: true,
               decoration: InputDecoration(
-                hintText: strings.isSpanish ? 'ej. Semana Express / Menú Ligero' : 'e.g. Quick Week / Healthy Menu',
+                filled: true,
+                hintText: strings.isSpanish ? 'ej. Menú Saludable / Semana Express' : 'e.g. Healthy Menu / Quick Week',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
               ),
             ),
           ],
@@ -644,6 +757,9 @@ class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text(strings.cancel)),
           FilledButton(
+            style: FilledButton.styleFrom(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
             onPressed: () async {
               final name = ctrl.text.trim();
               if (name.isNotEmpty) {
@@ -656,10 +772,12 @@ class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
+                      backgroundColor: theme.colorScheme.primary,
                       content: Text(
                         strings.isSpanish
-                            ? '¡Plantilla "$name" guardada con éxito!'
-                            : 'Template "$name" saved successfully!',
+                            ? '✨ ¡Plantilla "$name" guardada con éxito!'
+                            : '✨ Template "$name" saved successfully!',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                   );

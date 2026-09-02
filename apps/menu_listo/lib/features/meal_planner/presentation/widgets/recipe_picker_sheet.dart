@@ -68,24 +68,31 @@ class _RecipePickerSheetState extends ConsumerState<RecipePickerSheet> {
           builder: (context, setDialogState) {
             return AlertDialog(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-              title: Text(
-                title,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+              title: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('🍽️', style: TextStyle(fontSize: 32)),
+                  const SizedBox(height: 8),
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     strings.isSpanish
-                        ? '¿Cuántas porciones deseas planificar?'
+                        ? '¿Para cuántas porciones o comensales?'
                         : 'How many servings would you like to plan?',
                     textAlign: TextAlign.center,
                     style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 18),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
@@ -138,6 +145,9 @@ class _RecipePickerSheetState extends ConsumerState<RecipePickerSheet> {
                   child: Text(strings.cancel),
                 ),
                 FilledButton(
+                  style: FilledButton.styleFrom(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
                   onPressed: () {
                     Navigator.of(dialogCtx).pop();
                     onConfirm(servings);
@@ -170,25 +180,51 @@ class _RecipePickerSheetState extends ConsumerState<RecipePickerSheet> {
           children: [
             Center(
               child: Container(
-                width: 40,
-                height: 4,
+                width: 44,
+                height: 5,
                 decoration: BoxDecoration(
-                  color: Colors.grey.withValues(alpha: 0.4),
-                  borderRadius: BorderRadius.circular(2),
+                  color: Colors.grey.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(3),
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            Text(
-              '${strings.selectRecipeForSlot} ${widget.slotTitle}',
-              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Text('📖', style: TextStyle(fontSize: 22)),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        strings.selectRecipeForSlot,
+                        style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        widget.slotTitle,
+                        style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: strings.searchRecipes,
+                filled: true,
                 prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
                 suffixIcon: _query.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear),
@@ -215,10 +251,13 @@ class _RecipePickerSheetState extends ConsumerState<RecipePickerSheet> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(strings.emptyTitle),
+                          const Text('🍳', style: TextStyle(fontSize: 40)),
                           const SizedBox(height: 8),
+                          Text(strings.emptyTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 12),
                           if (_query.isNotEmpty)
-                            FilledButton.tonal(
+                            FilledButton.tonalIcon(
+                              icon: const Text('✨'),
                               onPressed: () {
                                 final customName = _searchController.text.trim();
                                 _showPortionDialog(
@@ -231,7 +270,7 @@ class _RecipePickerSheetState extends ConsumerState<RecipePickerSheet> {
                                   },
                                 );
                               },
-                              child: Text('Asignar "$_query" como comida personalizada'),
+                              label: Text('Asignar "$_query" como comida libre'),
                             ),
                         ],
                       ),
@@ -241,28 +280,43 @@ class _RecipePickerSheetState extends ConsumerState<RecipePickerSheet> {
                   return ListView.separated(
                     controller: scrollController,
                     itemCount: filtered.length,
-                    separatorBuilder: (_, _) => const Divider(height: 1),
+                    separatorBuilder: (_, _) => const SizedBox(height: 6),
                     itemBuilder: (context, index) {
                       final recipe = filtered[index];
-                      return ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: theme.colorScheme.primaryContainer,
-                          child: Icon(Icons.restaurant, color: theme.colorScheme.onPrimaryContainer, size: 20),
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surface,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
                         ),
-                        title: Text(recipe.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text('${recipe.category} • ${recipe.totalTimeMinutes} ${strings.minutes}'),
-                        trailing: Text('${recipe.baseServings} ${strings.persons}', style: theme.textTheme.labelSmall),
-                        onTap: () {
-                          _showPortionDialog(
-                            context: context,
-                            title: recipe.title,
-                            initialServings: recipe.baseServings,
-                            onConfirm: (servings) {
-                              Navigator.of(context).pop();
-                              widget.onRecipeSelected(recipe, servings);
-                            },
-                          );
-                        },
+                        child: ListTile(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          leading: CircleAvatar(
+                            backgroundColor: theme.colorScheme.primaryContainer,
+                            child: const Text('🍲', style: TextStyle(fontSize: 18)),
+                          ),
+                          title: Text(recipe.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                          subtitle: Text('${recipe.category} • ${recipe.totalTimeMinutes} ${strings.minutes}', style: const TextStyle(fontSize: 12)),
+                          trailing: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text('${recipe.baseServings} 👥', style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold)),
+                          ),
+                          onTap: () {
+                            _showPortionDialog(
+                              context: context,
+                              title: recipe.title,
+                              initialServings: recipe.baseServings,
+                              onConfirm: (servings) {
+                                Navigator.of(context).pop();
+                                widget.onRecipeSelected(recipe, servings);
+                              },
+                            );
+                          },
+                        ),
                       );
                     },
                   );

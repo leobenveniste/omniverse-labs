@@ -21,6 +21,7 @@ class RecipesListScreen extends ConsumerStatefulWidget {
 class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
   final TextEditingController _searchController = TextEditingController();
   bool _isGridView = true;
+  bool _isSearchOpen = false;
 
   final List<String> _categories = [
     'Todas',
@@ -62,13 +63,13 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
           children: [
             // Fixed Header Row
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+              padding: const EdgeInsets.fromLTRB(20, 14, 16, 4),
               child: Row(
                 children: [
                   // App Logo in Header
                   Container(
-                    width: 40,
-                    height: 40,
+                    width: 38,
+                    height: 38,
                     decoration: BoxDecoration(
                       color: theme.colorScheme.surface,
                       borderRadius: BorderRadius.circular(12),
@@ -80,7 +81,7 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                         ),
                       ],
                       border: Border.all(
-                        color: theme.colorScheme.outline.withValues(alpha: 0.5),
+                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
                         width: 1,
                       ),
                     ),
@@ -94,95 +95,105 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       strings.appTitle,
-                      style: theme.textTheme.headlineMedium?.copyWith(
+                      style: theme.textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.w900,
                         letterSpacing: -0.5,
                       ),
                     ),
                   ),
 
+                  // Search Toggle Button
+                  IconButton(
+                    tooltip: strings.isSpanish ? 'Buscar recetas' : 'Search recipes',
+                    icon: Icon(_isSearchOpen ? Icons.search_off_rounded : Icons.search_rounded),
+                    onPressed: () {
+                      setState(() {
+                        _isSearchOpen = !_isSearchOpen;
+                        if (!_isSearchOpen) {
+                          _searchController.clear();
+                          ref.read(recipeFilterProvider.notifier).setSearchQuery('');
+                        }
+                      });
+                    },
+                  ),
+
+                  // Grid / List Toggle
+                  IconButton(
+                    tooltip: _isGridView ? (strings.isSpanish ? 'Ver lista' : 'List view') : (strings.isSpanish ? 'Ver cuadrícula' : 'Grid view'),
+                    icon: Icon(_isGridView ? Icons.view_agenda_outlined : Icons.grid_view_rounded, size: 20),
+                    onPressed: () => setState(() => _isGridView = !_isGridView),
+                  ),
+
                   // Pro Crown Button (if not pro)
                   if (!ref.watch(premiumProvider).isProUser) ...[
                     IconButton(
                       tooltip: strings.isSpanish ? 'Menú Listo Pro' : 'Menú Listo Pro',
-                      onPressed: () => PaywallSheet.show(context),
                       icon: const Icon(Icons.workspace_premium_rounded, color: Colors.amber, size: 24),
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.amber.withValues(alpha: 0.15),
-                      ),
+                      onPressed: () => PaywallSheet.show(context),
                     ),
-                    const SizedBox(width: 8),
                   ],
-
-                  // Grid / List View Toggle
-                  IconButton(
-                    tooltip: _isGridView ? strings.viewList : strings.viewGrid,
-                    onPressed: () => setState(() => _isGridView = !_isGridView),
-                    icon: Icon(_isGridView ? Icons.view_list_rounded : Icons.grid_view_rounded),
-                    style: IconButton.styleFrom(
-                      backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                      foregroundColor: theme.colorScheme.onSurface,
-                    ),
-                  ),
                 ],
               ),
             ),
 
-            // Fixed Search Bar & Favorites Filter
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 10, 20, 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _searchController,
-                      onChanged: (val) {
-                        ref.read(recipeFilterProvider.notifier).setSearchQuery(val);
-                      },
-                      decoration: InputDecoration(
-                        hintText: strings.searchRecipesHint,
-                        prefixIcon: const Icon(Icons.search, size: 22),
-                        suffixIcon: _searchController.text.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear, size: 18),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  ref.read(recipeFilterProvider.notifier).setSearchQuery('');
-                                },
-                              )
-                            : null,
-                        filled: true,
-                        fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide.none,
+            // Collapsible Search Bar & Favorites Filter
+            if (_isSearchOpen)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 6, 20, 6),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        autofocus: true,
+                        onChanged: (val) {
+                          ref.read(recipeFilterProvider.notifier).setSearchQuery(val);
+                        },
+                        decoration: InputDecoration(
+                          hintText: strings.searchRecipesHint,
+                          prefixIcon: const Icon(Icons.search, size: 20),
+                          suffixIcon: _searchController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear, size: 18),
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    ref.read(recipeFilterProvider.notifier).setSearchQuery('');
+                                  },
+                                )
+                              : null,
+                          filled: true,
+                          isDense: true,
+                          fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide.none,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  FilterChip(
-                    avatar: Icon(
-                      filterState.onlyFavorites ? Icons.favorite : Icons.favorite_border,
-                      size: 16,
-                      color: filterState.onlyFavorites ? Colors.redAccent : null,
+                    const SizedBox(width: 8),
+                    FilterChip(
+                      avatar: Icon(
+                        filterState.onlyFavorites ? Icons.favorite : Icons.favorite_border,
+                        size: 16,
+                        color: filterState.onlyFavorites ? Colors.redAccent : null,
+                      ),
+                      label: Text(strings.isSpanish ? 'Favoritos' : 'Favorites'),
+                      selected: filterState.onlyFavorites,
+                      onSelected: (val) {
+                        HapticFeedback.selectionClick();
+                        ref.read(recipeFilterProvider.notifier).toggleOnlyFavorites();
+                      },
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
-                    label: Text(strings.isSpanish ? 'Favoritos' : 'Favorites'),
-                    selected: filterState.onlyFavorites,
-                    onSelected: (val) {
-                      HapticFeedback.selectionClick();
-                      ref.read(recipeFilterProvider.notifier).toggleOnlyFavorites();
-                    },
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
             // Category Chips Row
             SingleChildScrollView(
@@ -201,64 +212,47 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                           HapticFeedback.selectionClick();
                           ref.read(recipeFilterProvider.notifier).setCategory(cat);
                         },
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
                     );
                   }),
                 ],
               ),
             ),
-            const SizedBox(height: 4),
 
-            // High-contrast Pantry Matcher Card Banner
-            InkWell(
-              onTap: () => PantryMatcherDialog.show(context),
-              borderRadius: BorderRadius.circular(18),
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.7),
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.35), width: 1.2),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primaryContainer,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Text('🍳', style: TextStyle(fontSize: 22)),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            strings.isSpanish ? '¿Qué cocino hoy con mi heladera?' : 'What can I cook with my fridge?',
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w800,
-                              fontSize: 14,
-                              color: theme.colorScheme.onSurface,
-                            ),
+            // Compact Slim Fridge Matcher Banner
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 6, 20, 6),
+              child: InkWell(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  PantryMatcherDialog.show(context);
+                },
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.25), width: 1),
+                  ),
+                  child: Row(
+                    children: [
+                      const Text('🧊', style: TextStyle(fontSize: 20)),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          strings.isSpanish ? '¿Qué cocino hoy con mi heladera?' : 'What can I cook with my fridge?',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                            color: theme.colorScheme.onSurface,
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            strings.isSpanish
-                                ? 'Toca para buscar por ingredientes que ya tienes'
-                                : 'Tap to match recipes with ingredients on hand',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              fontSize: 12,
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                    Icon(Icons.arrow_forward_ios_rounded, size: 14, color: theme.colorScheme.primary),
-                  ],
+                      Icon(Icons.arrow_forward_ios_rounded, size: 13, color: theme.colorScheme.primary),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -273,7 +267,7 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                   }
 
                   return Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
+                    padding: const EdgeInsets.fromLTRB(20, 4, 20, 95),
                     child: _isGridView ? _buildGridView(context, recipes) : _buildListView(context, recipes),
                   );
                 },
@@ -366,9 +360,9 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 0.72,
-        crossAxisSpacing: 14,
-        mainAxisSpacing: 14,
+        childAspectRatio: 0.82,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
       ),
       itemCount: recipes.length,
       itemBuilder: (context, index) {
@@ -389,16 +383,17 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
           MaterialPageRoute(builder: (_) => RecipeDetailScreen(recipeId: recipe.id)),
         );
       },
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(16),
       child: Card(
         clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Stack(
               children: [
                 Container(
-                  height: 120,
+                  height: 105,
                   width: double.infinity,
                   color: theme.colorScheme.surfaceContainerHighest,
                   child: Hero(
@@ -410,7 +405,7 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                         : Center(
                             child: Icon(
                               Icons.restaurant_menu_rounded,
-                              size: 38,
+                              size: 32,
                               color: theme.colorScheme.primary.withValues(alpha: 0.3),
                             ),
                           ),
@@ -418,24 +413,24 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                 ),
                 // Time Tag Overlay on Image
                 Positioned(
-                  bottom: 6,
+                  bottom: 5,
                   left: 6,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.7),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(6),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.schedule_rounded, size: 12, color: Colors.white),
-                        const SizedBox(width: 4),
+                        const Icon(Icons.schedule_rounded, size: 11, color: Colors.white),
+                        const SizedBox(width: 3),
                         Text(
                           '${recipe.totalTimeMinutes}m',
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 11,
+                            fontSize: 10,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -445,14 +440,14 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                 ),
                 // Favorite Button Overlay
                 Positioned(
-                  top: 6,
-                  right: 6,
+                  top: 5,
+                  right: 5,
                   child: CircleAvatar(
-                    radius: 16,
+                    radius: 14,
                     backgroundColor: Colors.black.withValues(alpha: 0.4),
                     child: IconButton(
                       padding: EdgeInsets.zero,
-                      iconSize: 18,
+                      iconSize: 16,
                       icon: Icon(
                         recipe.isFavorite ? Icons.favorite : Icons.favorite_border,
                         color: recipe.isFavorite ? Colors.redAccent : Colors.white,
@@ -466,40 +461,39 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                 ),
               ],
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      recipe.title,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 14,
-                        height: 1.25,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 6, 10, 6),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    recipe.title,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 13,
+                      height: 1.2,
                     ),
-                    const Spacer(),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        recipe.category,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 11,
-                        ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 3),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Text(
+                      recipe.category,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 10,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -512,7 +506,7 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
   Widget _buildListView(BuildContext context, List<Recipe> recipes) {
     return ListView.separated(
       itemCount: recipes.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 12),
+      separatorBuilder: (_, _) => const SizedBox(height: 6),
       itemBuilder: (context, index) {
         final recipe = recipes[index];
         return _buildListCard(context, recipe);
@@ -531,19 +525,20 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
           MaterialPageRoute(builder: (_) => RecipeDetailScreen(recipeId: recipe.id)),
         );
       },
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(12),
       child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           child: Row(
             children: [
               Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10),
                     child: Container(
-                      width: 76,
-                      height: 76,
+                      width: 54,
+                      height: 54,
                       color: theme.colorScheme.surfaceContainerHighest,
                       child: Hero(
                         tag: 'recipe_image_${recipe.id}',
@@ -554,7 +549,7 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                             : Center(
                                 child: Icon(
                                   Icons.restaurant_menu_rounded,
-                                  size: 28,
+                                  size: 24,
                                   color: theme.colorScheme.primary.withValues(alpha: 0.3),
                                 ),
                               ),
@@ -562,23 +557,23 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                     ),
                   ),
                   Positioned(
-                    bottom: 3,
-                    left: 3,
-                    right: 3,
+                    bottom: 2,
+                    left: 2,
+                    right: 2,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1),
                       decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.7),
-                        borderRadius: BorderRadius.circular(6),
+                        color: Colors.black.withValues(alpha: 0.75),
+                        borderRadius: BorderRadius.circular(4),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.schedule_rounded, size: 10, color: Colors.white),
-                          const SizedBox(width: 3),
+                          const Icon(Icons.schedule_rounded, size: 9, color: Colors.white),
+                          const SizedBox(width: 2),
                           Text(
                             '${recipe.totalTimeMinutes}m',
-                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                            style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -586,33 +581,34 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                   ),
                 ],
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       recipe.title,
-                      style: theme.textTheme.titleMedium?.copyWith(
+                      style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w800,
-                        fontSize: 15,
+                        fontSize: 14,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 3),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(5),
                       ),
                       child: Text(
                         recipe.category,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.w700,
-                          fontSize: 11,
+                          fontSize: 10,
                         ),
                       ),
                     ),
@@ -620,6 +616,9 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                 ),
               ),
               IconButton(
+                iconSize: 20,
+                padding: const EdgeInsets.all(6),
+                constraints: const BoxConstraints(),
                 icon: Icon(
                   recipe.isFavorite ? Icons.favorite : Icons.favorite_border,
                   color: recipe.isFavorite ? Colors.redAccent : theme.colorScheme.onSurfaceVariant,

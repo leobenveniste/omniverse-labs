@@ -35,7 +35,7 @@ class RecipeCard extends StatelessWidget {
             Stack(
               children: [
                 Container(
-                  height: 140,
+                  height: 115,
                   width: double.infinity,
                   color: theme.colorScheme.surfaceContainerHighest,
                   child: Hero(
@@ -45,13 +45,13 @@ class RecipeCard extends StatelessWidget {
                 ),
                 // Category Chip (Top Left)
                 Positioned(
-                  top: 10,
-                  left: 10,
+                  top: 8,
+                  left: 8,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
                       color: theme.colorScheme.surface.withValues(alpha: 0.9),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.1),
@@ -61,7 +61,7 @@ class RecipeCard extends StatelessWidget {
                     ),
                     child: Text(
                       recipe.categories.take(2).join(' • ') + (recipe.categories.length > 2 ? ' +' : ''),
-                      style: theme.textTheme.labelMedium?.copyWith(
+                      style: theme.textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: theme.colorScheme.primary,
                       ),
@@ -70,24 +70,24 @@ class RecipeCard extends StatelessWidget {
                 ),
                 // Time Tag (Bottom Left)
                 Positioned(
-                  bottom: 8,
-                  left: 10,
+                  bottom: 6,
+                  left: 8,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.7),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(6),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.schedule_rounded, size: 12, color: Colors.white),
-                        const SizedBox(width: 4),
+                        const Icon(Icons.schedule_rounded, size: 11, color: Colors.white),
+                        const SizedBox(width: 3),
                         Text(
                           '${recipe.totalTimeMinutes}m',
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 11,
+                            fontSize: 10,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -97,19 +97,22 @@ class RecipeCard extends StatelessWidget {
                 ),
                 // Favorite Button (Top Right)
                 Positioned(
-                  top: 6,
-                  right: 6,
-                  child: IconButton(
-                    icon: Icon(
-                      recipe.isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: recipe.isFavorite ? Colors.redAccent : theme.colorScheme.onSurfaceVariant,
-                    ),
-                    onPressed: () {
-                      HapticFeedback.lightImpact();
-                      onToggleFavorite();
-                    },
-                    style: IconButton.styleFrom(
-                      backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.8),
+                  top: 5,
+                  right: 5,
+                  child: CircleAvatar(
+                    radius: 15,
+                    backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.85),
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      iconSize: 18,
+                      icon: Icon(
+                        recipe.isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: recipe.isFavorite ? Colors.redAccent : theme.colorScheme.onSurfaceVariant,
+                      ),
+                      onPressed: () {
+                        HapticFeedback.lightImpact();
+                        onToggleFavorite();
+                      },
                     ),
                   ),
                 ),
@@ -117,7 +120,7 @@ class RecipeCard extends StatelessWidget {
             ),
             // Info Body
             Padding(
-              padding: const EdgeInsets.all(14.0),
+              padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -125,17 +128,18 @@ class RecipeCard extends StatelessWidget {
                     recipe.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.titleMedium?.copyWith(
+                    style: theme.textTheme.titleSmall?.copyWith(
                       fontWeight: FontWeight.bold,
+                      fontSize: 14,
                     ),
                   ),
                   if (recipe.description.isNotEmpty) ...[
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Text(
                       recipe.description,
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodyMedium?.copyWith(fontSize: 12),
+                      style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),
                     ),
                   ],
                 ],

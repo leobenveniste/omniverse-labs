@@ -52,10 +52,10 @@ class _QuickPlanMealSheetState extends ConsumerState<QuickPlanMealSheet> {
     ];
 
     final slots = [
-      {'id': 'breakfast', 'name': strings.mealBreakfast, 'icon': Icons.wb_twilight},
-      {'id': 'lunch', 'name': strings.mealLunch, 'icon': Icons.wb_sunny_outlined},
-      {'id': 'snack', 'name': strings.mealSnack, 'icon': Icons.coffee_outlined},
-      {'id': 'dinner', 'name': strings.mealDinner, 'icon': Icons.nightlight_outlined},
+      {'id': 'breakfast', 'name': strings.mealBreakfast, 'emoji': '☕', 'icon': Icons.wb_twilight},
+      {'id': 'lunch', 'name': strings.mealLunch, 'emoji': '🍲', 'icon': Icons.wb_sunny_outlined},
+      {'id': 'snack', 'name': strings.mealSnack, 'emoji': '🥐', 'icon': Icons.coffee_outlined},
+      {'id': 'dinner', 'name': strings.mealDinner, 'emoji': '🌙', 'icon': Icons.nightlight_outlined},
     ];
 
     final targetDate = weekStart.add(Duration(days: _selectedDayOffset));
@@ -64,33 +64,51 @@ class _QuickPlanMealSheetState extends ConsumerState<QuickPlanMealSheet> {
 
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
               child: Container(
-                width: 40,
-                height: 4,
+                width: 44,
+                height: 5,
                 decoration: BoxDecoration(
                   color: Colors.grey.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(3),
                 ),
               ),
             ),
             const SizedBox(height: 16),
             Row(
               children: [
-                Icon(Icons.event_note_rounded, color: theme.colorScheme.primary, size: 24),
-                const SizedBox(width: 10),
-                Text(
-                  strings.isSpanish ? 'Planificar en la Agenda' : 'Plan a Meal',
-                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Text('🪄', style: TextStyle(fontSize: 22)),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        strings.isSpanish ? 'Planificar en la Agenda' : 'Plan a Meal',
+                        style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        strings.isSpanish ? 'Elige el momento perfecto para tu comida' : 'Pick the perfect moment for your meal',
+                        style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
 
             // Step 1: Select Day
             Text(
@@ -110,6 +128,7 @@ class _QuickPlanMealSheetState extends ConsumerState<QuickPlanMealSheet> {
                     padding: const EdgeInsets.only(right: 8),
                     child: ChoiceChip(
                       selected: isSelected,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       label: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -123,7 +142,7 @@ class _QuickPlanMealSheetState extends ConsumerState<QuickPlanMealSheet> {
                 }).toList(),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
 
             // Step 2: Select Slot
             Text(
@@ -139,9 +158,10 @@ class _QuickPlanMealSheetState extends ConsumerState<QuickPlanMealSheet> {
                 final isSelected = _selectedSlot == id;
 
                 return ChoiceChip(
-                  avatar: Icon(s['icon'] as IconData, size: 16),
+                  avatar: Text(s['emoji'] as String, style: const TextStyle(fontSize: 16)),
                   selected: isSelected,
-                  label: Text(s['name'] as String),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  label: Text(s['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold)),
                   onSelected: (_) => setState(() => _selectedSlot = id),
                 );
               }).toList(),
@@ -153,7 +173,10 @@ class _QuickPlanMealSheetState extends ConsumerState<QuickPlanMealSheet> {
               width: double.infinity,
               height: 52,
               child: FilledButton.icon(
-                icon: const Icon(Icons.restaurant_menu),
+                style: FilledButton.styleFrom(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+                icon: const Icon(Icons.restaurant_menu_rounded),
                 label: Text(
                   strings.isSpanish ? 'Elegir receta para planificar' : 'Choose Recipe',
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
@@ -176,10 +199,12 @@ class _QuickPlanMealSheetState extends ConsumerState<QuickPlanMealSheet> {
                           );
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
+                          backgroundColor: theme.colorScheme.primary,
                           content: Text(
                             strings.isSpanish
-                                ? '¡${recipe.title} agregada a la agenda!'
-                                : '${recipe.title} added to planner!',
+                                ? '✨ ¡"${recipe.title}" agregada a la agenda!'
+                                : '✨ "${recipe.title}" added to planner!',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       );
@@ -193,10 +218,12 @@ class _QuickPlanMealSheetState extends ConsumerState<QuickPlanMealSheet> {
                           );
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
+                          backgroundColor: theme.colorScheme.primary,
                           content: Text(
                             strings.isSpanish
-                                ? '¡"$customName" agregada a la agenda!'
-                                : '"$customName" added to planner!',
+                                ? '✨ ¡"$customName" agregada a la agenda!'
+                                : '✨ "$customName" added to planner!',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
                       );
