@@ -269,27 +269,52 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                   : (strings.isSpanish ? 'Agrupar por góndola' : 'Group by aisle'),
               onPressed: () => setState(() => _isCategorizedView = !_isCategorizedView),
             ),
-            IconButton(
-              icon: const Icon(Icons.share_outlined),
-              tooltip: strings.shareList,
-              onPressed: () {
-                final text = notifier.buildShareableText(header: strings.shareListHeader);
-                if (text.isNotEmpty) {
-                  Share.share(text);
-                }
-              },
-            ),
             PopupMenuButton<String>(
+              tooltip: strings.isSpanish ? 'Más opciones' : 'More options',
               onSelected: (val) {
-                if (val == 'clear_completed') {
+                if (val == 'share') {
+                  final text = notifier.buildShareableText(header: strings.shareListHeader);
+                  if (text.isNotEmpty) {
+                    Share.share(text);
+                  }
+                } else if (val == 'clear_completed') {
                   notifier.clearCompleted();
                 } else if (val == 'clear_all') {
                   notifier.clearAll();
                 }
               },
               itemBuilder: (ctx) => [
-                PopupMenuItem(value: 'clear_completed', child: Text(strings.clearCompleted)),
-                PopupMenuItem(value: 'clear_all', child: Text(strings.clearAll)),
+                PopupMenuItem(
+                  value: 'share',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.share_outlined, size: 20),
+                      const SizedBox(width: 12),
+                      Text(strings.shareList),
+                    ],
+                  ),
+                ),
+                const PopupMenuDivider(),
+                PopupMenuItem(
+                  value: 'clear_completed',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.remove_done_rounded, size: 20),
+                      const SizedBox(width: 12),
+                      Text(strings.clearCompleted),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'clear_all',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.delete_sweep_outlined, size: 20),
+                      const SizedBox(width: 12),
+                      Text(strings.clearAll),
+                    ],
+                  ),
+                ),
               ],
             ),
           ],

@@ -21,6 +21,7 @@ class AppShell extends ConsumerStatefulWidget {
 class _AppShellState extends ConsumerState<AppShell> {
   // Tabs: 0: Recipes (Home - first in list), 1: Planner, 2: Shopping, 3: Settings
   int _currentIndex = 0;
+  late final PageController _pageController;
 
   final List<Widget> _screens = const [
     RecipesListScreen(),
@@ -28,6 +29,33 @@ class _AppShellState extends ConsumerState<AppShell> {
     ShoppingListScreen(),
     SettingsScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _currentIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _onPageChanged(int index) {
+    if (_currentIndex != index) {
+      setState(() => _currentIndex = index);
+    }
+    if (index == 1) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) WeeklyPlannerScreen.showGuideIfFirstTime(context);
+      });
+    } else if (index == 2) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) ShoppingListScreen.showGuideIfFirstTime(context);
+      });
+    }
+  }
 
   void _onCenterActionPressed(BuildContext context) {
     if (_currentIndex == 1) {
@@ -55,8 +83,12 @@ class _AppShellState extends ConsumerState<AppShell> {
 
     return Scaffold(
       extendBody: true,
-      body: IndexedStack(
-        index: _currentIndex,
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          HapticFeedback.selectionClick();
+          _onPageChanged(index);
+        },
         children: _screens,
       ),
       floatingActionButton: _currentIndex == 3
@@ -75,67 +107,83 @@ class _AppShellState extends ConsumerState<AppShell> {
               child: const Icon(Icons.add_rounded, size: 28),
             ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      bottomNavigationBar: NavigationBarTheme(
-        data: NavigationBarThemeData(
-          height: 64,
-          backgroundColor: theme.colorScheme.surfaceContainer,
-          elevation: 0,
-          indicatorColor: theme.colorScheme.secondaryContainer,
-          indicatorShape: const StadiumBorder(),
-          iconTheme: WidgetStateProperty.resolveWith((states) {
-            final isSelected = states.contains(WidgetState.selected);
-            return IconThemeData(
-              size: 26,
-              color: isSelected
-                  ? theme.colorScheme.onSecondaryContainer
-                  : theme.colorScheme.onSurfaceVariant,
-            );
-          }),
-        ),
-        child: NavigationBar(
-          selectedIndex: _currentIndex,
-          labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-          onDestinationSelected: (index) {
-            HapticFeedback.selectionClick();
-            if (_currentIndex != index) {
-              setState(() => _currentIndex = index);
-              if (index == 1) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (mounted) WeeklyPlannerScreen.showGuideIfFirstTime(context);
-                });
-              } else if (index == 2) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (mounted) ShoppingListScreen.showGuideIfFirstTime(context);
-                });
-              }
-            }
-          },
-          destinations: [
-            NavigationDestination(
-              icon: const Icon(Icons.menu_book_outlined),
-              selectedIcon: const Icon(Icons.menu_book_rounded),
-              label: strings.tabRecipes,
-              tooltip: strings.tabRecipes,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.calendar_month_outlined),
-              selectedIcon: const Icon(Icons.calendar_month_rounded),
-              label: strings.tabPlanner,
-              tooltip: strings.tabPlanner,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.shopping_cart_outlined),
-              selectedIcon: const Icon(Icons.shopping_cart_rounded),
-              label: strings.tabShopping,
-              tooltip: strings.tabShopping,
-            ),
-            NavigationDestination(
-              icon: const Icon(Icons.settings_outlined),
-              selectedIcon: const Icon(Icons.settings_rounded),
-              label: strings.tabSettings,
-              tooltip: strings.tabSettings,
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainer,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(
+                alpha: theme.brightness == Brightness.dark ? 0.35 : 0.08,
+              ),
+              blurRadius: 12,
+              offset: const Offset(0, -3),
             ),
           ],
+          border: Border(
+            top: BorderSide(
+              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+              width: 0.8,
+            ),
+          ),
+        ),
+        child: NavigationBarTheme(
+          data: NavigationBarThemeData(
+            height: 64,
+            backgroundColor: theme.colorScheme.surfaceContainer,
+            elevation: 0,
+            indicatorColor: theme.colorScheme.secondaryContainer,
+            indicatorShape: const StadiumBorder(),
+            iconTheme: WidgetStateProperty.resolveWith((states) {
+              final isSelected = states.contains(WidgetState.selected);
+              return IconThemeData(
+                size: 26,
+                color: isSelected
+                    ? theme.colorScheme.onSecondaryContainer
+                    : theme.colorScheme.onSurfaceVariant,
+              );
+            }),
+          ),
+          child: NavigationBar(
+            selectedIndex: _currentIndex,
+            labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
+            onDestinationSelected: (index) {
+              HapticFeedback.selectionClick();
+              if (_currentIndex != index) {
+                _pageController.animateToPage(
+                  index,
+                  duration: const Duration(milliseconds: 280),
+                  curve: Curves.easeInOutCubic,
+                );
+                _onPageChanged(index);
+              }
+            },
+            destinations: [
+              NavigationDestination(
+                icon: const Icon(Icons.menu_book_outlined),
+                selectedIcon: const Icon(Icons.menu_book_rounded),
+                label: strings.tabRecipes,
+                tooltip: strings.tabRecipes,
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.calendar_month_outlined),
+                selectedIcon: const Icon(Icons.calendar_month_rounded),
+                label: strings.tabPlanner,
+                tooltip: strings.tabPlanner,
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.shopping_cart_outlined),
+                selectedIcon: const Icon(Icons.shopping_cart_rounded),
+                label: strings.tabShopping,
+                tooltip: strings.tabShopping,
+              ),
+              NavigationDestination(
+                icon: const Icon(Icons.settings_outlined),
+                selectedIcon: const Icon(Icons.settings_rounded),
+                label: strings.tabSettings,
+                tooltip: strings.tabSettings,
+              ),
+            ],
+          ),
         ),
       ),
     );

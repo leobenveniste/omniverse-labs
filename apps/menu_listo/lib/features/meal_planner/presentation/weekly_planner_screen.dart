@@ -137,11 +137,6 @@ class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
             onPressed: () => _confirmCopyPreviousWeek(context, weekPlanNotifier),
           ),
           IconButton(
-            icon: const Icon(Icons.casino_outlined),
-            tooltip: strings.fillRandom,
-            onPressed: () => _confirmFillRandom(context, weekPlanNotifier),
-          ),
-          IconButton(
             icon: const Icon(Icons.delete_sweep_outlined),
             tooltip: strings.clearWeek,
             onPressed: () => _confirmClearWeek(context, weekPlanNotifier),
@@ -451,59 +446,7 @@ class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
     );
   }
 
-  void _confirmFillRandom(BuildContext context, WeeklyMealPlanNotifier notifier) {
-    final theme = Theme.of(context);
-    final strings = AppStrings.of(context);
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.amber.withValues(alpha: 0.2),
-                shape: BoxShape.circle,
-              ),
-              child: const Text('🎲', style: TextStyle(fontSize: 22)),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                strings.fillRandom,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
-              ),
-            ),
-          ],
-        ),
-        content: Text(
-          strings.isSpanish
-              ? '¿Deseas que Menú Listo rellene automáticamente los espacios vacíos con recetas de tu recetario?'
-              : 'Would you like Menú Listo to automatically fill empty slots with recipes from your book?',
-          style: theme.textTheme.bodyMedium?.copyWith(height: 1.4),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(strings.cancel),
-          ),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.amber.shade700,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-            ),
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              notifier.fillRandomSlots();
-            },
-            child: Text(strings.confirm),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   void _confirmClearWeek(BuildContext context, WeeklyMealPlanNotifier notifier) {
     final theme = Theme.of(context);
