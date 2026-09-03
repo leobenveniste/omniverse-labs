@@ -6,6 +6,7 @@ import 'package:menu_listo/core/localization/locale_provider.dart';
 import 'package:menu_listo/core/theme/app_colors.dart';
 import 'package:menu_listo/core/theme/app_theme_types.dart';
 import 'package:menu_listo/core/theme/theme_provider.dart';
+import 'package:menu_listo/core/widgets/app_header_title.dart';
 import '../../backup/services/backup_service.dart';
 import '../../premium/presentation/paywall_sheet.dart';
 import '../../premium/providers/premium_provider.dart';
@@ -25,7 +26,7 @@ class SettingsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(strings.settingsTitle),
+        title: AppHeaderTitle(title: strings.settingsTitle),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 10, 20, 100),

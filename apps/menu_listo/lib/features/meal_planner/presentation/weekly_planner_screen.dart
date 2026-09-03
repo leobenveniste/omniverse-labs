@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:menu_listo/core/localization/app_localizations.dart';
+import 'package:menu_listo/core/widgets/app_header_title.dart';
 import 'package:menu_listo/core/widgets/feature_guide_dialog.dart';
 import '../models/meal_plan_model.dart';
 import '../providers/meal_planner_provider.dart';
@@ -84,7 +85,7 @@ class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(strings.plannerTitle),
+        title: AppHeaderTitle(title: strings.plannerTitle),
         actions: [
           PopupMenuButton<String>(
             icon: const Icon(Icons.bookmarks_outlined),

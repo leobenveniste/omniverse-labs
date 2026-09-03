@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:menu_listo/core/localization/app_localizations.dart';
+import 'package:menu_listo/core/widgets/app_header_title.dart';
 import '../models/recipe_model.dart';
 import '../providers/recipe_provider.dart';
 import 'recipe_detail_screen.dart';
@@ -63,41 +64,9 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
               padding: const EdgeInsets.fromLTRB(20, 14, 16, 4),
               child: Row(
                 children: [
-                  // App Logo in Header
-                  Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.surface,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.06),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                      border: Border.all(
-                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
-                        width: 1,
-                      ),
-                    ),
-                    padding: const EdgeInsets.all(4),
-                    child: Image.asset(
-                      'assets/images/app_icon.png',
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  // Screen Title
+                  // App Logo and Screen Title
                   Expanded(
-                    child: Text(
-                      strings.tabRecipes,
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
+                    child: AppHeaderTitle(title: strings.tabRecipes),
                   ),
                   // Search Toggle
                   IconButton(

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:menu_listo/core/localization/app_localizations.dart';
 import 'package:menu_listo/core/utils/culinary_catalog.dart';
+import 'package:menu_listo/core/widgets/app_header_title.dart';
 import 'package:menu_listo/core/widgets/empty_state_view.dart';
 import 'package:menu_listo/core/widgets/feature_guide_dialog.dart';
 import '../models/shopping_item_model.dart';
@@ -249,7 +250,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(strings.shoppingTitle),
+        title: AppHeaderTitle(title: strings.shoppingTitle),
         actions: [
           if (hasItems) ...[
             IconButton(

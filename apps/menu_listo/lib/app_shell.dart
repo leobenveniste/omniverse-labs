@@ -77,25 +77,15 @@ class _AppShellState extends ConsumerState<AppShell> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: NavigationBarTheme(
         data: NavigationBarThemeData(
-          height: 68,
+          height: 64,
           backgroundColor: theme.colorScheme.surfaceContainer,
           elevation: 0,
           indicatorColor: theme.colorScheme.secondaryContainer,
           indicatorShape: const StadiumBorder(),
-          labelTextStyle: WidgetStateProperty.resolveWith((states) {
-            final isSelected = states.contains(WidgetState.selected);
-            return TextStyle(
-              fontSize: 12,
-              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              color: isSelected
-                  ? theme.colorScheme.secondary
-                  : theme.colorScheme.onSurfaceVariant,
-            );
-          }),
           iconTheme: WidgetStateProperty.resolveWith((states) {
             final isSelected = states.contains(WidgetState.selected);
             return IconThemeData(
-              size: 24,
+              size: 26,
               color: isSelected
                   ? theme.colorScheme.onSecondaryContainer
                   : theme.colorScheme.onSurfaceVariant,
@@ -104,6 +94,7 @@ class _AppShellState extends ConsumerState<AppShell> {
         ),
         child: NavigationBar(
           selectedIndex: _currentIndex,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
           onDestinationSelected: (index) {
             HapticFeedback.selectionClick();
             if (_currentIndex != index) {
