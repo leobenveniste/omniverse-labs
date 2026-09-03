@@ -23,8 +23,9 @@ class RecipeCard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       elevation: 2,
       shadowColor: Colors.black.withValues(alpha: 0.15),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: InkWell(
+        borderRadius: BorderRadius.circular(20),
         onTap: () {
           HapticFeedback.selectionClick();
           onTap();
@@ -71,22 +72,28 @@ class RecipeCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Favorite Button (Top Right)
+                // Favorite Button with Spring Pop Animation (Top Right)
                 Positioned(
                   top: 5,
                   right: 5,
                   child: CircleAvatar(
-                    radius: 15,
-                    backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.85),
+                    radius: 16,
+                    backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.9),
                     child: IconButton(
                       padding: EdgeInsets.zero,
-                      iconSize: 18,
-                      icon: Icon(
-                        recipe.isFavorite ? Icons.favorite : Icons.favorite_border,
-                        color: recipe.isFavorite ? Colors.redAccent : theme.colorScheme.onSurfaceVariant,
+                      iconSize: 19,
+                      tooltip: recipe.isFavorite ? 'Quitar de favoritos' : 'Guardar en favoritos',
+                      icon: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 250),
+                        transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+                        child: Icon(
+                          recipe.isFavorite ? Icons.favorite_rounded : Icons.favorite_outline_rounded,
+                          key: ValueKey(recipe.isFavorite),
+                          color: recipe.isFavorite ? Colors.redAccent : theme.colorScheme.onSurfaceVariant,
+                        ),
                       ),
                       onPressed: () {
-                        HapticFeedback.lightImpact();
+                        HapticFeedback.mediumImpact();
                         onToggleFavorite();
                       },
                     ),

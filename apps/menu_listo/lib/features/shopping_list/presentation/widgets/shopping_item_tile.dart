@@ -83,14 +83,19 @@ class ShoppingItemTile extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
                 children: [
-                  // Checkbox
-                  Checkbox(
-                    value: item.isCompleted,
-                    onChanged: (val) {
-                      HapticFeedback.lightImpact();
-                      onToggle(val);
-                    },
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                  // Checkbox with spring scale feedback
+                  AnimatedScale(
+                    scale: item.isCompleted ? 1.06 : 1.0,
+                    duration: const Duration(milliseconds: 180),
+                    curve: Curves.easeOutBack,
+                    child: Checkbox(
+                      value: item.isCompleted,
+                      onChanged: (val) {
+                        HapticFeedback.lightImpact();
+                        onToggle(val);
+                      },
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                    ),
                   ),
                   const SizedBox(width: 4),
 

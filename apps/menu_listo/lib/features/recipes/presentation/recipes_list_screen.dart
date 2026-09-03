@@ -96,37 +96,37 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
               ),
             ),
 
-            // Collapsible Search Bar
+            // Collapsible M3 Expressive Search Bar
             if (_isSearchOpen)
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 6, 20, 6),
-                child: TextField(
+                padding: const EdgeInsets.fromLTRB(20, 4, 20, 6),
+                child: SearchBar(
                   controller: _searchController,
-                  autofocus: true,
+                  autoFocus: true,
+                  hintText: strings.searchRecipesHint,
+                  leading: const Icon(Icons.search),
+                  trailing: [
+                    if (_searchController.text.isNotEmpty)
+                      IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          _searchController.clear();
+                          ref.read(recipeFilterProvider.notifier).setSearchQuery('');
+                          setState(() {});
+                        },
+                      ),
+                  ],
+                  elevation: const WidgetStatePropertyAll(0),
+                  backgroundColor: WidgetStatePropertyAll(
+                    theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                  ),
+                  shape: WidgetStatePropertyAll(
+                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
                   onChanged: (val) {
                     ref.read(recipeFilterProvider.notifier).setSearchQuery(val);
+                    setState(() {});
                   },
-                  decoration: InputDecoration(
-                    hintText: strings.searchRecipesHint,
-                    prefixIcon: const Icon(Icons.search, size: 20),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear, size: 18),
-                            onPressed: () {
-                              _searchController.clear();
-                              ref.read(recipeFilterProvider.notifier).setSearchQuery('');
-                            },
-                          )
-                        : null,
-                    filled: true,
-                    isDense: true,
-                    fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
                 ),
               ),
 
@@ -148,18 +148,29 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                       label: Text(
                         strings.isSpanish ? 'Favoritos' : 'Favorites',
                         style: TextStyle(
-                          fontWeight: FontWeight.w600,
+                          fontWeight: filterState.onlyFavorites ? FontWeight.w700 : FontWeight.w500,
                           fontSize: 13,
-                          color: filterState.onlyFavorites ? theme.colorScheme.primary : null,
                         ),
                       ),
                       selected: filterState.onlyFavorites,
                       showCheckmark: false,
+                      selectedColor: theme.colorScheme.secondaryContainer,
+                      labelStyle: TextStyle(
+                        color: filterState.onlyFavorites
+                            ? theme.colorScheme.onSecondaryContainer
+                            : theme.colorScheme.onSurfaceVariant,
+                      ),
                       onSelected: (_) {
                         HapticFeedback.selectionClick();
                         ref.read(recipeFilterProvider.notifier).toggleOnlyFavorites();
                       },
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      side: BorderSide(
+                        color: filterState.onlyFavorites
+                            ? Colors.transparent
+                            : theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                        width: 1,
+                      ),
                     ),
                   ),
                   // Meal Time Filters (Multi-select enabled, no "Todas")
@@ -170,15 +181,30 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                       child: FilterChip(
                         label: Text(
                           cat,
-                          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                          style: TextStyle(
+                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                            fontSize: 13,
+                          ),
                         ),
                         selected: isSelected,
                         showCheckmark: false,
+                        selectedColor: theme.colorScheme.secondaryContainer,
+                        labelStyle: TextStyle(
+                          color: isSelected
+                              ? theme.colorScheme.onSecondaryContainer
+                              : theme.colorScheme.onSurfaceVariant,
+                        ),
                         onSelected: (_) {
                           HapticFeedback.selectionClick();
                           ref.read(recipeFilterProvider.notifier).toggleCategory(cat);
                         },
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        side: BorderSide(
+                          color: isSelected
+                              ? Colors.transparent
+                              : theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                          width: 1,
+                        ),
                       ),
                     );
                   }),
