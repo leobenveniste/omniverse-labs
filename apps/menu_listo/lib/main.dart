@@ -1,35 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'app_shell.dart';
-import 'core/database/app_database.dart';
 import 'core/localization/locale_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
-import 'features/onboarding/presentation/onboarding_screen.dart';
+import 'features/splash/presentation/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize and seed SQLite database
-  await AppDatabase.instance.seedInitialDataIfEmpty();
-
-  // Check if user has seen onboarding
-  final prefs = await SharedPreferences.getInstance();
-  final hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
-
   runApp(
-    ProviderScope(
-      child: MenuListoApp(hasSeenOnboarding: hasSeenOnboarding),
+    const ProviderScope(
+      child: MenuListoApp(),
     ),
   );
 }
 
 class MenuListoApp extends ConsumerWidget {
-  final bool hasSeenOnboarding;
-
-  const MenuListoApp({super.key, required this.hasSeenOnboarding});
+  const MenuListoApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,7 +41,7 @@ class MenuListoApp extends ConsumerWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      home: hasSeenOnboarding ? const AppShell() : const OnboardingScreen(),
+      home: const SplashScreen(),
     );
   }
 }
