@@ -110,14 +110,14 @@ class MealSlotCard extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: hasMeal
               ? theme.colorScheme.surface
               : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: hasMeal
                 ? theme.colorScheme.primary.withValues(alpha: 0.4)
@@ -135,7 +135,7 @@ class MealSlotCard extends StatelessWidget {
                   size: 16,
                   color: hasMeal ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
                 ),
-                const SizedBox(width: 5),
+                const SizedBox(width: 6),
                 Expanded(
                   child: Text(
                     mealTitle,
@@ -160,7 +160,7 @@ class MealSlotCard extends StatelessWidget {
                   Icon(Icons.add_rounded, size: 16, color: theme.colorScheme.primary.withValues(alpha: 0.7)),
               ],
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             SizedBox(
               height: 32,
               child: Text(
@@ -182,15 +182,19 @@ class MealSlotCard extends StatelessWidget {
               children: [
                 if (isLeftover)
                   Container(
-                    margin: const EdgeInsets.only(right: 4),
-                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                    margin: const EdgeInsets.only(right: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: Colors.orange.withValues(alpha: 0.15),
+                      color: theme.colorScheme.tertiaryContainer.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: const Text(
+                    child: Text(
                       '🍱 Tupper',
-                      style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.deepOrange),
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onTertiaryContainer,
+                      ),
                     ),
                   ),
                 if (hasMeal && item!.servings > 0)
@@ -198,7 +202,7 @@ class MealSlotCard extends StatelessWidget {
                     onTap: onAdjustServings != null ? () => _showServingsSheet(context) : null,
                     borderRadius: BorderRadius.circular(6),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(6),

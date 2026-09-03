@@ -72,18 +72,11 @@ class _AppShellState extends ConsumerState<AppShell> {
               elevation: 4,
               shape: const CircleBorder(),
               child: Container(
-                width: 58,
-                height: 58,
+                width: 56,
+                height: 56,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    colors: [
-                      theme.colorScheme.primary,
-                      theme.colorScheme.primary.withValues(alpha: 0.88),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: theme.colorScheme.primary,
                 ),
                 child: const Center(
                   child: Icon(Icons.add_rounded, color: Colors.white, size: 32),

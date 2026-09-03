@@ -509,20 +509,20 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
           MaterialPageRoute(builder: (_) => RecipeDetailScreen(recipeId: recipe.id)),
         );
       },
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(16),
       child: Card(
-        elevation: 2,
-        shadowColor: Colors.black.withValues(alpha: 0.12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        elevation: 1.5,
+        shadowColor: Colors.black.withValues(alpha: 0.1),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Row(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
                 child: Container(
-                  width: 52,
-                  height: 52,
+                  width: 56,
+                  height: 56,
                   color: theme.colorScheme.surfaceContainerHighest,
                   child: Hero(
                     tag: 'recipe_image_${recipe.id}',
@@ -558,21 +558,21 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                     const SizedBox(height: 4),
                     // Time Tag
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.surfaceContainerHighest,
-                        borderRadius: BorderRadius.circular(5),
+                        borderRadius: BorderRadius.circular(6),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.schedule_rounded, size: 11, color: theme.colorScheme.onSurfaceVariant),
-                          const SizedBox(width: 3),
+                          Icon(Icons.schedule_rounded, size: 12, color: theme.colorScheme.onSurfaceVariant),
+                          const SizedBox(width: 4),
                           Text(
                             '${recipe.totalTimeMinutes}m',
                             style: TextStyle(
                               color: theme.colorScheme.onSurfaceVariant,
-                              fontSize: 10,
+                              fontSize: 12,
                               fontWeight: FontWeight.w700,
                             ),
                           ),

@@ -468,7 +468,7 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
               // Body Content
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -478,14 +478,14 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                         children: [
                           Expanded(
                             child: Wrap(
-                              spacing: 6,
-                              runSpacing: 6,
+                              spacing: 8,
+                              runSpacing: 8,
                               children: recipe.categories.map((cat) {
                                 return Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                   decoration: BoxDecoration(
                                     color: theme.colorScheme.primaryContainer,
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
                                     cat,
@@ -507,41 +507,46 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                               const SizedBox(width: 4),
                               Text(
                                 '${recipe.totalTimeMinutes} ${strings.minutes}',
-                                style: const TextStyle(fontWeight: FontWeight.bold),
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                               ),
                             ],
                           ),
                         ],
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 16),
                       // Title
                       Text(
                         recipe.title,
-                        style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800),
+                        style: theme.textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 24,
+                        ),
                       ),
                       if (recipe.description.isNotEmpty) ...[
                         const SizedBox(height: 8),
                         Text(
                           recipe.description,
-                          style: theme.textTheme.bodyLarge?.copyWith(
+                          style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
+                            fontSize: 14,
+                            height: 1.4,
                           ),
                         ),
                       ],
                       const SizedBox(height: 24),
                       // Dynamic Portion Scaler Box
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
                           color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(16),
                           border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             IconButton.filledTonal(
-                              icon: const Icon(Icons.remove_rounded, size: 22),
+                              icon: const Icon(Icons.remove_rounded, size: 20),
                               onPressed: servings > 1
                                   ? () {
                                       HapticFeedback.lightImpact();
@@ -576,7 +581,7 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                               ],
                             ),
                             IconButton.filled(
-                              icon: const Icon(Icons.add_rounded, size: 22),
+                              icon: const Icon(Icons.add_rounded, size: 20),
                               onPressed: () {
                                 HapticFeedback.lightImpact();
                                 setState(() => _currentServings = servings + 1);
@@ -585,11 +590,14 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 28),
+                      const SizedBox(height: 24),
                       // Ingredients List Header
                       Text(
                         strings.ingredientsTitle,
-                        style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
                       ),
                       const SizedBox(height: 12),
                       // Ingredients List without dividers
@@ -625,10 +633,10 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                           final emoji = CulinaryCatalog.getEmoji(ing.name);
 
                           return Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             decoration: BoxDecoration(
                               color: theme.colorScheme.surface,
-                              borderRadius: BorderRadius.circular(14),
+                              borderRadius: BorderRadius.circular(16),
                               border: Border.all(
                                 color: theme.colorScheme.outline.withValues(alpha: 0.2),
                               ),
@@ -643,7 +651,7 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                                     scaledIng.name,
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w600,
-                                      fontSize: 15,
+                                      fontSize: 14,
                                     ),
                                   ),
                                 ),
@@ -657,7 +665,7 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                                     PortionCalculator.formatIngredientAmount(scaledIng.amount, scaledIng.unit),
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 13,
+                                      fontSize: 12,
                                       color: theme.colorScheme.primary,
                                     ),
                                   ),
@@ -667,13 +675,16 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                           );
                         },
                       ),
-                      const SizedBox(height: 28),
+                      const SizedBox(height: 24),
                       // Step by Step Instructions
                       Text(
                         strings.instructionsTitle,
-                        style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 12),
                       ListView.separated(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -684,7 +695,7 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
 
                           if (step.isSectionHeader) {
                             return Padding(
-                              padding: const EdgeInsets.only(top: 14.0, bottom: 4.0),
+                              padding: const EdgeInsets.only(top: 12.0, bottom: 4.0),
                               child: Row(
                                 children: [
                                   Icon(Icons.bookmark_rounded, size: 18, color: theme.colorScheme.primary),
@@ -694,7 +705,7 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                                     style: theme.textTheme.titleSmall?.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: theme.colorScheme.primary,
-                                      fontSize: 15,
+                                      fontSize: 14,
                                     ),
                                   ),
                                 ],
@@ -720,30 +731,36 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
+                                    fontSize: 14,
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 14),
+                              const SizedBox(width: 12),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       step.instruction,
-                                      style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        fontSize: 14,
+                                        height: 1.5,
+                                      ),
                                     ),
                                     if (durationSec > 0) ...[
-                                      const SizedBox(height: 6),
+                                      const SizedBox(height: 8),
                                       ActionChip(
                                         avatar: const Icon(Icons.timer_outlined, size: 14),
                                         label: Text(
-                                          '⏱️ ${_formatTimerChip(durationSec)} (Tocar para iniciar)',
+                                          '⏱️ ${_formatTimerChip(durationSec)}',
                                           style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold,
                                             color: theme.colorScheme.primary,
                                           ),
                                         ),
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                        side: BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.3)),
                                         backgroundColor: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
                                         onPressed: () => _startStepTimer('Paso ${step.stepNumber}', durationSec),
                                       ),
@@ -780,16 +797,16 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                   // Floating Active Timer Banner (if active)
                   if (_timerInitialSeconds > 0)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       color: theme.colorScheme.primaryContainer,
                       child: Row(
                         children: [
                           Icon(
                             _isTimerRunning ? Icons.timer : Icons.timer_outlined,
                             color: theme.colorScheme.onPrimaryContainer,
-                            size: 22,
+                            size: 20,
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 8),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
@@ -808,7 +825,7 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                                   fontSize: 18,
                                   fontWeight: FontWeight.w900,
                                   color: _timerSecondsRemaining == 0
-                                      ? Colors.red
+                                      ? theme.colorScheme.error
                                       : theme.colorScheme.onPrimaryContainer,
                                   letterSpacing: 1.5,
                                 ),
@@ -845,9 +862,13 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                     padding: const EdgeInsets.all(16),
                     child: SizedBox(
                       width: double.infinity,
-                      height: 54,
+                      height: 56,
                       child: FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
                         onPressed: () {
+                          HapticFeedback.mediumImpact();
                           Navigator.of(context).push(
                             MaterialPageRoute(
                               builder: (ctx) => RecipeCookModeScreen(
@@ -857,7 +878,7 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                             ),
                           );
                         },
-                        icon: const Icon(Icons.outdoor_grill),
+                        icon: const Icon(Icons.soup_kitchen_rounded, size: 22),
                         label: Text(
                           strings.startCooking,
                           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -909,31 +930,7 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
       );
     }
 
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        imageWidget,
-        // Status bar & AppBar button contrast protection scrim
-        Positioned(
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 120,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.black.withValues(alpha: 0.75),
-                  Colors.transparent,
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
+    return imageWidget;
   }
 
   void _confirmDelete(BuildContext context, Recipe recipe) {

@@ -503,7 +503,7 @@ class _RecipeCookModeScreenState extends ConsumerState<RecipeCookModeScreen> {
                           elevation: 1,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                           child: Padding(
-                            padding: const EdgeInsets.all(22.0),
+                            padding: const EdgeInsets.all(24.0),
                             child: Column(
                               children: [
                                 Text(
@@ -551,12 +551,12 @@ class _RecipeCookModeScreenState extends ConsumerState<RecipeCookModeScreen> {
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
                               color: (_isTimerRunning && _timerSecondsRemaining <= 10 && _timerSecondsRemaining > 0)
-                                  ? Colors.orange.withValues(alpha: 0.15)
+                                  ? theme.colorScheme.errorContainer.withValues(alpha: 0.4)
                                   : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(16),
                               border: Border.all(
                                 color: (_isTimerRunning && _timerSecondsRemaining <= 10 && _timerSecondsRemaining > 0)
-                                    ? Colors.deepOrange
+                                    ? theme.colorScheme.error
                                     : (_isTimerRunning ? theme.colorScheme.primary : theme.colorScheme.outline.withValues(alpha: 0.3)),
                                 width: _isTimerRunning ? 2 : 1,
                               ),
@@ -578,7 +578,7 @@ class _RecipeCookModeScreenState extends ConsumerState<RecipeCookModeScreen> {
                                         fontSize: 32,
                                         fontWeight: FontWeight.bold,
                                         color: _timerSecondsRemaining == 0
-                                            ? Colors.red
+                                            ? theme.colorScheme.error
                                             : theme.colorScheme.onSurface,
                                         letterSpacing: 2,
                                       ),
@@ -624,13 +624,13 @@ class _RecipeCookModeScreenState extends ConsumerState<RecipeCookModeScreen> {
                           ),
                         ],
 
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 16),
 
                         Container(
                           padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surface,
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.25)),
                             boxShadow: [
                               BoxShadow(
@@ -689,7 +689,7 @@ class _RecipeCookModeScreenState extends ConsumerState<RecipeCookModeScreen> {
                                 final emoji = CulinaryCatalog.getEmoji(ing.name);
 
                                 return Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 4),
+                                  padding: const EdgeInsets.symmetric(vertical: 2),
                                   child: InkWell(
                                     onTap: () {
                                       HapticFeedback.lightImpact();
@@ -701,15 +701,16 @@ class _RecipeCookModeScreenState extends ConsumerState<RecipeCookModeScreen> {
                                         }
                                       });
                                     },
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Container(
+                                      constraints: const BoxConstraints(minHeight: 48),
+                                      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
                                       child: Row(
                                         children: [
                                           Icon(
                                             isChecked ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
-                                            color: isChecked ? Colors.green : theme.colorScheme.outline,
-                                            size: 20,
+                                            color: isChecked ? theme.colorScheme.primary : theme.colorScheme.outline,
+                                            size: 22,
                                           ),
                                           const SizedBox(width: 10),
                                           Text(emoji, style: const TextStyle(fontSize: 18)),
@@ -722,7 +723,7 @@ class _RecipeCookModeScreenState extends ConsumerState<RecipeCookModeScreen> {
                                                 name: scaledIng.name,
                                               ),
                                               style: TextStyle(
-                                                fontSize: 15,
+                                                fontSize: 14,
                                                 fontWeight: FontWeight.w600,
                                                 decoration: isChecked ? TextDecoration.lineThrough : null,
                                                 color: isChecked
@@ -758,6 +759,7 @@ class _RecipeCookModeScreenState extends ConsumerState<RecipeCookModeScreen> {
                     child: OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       ),
                       onPressed: _currentStepIndex > 0
                           ? () {
@@ -777,6 +779,7 @@ class _RecipeCookModeScreenState extends ConsumerState<RecipeCookModeScreen> {
                     child: FilledButton.icon(
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       ),
                       onPressed: () {
                         HapticFeedback.mediumImpact();

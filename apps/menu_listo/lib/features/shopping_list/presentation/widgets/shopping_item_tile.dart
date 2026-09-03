@@ -80,7 +80,7 @@ class ShoppingItemTile extends StatelessWidget {
             duration: const Duration(milliseconds: 200),
             opacity: item.isCompleted ? 0.55 : 1.0,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
                 children: [
                   // Checkbox
@@ -90,7 +90,7 @@ class ShoppingItemTile extends StatelessWidget {
                       HapticFeedback.lightImpact();
                       onToggle(val);
                     },
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                   ),
                   const SizedBox(width: 4),
 
@@ -108,7 +108,7 @@ class ShoppingItemTile extends StatelessWidget {
                           item.name,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            fontSize: 15,
+                            fontSize: 14,
                             decoration: item.isCompleted ? TextDecoration.lineThrough : null,
                             color: item.isCompleted ? theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6) : null,
                           ),
@@ -116,7 +116,10 @@ class ShoppingItemTile extends StatelessWidget {
                         if (item.sourceRecipeTitle.isNotEmpty)
                           Text(
                             item.sourceRecipeTitle,
-                            style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontSize: 12,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -127,14 +130,22 @@ class ShoppingItemTile extends StatelessWidget {
                   // Amount & Unit Badge
                   if (formattedAmount.isNotEmpty)
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.surfaceContainerHighest,
                         borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                          width: 1,
+                        ),
                       ),
                       child: Text(
                         '$formattedAmount ${item.unit}'.trim(),
-                        style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                          color: theme.colorScheme.onSurface,
+                        ),
                       ),
                     ),
                 ],
