@@ -1,0 +1,7 @@
+Welcome to Menú Listo! 🍳 Your all-in-one meal planner and culinary assistant:
+• Smart recipe catalog & "Cook with what's in my fridge" finder.
+• Complete weekly meal planner (breakfast, lunch, snack & dinner).
+• Dynamic portion scaler for instant ingredient recalculation.
+• Smart grocery list automatically consolidated by store aisles.
+• Interactive Cook Mode with timers and hands-free gesture control.
+• 100% offline, lightning-fast, and completely private.
