@@ -21,7 +21,6 @@ class AppShell extends ConsumerStatefulWidget {
 class _AppShellState extends ConsumerState<AppShell> {
   // Tabs: 0: Recipes (Home - first in list), 1: Planner, 2: Shopping, 3: Settings
   int _currentIndex = 0;
-  late final PageController _pageController;
 
   final List<Widget> _screens = const [
     RecipesListScreen(),
@@ -29,33 +28,6 @@ class _AppShellState extends ConsumerState<AppShell> {
     ShoppingListScreen(),
     SettingsScreen(),
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController(initialPage: _currentIndex);
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  void _onPageChanged(int index) {
-    if (_currentIndex != index) {
-      setState(() => _currentIndex = index);
-    }
-    if (index == 1) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) WeeklyPlannerScreen.showGuideIfFirstTime(context);
-      });
-    } else if (index == 2) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) ShoppingListScreen.showGuideIfFirstTime(context);
-      });
-    }
-  }
 
   void _onCenterActionPressed(BuildContext context) {
     if (_currentIndex == 1) {
@@ -83,12 +55,8 @@ class _AppShellState extends ConsumerState<AppShell> {
 
     return Scaffold(
       extendBody: true,
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: (index) {
-          HapticFeedback.selectionClick();
-          _onPageChanged(index);
-        },
+      body: IndexedStack(
+        index: _currentIndex,
         children: _screens,
       ),
       floatingActionButton: _currentIndex == 3
@@ -149,12 +117,16 @@ class _AppShellState extends ConsumerState<AppShell> {
             onDestinationSelected: (index) {
               HapticFeedback.selectionClick();
               if (_currentIndex != index) {
-                _pageController.animateToPage(
-                  index,
-                  duration: const Duration(milliseconds: 280),
-                  curve: Curves.easeInOutCubic,
-                );
-                _onPageChanged(index);
+                setState(() => _currentIndex = index);
+                if (index == 1) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) WeeklyPlannerScreen.showGuideIfFirstTime(context);
+                  });
+                } else if (index == 2) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (mounted) ShoppingListScreen.showGuideIfFirstTime(context);
+                  });
+                }
               }
             },
             destinations: [
