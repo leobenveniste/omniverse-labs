@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,124 +23,6 @@ class RecipeDetailScreen extends ConsumerStatefulWidget {
 
 class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
   int? _currentServings;
-
-  // Floating Interactive Step Timer
-  Timer? _activeTimer;
-  int _timerSecondsRemaining = 0;
-  int _timerInitialSeconds = 0;
-  String _timerLabel = '';
-  bool _isTimerRunning = false;
-
-  @override
-  void dispose() {
-    _activeTimer?.cancel();
-    super.dispose();
-  }
-
-  void _startStepTimer(String label, int seconds) {
-    _activeTimer?.cancel();
-    setState(() {
-      _timerLabel = label;
-      _timerInitialSeconds = seconds;
-      _timerSecondsRemaining = seconds;
-      _isTimerRunning = true;
-    });
-
-    _activeTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_timerSecondsRemaining > 1) {
-        setState(() => _timerSecondsRemaining--);
-      } else {
-        timer.cancel();
-        setState(() {
-          _timerSecondsRemaining = 0;
-          _isTimerRunning = false;
-        });
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              backgroundColor: Colors.deepOrange,
-              content: Row(
-                children: [
-                  const Icon(Icons.alarm_on, color: Colors.white),
-                  const SizedBox(width: 8),
-                  Text('⏰ ¡Tiempo cumplido para $_timerLabel!'),
-                ],
-              ),
-            ),
-          );
-        }
-      }
-    });
-  }
-
-  void _toggleActiveTimer() {
-    if (_isTimerRunning) {
-      _activeTimer?.cancel();
-      setState(() => _isTimerRunning = false);
-    } else {
-      if (_timerSecondsRemaining <= 0) return;
-      setState(() => _isTimerRunning = true);
-      _activeTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        if (_timerSecondsRemaining > 1) {
-          setState(() => _timerSecondsRemaining--);
-        } else {
-          timer.cancel();
-          setState(() {
-            _timerSecondsRemaining = 0;
-            _isTimerRunning = false;
-          });
-        }
-      });
-    }
-  }
-
-  void _resetActiveTimer() {
-    _activeTimer?.cancel();
-    setState(() {
-      _isTimerRunning = false;
-      _timerSecondsRemaining = _timerInitialSeconds;
-    });
-  }
-
-  void _addMinuteToActiveTimer() {
-    setState(() {
-      _timerSecondsRemaining += 60;
-      _timerInitialSeconds += 60;
-    });
-  }
-
-  void _closeActiveTimer() {
-    _activeTimer?.cancel();
-    setState(() {
-      _timerInitialSeconds = 0;
-      _timerSecondsRemaining = 0;
-      _isTimerRunning = false;
-    });
-  }
-
-  int _detectSeconds(String text) {
-    final minMatch = RegExp(r'(\d+)\s*(?:minutos?|mins?|min)\b', caseSensitive: false).firstMatch(text);
-    final hourMatch = RegExp(r'(\d+)\s*(?:horas?|hrs?|hs?|h)\b', caseSensitive: false).firstMatch(text);
-    final secMatch = RegExp(r'(\d+)\s*(?:segundos?|segs?|seg)\b', caseSensitive: false).firstMatch(text);
-
-    int total = 0;
-    if (minMatch != null) total += (int.tryParse(minMatch.group(1)!) ?? 0) * 60;
-    if (hourMatch != null) total += (int.tryParse(hourMatch.group(1)!) ?? 0) * 3600;
-    if (secMatch != null) total += (int.tryParse(secMatch.group(1)!) ?? 0);
-    return total;
-  }
-
-  String _formatTimerDisplay(int totalSeconds) {
-    final m = (totalSeconds ~/ 60).toString().padLeft(2, '0');
-    final s = (totalSeconds % 60).toString().padLeft(2, '0');
-    return '$m:$s';
-  }
-
-  String _formatTimerChip(int totalSeconds) {
-    final minutes = totalSeconds ~/ 60;
-    if (minutes > 0) return '$minutes min';
-    return '$totalSeconds seg';
-  }
 
   void _showScheduleSheet(BuildContext context, Recipe recipe, int servings) {
     final theme = Theme.of(context);
@@ -713,8 +594,6 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                             );
                           }
 
-                          final durationSec = _detectSeconds(step.instruction);
-
                           return Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -737,35 +616,12 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                               ),
                               const SizedBox(width: 12),
                               Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      step.instruction,
-                                      style: theme.textTheme.bodyMedium?.copyWith(
-                                        fontSize: 14,
-                                        height: 1.5,
-                                      ),
-                                    ),
-                                    if (durationSec > 0) ...[
-                                      const SizedBox(height: 8),
-                                      ActionChip(
-                                        avatar: const Icon(Icons.timer_outlined, size: 14),
-                                        label: Text(
-                                          '⏱️ ${_formatTimerChip(durationSec)}',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                            color: theme.colorScheme.primary,
-                                          ),
-                                        ),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                        side: BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.3)),
-                                        backgroundColor: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
-                                        onPressed: () => _startStepTimer('Paso ${step.stepNumber}', durationSec),
-                                      ),
-                                    ],
-                                  ],
+                                child: Text(
+                                  step.instruction,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontSize: 14,
+                                    height: 1.5,
+                                  ),
                                 ),
                               ),
                             ],
@@ -791,76 +647,9 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
               ],
             ),
             child: SafeArea(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Floating Active Timer Banner (if active)
-                  if (_timerInitialSeconds > 0)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      color: theme.colorScheme.primaryContainer,
-                      child: Row(
-                        children: [
-                          Icon(
-                            _isTimerRunning ? Icons.timer : Icons.timer_outlined,
-                            color: theme.colorScheme.onPrimaryContainer,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 8),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                _timerLabel,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: theme.colorScheme.onPrimaryContainer,
-                                ),
-                              ),
-                              Text(
-                                _formatTimerDisplay(_timerSecondsRemaining),
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w900,
-                                  color: _timerSecondsRemaining == 0
-                                      ? theme.colorScheme.error
-                                      : theme.colorScheme.onPrimaryContainer,
-                                  letterSpacing: 1.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const Spacer(),
-                          IconButton.filledTonal(
-                            icon: Icon(_isTimerRunning ? Icons.pause : Icons.play_arrow, size: 20),
-                            onPressed: _toggleActiveTimer,
-                          ),
-                          const SizedBox(width: 4),
-                          IconButton.filledTonal(
-                            icon: const Icon(Icons.more_time, size: 20),
-                            tooltip: '+1 min',
-                            onPressed: _addMinuteToActiveTimer,
-                          ),
-                          const SizedBox(width: 4),
-                          IconButton.filledTonal(
-                            icon: const Icon(Icons.refresh, size: 20),
-                            tooltip: 'Reiniciar',
-                            onPressed: _resetActiveTimer,
-                          ),
-                          const SizedBox(width: 4),
-                          IconButton(
-                            icon: const Icon(Icons.close, size: 18),
-                            onPressed: _closeActiveTimer,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: SizedBox(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: SizedBox(
                       width: double.infinity,
                       height: 56,
                       child: FilledButton.icon(
@@ -886,12 +675,10 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                       ),
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
-        );
-      },
+            );
+          },
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (_, _) => Scaffold(body: Center(child: Text(strings.emptyTitle))),
     );

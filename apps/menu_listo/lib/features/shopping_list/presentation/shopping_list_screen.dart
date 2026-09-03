@@ -361,9 +361,10 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                 // Categorized Grouping View (without dividers)
                 final Map<String, List<ShoppingItem>> grouped = {};
                 for (var item in items) {
-                  final cat = item.category.isNotEmpty && item.category != 'General'
-                      ? item.category
-                      : CulinaryCatalog.getCategory(item.name);
+                  final cat = CulinaryCatalog.normalizeCategory(
+                    item.category,
+                    ingredientName: item.name,
+                  );
                   grouped.putIfAbsent(cat, () => []).add(item);
                 }
 
@@ -379,10 +380,12 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                     String catIcon = '🛒';
                     if (category.contains('Verd') || category.contains('Frut')) catIcon = '🥬';
                     if (category.contains('Carn') || category.contains('Pesc')) catIcon = '🥩';
-                    if (category.contains('Láct')) catIcon = '🧀';
-                    if (category.contains('Gran') || category.contains('Past')) catIcon = '🌾';
-                    if (category.contains('Desp') || category.contains('Almac')) catIcon = '🥫';
-                    if (category.contains('Espec')) catIcon = '🧂';
+                    if (category.contains('Láct') || category.contains('Huevo')) catIcon = '🧀';
+                    if (category.contains('Pan')) catIcon = '🍞';
+                    if (category.contains('Espec') || category.contains('Cond')) catIcon = '🧂';
+                    if (category.contains('Bebid')) catIcon = '🧃';
+                    if (category.contains('Repost')) catIcon = '🧁';
+                    if (category.contains('Desp') || category.contains('Almac') || category.contains('Gran') || category.contains('Past')) catIcon = '🥫';
 
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 16.0),

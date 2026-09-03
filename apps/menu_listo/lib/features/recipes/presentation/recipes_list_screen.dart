@@ -267,10 +267,7 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                     return isFiltering ? _buildNoResultsState(context, strings) : _buildEmptyState(context, strings);
                   }
 
-                  return Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 4, 20, 130),
-                    child: _isGridView ? _buildGridView(context, recipes) : _buildListView(context, recipes),
-                  );
+                  return _isGridView ? _buildGridView(context, recipes) : _buildListView(context, recipes);
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (e, _) => Center(child: Text('Error: $e')),
@@ -359,6 +356,7 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
   // --- GRID VIEW ---
   Widget _buildGridView(BuildContext context, List<Recipe> recipes) {
     return GridView.builder(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 130),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: 1.15,
@@ -489,8 +487,9 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
   // --- LIST VIEW ---
   Widget _buildListView(BuildContext context, List<Recipe> recipes) {
     return ListView.separated(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 130),
       itemCount: recipes.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 6),
+      separatorBuilder: (_, _) => const SizedBox(height: 8),
       itemBuilder: (context, index) {
         final recipe = recipes[index];
         return _buildListCard(context, recipe);

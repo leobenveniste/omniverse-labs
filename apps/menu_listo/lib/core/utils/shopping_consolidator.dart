@@ -1,4 +1,5 @@
 import 'package:uuid/uuid.dart';
+import 'package:menu_listo/core/utils/culinary_catalog.dart';
 import 'package:menu_listo/features/recipes/models/ingredient_model.dart';
 import 'package:menu_listo/features/shopping_list/models/shopping_item_model.dart';
 
@@ -96,20 +97,7 @@ class ShoppingConsolidator {
   }
 
   static String _guessCategory(String name) {
-    final lower = name.toLowerCase();
-    if (lower.contains('cebolla') || lower.contains('tomate') || lower.contains('ajo') || lower.contains('zanahoria') || lower.contains('espinaca') || lower.contains('papa') || lower.contains('lechuga') || lower.contains('palta')) {
-      return 'Verdulería';
-    }
-    if (lower.contains('carne') || lower.contains('pollo') || lower.contains('bife') || lower.contains('lomo') || lower.contains('cerdo') || lower.contains('pescado') || lower.contains('salmón')) {
-      return 'Carnicería / Pescadería';
-    }
-    if (lower.contains('leche') || lower.contains('queso') || lower.contains('crema') || lower.contains('manteca') || lower.contains('huevo') || lower.contains('yogur')) {
-      return 'Lácteos & Huevos';
-    }
-    if (lower.contains('arroz') || lower.contains('pasta') || lower.contains('fideo') || lower.contains('harina') || lower.contains('avena') || lower.contains('aceite') || lower.contains('sal') || lower.contains('azúcar')) {
-      return 'Despensa';
-    }
-    return 'General';
+    return CulinaryCatalog.getCategory(name);
   }
 }
 

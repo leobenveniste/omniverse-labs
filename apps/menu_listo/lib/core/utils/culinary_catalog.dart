@@ -236,22 +236,115 @@ class CulinaryCatalog {
     return 'unidades';
   }
 
+  /// Standardizes category names across the app so that variations
+  /// like 'Verdulería' and 'Verduras', 'Lácteos' and 'Lácteos & Huevos', etc.
+  /// are merged into cohesive, unified grocery aisles.
+  static String normalizeCategory(String? rawCategory, {String? ingredientName}) {
+    String cat = (rawCategory ?? '').trim();
+    if (cat.isEmpty || cat.toLowerCase() == 'general') {
+      if (ingredientName != null && ingredientName.trim().isNotEmpty) {
+        cat = getCategory(ingredientName);
+      } else {
+        cat = 'General';
+      }
+    }
+
+    final lower = removeDiacritics(cat.toLowerCase());
+
+    // 1. Verdulería (Verduras, Hortalizas, Vegetales, Frutas, Verduleria)
+    if (lower.contains('verdur') ||
+        lower.contains('verdul') ||
+        lower.contains('hortaliz') ||
+        lower.contains('vegetal') ||
+        lower.contains('frut')) {
+      return 'Verdulería';
+    }
+
+    // 2. Carnicería y Pescadería
+    if (lower.contains('carn') ||
+        lower.contains('pescad') ||
+        lower.contains('pescader') ||
+        lower.contains('pollo') ||
+        lower.contains('marisc') ||
+        lower.contains('embutid')) {
+      return 'Carnicería';
+    }
+
+    // 3. Lácteos y Huevos
+    if (lower.contains('lact') ||
+        lower.contains('ques') ||
+        lower.contains('huevo') ||
+        lower.contains('leche') ||
+        lower.contains('mantec') ||
+        lower.contains('yogur')) {
+      return 'Lácteos y Huevos';
+    }
+
+    // 4. Panadería
+    if (lower.contains('panad') ||
+        lower.contains('pan') ||
+        lower.contains('bakery')) {
+      return 'Panadería';
+    }
+
+    // 5. Condimentos y Especias
+    if (lower.contains('espec') ||
+        lower.contains('condiment') ||
+        lower.contains('hierb') ||
+        lower.contains('sazon')) {
+      return 'Condimentos y Especias';
+    }
+
+    // 6. Bebidas
+    if (lower.contains('bebid') ||
+        lower.contains('jugo') ||
+        lower.contains('gaseos') ||
+        lower.contains('vino') ||
+        lower.contains('cervez') ||
+        lower.contains('trago')) {
+      return 'Bebidas';
+    }
+
+    // 7. Repostería
+    if (lower.contains('reposter') ||
+        lower.contains('dulce') ||
+        lower.contains('chocolat')) {
+      return 'Repostería';
+    }
+
+    // 8. Despensa / Almacén
+    if (lower.contains('despens') ||
+        lower.contains('almac') ||
+        lower.contains('gran') ||
+        lower.contains('past') ||
+        lower.contains('legumbr') ||
+        lower.contains('arroz') ||
+        lower.contains('harin') ||
+        lower.contains('aceit') ||
+        lower.contains('conser')) {
+      return 'Despensa';
+    }
+
+    return cat.isNotEmpty ? cat : 'General';
+  }
+
   static String getCategory(String ingredientName) {
     if (ingredientName.trim().isEmpty) return 'General';
     final lower = ingredientName.toLowerCase();
     for (var item in ingredients) {
       if (lower.contains(item.name.toLowerCase()) || lower.contains(item.nameEn.toLowerCase())) {
-        return item.category;
+        return normalizeCategory(item.category);
       }
     }
-    if (lower.contains('carne') || lower.contains('pollo') || lower.contains('bife') || lower.contains('cerdo') || lower.contains('panceta') || lower.contains('jamón')) return 'Carnes';
-    if (lower.contains('pescado') || lower.contains('salmón') || lower.contains('atún') || lower.contains('merluza') || lower.contains('langostino')) return 'Pescados';
-    if (lower.contains('queso') || lower.contains('leche') || lower.contains('crema') || lower.contains('yogur') || lower.contains('manteca') || lower.contains('huevo')) return 'Lácteos';
-    if (lower.contains('cebolla') || lower.contains('tomate') || lower.contains('papa') || lower.contains('zanahoria') || lower.contains('lechuga') || lower.contains('ajo') || lower.contains('espinaca') || lower.contains('palta') || lower.contains('morron') || lower.contains('morrón') || lower.contains('pimiento')) return 'Verduras';
-    if (lower.contains('manzana') || lower.contains('banana') || lower.contains('limón') || lower.contains('naranja') || lower.contains('frutilla')) return 'Frutas';
-    if (lower.contains('arroz') || lower.contains('fideo') || lower.contains('pasta') || lower.contains('pan') || lower.contains('avena')) return 'Granos';
+    if (lower.contains('carne') || lower.contains('pollo') || lower.contains('bife') || lower.contains('cerdo') || lower.contains('panceta') || lower.contains('jamón')) return 'Carnicería';
+    if (lower.contains('pescado') || lower.contains('salmón') || lower.contains('atún') || lower.contains('merluza') || lower.contains('langostino')) return 'Carnicería';
+    if (lower.contains('queso') || lower.contains('leche') || lower.contains('crema') || lower.contains('yogur') || lower.contains('manteca') || lower.contains('huevo')) return 'Lácteos y Huevos';
+    if (lower.contains('cebolla') || lower.contains('tomate') || lower.contains('papa') || lower.contains('zanahoria') || lower.contains('lechuga') || lower.contains('ajo') || lower.contains('espinaca') || lower.contains('palta') || lower.contains('morron') || lower.contains('morrón') || lower.contains('pimiento')) return 'Verdulería';
+    if (lower.contains('manzana') || lower.contains('banana') || lower.contains('limón') || lower.contains('naranja') || lower.contains('frutilla')) return 'Verdulería';
+    if (lower.contains('pan') || lower.contains('baguette') || lower.contains('tostada')) return 'Panadería';
+    if (lower.contains('arroz') || lower.contains('fideo') || lower.contains('pasta') || lower.contains('avena')) return 'Despensa';
     if (lower.contains('harina') || lower.contains('azúcar') || lower.contains('chocolate') || lower.contains('vainilla') || lower.contains('polvo para hornear')) return 'Repostería';
-    if (lower.contains('sal') || lower.contains('pimienta') || lower.contains('orégano') || lower.contains('pimentón') || lower.contains('comino') || lower.contains('laurel') || lower.contains('tomillo') || lower.contains('romero') || lower.contains('albahaca') || lower.contains('perejil') || lower.contains('cilantro')) return 'Especias';
+    if (lower.contains('sal') || lower.contains('pimienta') || lower.contains('orégano') || lower.contains('pimentón') || lower.contains('comino') || lower.contains('laurel') || lower.contains('tomillo') || lower.contains('romero') || lower.contains('albahaca') || lower.contains('perejil') || lower.contains('cilantro')) return 'Condimentos y Especias';
     if (lower.contains('aceite') || lower.contains('vinagre') || lower.contains('vino') || lower.contains('caldo') || lower.contains('soja') || lower.contains('salsa') || lower.contains('mostaza') || lower.contains('mayonesa')) return 'Despensa';
     return 'General';
   }

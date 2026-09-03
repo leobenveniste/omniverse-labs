@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:menu_listo/core/utils/culinary_catalog.dart';
 import 'package:menu_listo/core/utils/portion_calculator.dart';
 import 'package:menu_listo/core/utils/ingredient_parser.dart';
 import 'package:menu_listo/core/utils/shopping_consolidator.dart';
@@ -49,6 +50,19 @@ void main() {
       expect(consolidated.first.amount, equals(5.0));
       expect(consolidated.first.sourceRecipeTitle, contains('Tarta'));
       expect(consolidated.first.sourceRecipeTitle, contains('Sopa'));
+      expect(consolidated.first.category, equals('Verdulería'));
+    });
+  });
+
+  group('CulinaryCatalog Category Tests', () {
+    test('Normalizes and merges Verduras and Verdulería into a single category', () {
+      expect(CulinaryCatalog.normalizeCategory('Verduras'), equals('Verdulería'));
+      expect(CulinaryCatalog.normalizeCategory('Verdulería'), equals('Verdulería'));
+      expect(CulinaryCatalog.normalizeCategory('Hortalizas'), equals('Verdulería'));
+      expect(CulinaryCatalog.normalizeCategory('Frutas'), equals('Verdulería'));
+      expect(CulinaryCatalog.normalizeCategory(null, ingredientName: 'Zanahoria'), equals('Verdulería'));
+      expect(CulinaryCatalog.normalizeCategory(null, ingredientName: 'Bife de chorizo'), equals('Carnicería'));
+      expect(CulinaryCatalog.normalizeCategory('Lácteos'), equals('Lácteos y Huevos'));
     });
   });
 }
