@@ -1,4 +1,3 @@
-import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -53,7 +52,6 @@ class _AppShellState extends ConsumerState<AppShell> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final strings = AppStrings.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       extendBody: true,
@@ -69,96 +67,84 @@ class _AppShellState extends ConsumerState<AppShell> {
                 _onCenterActionPressed(context);
               },
               backgroundColor: theme.colorScheme.primary,
-              elevation: 4,
-              shape: const CircleBorder(),
-              child: Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: theme.colorScheme.primary,
-                ),
-                child: const Center(
-                  child: Icon(Icons.add_rounded, color: Colors.white, size: 32),
-                ),
+              foregroundColor: Colors.white,
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
               ),
+              child: const Icon(Icons.add_rounded, size: 28),
             ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
-          child: ClipRRect(
-            borderRadius: const BorderRadius.only(
-              bottomLeft: Radius.circular(28),
-              bottomRight: Radius.circular(28),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      bottomNavigationBar: NavigationBarTheme(
+        data: NavigationBarThemeData(
+          height: 68,
+          backgroundColor: theme.colorScheme.surfaceContainer,
+          elevation: 0,
+          indicatorColor: theme.colorScheme.secondaryContainer,
+          indicatorShape: const StadiumBorder(),
+          labelTextStyle: WidgetStateProperty.resolveWith((states) {
+            final isSelected = states.contains(WidgetState.selected);
+            return TextStyle(
+              fontSize: 12,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              color: isSelected
+                  ? theme.colorScheme.secondary
+                  : theme.colorScheme.onSurfaceVariant,
+            );
+          }),
+          iconTheme: WidgetStateProperty.resolveWith((states) {
+            final isSelected = states.contains(WidgetState.selected);
+            return IconThemeData(
+              size: 24,
+              color: isSelected
+                  ? theme.colorScheme.onSecondaryContainer
+                  : theme.colorScheme.onSurfaceVariant,
+            );
+          }),
+        ),
+        child: NavigationBar(
+          selectedIndex: _currentIndex,
+          onDestinationSelected: (index) {
+            HapticFeedback.selectionClick();
+            if (_currentIndex != index) {
+              setState(() => _currentIndex = index);
+              if (index == 1) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) WeeklyPlannerScreen.showGuideIfFirstTime(context);
+                });
+              } else if (index == 2) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) ShoppingListScreen.showGuideIfFirstTime(context);
+                });
+              }
+            }
+          },
+          destinations: [
+            NavigationDestination(
+              icon: const Icon(Icons.menu_book_outlined),
+              selectedIcon: const Icon(Icons.menu_book_rounded),
+              label: strings.tabRecipes,
+              tooltip: strings.tabRecipes,
             ),
-            child: AnimatedBottomNavigationBar.builder(
-              itemCount: 4,
-              tabBuilder: (int index, bool isActive) {
-                final icons = [
-                  isActive ? Icons.menu_book_rounded : Icons.menu_book_outlined,
-                  isActive ? Icons.calendar_month_rounded : Icons.calendar_month_outlined,
-                  Icons.format_list_bulleted_rounded,
-                  isActive ? Icons.settings_rounded : Icons.settings_outlined,
-                ];
-                final tooltips = [
-                  strings.tabRecipes,
-                  strings.tabPlanner,
-                  strings.tabShopping,
-                  strings.tabSettings,
-                ];
-                final primaryColor = theme.colorScheme.primary;
-                final unselectedColor = theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6);
-
-                return Tooltip(
-                  message: tooltips[index],
-                  child: Center(
-                    child: Icon(
-                      icons[index],
-                      size: 26,
-                      color: isActive ? primaryColor : unselectedColor,
-                    ),
-                  ),
-                );
-              },
-              activeIndex: _currentIndex,
-              gapLocation: _currentIndex == 3 ? GapLocation.none : GapLocation.center,
-              notchSmoothness: _currentIndex == 3 ? NotchSmoothness.sharpEdge : NotchSmoothness.verySmoothEdge,
-              notchMargin: 8,
-              leftCornerRadius: 28,
-              rightCornerRadius: 28,
-              height: 64,
-              backgroundColor: isDark ? const Color(0xFF232E20) : Colors.white,
-              splashColor: theme.colorScheme.primary.withValues(alpha: 0.2),
-              splashRadius: 26,
-              splashSpeedInMilliseconds: 300,
-              elevation: 8,
-              shadow: Shadow(
-                color: Colors.black.withValues(alpha: isDark ? 0.6 : 0.08),
-                blurRadius: 20,
-                offset: const Offset(0, 6),
-              ),
-              borderColor: isDark
-                  ? Colors.white.withValues(alpha: 0.16)
-                  : theme.colorScheme.outline.withValues(alpha: 0.4),
-              borderWidth: 1.2,
-              onTap: (index) {
-                HapticFeedback.selectionClick();
-                if (_currentIndex != index) {
-                  setState(() => _currentIndex = index);
-                  if (index == 1) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      if (mounted) WeeklyPlannerScreen.showGuideIfFirstTime(context);
-                    });
-                  } else if (index == 2) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      if (mounted) ShoppingListScreen.showGuideIfFirstTime(context);
-                    });
-                  }
-                }
-              },
+            NavigationDestination(
+              icon: const Icon(Icons.calendar_month_outlined),
+              selectedIcon: const Icon(Icons.calendar_month_rounded),
+              label: strings.tabPlanner,
+              tooltip: strings.tabPlanner,
             ),
-          ),
+            NavigationDestination(
+              icon: const Icon(Icons.shopping_cart_outlined),
+              selectedIcon: const Icon(Icons.shopping_cart_rounded),
+              label: strings.tabShopping,
+              tooltip: strings.tabShopping,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.settings_outlined),
+              selectedIcon: const Icon(Icons.settings_rounded),
+              label: strings.tabSettings,
+              tooltip: strings.tabSettings,
+            ),
+          ],
         ),
       ),
     );
