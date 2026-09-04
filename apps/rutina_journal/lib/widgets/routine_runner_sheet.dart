@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
+import '../services/app_services.dart';
 import '../services/routine_service.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
@@ -15,6 +16,11 @@ class RoutineRunnerSheet extends StatelessWidget {
   });
 
   static void show(BuildContext context, RoutineService service) {
+    final audio = AppServices.of(context).audioService;
+    if (audio.isSoundEnabled) {
+      audio.playRoutineAmbient();
+    }
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -23,7 +29,9 @@ class RoutineRunnerSheet extends StatelessWidget {
         animation: service,
         builder: (ctx, _) => RoutineRunnerSheet(routineService: service),
       ),
-    );
+    ).whenComplete(() {
+      audio.stopAmbient();
+    });
   }
 
   String _formatTime(int totalSeconds) {

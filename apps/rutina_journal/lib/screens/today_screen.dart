@@ -250,11 +250,35 @@ class _TodayScreenState extends State<TodayScreen> {
                           final wasCompleted = log?.completed ?? false;
                           widget.habitService.toggleHabit(habit.id, cleanSelected);
                           if (!wasCompleted) {
-                            AppServices.of(context).audioService.playHabitChime();
+                            final todayHabits = widget.habitService.getHabitsForDate(cleanSelected);
+                            final doneCount = widget.habitService.getCompletedCountForDate(cleanSelected);
+                            final allDone = todayHabits.isNotEmpty && doneCount >= todayHabits.length;
+
+                            if (allDone) {
+                              AppServices.of(context).audioService.playAllHabitsCompleteSound();
+                              _showAllHabitsCompletedDialog(context);
+                            } else {
+                              AppServices.of(context).audioService.playHabitChime();
+                            }
                           }
                         },
-                        onDelta: (delta) =>
-                            widget.habitService.updateCounter(habit.id, cleanSelected, delta),
+                        onDelta: (delta) {
+                          final wasCompleted = log?.completed ?? false;
+                          widget.habitService.updateCounter(habit.id, cleanSelected, delta);
+                          final isCompletedNow = widget.habitService.isCompleted(habit.id, dateKey);
+                          if (!wasCompleted && isCompletedNow) {
+                            final todayHabits = widget.habitService.getHabitsForDate(cleanSelected);
+                            final doneCount = widget.habitService.getCompletedCountForDate(cleanSelected);
+                            final allDone = todayHabits.isNotEmpty && doneCount >= todayHabits.length;
+
+                            if (allDone) {
+                              AppServices.of(context).audioService.playAllHabitsCompleteSound();
+                              _showAllHabitsCompletedDialog(context);
+                            } else {
+                              AppServices.of(context).audioService.playHabitChime();
+                            }
+                          }
+                        },
                         onEdit: () => _openEditHabitDialog(context, habit),
                       ),
                     );
@@ -582,6 +606,93 @@ class _TodayScreenState extends State<TodayScreen> {
       onDelete: () async {
         await widget.habitService.deleteHabit(habit.id);
       },
+    );
+  }
+
+  void _showAllHabitsCompletedDialog(BuildContext context) {
+    HapticsHelper.heavy();
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+        ),
+        backgroundColor: theme.colorScheme.surface,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 76,
+                height: 76,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      theme.colorScheme.primary,
+                      theme.colorScheme.secondary,
+                    ],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.35),
+                      blurRadius: 20,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.emoji_events_rounded,
+                  color: Colors.white,
+                  size: 40,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Text(
+                l10n.t('allHabitsCompletedTitle'),
+                textAlign: TextAlign.center,
+                style: AppTypography.display(theme.colorScheme.onSurface).copyWith(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                l10n.t('allHabitsCompletedSubtitle'),
+                textAlign: TextAlign.center,
+                style: AppTypography.body(
+                  theme.colorScheme.onSurface.withValues(alpha: 0.75),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                    ),
+                  ),
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: Text(
+                    l10n.t('actionClose'),
+                    style: AppTypography.body(theme.colorScheme.onPrimary, isMedium: true),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

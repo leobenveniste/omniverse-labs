@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../models/journal_entry.dart';
+import '../services/app_services.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 import '../utils/haptics_helper.dart';
@@ -87,6 +88,9 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
 
   void _save() {
     HapticsHelper.medium();
+    try {
+      AppServices.of(context).audioService.playJournalSavedSound();
+    } catch (_) {}
     widget.onSave(
       moodLevel: _selectedMood,
       energyLevel: _energyLevel,

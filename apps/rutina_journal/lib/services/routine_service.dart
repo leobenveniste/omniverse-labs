@@ -50,16 +50,30 @@ class RoutineService extends ChangeNotifier {
 
     _routines = await _storage.loadRoutines();
     if (_routines.isEmpty) {
-      _initDefaultRoutines();
+      _routines = _buildDefaultRoutines();
       await _storage.saveRoutines(_routines);
+    } else {
+      // Seamlessly merge new default routines if not already added
+      final existingTitles = _routines.map((r) => r.title).toSet();
+      final defaults = _buildDefaultRoutines();
+      bool addedNew = false;
+      for (final def in defaults) {
+        if (!existingTitles.contains(def.title)) {
+          _routines.add(def);
+          addedNew = true;
+        }
+      }
+      if (addedNew) {
+        await _storage.saveRoutines(_routines);
+      }
     }
 
     _isLoading = false;
     notifyListeners();
   }
 
-  void _initDefaultRoutines() {
-    _routines = [
+  List<Routine> _buildDefaultRoutines() {
+    return [
       Routine(
         id: _uuid.v4(),
         title: 'routineMorning',
@@ -137,6 +151,84 @@ class RoutineService extends ChangeNotifier {
             title: 'Cierre mental y desconexión',
             durationSeconds: 60,
             description: 'Cierra tu laptop y respira hondo: la jornada concluyó.',
+          ),
+        ],
+      ),
+      Routine(
+        id: _uuid.v4(),
+        title: 'routineDeepFocus',
+        description: 'routineDeepFocusDesc',
+        reminderTime: '10:00',
+        steps: [
+          RoutineStep(
+            id: _uuid.v4(),
+            title: 'Preparar entorno y silenciar distracciones',
+            durationSeconds: 120,
+            description: 'Pon el móvil boca abajo, llena tu vaso de agua y cierra pestañas innecesarias.',
+          ),
+          RoutineStep(
+            id: _uuid.v4(),
+            title: 'Definir objetivo único del bloque',
+            durationSeconds: 60,
+            description: 'Escribe en una frase clara el entregable tangible de esta sesión.',
+          ),
+          RoutineStep(
+            id: _uuid.v4(),
+            title: 'Sesión de trabajo profundo (Deep Work)',
+            durationSeconds: 1500,
+            description: 'Foco total e ininterrumpido en una sola tarea de alto valor.',
+          ),
+        ],
+      ),
+      Routine(
+        id: _uuid.v4(),
+        title: 'routineMiddayReset',
+        description: 'routineMiddayResetDesc',
+        reminderTime: '14:00',
+        steps: [
+          RoutineStep(
+            id: _uuid.v4(),
+            title: 'Movilidad de cuello, hombros y espalda',
+            durationSeconds: 180,
+            description: 'Descomprime la postura sentada con rotaciones lentas y estiramientos suaves.',
+          ),
+          RoutineStep(
+            id: _uuid.v4(),
+            title: 'Hidratación y mirada al horizonte',
+            durationSeconds: 60,
+            description: 'Bebe agua y relaja la vista mirando un punto lejano por la ventana.',
+          ),
+          RoutineStep(
+            id: _uuid.v4(),
+            title: 'Respiración consciente y calma',
+            durationSeconds: 180,
+            description: 'Oxigena tu mente con respiraciones profundas para reiniciar tu tarde.',
+          ),
+        ],
+      ),
+      Routine(
+        id: _uuid.v4(),
+        title: 'routineWorkoutWarmup',
+        description: 'routineWorkoutWarmupDesc',
+        reminderTime: '18:30',
+        steps: [
+          RoutineStep(
+            id: _uuid.v4(),
+            title: 'Música motivacional e hidratación',
+            durationSeconds: 120,
+            description: 'Activa tu playlist energética y prepara tu botella de agua.',
+          ),
+          RoutineStep(
+            id: _uuid.v4(),
+            title: 'Movilidad articular dinámica',
+            durationSeconds: 240,
+            description: 'Círculos de tobillos, caderas, hombros y elevaciones de rodillas.',
+          ),
+          RoutineStep(
+            id: _uuid.v4(),
+            title: 'Enfoque mental y visualización',
+            durationSeconds: 60,
+            description: 'Visualiza la intensidad y los objetivos de tu entrenamiento de hoy.',
           ),
         ],
       ),

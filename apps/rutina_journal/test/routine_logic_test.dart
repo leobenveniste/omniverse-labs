@@ -24,8 +24,8 @@ void main() {
   });
 
   group('RoutineService Logic Tests', () {
-    test('Initializes with default routines (Morning, Evening, Work)', () {
-      expect(routineService.routines.length, 3);
+    test('Initializes with default routines (Morning, Evening, Work, Deep Focus, Midday Reset, Workout)', () {
+      expect(routineService.routines.length, 6);
       final morning = routineService.routines.first;
       expect(morning.steps.length, 3);
       expect(morning.totalMinutes, 13);
@@ -63,7 +63,7 @@ void main() {
       );
 
       await routineService.addRoutine(newRoutine);
-      expect(routineService.routines.length, 4);
+      expect(routineService.routines.length, 7);
       expect(routineService.routines.any((r) => r.id == 'test_routine_1'), isTrue);
 
       final updated = newRoutine.copyWith(title: 'Deep Work Sprint 2.0');
@@ -71,7 +71,7 @@ void main() {
       expect(routineService.routines.firstWhere((r) => r.id == 'test_routine_1').title, 'Deep Work Sprint 2.0');
 
       await routineService.deleteRoutine('test_routine_1');
-      expect(routineService.routines.length, 3);
+      expect(routineService.routines.length, 6);
       expect(routineService.routines.any((r) => r.id == 'test_routine_1'), isFalse);
     });
   });
