@@ -167,8 +167,47 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
             except Exception as e:
                 print(f"Ritmo Listing notice: {e}")
 
-            # Sync graphics and listings across English and Spanish locales
-            all_langs = ["es-419", "en-US", "en-GB", "es-ES"]
+            # Sync graphics and listings across all supported locales
+            extra_listings = {
+                "pt-BR": {
+                    "title": "Ritmo: Hábitos & Diário",
+                    "shortDescription": "Hábitos atômicos, rotinas guiadas e diário pessoal 100% offline.",
+                    "fullDescription": "Transforme seu dia a dia com Ritmo, o app completo para cultivar hábitos saudáveis, rotinas sequenciais e um diário consciente com total privacidade e 100% offline.\n\nDisponível em 5 idiomas, com 3 temas visuais exclusivos."
+                },
+                "fr-FR": {
+                    "title": "Ritmo : Habitudes & Journal",
+                    "shortDescription": "Habitudes atomiques, routines guidées et journal personnel 100% hors ligne.",
+                    "fullDescription": "Transformez votre quotidien avec Ritmo, l’application complète conçue pour cultiver des habitudes saines, structurer des routines quotidiennes et tenir un journal réflexif 100% privé et hors ligne.\n\nDisponible en 5 langues avec 3 thèmes esthétiques uniques."
+                },
+                "it-IT": {
+                    "title": "Ritmo: Abitudini & Diario",
+                    "shortDescription": "Abitudini atomiche, routine guidate e diario personale 100% offline.",
+                    "fullDescription": "Trasforma la tua vita quotidiana con Ritmo, l’app completa per coltivare abitudini sane, routine guidate e un diario riflessivo 100% privato e offline.\n\nDisponibile in 5 lingue con 3 stili estetici unici."
+                },
+                "es-ES": {
+                    "title": "Ritmo: Hábitos & Diario",
+                    "shortDescription": "Construye hábitos atómicos, rutinas guiadas y un diario reflexivo 100% offline.",
+                    "fullDescription": "Transforma tu día a día con Ritmo, la aplicación integral diseñada para ayudarte a cultivar hábitos conscientes, estructurar tus rutinas diarias y reflexionar con claridad mental, todo en una experiencia 100% privada, elegante y sin distracciones.\n\nDisponible en 5 idiomas con 3 presets estéticos únicos."
+                },
+                "en-GB": {
+                    "title": "Ritmo: Habits & Journal",
+                    "shortDescription": "Build atomic habits, guided routines, and a mindful micro-journal 100% offline.",
+                    "fullDescription": "Transform your daily life with Ritmo, the all-in-one companion designed to help you build positive habits, flow through guided daily routines, and reflect with mindful clarity—all in a private, distraction-free, and beautifully crafted offline experience.\n\nAvailable in 5 global languages with 3 switchable aesthetic presets."
+                }
+            }
+
+            for extra_lang, extra_body in extra_listings.items():
+                try:
+                    edits.listings().update(
+                        packageName=package_name,
+                        editId=edit_id,
+                        language=extra_lang,
+                        body=extra_body
+                    ).execute()
+                except Exception as e:
+                    print(f"Ritmo Listing notice ({extra_lang}): {e}")
+
+            all_langs = ["es-419", "en-US", "en-GB", "es-ES", "pt-BR", "fr-FR", "it-IT"]
             for lang in all_langs:
                 if os.path.exists(icon_path):
                     try:
