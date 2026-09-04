@@ -132,7 +132,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
-            android:text="Meditación & calma"
+            android:text="Meditación &amp; calma"
             android:textSize="12sp"
             android:textColor="#1B221C"
             android:maxLines="1"
@@ -211,7 +211,7 @@
             android:paddingEnd="14dp"
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
-            android:text="Desbloquear Pro • \.99"
+            android:text="Desbloquear Pro • $2.99"
             android:textSize="11sp"
             android:textStyle="bold"
             android:textColor="#2D4A2B" />
