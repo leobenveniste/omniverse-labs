@@ -9,6 +9,8 @@ class PreferencesService extends ChangeNotifier {
   static const String _keyNotifHabits = 'pref_notif_habits';
   static const String _keyNotifStreak = 'pref_notif_streak';
   static const String _keyNotifEvening = 'pref_notif_evening';
+  static const String _keyWaterDate = 'pref_water_date';
+  static const String _keyWaterCount = 'pref_water_count';
 
   final SharedPreferences _prefs;
 
@@ -18,6 +20,8 @@ class PreferencesService extends ChangeNotifier {
   bool _notifHabits = true;
   bool _notifStreak = true;
   bool _notifEvening = true;
+  int _waterCount = 0;
+  String _waterDate = '';
 
   PreferencesService(this._prefs) {
     _load();
@@ -30,6 +34,18 @@ class PreferencesService extends ChangeNotifier {
   bool get notifHabits => _notifHabits;
   bool get notifStreak => _notifStreak;
   bool get notifEvening => _notifEvening;
+  int get waterCount {
+    final today = _getTodayKey();
+    if (_waterDate != today) {
+      return 0;
+    }
+    return _waterCount;
+  }
+
+  String _getTodayKey() {
+    final now = DateTime.now();
+    return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+  }
 
   void _load() {
     final presetKey = _prefs.getString(_keyThemePreset);
@@ -44,6 +60,8 @@ class PreferencesService extends ChangeNotifier {
     _notifHabits = _prefs.getBool(_keyNotifHabits) ?? true;
     _notifStreak = _prefs.getBool(_keyNotifStreak) ?? true;
     _notifEvening = _prefs.getBool(_keyNotifEvening) ?? true;
+    _waterDate = _prefs.getString(_keyWaterDate) ?? '';
+    _waterCount = _prefs.getInt(_keyWaterCount) ?? 0;
   }
 
   Future<void> setThemePreset(AppThemePreset preset) async {
@@ -82,6 +100,22 @@ class PreferencesService extends ChangeNotifier {
   Future<void> setNotifEvening(bool value) async {
     _notifEvening = value;
     await _prefs.setBool(_keyNotifEvening, value);
+    notifyListeners();
+  }
+
+  Future<void> incrementWater({int maxGlasses = 8}) async {
+    final today = _getTodayKey();
+    if (_waterDate != today) {
+      _waterDate = today;
+      _waterCount = 0;
+    }
+    if (_waterCount < maxGlasses) {
+      _waterCount++;
+    } else {
+      _waterCount = 0; // wrap around on completion click
+    }
+    await _prefs.setString(_keyWaterDate, _waterDate);
+    await _prefs.setInt(_keyWaterCount, _waterCount);
     notifyListeners();
   }
 }

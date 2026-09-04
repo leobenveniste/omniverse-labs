@@ -5,6 +5,7 @@ import '../services/routine_service.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 import '../utils/haptics_helper.dart';
+import '../widgets/focus_zone_screen.dart';
 import '../widgets/routine_edit_dialog.dart';
 import '../widgets/routine_runner_sheet.dart';
 import '../widgets/state_button.dart';
@@ -47,16 +48,113 @@ class RoutinesScreen extends StatelessWidget {
         builder: (context, _) {
           final routines = routineService.routines;
 
-          return ListView.separated(
+          return ListView(
             padding: const EdgeInsets.all(AppSpacing.md),
-            itemCount: routines.length,
-            separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.md),
-            itemBuilder: (context, index) {
-              final routine = routines[index];
-              return _buildRoutineCard(context, routine);
-            },
+            children: [
+              // Hero Focus Zone Banner inspired by mockup
+              _buildFocusZoneHero(context, l10n, routines.isNotEmpty ? routines.first : null),
+              const SizedBox(height: AppSpacing.md),
+
+              // Routine List
+              ...routines.map((routine) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                  child: _buildRoutineCard(context, routine),
+                );
+              }),
+            ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildFocusZoneHero(BuildContext context, AppLocalizations l10n, Routine? defaultRoutine) {
+    const heroBg = Color(0xFF23362B);
+    const terracotta = Color(0xFFE07A5F);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: heroBg,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        boxShadow: [
+          BoxShadow(
+            color: heroBg.withValues(alpha: 0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xxs),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 14),
+                    const SizedBox(width: AppSpacing.xs),
+                    Text(
+                      l10n.t('focusModeTag'),
+                      style: AppTypography.caption(Colors.white, isMedium: true),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.xs),
+                decoration: BoxDecoration(
+                  color: terracotta,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                ),
+                child: const Icon(Icons.self_improvement_rounded, color: Colors.white, size: 22),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            l10n.t('enterFocusZone'),
+            style: AppTypography.title(Colors.white).copyWith(fontSize: 18),
+          ),
+          const SizedBox(height: AppSpacing.xxs),
+          Text(
+            l10n.t('focusZoneDesc'),
+            style: AppTypography.body(Colors.white.withValues(alpha: 0.8)),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: terracotta,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                ),
+                elevation: 0,
+              ),
+              onPressed: () {
+                HapticsHelper.medium();
+                FocusZoneScreen.show(context, routine: defaultRoutine);
+              },
+              icon: const Icon(Icons.play_arrow_rounded),
+              label: Text(
+                l10n.t('startFocusMode'),
+                style: AppTypography.body(Colors.white, isMedium: true),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

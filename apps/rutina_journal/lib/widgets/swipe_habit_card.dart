@@ -196,16 +196,32 @@ class _SwipeHabitCardState extends State<SwipeHabitCard>
                   duration: const Duration(milliseconds: 100),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: cardBgColor,
+                      color: isDark
+                          ? (isCompleted ? const Color(0xFF1E2420) : const Color(0xFF1B201D))
+                          : (isCompleted ? const Color(0xFFF3F5F2) : const Color(0xFFFBFBF9)),
                       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                      border: Border.all(
-                        color: cardBorderColor,
-                        width: 1.5,
+                      border: Border(
+                        left: BorderSide(
+                          color: categoryColor,
+                          width: 4.0,
+                        ),
+                        top: BorderSide(
+                          color: theme.colorScheme.outline.withValues(alpha: isDark ? 0.2 : 0.4),
+                          width: 1.0,
+                        ),
+                        right: BorderSide(
+                          color: theme.colorScheme.outline.withValues(alpha: isDark ? 0.2 : 0.4),
+                          width: 1.0,
+                        ),
+                        bottom: BorderSide(
+                          color: theme.colorScheme.outline.withValues(alpha: isDark ? 0.2 : 0.4),
+                          width: 1.0,
+                        ),
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: categoryColor.withValues(alpha: isCompleted ? 0.04 : 0.12),
-                          blurRadius: 8,
+                          color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                          blurRadius: 6,
                           offset: const Offset(0, 2),
                         ),
                       ],
@@ -232,22 +248,18 @@ class _SwipeHabitCardState extends State<SwipeHabitCard>
                             children: [
                               // Status / Category Icon Badge
                               Container(
-                                width: 40,
-                                height: 40,
+                                width: 42,
+                                height: 42,
                                 decoration: BoxDecoration(
                                   color: isCompleted
-                                      ? categoryColor
-                                      : categoryColor.withValues(alpha: 0.2),
-                                  shape: BoxShape.circle,
+                                      ? categoryColor.withValues(alpha: 0.18)
+                                      : categoryColor.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                                 ),
                                 child: Icon(
-                                  isCompleted
-                                      ? Icons.check_rounded
-                                      : widget.habit.category.icon,
+                                  widget.habit.category.icon,
                                   size: 22,
-                                  color: isCompleted
-                                      ? Colors.white
-                                      : categoryColor,
+                                  color: categoryColor,
                                 ),
                               ),
                               const SizedBox(width: AppSpacing.sm),
@@ -339,13 +351,46 @@ class _SwipeHabitCardState extends State<SwipeHabitCard>
                               // Dedicated Edit Icon Button
                               IconButton(
                                 icon: const Icon(Icons.edit_outlined),
-                                iconSize: 20,
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                iconSize: 18,
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                                 tooltip: l10n.t('actionEdit'),
                                 onPressed: () {
                                   HapticsHelper.light();
                                   widget.onEdit();
                                 },
+                              ),
+                              const SizedBox(width: AppSpacing.xxs),
+
+                              // Zen Circular Checkbox Button
+                              InkWell(
+                                onTap: () {
+                                  HapticsHelper.selection();
+                                  widget.onToggle();
+                                },
+                                borderRadius: BorderRadius.circular(16),
+                                child: Container(
+                                  width: 32,
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: isCompleted
+                                        ? const Color(0xFF2E4334)
+                                        : Colors.transparent,
+                                    border: Border.all(
+                                      color: isCompleted
+                                          ? const Color(0xFF2E4334)
+                                          : theme.colorScheme.outline.withValues(alpha: 0.6),
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  child: isCompleted
+                                      ? const Icon(
+                                          Icons.check_rounded,
+                                          color: Colors.white,
+                                          size: 18,
+                                        )
+                                      : null,
+                                ),
                               ),
                             ],
                           ),

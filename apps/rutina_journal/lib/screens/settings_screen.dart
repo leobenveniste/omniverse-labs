@@ -41,38 +41,53 @@ class SettingsScreen extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacing.md),
             children: [
               // Aesthetic Presets Section
-              _buildSectionHeader(context, l10n.t('aestheticPresetTitle')),
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.sm),
-                  child: Column(
-                    children: [
-                      _buildPresetTile(
-                        context,
-                        title: l10n.t('presetCalmSage'),
-                        subtitle: l10n.t('presetCalmSageDesc'),
-                        icon: Icons.spa_rounded,
-                        preset: AppThemePreset.calmSage,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildSectionHeader(context, l10n.t('aestheticPresetTitle').toUpperCase()),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+                    child: Text(
+                      '3 temas disponibles',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFFC85A3B),
                       ),
-                      const Divider(height: 1),
-                      _buildPresetTile(
-                        context,
-                        title: l10n.t('presetNeoKinetic'),
-                        subtitle: l10n.t('presetNeoKineticDesc'),
-                        icon: Icons.bolt_rounded,
-                        preset: AppThemePreset.neoKinetic,
-                      ),
-                      const Divider(height: 1),
-                      _buildPresetTile(
-                        context,
-                        title: l10n.t('presetMidnightBento'),
-                        subtitle: l10n.t('presetMidnightBentoDesc'),
-                        icon: Icons.grid_view_rounded,
-                        preset: AppThemePreset.midnightBento,
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.xxs),
+              _buildPresetBentoCard(
+                context,
+                title: 'Calm Sage',
+                subtitle: 'Tonos orgánicos y lino cálido para máxima serenidad.',
+                icon: Icons.spa_rounded,
+                preset: AppThemePreset.calmSage,
+                bgLight: const Color(0xFF234E35),
+                textColor: Colors.white,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              _buildPresetBentoCard(
+                context,
+                title: 'Neo-Kinetic',
+                subtitle: 'Contrastes energéticos con acentos terracotta vivos.',
+                icon: Icons.bolt_rounded,
+                preset: AppThemePreset.neoKinetic,
+                bgLight: const Color(0xFFFAF0EB),
+                textColor: const Color(0xFF2E1500),
+                accentColor: const Color(0xFFE07A5F),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              _buildPresetBentoCard(
+                context,
+                title: 'Midnight Bento',
+                subtitle: 'Profundidad nocturna para sesiones de reflexión tardías.',
+                icon: Icons.dark_mode_rounded,
+                preset: AppThemePreset.midnightBento,
+                bgLight: const Color(0xFF232523),
+                textColor: Colors.white,
               ),
               const SizedBox(height: AppSpacing.md),
 
@@ -230,27 +245,103 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPresetTile(
+  Widget _buildPresetBentoCard(
     BuildContext context, {
     required String title,
     required String subtitle,
     required IconData icon,
     required AppThemePreset preset,
+    required Color bgLight,
+    required Color textColor,
+    Color? accentColor,
   }) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final isSelected = prefs.themePreset == preset;
 
-    return ListTile(
-      leading: Icon(icon, color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface.withValues(alpha: 0.6)),
-      title: Text(title, style: AppTypography.body(theme.colorScheme.onSurface, isMedium: isSelected)),
-      subtitle: Text(subtitle, style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.6))),
-      trailing: isSelected
-          ? Icon(Icons.check_circle_rounded, color: theme.colorScheme.primary)
-          : null,
+    final cardBg = isDark
+        ? (isSelected ? const Color(0xFF242C26) : const Color(0xFF191D1A))
+        : bgLight;
+
+    return GestureDetector(
       onTap: () {
         HapticsHelper.selection();
         prefs.setThemePreset(preset);
       },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          color: cardBg,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+          border: Border.all(
+            color: isSelected
+                ? (isDark ? theme.colorScheme.primary : const Color(0xFF2E7D32))
+                : theme.colorScheme.outline.withValues(alpha: isDark ? 0.3 : 0.15),
+            width: isSelected ? 2.0 : 1.0,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.xs),
+              decoration: BoxDecoration(
+                color: (accentColor ?? theme.colorScheme.primary).withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+              ),
+              child: Icon(
+                icon,
+                color: accentColor ?? (isDark ? theme.colorScheme.primary : textColor),
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: AppTypography.title(textColor).copyWith(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    subtitle,
+                    style: AppTypography.caption(
+                      textColor.withValues(alpha: 0.8),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (isSelected)
+              Container(
+                margin: const EdgeInsets.only(left: 8),
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: accentColor ?? theme.colorScheme.primary,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.check_rounded,
+                  color: Colors.white,
+                  size: 16,
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 

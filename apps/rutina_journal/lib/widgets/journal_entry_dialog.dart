@@ -151,9 +151,21 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                l10n.t('journalTitle'),
-                style: AppTypography.title(theme.colorScheme.onSurface),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.t('journalBreathTitle'),
+                    style: AppTypography.title(theme.colorScheme.onSurface).copyWith(fontSize: 18),
+                  ),
+                  Text(
+                    l10n.t('journalBreathSubtitle'),
+                    style: AppTypography.caption(
+                      theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                      isMedium: true,
+                    ),
+                  ),
+                ],
               ),
               IconButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -162,7 +174,7 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.md),
 
           // Scrollable fields
           Expanded(
@@ -170,104 +182,201 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Atmospheric Glowing Mood Orbs
-                  MoodOrbsSelector(
-                    selectedMood: _selectedMood,
-                    energyLevel: _energyLevel,
-                    onMoodChanged: (m) => setState(() => _selectedMood = m),
-                    onEnergyChanged: (e) => setState(() => _energyLevel = e),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // State Tags
-                  Text(
-                    l10n.t('stateTagsLabel'),
-                    style: AppTypography.caption(
-                      theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                      isMedium: true,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Wrap(
-                    spacing: AppSpacing.xs,
-                    runSpacing: AppSpacing.xs,
-                    children: _availableTags.map((tagKey) {
-                      final isSelected = _selectedTags.contains(tagKey);
-                      return FilterChip(
-                        label: Text(l10n.t(tagKey)),
-                        selected: isSelected,
-                        onSelected: (selected) {
+                  // Zen Atmospheres Selector: Sereno, Enérgico, Reflexivo
+                  Row(
+                    children: [
+                      _buildAtmosphereChip(
+                        context,
+                        title: l10n.t('atmSerene'),
+                        icon: Icons.spa_rounded,
+                        color: const Color(0xFF4E8752),
+                        isSelected: _selectedMood == 5 || _selectedMood == 4,
+                        onTap: () {
                           HapticsHelper.selection();
                           setState(() {
-                            if (selected) {
-                              _selectedTags.add(tagKey);
-                            } else {
-                              _selectedTags.remove(tagKey);
-                            }
+                            _selectedMood = 5;
+                            _energyLevel = 3;
                           });
                         },
-                      );
-                    }).toList(),
+                      ),
+                      const SizedBox(width: AppSpacing.xs),
+                      _buildAtmosphereChip(
+                        context,
+                        title: l10n.t('atmEnergetic'),
+                        icon: Icons.wb_sunny_rounded,
+                        color: const Color(0xFFE07A5F),
+                        isSelected: _energyLevel >= 4,
+                        onTap: () {
+                          HapticsHelper.selection();
+                          setState(() {
+                            _selectedMood = 4;
+                            _energyLevel = 5;
+                          });
+                        },
+                      ),
+                      const SizedBox(width: AppSpacing.xs),
+                      _buildAtmosphereChip(
+                        context,
+                        title: l10n.t('atmReflective'),
+                        icon: Icons.psychology_rounded,
+                        color: const Color(0xFF8E5A78),
+                        isSelected: _selectedMood <= 3 && _energyLevel <= 3,
+                        onTap: () {
+                          HapticsHelper.selection();
+                          setState(() {
+                            _selectedMood = 3;
+                            _energyLevel = 2;
+                          });
+                        },
+                      ),
+                    ],
                   ),
                   const SizedBox(height: AppSpacing.lg),
 
-                  // Gratitude Prompts
-                  Text(
-                    l10n.t('gratitudePrompt'),
-                    style: AppTypography.section(theme.colorScheme.onSurface),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  TextField(
-                    controller: _gratitude1Controller,
-                    decoration: InputDecoration(
-                      hintText: l10n.t('gratitudeHint1'),
-                      prefixIcon: const Icon(Icons.favorite_outline_rounded, size: 18),
+                  // Tres Gratitudes Section
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                      border: Border.all(
+                        color: theme.colorScheme.outline.withValues(alpha: 0.25),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  TextField(
-                    controller: _gratitude2Controller,
-                    decoration: InputDecoration(
-                      hintText: l10n.t('gratitudeHint2'),
-                      prefixIcon: const Icon(Icons.star_outline_rounded, size: 18),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  TextField(
-                    controller: _gratitude3Controller,
-                    decoration: InputDecoration(
-                      hintText: l10n.t('gratitudeHint3'),
-                      prefixIcon: const Icon(Icons.wb_sunny_outlined, size: 18),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.favorite_outline_rounded, color: Color(0xFFC85A3B), size: 20),
+                                const SizedBox(width: AppSpacing.xs),
+                                Text(
+                                  l10n.t('threeGratitudesTitle'),
+                                  style: AppTypography.title(theme.colorScheme.onSurface).copyWith(fontSize: 16),
+                                ),
+                              ],
+                            ),
+                            Text(
+                              '${[_gratitude1Controller.text, _gratitude2Controller.text, _gratitude3Controller.text].where((s) => s.trim().isNotEmpty).length}/3',
+                              style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.5), isMedium: true),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          l10n.t('threeGratitudesSubtitle'),
+                          style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
 
-                  // Daily Win
-                  Text(
-                    l10n.t('dailyWinPrompt'),
-                    style: AppTypography.section(theme.colorScheme.onSurface),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  TextField(
-                    controller: _dailyWinController,
-                    maxLines: 2,
-                    decoration: InputDecoration(
-                      hintText: l10n.t('dailyWinHint'),
+                        _buildNumberedField(1, _gratitude1Controller, l10n.t('gratitudeHint1')),
+                        const SizedBox(height: AppSpacing.xs),
+                        _buildNumberedField(2, _gratitude2Controller, l10n.t('gratitudeHint2')),
+                        const SizedBox(height: AppSpacing.xs),
+                        _buildNumberedField(3, _gratitude3Controller, l10n.t('gratitudeHint3')),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.lg),
+                  const SizedBox(height: AppSpacing.md),
 
-                  // Freeform Notes
-                  Text(
-                    l10n.t('freeformNotesLabel'),
-                    style: AppTypography.section(theme.colorScheme.onSurface),
+                  // Victoria del Día Section
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                      border: Border.all(
+                        color: theme.colorScheme.outline.withValues(alpha: 0.25),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.military_tech_outlined, color: Color(0xFF2E7D32), size: 20),
+                            const SizedBox(width: AppSpacing.xs),
+                            Text(
+                              l10n.t('dailyWinTitle'),
+                              style: AppTypography.title(theme.colorScheme.onSurface).copyWith(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          l10n.t('dailyWinSubtitle'),
+                          style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        TextField(
+                          controller: _dailyWinController,
+                          decoration: InputDecoration(
+                            hintText: l10n.t('dailyWinPlaceholder'),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: AppSpacing.xs),
-                  TextField(
-                    controller: _notesController,
-                    maxLines: 3,
-                    decoration: InputDecoration(
-                      hintText: l10n.t('freeformNotesHint'),
+                  const SizedBox(height: AppSpacing.md),
+
+                  // Reflexión libre & Factores Influyentes
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                      border: Border.all(
+                        color: theme.colorScheme.outline.withValues(alpha: 0.25),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.mode_edit_outline_rounded, size: 20),
+                            const SizedBox(width: AppSpacing.xs),
+                            Text(
+                              l10n.t('freeReflectionTitle'),
+                              style: AppTypography.title(theme.colorScheme.onSurface).copyWith(fontSize: 16),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          l10n.t('freeReflectionSubtitle'),
+                          style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        TextField(
+                          controller: _notesController,
+                          maxLines: 3,
+                          decoration: InputDecoration(
+                            hintText: l10n.t('freeReflectionPlaceholder'),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+
+                        // Factores influyentes hoy (chips)
+                        Text(
+                          l10n.t('influencingFactorsTitle'),
+                          style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.7), isMedium: true),
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Wrap(
+                          spacing: AppSpacing.xs,
+                          runSpacing: AppSpacing.xs,
+                          children: [
+                            _buildFactorChip('factorHydration', Icons.water_drop_outlined, l10n.t('factorHydration')),
+                            _buildFactorChip('factorRest', Icons.bedtime_outlined, l10n.t('factorRest')),
+                            _buildFactorChip('factorWalk', Icons.directions_walk_rounded, l10n.t('factorWalk')),
+                            _buildFactorChip('factorDigitalDetox', Icons.phonelink_erase_rounded, l10n.t('factorDigitalDetox')),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -276,17 +385,124 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
           ),
           const SizedBox(height: AppSpacing.md),
 
-          // Save Button
+          // Save Button Zen CTA
           SizedBox(
             width: double.infinity,
-            height: 48,
-            child: FilledButton(
+            height: 50,
+            child: FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFF2D4638),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                ),
+              ),
               onPressed: _save,
-              child: Text(l10n.t('saveJournal')),
+              icon: const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 20),
+              label: Text(
+                l10n.t('saveDayLog'),
+                style: AppTypography.body(Colors.white, isMedium: true),
+              ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildAtmosphereChip(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required Color color,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? color.withValues(alpha: isDark ? 0.25 : 0.18)
+                : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.25),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+            border: Border.all(
+              color: isSelected ? color : theme.colorScheme.outline.withValues(alpha: 0.25),
+              width: isSelected ? 1.6 : 1.0,
+            ),
+          ),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.xs),
+                decoration: BoxDecoration(
+                  color: isSelected ? color : color.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  color: isSelected ? Colors.white : color,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xxs),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  color: isSelected ? color : theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNumberedField(int number, TextEditingController controller, String hint) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        prefixIcon: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Text(
+            '$number.',
+            style: const TextStyle(
+              color: Color(0xFFC85A3B),
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+        ),
+        prefixIconConstraints: const BoxConstraints(minWidth: 28, minHeight: 0),
+        hintText: hint,
+      ),
+    );
+  }
+
+  Widget _buildFactorChip(String tagKey, IconData icon, String label) {
+    final isSelected = _selectedTags.contains(tagKey);
+    return FilterChip(
+      avatar: Icon(icon, size: 16),
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (selected) {
+        HapticsHelper.selection();
+        setState(() {
+          if (selected) {
+            _selectedTags.add(tagKey);
+          } else {
+            _selectedTags.remove(tagKey);
+          }
+        });
+      },
     );
   }
 }
