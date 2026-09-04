@@ -250,7 +250,13 @@ class _TodayScreenState extends State<TodayScreen> {
                         habit: habit,
                         log: log,
                         streak: streak,
-                        onToggle: () => widget.habitService.toggleHabit(habit.id, cleanSelected),
+                        onToggle: () {
+                          final wasCompleted = log?.completed ?? false;
+                          widget.habitService.toggleHabit(habit.id, cleanSelected);
+                          if (!wasCompleted) {
+                            AppServices.of(context).audioService.playHabitChime();
+                          }
+                        },
                         onDelta: (delta) =>
                             widget.habitService.updateCounter(habit.id, cleanSelected, delta),
                         onEdit: () => _openEditHabitDialog(context, habit),

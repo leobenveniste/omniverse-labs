@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'audio_service.dart';
 import 'habit_service.dart';
 import 'journal_service.dart';
 import 'notification_service.dart';
@@ -7,6 +8,7 @@ import 'preferences_service.dart';
 import 'premium_service.dart';
 import 'routine_service.dart';
 import 'storage_service.dart';
+import 'widget_sync_service.dart';
 
 class AppServices {
   final SharedPreferences sharedPreferences;
@@ -17,6 +19,8 @@ class AppServices {
   final HabitService habitService;
   final RoutineService routineService;
   final JournalService journalService;
+  final AudioService audioService;
+  final WidgetSyncService widgetSyncService;
 
   AppServices._({
     required this.sharedPreferences,
@@ -27,6 +31,8 @@ class AppServices {
     required this.habitService,
     required this.routineService,
     required this.journalService,
+    required this.audioService,
+    required this.widgetSyncService,
   });
 
   static AppServices of(BuildContext context) {
@@ -45,6 +51,9 @@ class AppServices {
     final habit = HabitService(storage, notif);
     final routine = RoutineService(storage, habit);
     final journal = JournalService(storage);
+    final audio = AudioService();
+    final widgetSync = WidgetSyncService(habit, premium);
+    await widgetSync.handlePendingWidgetLaunch();
 
     return AppServices._(
       sharedPreferences: prefs,
@@ -55,6 +64,8 @@ class AppServices {
       habitService: habit,
       routineService: routine,
       journalService: journal,
+      audioService: audio,
+      widgetSyncService: widgetSync,
     );
   }
 }

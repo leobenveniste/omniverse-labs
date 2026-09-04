@@ -217,10 +217,33 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
                               ],
                             ),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.close_rounded, color: Colors.white70),
-                            tooltip: l10n.t('actionClose'),
-                            onPressed: () => Navigator.of(context).pop(),
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  AppServices.of(context).audioService.isSoundEnabled
+                                      ? Icons.volume_up_rounded
+                                      : Icons.volume_off_rounded,
+                                  color: Colors.white70,
+                                ),
+                                tooltip: 'Sonido zen',
+                                onPressed: () {
+                                  HapticsHelper.light();
+                                  final audio = AppServices.of(context).audioService;
+                                  setState(() {
+                                    audio.toggleSound(!audio.isSoundEnabled);
+                                  });
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.close_rounded, color: Colors.white70),
+                                tooltip: l10n.t('actionClose'),
+                                onPressed: () {
+                                  AppServices.of(context).audioService.stopAmbient();
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
                           ),
                         ],
                       ),

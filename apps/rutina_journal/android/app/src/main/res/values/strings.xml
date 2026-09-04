@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ritmo</string>
+    <string name="widget_pulse_name">Ritmo: Pulso Diario</string>
+    <string name="widget_pulse_desc">Progreso zen del día, racha activa y halo circadiano.</string>
+    <string name="widget_bento_name">Ritmo: Matriz Bento</string>
+    <string name="widget_bento_desc">Tus hábitos del día con check directo de un solo toque.</string>
+</resources>

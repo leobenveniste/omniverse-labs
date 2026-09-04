@@ -186,10 +186,73 @@ class PaywallSheet extends StatelessWidget {
                             const Divider(height: AppSpacing.lg),
                             _buildBenefitRow(
                               context,
+                              icon: Icons.dashboard_customize_rounded,
+                              iconColor: const Color(0xFF10B981),
+                              title: l10n.t('proFeatureWidgetsTitle'),
+                              description: l10n.t('proFeatureWidgetsDesc'),
+                            ),
+                            const Divider(height: AppSpacing.lg),
+                            _buildBenefitRow(
+                              context,
                               icon: Icons.backup_outlined,
                               iconColor: const Color(0xFFE5BA5A),
                               title: l10n.t('proFeatureBackupTitle'),
                               description: l10n.t('proFeatureBackupDesc'),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+
+                      // High-Converting Value Comparison Card
+                      Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF2D4A2B).withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                          border: Border.all(color: const Color(0xFF2D4A2B).withValues(alpha: 0.25)),
+                        ),
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF2D4A2B),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    l10n.t('proComparisonBadge'),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: AppSpacing.xs),
+                                Expanded(
+                                  child: Text(
+                                    l10n.t('proComparisonTitle'),
+                                    style: AppTypography.caption(theme.colorScheme.onSurface, isMedium: true),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            Text(
+                              l10n.t('proComparisonDetail'),
+                              style: AppTypography.body(theme.colorScheme.onSurface.withValues(alpha: 0.8)).copyWith(
+                                fontSize: 13,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            Text(
+                              l10n.t('proTrustPrivacy'),
+                              style: AppTypography.caption(const Color(0xFF2D4A2B), isMedium: true),
                             ),
                           ],
                         ),
