@@ -4,6 +4,7 @@ import 'habit_service.dart';
 import 'journal_service.dart';
 import 'notification_service.dart';
 import 'preferences_service.dart';
+import 'premium_service.dart';
 import 'routine_service.dart';
 import 'storage_service.dart';
 
@@ -12,6 +13,7 @@ class AppServices {
   final StorageService storageService;
   final NotificationService notificationService;
   final PreferencesService preferencesService;
+  final PremiumService premiumService;
   final HabitService habitService;
   final RoutineService routineService;
   final JournalService journalService;
@@ -21,6 +23,7 @@ class AppServices {
     required this.storageService,
     required this.notificationService,
     required this.preferencesService,
+    required this.premiumService,
     required this.habitService,
     required this.routineService,
     required this.journalService,
@@ -37,6 +40,8 @@ class AppServices {
     await notif.init();
 
     final preferences = PreferencesService(prefs);
+    final premium = PremiumService(prefs);
+    await premium.init();
     final habit = HabitService(storage, notif);
     final routine = RoutineService(storage, habit);
     final journal = JournalService(storage);
@@ -46,6 +51,7 @@ class AppServices {
       storageService: storage,
       notificationService: notif,
       preferencesService: preferences,
+      premiumService: premium,
       habitService: habit,
       routineService: routine,
       journalService: journal,

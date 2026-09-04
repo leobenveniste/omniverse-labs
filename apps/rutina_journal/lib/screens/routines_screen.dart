@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../models/routine.dart';
+import '../services/app_services.dart';
 import '../services/routine_service.dart';
 import '../theme/app_spacing.dart';
+import '../theme/app_theme.dart';
 import '../theme/app_typography.dart';
 import '../utils/haptics_helper.dart';
 import '../widgets/focus_zone_screen.dart';
 import '../widgets/routine_edit_dialog.dart';
 import '../widgets/routine_runner_sheet.dart';
+import '../widgets/paywall_sheet.dart';
 import '../widgets/state_button.dart';
+import 'settings_screen.dart';
 
 class RoutinesScreen extends StatelessWidget {
   final RoutineService routineService;
@@ -22,6 +26,10 @@ class RoutinesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
+    final appServices = AppServices.of(context);
+    final prefs = appServices.preferencesService;
+    final storage = appServices.storageService;
+    final habitService = appServices.habitService;
 
     return Scaffold(
       appBar: AppBar(
@@ -35,51 +43,86 @@ class RoutinesScreen extends StatelessWidget {
             tooltip: l10n.t('newRoutine'),
             onPressed: () {
               HapticsHelper.light();
+              final premiumService = appServices.premiumService;
+              if (!premiumService.isPro && routineService.routines.length >= 3) {
+                PaywallSheet.show(
+                  context,
+                  customReason: l10n.t('proLimitRoutinesMsg'),
+                );
+                return;
+              }
               RoutineEditDialog.show(
                 context,
                 onSave: (newRoutine) => routineService.addRoutine(newRoutine),
               );
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: l10n.t('navSettings'),
+            onPressed: () {
+              HapticsHelper.light();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => SettingsScreen(
+                    prefs: prefs,
+                    storage: storage,
+                    habitService: habitService,
+                  ),
+                ),
+              );
+            },
+          ),
         ],
       ),
-      body: AnimatedBuilder(
-        animation: routineService,
-        builder: (context, _) {
-          final routines = routineService.routines;
+      body: Container(
+        decoration: AppTheme.getAtmosphericBackground(context, prefs.themePreset),
+        child: AnimatedBuilder(
+          animation: routineService,
+          builder: (context, _) {
+            final routines = routineService.routines;
 
-          return ListView(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            children: [
-              // Hero Focus Zone Banner inspired by mockup
-              _buildFocusZoneHero(context, l10n, routines.isNotEmpty ? routines.first : null),
-              const SizedBox(height: AppSpacing.md),
+            return ListView(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              children: [
+                // Hero Focus Zone Banner inspired by mockup
+                _buildFocusZoneHero(context, l10n, routines.isNotEmpty ? routines.first : null),
+                const SizedBox(height: AppSpacing.md),
 
-              // Routine List
-              ...routines.map((routine) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                  child: _buildRoutineCard(context, routine),
-                );
-              }),
-            ],
-          );
-        },
+                // Routine List
+                ...routines.map((routine) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                    child: _buildRoutineCard(context, routine),
+                  );
+                }),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
 
   Widget _buildFocusZoneHero(BuildContext context, AppLocalizations l10n, Routine? defaultRoutine) {
-    const heroBg = Color(0xFF23362B);
-    const terracotta = Color(0xFFE07A5F);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final heroBg = isDark
+        ? theme.colorScheme.surfaceContainerHighest
+        : theme.colorScheme.primary;
+    final accentColor = theme.colorScheme.secondary;
+    final onHero = isDark ? theme.colorScheme.onSurface : theme.colorScheme.onPrimary;
 
     return Container(
       decoration: BoxDecoration(
         color: heroBg,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: isDark ? 0.35 : 0.15),
+        ),
         boxShadow: [
           BoxShadow(
-            color: heroBg.withValues(alpha: 0.3),
+            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -95,17 +138,17 @@ class RoutinesScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xxs),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.12),
+                  color: (isDark ? theme.colorScheme.surface : Colors.white).withValues(alpha: 0.16),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 14),
+                    Icon(Icons.auto_awesome_rounded, color: onHero, size: 14),
                     const SizedBox(width: AppSpacing.xs),
                     Text(
                       l10n.t('focusModeTag'),
-                      style: AppTypography.caption(Colors.white, isMedium: true),
+                      style: AppTypography.caption(onHero, isMedium: true),
                     ),
                   ],
                 ),
@@ -113,30 +156,30 @@ class RoutinesScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.xs),
                 decoration: BoxDecoration(
-                  color: terracotta,
+                  color: accentColor,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                 ),
-                child: const Icon(Icons.self_improvement_rounded, color: Colors.white, size: 22),
+                child: Icon(Icons.self_improvement_rounded, color: theme.colorScheme.onSecondary, size: 22),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
             l10n.t('enterFocusZone'),
-            style: AppTypography.title(Colors.white).copyWith(fontSize: 18),
+            style: AppTypography.title(onHero).copyWith(fontSize: 18),
           ),
           const SizedBox(height: AppSpacing.xxs),
           Text(
             l10n.t('focusZoneDesc'),
-            style: AppTypography.body(Colors.white.withValues(alpha: 0.8)),
+            style: AppTypography.body(onHero.withValues(alpha: 0.8)),
           ),
           const SizedBox(height: AppSpacing.lg),
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: terracotta,
-                foregroundColor: Colors.white,
+                backgroundColor: accentColor,
+                foregroundColor: theme.colorScheme.onSecondary,
                 padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -150,7 +193,7 @@ class RoutinesScreen extends StatelessWidget {
               icon: const Icon(Icons.play_arrow_rounded),
               label: Text(
                 l10n.t('startFocusMode'),
-                style: AppTypography.body(Colors.white, isMedium: true),
+                style: AppTypography.body(theme.colorScheme.onSecondary, isMedium: true),
               ),
             ),
           ),

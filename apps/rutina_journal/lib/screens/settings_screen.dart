@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../l10n/app_localizations.dart';
+import '../services/app_services.dart';
 import '../services/habit_service.dart';
 import '../services/preferences_service.dart';
+import '../services/premium_service.dart';
 import '../services/storage_service.dart';
+import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_theme_preset.dart';
 import '../theme/app_typography.dart';
 import '../utils/haptics_helper.dart';
 import '../widgets/about_dialog_widget.dart';
+import '../widgets/paywall_sheet.dart';
 
 class SettingsScreen extends StatelessWidget {
   final PreferencesService prefs;
@@ -26,6 +30,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
+    final premiumService = AppServices.of(context).premiumService;
 
     return Scaffold(
       appBar: AppBar(
@@ -35,11 +40,16 @@ class SettingsScreen extends StatelessWidget {
         ),
       ),
       body: AnimatedBuilder(
-        animation: prefs,
+        animation: Listenable.merge([prefs, premiumService]),
         builder: (context, _) {
+          final isPro = premiumService.isPro;
+
           return ListView(
             padding: const EdgeInsets.all(AppSpacing.md),
             children: [
+              // Ritmo Pro Hero Banner
+              _buildProCard(context, l10n, premiumService),
+
               // Aesthetic Presets Section
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -62,32 +72,31 @@ class SettingsScreen extends StatelessWidget {
               _buildPresetBentoCard(
                 context,
                 title: 'Calm Sage',
-                subtitle: 'Tonos orgánicos y lino cálido para máxima serenidad.',
+                subtitle: 'Forest Canopy • Lino cálido y verde bosque orgánico.',
                 icon: Icons.spa_rounded,
                 preset: AppThemePreset.calmSage,
-                bgLight: const Color(0xFF234E35),
-                textColor: Colors.white,
+                isLocked: false,
+                l10n: l10n,
               ),
               const SizedBox(height: AppSpacing.sm),
               _buildPresetBentoCard(
                 context,
-                title: 'Neo-Kinetic',
-                subtitle: 'Contrastes energéticos con acentos terracotta vivos.',
-                icon: Icons.bolt_rounded,
+                title: 'Desert Rose',
+                subtitle: 'Sunset Boulevard • Terracotta enriquecida y brasas de arcilla.',
+                icon: Icons.wb_twilight_rounded,
                 preset: AppThemePreset.neoKinetic,
-                bgLight: const Color(0xFFFAF0EB),
-                textColor: const Color(0xFF2E1500),
-                accentColor: const Color(0xFFE07A5F),
+                isLocked: !isPro,
+                l10n: l10n,
               ),
               const SizedBox(height: AppSpacing.sm),
               _buildPresetBentoCard(
                 context,
-                title: 'Midnight Bento',
-                subtitle: 'Profundidad nocturna para sesiones de reflexión tardías.',
-                icon: Icons.dark_mode_rounded,
+                title: 'Midnight Galaxy',
+                subtitle: 'Deep Cosmic • Obsidiana estelar y bígaro celestial.',
+                icon: Icons.auto_awesome_rounded,
                 preset: AppThemePreset.midnightBento,
-                bgLight: const Color(0xFF232523),
-                textColor: Colors.white,
+                isLocked: !isPro,
+                l10n: l10n,
               ),
               const SizedBox(height: AppSpacing.md),
 
@@ -175,13 +184,48 @@ class SettingsScreen extends StatelessWidget {
                     ListTile(
                       leading: const Icon(Icons.download_rounded),
                       title: Text(l10n.t('exportData'), style: AppTypography.body(theme.colorScheme.onSurface)),
-                      onTap: () => _handleExport(context, l10n),
+                      trailing: !isPro ? _buildProBadge() : null,
+                      onTap: () {
+                        if (!isPro) {
+                          HapticsHelper.warning();
+                          PaywallSheet.show(context, customReason: l10n.t('proLimitBackupMsg'));
+                          return;
+                        }
+                        _handleExport(context, l10n);
+                      },
                     ),
                     const Divider(height: 1),
                     ListTile(
                       leading: const Icon(Icons.upload_rounded),
                       title: Text(l10n.t('importData'), style: AppTypography.body(theme.colorScheme.onSurface)),
-                      onTap: () => _handleImport(context, l10n),
+                      trailing: !isPro ? _buildProBadge() : null,
+                      onTap: () {
+                        if (!isPro) {
+                          HapticsHelper.warning();
+                          PaywallSheet.show(context, customReason: l10n.t('proLimitBackupMsg'));
+                          return;
+                        }
+                        _handleImport(context, l10n);
+                      },
+                    ),
+                    const Divider(height: 1),
+                    ListTile(
+                      leading: const Icon(Icons.restore_rounded),
+                      title: Text(l10n.t('proRestoreBtn'), style: AppTypography.body(theme.colorScheme.onSurface)),
+                      onTap: () async {
+                        HapticsHelper.selection();
+                        final restored = await premiumService.restorePurchases();
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                restored ? l10n.t('proRestoreSuccess') : l10n.t('proRestoreNone'),
+                              ),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }
+                      },
                     ),
                     const Divider(height: 1),
                     ListTile(
@@ -245,26 +289,238 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildProCard(BuildContext context, AppLocalizations l10n, PremiumService premium) {
+    final isPro = premium.isPro;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    if (isPro) {
+      return Container(
+        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+        padding: const EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1E281F) : const Color(0xFFE8F5E9),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+          border: Border.all(
+            color: isDark ? const Color(0xFF4CAF50).withValues(alpha: 0.5) : const Color(0xFF2E7D32),
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.xs),
+              decoration: BoxDecoration(
+                color: const Color(0xFF2E7D32).withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.stars_rounded,
+                color: Color(0xFF2E7D32),
+                size: 26,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        l10n.t('proActiveTitle'),
+                        style: AppTypography.title(theme.colorScheme.onSurface).copyWith(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF2E7D32),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text(
+                          'PRO',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    l10n.t('proActiveSubtitle'),
+                    style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        gradient: theme.brightness == Brightness.dark
+            ? const LinearGradient(
+                colors: [Color(0xFF2A1C16), Color(0xFF1E1715)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
+            : const LinearGradient(
+                colors: [Color(0xFFFFF6F0), Color(0xFFFDECE4)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        border: Border.all(
+          color: const Color(0xFFC85A3B).withValues(alpha: 0.35),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFC85A3B).withValues(alpha: isDark ? 0.2 : 0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.xs),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFC85A3B).withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.auto_awesome_rounded,
+                  color: Color(0xFFC85A3B),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.xs),
+              Text(
+                l10n.t('proTitle'),
+                style: AppTypography.title(theme.colorScheme.onSurface).copyWith(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFC85A3B),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  'LIFETIME',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            l10n.t('proTagline'),
+            style: AppTypography.body(theme.colorScheme.onSurface.withValues(alpha: 0.8)).copyWith(
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () {
+                HapticsHelper.selection();
+                PaywallSheet.show(context);
+              },
+              icon: const Icon(Icons.stars_rounded, size: 18),
+              label: Text(
+                '${l10n.t('proBadge')} • ${premium.proProduct?.price ?? '\$2.99 USD'}',
+                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFC85A3B),
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProBadge() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: const Color(0xFFC85A3B).withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(color: const Color(0xFFC85A3B).withValues(alpha: 0.4)),
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.lock_rounded, size: 10, color: Color(0xFFC85A3B)),
+          SizedBox(width: 3),
+          Text(
+            'PRO',
+            style: TextStyle(
+              color: Color(0xFFC85A3B),
+              fontSize: 9,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildPresetBentoCard(
     BuildContext context, {
     required String title,
     required String subtitle,
     required IconData icon,
     required AppThemePreset preset,
-    required Color bgLight,
-    required Color textColor,
-    Color? accentColor,
+    bool isLocked = false,
+    required AppLocalizations l10n,
   }) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final isSelected = prefs.themePreset == preset;
-
-    final cardBg = isDark
-        ? (isSelected ? const Color(0xFF242C26) : const Color(0xFF191D1A))
-        : bgLight;
+    final presetColors = AppColors.of(preset, isDark);
 
     return GestureDetector(
       onTap: () {
+        if (isLocked) {
+          HapticsHelper.warning();
+          PaywallSheet.show(context, customReason: l10n.t('proLimitThemeMsg'));
+          return;
+        }
         HapticsHelper.selection();
         prefs.setThemePreset(preset);
       },
@@ -272,17 +528,17 @@ class SettingsScreen extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: cardBg,
+          color: isDark ? presetColors.surface : (isSelected ? presetColors.surfaceVariant : presetColors.surface),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           border: Border.all(
             color: isSelected
-                ? (isDark ? theme.colorScheme.primary : const Color(0xFF2E7D32))
-                : theme.colorScheme.outline.withValues(alpha: isDark ? 0.3 : 0.15),
+                ? presetColors.primary
+                : presetColors.outline.withValues(alpha: isDark ? 0.4 : 0.6),
             width: isSelected ? 2.0 : 1.0,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.05),
+              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.04),
               blurRadius: 8,
               offset: const Offset(0, 3),
             ),
@@ -294,12 +550,12 @@ class SettingsScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.xs),
               decoration: BoxDecoration(
-                color: (accentColor ?? theme.colorScheme.primary).withValues(alpha: 0.2),
+                color: presetColors.primary.withValues(alpha: isDark ? 0.2 : 0.12),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
               ),
               child: Icon(
                 icon,
-                color: accentColor ?? (isDark ? theme.colorScheme.primary : textColor),
+                color: presetColors.primary,
                 size: 22,
               ),
             ),
@@ -308,18 +564,26 @@ class SettingsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: AppTypography.title(textColor).copyWith(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        title,
+                        style: AppTypography.title(theme.colorScheme.onSurface).copyWith(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      if (isLocked) ...[
+                        const SizedBox(width: 8),
+                        _buildProBadge(),
+                      ],
+                    ],
                   ),
                   const SizedBox(height: 3),
                   Text(
                     subtitle,
                     style: AppTypography.caption(
-                      textColor.withValues(alpha: 0.8),
+                      theme.colorScheme.onSurface.withValues(alpha: 0.75),
                     ),
                   ),
                 ],
@@ -330,12 +594,12 @@ class SettingsScreen extends StatelessWidget {
                 margin: const EdgeInsets.only(left: 8),
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: accentColor ?? theme.colorScheme.primary,
+                  color: presetColors.primary,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.check_rounded,
-                  color: Colors.white,
+                  color: presetColors.onPrimary,
                   size: 16,
                 ),
               ),

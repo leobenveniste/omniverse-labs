@@ -237,53 +237,54 @@ class PaywallSheet extends ConsumerWidget {
           ),
           const SizedBox(height: 4),
 
-          // Testing Mode Toggle Button
-          TextButton.icon(
-            onPressed: () async {
-              HapticFeedback.mediumImpact();
-              final isCurrentlyPro = premiumState.isProUser;
-              await ref.read(premiumProvider.notifier).setProUser(!isCurrentlyPro);
-              if (context.mounted) {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    backgroundColor: !isCurrentlyPro ? Colors.green.shade700 : Colors.blueGrey.shade800,
-                    content: Row(
-                      children: [
-                        Icon(
-                          !isCurrentlyPro ? Icons.stars_rounded : Icons.info_outline,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            !isCurrentlyPro ? strings.testProActivated : strings.testProDeactivated,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+          // Testing Mode Toggle Button (Only visible in debug / internal development builds)
+          if (kDebugMode)
+            TextButton.icon(
+              onPressed: () async {
+                HapticFeedback.mediumImpact();
+                final isCurrentlyPro = premiumState.isProUser;
+                await ref.read(premiumProvider.notifier).setProUser(!isCurrentlyPro);
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: !isCurrentlyPro ? Colors.green.shade700 : Colors.blueGrey.shade800,
+                      content: Row(
+                        children: [
+                          Icon(
+                            !isCurrentlyPro ? Icons.stars_rounded : Icons.info_outline,
+                            color: Colors.white,
+                            size: 20,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              !isCurrentlyPro ? strings.testProActivated : strings.testProDeactivated,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              }
-            },
-            icon: Icon(
-              Icons.science_outlined,
-              size: 16,
-              color: theme.colorScheme.tertiary,
-            ),
-            label: Text(
-              premiumState.isProUser
-                  ? (strings.isSpanish ? '🧪 Desactivar Pro (Testing)' : '🧪 Disable Pro (Testing)')
-                  : strings.activateTestPro,
-              style: TextStyle(
+                  );
+                }
+              },
+              icon: Icon(
+                Icons.science_outlined,
+                size: 16,
                 color: theme.colorScheme.tertiary,
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
+              ),
+              label: Text(
+                premiumState.isProUser
+                    ? (strings.isSpanish ? '🧪 Desactivar Pro (Testing)' : '🧪 Disable Pro (Testing)')
+                    : strings.activateTestPro,
+                style: TextStyle(
+                  color: theme.colorScheme.tertiary,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

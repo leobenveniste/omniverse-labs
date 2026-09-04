@@ -229,6 +229,13 @@ class HabitService extends ChangeNotifier {
     final index = _habits.indexWhere((h) => h.id == updated.id);
     if (index >= 0) {
       _habits[index] = updated;
+      // When a habit is edited, automatically mark today's log as not completed
+      final todayKey = AppDateUtils.toDateKey(DateTime.now());
+      final logKey = '${updated.id}_$todayKey';
+      if (_logs.containsKey(logKey)) {
+        _logs[logKey] = _logs[logKey]!.copyWith(completed: false, currentValue: 0.0);
+        await _persistLogs();
+      }
       await _storage.saveHabits(_habits);
       _scheduleHabitReminderIfNeeded(updated);
       notifyListeners();

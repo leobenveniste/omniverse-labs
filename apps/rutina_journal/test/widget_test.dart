@@ -16,9 +16,9 @@ void main() {
     expect(find.text('RITMO'), findsOneWidget);
     expect(find.text('Hábitos, Rutinas & Diario'), findsOneWidget);
 
-    // Pump past the 1800ms timer
+    // Pump past the 1800ms timer and 500ms transition
     await tester.pump(const Duration(milliseconds: 2000));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 600));
 
     // Verify main navigation loaded with tabs and elevated focus button
     expect(find.text('Hoy'), findsWidgets);

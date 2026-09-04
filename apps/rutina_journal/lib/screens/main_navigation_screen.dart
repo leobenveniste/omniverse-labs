@@ -8,6 +8,7 @@ import '../services/routine_service.dart';
 import '../services/storage_service.dart';
 import '../utils/haptics_helper.dart';
 import '../widgets/focus_zone_screen.dart';
+import '../widgets/paywall_sheet.dart';
 import 'analytics_screen.dart';
 import 'journal_screen.dart';
 import 'routines_screen.dart';
@@ -70,9 +71,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     ];
 
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: screens,
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 220),
+        switchInCurve: Curves.easeOut,
+        switchOutCurve: Curves.easeIn,
+        child: KeyedSubtree(
+          key: ValueKey<int>(_currentIndex),
+          child: screens[_currentIndex],
+        ),
       ),
       floatingActionButton: Container(
         width: 58,
@@ -101,6 +107,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             customBorder: const CircleBorder(),
             onTap: () {
               HapticsHelper.medium();
+              final premiumService = AppServices.of(context).premiumService;
+              if (!premiumService.canStartFocusSession) {
+                PaywallSheet.show(
+                  context,
+                  customReason: l10n.t('proLimitFocusMsg'),
+                );
+                return;
+              }
               FocusZoneScreen.show(context);
             },
             child: Tooltip(

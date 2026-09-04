@@ -10,6 +10,7 @@ import '../theme/app_typography.dart';
 import '../utils/date_utils.dart';
 import '../utils/haptics_helper.dart';
 import '../widgets/journal_entry_dialog.dart';
+import 'settings_screen.dart';
 
 class JournalScreen extends StatelessWidget {
   final JournalService journalService;
@@ -19,11 +20,45 @@ class JournalScreen extends StatelessWidget {
     required this.journalService,
   });
 
+  void _openEntryDialog(BuildContext context, DateTime today, String todayKey) {
+    HapticsHelper.medium();
+    final todayEntry = journalService.getEntryForDate(today);
+    JournalEntryDialog.show(
+      context,
+      entry: todayEntry,
+      onSave: ({
+        required moodLevel,
+        required energyLevel,
+        required tags,
+        required gratitude1,
+        required gratitude2,
+        required gratitude3,
+        required dailyWin,
+        required notes,
+      }) {
+        journalService.saveEntry(
+          dateKey: todayKey,
+          moodLevel: moodLevel,
+          energyLevel: energyLevel,
+          tags: tags,
+          gratitude1: gratitude1,
+          gratitude2: gratitude2,
+          gratitude3: gratitude3,
+          dailyWin: dailyWin,
+          notes: notes,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
-    final prefs = AppServices.of(context).preferencesService;
+    final appServices = AppServices.of(context);
+    final prefs = appServices.preferencesService;
+    final storage = appServices.storageService;
+    final habitService = appServices.habitService;
     final today = DateTime.now();
     final todayKey = AppDateUtils.toDateKey(today);
 
@@ -33,6 +68,29 @@ class JournalScreen extends StatelessWidget {
           l10n.t('journalTitle'),
           style: AppTypography.display(theme.colorScheme.onSurface),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add_rounded),
+            tooltip: l10n.t('newEntry'),
+            onPressed: () => _openEntryDialog(context, today, todayKey),
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: l10n.t('navSettings'),
+            onPressed: () {
+              HapticsHelper.light();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => SettingsScreen(
+                    prefs: prefs,
+                    storage: storage,
+                    habitService: habitService,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Container(
         decoration: AppTheme.getAtmosphericBackground(context, prefs.themePreset),
@@ -82,41 +140,6 @@ class JournalScreen extends StatelessWidget {
             );
           },
         ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'journal_fab',
-        onPressed: () {
-          HapticsHelper.medium();
-          final todayEntry = journalService.getEntryForDate(today);
-          JournalEntryDialog.show(
-            context,
-            entry: todayEntry,
-            onSave: ({
-              required moodLevel,
-              required energyLevel,
-              required tags,
-              required gratitude1,
-              required gratitude2,
-              required gratitude3,
-              required dailyWin,
-              required notes,
-            }) {
-              journalService.saveEntry(
-                dateKey: todayKey,
-                moodLevel: moodLevel,
-                energyLevel: energyLevel,
-                tags: tags,
-                gratitude1: gratitude1,
-                gratitude2: gratitude2,
-                gratitude3: gratitude3,
-                dailyWin: dailyWin,
-                notes: notes,
-              );
-            },
-          );
-        },
-        icon: const Icon(Icons.edit_calendar_rounded),
-        label: Text(l10n.t('newEntry')),
       ),
     );
   }

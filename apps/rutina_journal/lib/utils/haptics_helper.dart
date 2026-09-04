@@ -18,4 +18,8 @@ class HapticsHelper {
   static void selection() {
     HapticFeedback.selectionClick();
   }
+
+  static void warning() {
+    HapticFeedback.heavyImpact();
+  }
 }

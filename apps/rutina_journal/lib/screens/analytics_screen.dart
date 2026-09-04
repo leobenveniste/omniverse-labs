@@ -5,6 +5,8 @@ import '../services/journal_service.dart';
 import '../services/preferences_service.dart';
 import '../services/storage_service.dart';
 import '../theme/app_spacing.dart';
+import '../theme/app_theme.dart';
+import '../theme/app_theme_preset.dart';
 import '../theme/app_typography.dart';
 import '../utils/haptics_helper.dart';
 import '../widgets/heatmap_calendar.dart';
@@ -55,23 +57,33 @@ class AnalyticsScreen extends StatelessWidget {
             ),
         ],
       ),
-      body: AnimatedBuilder(
-        animation: Listenable.merge([habitService, journalService]),
-        builder: (context, _) {
-          final heatmapData = habitService.getHeatmapData(90);
-          final habits = habitService.habits;
+      body: Container(
+        decoration: AppTheme.getAtmosphericBackground(
+          context,
+          prefs?.themePreset ?? AppThemePreset.calmSage,
+        ),
+        child: AnimatedBuilder(
+          animation: Listenable.merge([habitService, journalService]),
+          builder: (context, _) {
+            final heatmapData = habitService.getHeatmapData(90);
+            final habits = habitService.habits;
 
-          // Compute average completion rate over past 7 days
-          final past7 = heatmapData.entries.toList().reversed.take(7);
-          final avg7 = past7.isEmpty
-              ? 0.0
-              : past7.fold<double>(0.0, (acc, e) => acc + e.value) / past7.length;
+            // Compute average completion rate over past 7 days
+            final past7 = heatmapData.entries.toList().reversed.take(7);
+            final avg7 = past7.isEmpty
+                ? 0.0
+                : past7.fold<double>(0.0, (acc, e) => acc + e.value) / past7.length;
 
-          final consistencyPercent = (avg7 * 100).toInt();
+            final consistencyPercent = (avg7 * 100).toInt();
 
-          return ListView(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            children: [
+            return ListView(
+              padding: const EdgeInsets.only(
+                left: AppSpacing.md,
+                right: AppSpacing.md,
+                top: AppSpacing.md,
+                bottom: 88,
+              ),
+              children: [
               // Metric cards row
               Row(
                 children: [
@@ -248,15 +260,15 @@ class AnalyticsScreen extends StatelessWidget {
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.local_fire_department_rounded,
-                              color: Colors.deepOrange,
+                              color: theme.colorScheme.secondary,
                               size: 18,
                             ),
                             const SizedBox(width: 2),
                             Text(
                               '${streak.current}d',
-                              style: AppTypography.body(Colors.deepOrange, isMedium: true),
+                              style: AppTypography.body(theme.colorScheme.secondary, isMedium: true),
                             ),
                           ],
                         ),
@@ -309,6 +321,7 @@ class AnalyticsScreen extends StatelessWidget {
           );
         },
       ),
-    );
-  }
+    ),
+  );
+}
 }

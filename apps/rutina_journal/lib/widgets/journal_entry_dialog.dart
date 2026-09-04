@@ -155,11 +155,11 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    l10n.t('journalBreathTitle'),
+                    l10n.t('journalLogTitle'),
                     style: AppTypography.title(theme.colorScheme.onSurface).copyWith(fontSize: 18),
                   ),
                   Text(
-                    l10n.t('journalBreathSubtitle'),
+                    l10n.t('journalLogSubtitle'),
                     style: AppTypography.caption(
                       theme.colorScheme.onSurface.withValues(alpha: 0.6),
                       isMedium: true,
@@ -182,51 +182,142 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Zen Atmospheres Selector: Sereno, Enérgico, Reflexivo
+                  // 1. Estado General (5 options with distinct semantic colors)
+                  Text(
+                    l10n.t('moodLevelTitle'),
+                    style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.8), isMedium: true),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
                   Row(
                     children: [
-                      _buildAtmosphereChip(
+                      _buildLevelItem(
                         context,
-                        title: l10n.t('atmSerene'),
-                        icon: Icons.spa_rounded,
-                        color: const Color(0xFF4E8752),
-                        isSelected: _selectedMood == 5 || _selectedMood == 4,
+                        title: l10n.t('moodDifficult'),
+                        icon: Icons.sentiment_very_dissatisfied_rounded,
+                        color: const Color(0xFFD96B6B),
+                        isSelected: _selectedMood == 1,
                         onTap: () {
                           HapticsHelper.selection();
-                          setState(() {
-                            _selectedMood = 5;
-                            _energyLevel = 3;
-                          });
+                          setState(() => _selectedMood = 1);
                         },
                       ),
-                      const SizedBox(width: AppSpacing.xs),
-                      _buildAtmosphereChip(
+                      const SizedBox(width: AppSpacing.xxs),
+                      _buildLevelItem(
                         context,
-                        title: l10n.t('atmEnergetic'),
-                        icon: Icons.wb_sunny_rounded,
+                        title: l10n.t('moodLow'),
+                        icon: Icons.sentiment_dissatisfied_rounded,
+                        color: const Color(0xFFE28A53),
+                        isSelected: _selectedMood == 2,
+                        onTap: () {
+                          HapticsHelper.selection();
+                          setState(() => _selectedMood = 2);
+                        },
+                      ),
+                      const SizedBox(width: AppSpacing.xxs),
+                      _buildLevelItem(
+                        context,
+                        title: l10n.t('moodNeutral'),
+                        icon: Icons.sentiment_neutral_rounded,
+                        color: const Color(0xFFE5BA5A),
+                        isSelected: _selectedMood == 3,
+                        onTap: () {
+                          HapticsHelper.selection();
+                          setState(() => _selectedMood = 3);
+                        },
+                      ),
+                      const SizedBox(width: AppSpacing.xxs),
+                      _buildLevelItem(
+                        context,
+                        title: l10n.t('moodGood'),
+                        icon: Icons.sentiment_satisfied_alt_rounded,
+                        color: const Color(0xFF6B9E78),
+                        isSelected: _selectedMood == 4,
+                        onTap: () {
+                          HapticsHelper.selection();
+                          setState(() => _selectedMood = 4);
+                        },
+                      ),
+                      const SizedBox(width: AppSpacing.xxs),
+                      _buildLevelItem(
+                        context,
+                        title: l10n.t('moodRadiant'),
+                        icon: Icons.sentiment_very_satisfied_rounded,
+                        color: const Color(0xFF2D7A4F),
+                        isSelected: _selectedMood == 5,
+                        onTap: () {
+                          HapticsHelper.selection();
+                          setState(() => _selectedMood = 5);
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+
+                  // 2. Nivel de Energía (5 levels: Sereno a Muy Alto)
+                  Text(
+                    l10n.t('energyLevelTitle'),
+                    style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.8), isMedium: true),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Row(
+                    children: [
+                      _buildLevelItem(
+                        context,
+                        title: l10n.t('energyVeryLow'),
+                        icon: Icons.battery_0_bar_rounded,
+                        color: const Color(0xFF64748B),
+                        isSelected: _energyLevel == 1,
+                        onTap: () {
+                          HapticsHelper.selection();
+                          setState(() => _energyLevel = 1);
+                        },
+                      ),
+                      const SizedBox(width: AppSpacing.xxs),
+                      _buildLevelItem(
+                        context,
+                        title: l10n.t('energyLow'),
+                        icon: Icons.battery_2_bar_rounded,
+                        color: const Color(0xFF5E8B7E),
+                        isSelected: _energyLevel == 2,
+                        onTap: () {
+                          HapticsHelper.selection();
+                          setState(() => _energyLevel = 2);
+                        },
+                      ),
+                      const SizedBox(width: AppSpacing.xxs),
+                      _buildLevelItem(
+                        context,
+                        title: l10n.t('energyModerate'),
+                        icon: Icons.battery_4_bar_rounded,
+                        color: const Color(0xFF388E3C),
+                        isSelected: _energyLevel == 3,
+                        onTap: () {
+                          HapticsHelper.selection();
+                          setState(() => _energyLevel = 3);
+                        },
+                      ),
+                      const SizedBox(width: AppSpacing.xxs),
+                      _buildLevelItem(
+                        context,
+                        title: l10n.t('energyHigh'),
+                        icon: Icons.battery_5_bar_rounded,
                         color: const Color(0xFFE07A5F),
-                        isSelected: _energyLevel >= 4,
+                        isSelected: _energyLevel == 4,
                         onTap: () {
                           HapticsHelper.selection();
-                          setState(() {
-                            _selectedMood = 4;
-                            _energyLevel = 5;
-                          });
+                          setState(() => _energyLevel = 4);
                         },
                       ),
-                      const SizedBox(width: AppSpacing.xs),
-                      _buildAtmosphereChip(
+                      const SizedBox(width: AppSpacing.xxs),
+                      _buildLevelItem(
                         context,
-                        title: l10n.t('atmReflective'),
-                        icon: Icons.psychology_rounded,
-                        color: const Color(0xFF8E5A78),
-                        isSelected: _selectedMood <= 3 && _energyLevel <= 3,
+                        title: l10n.t('energyVeryHigh'),
+                        icon: Icons.bolt_rounded,
+                        color: const Color(0xFFD32F2F),
+                        isSelected: _energyLevel == 5,
                         onTap: () {
                           HapticsHelper.selection();
-                          setState(() {
-                            _selectedMood = 3;
-                            _energyLevel = 2;
-                          });
+                          setState(() => _energyLevel = 5);
                         },
                       ),
                     ],
@@ -360,7 +451,7 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
                         ),
                         const SizedBox(height: AppSpacing.md),
 
-                        // Factores influyentes hoy (chips)
+                        // Factores influyentes hoy (10 chips en Wrap)
                         Text(
                           l10n.t('influencingFactorsTitle'),
                           style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.7), isMedium: true),
@@ -374,6 +465,12 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
                             _buildFactorChip('factorRest', Icons.bedtime_outlined, l10n.t('factorRest')),
                             _buildFactorChip('factorWalk', Icons.directions_walk_rounded, l10n.t('factorWalk')),
                             _buildFactorChip('factorDigitalDetox', Icons.phonelink_erase_rounded, l10n.t('factorDigitalDetox')),
+                            _buildFactorChip('factorNutrition', Icons.restaurant_rounded, l10n.t('factorNutrition')),
+                            _buildFactorChip('factorExercise', Icons.fitness_center_rounded, l10n.t('factorExercise')),
+                            _buildFactorChip('factorSocial', Icons.people_outline_rounded, l10n.t('factorSocial')),
+                            _buildFactorChip('factorMindfulness', Icons.self_improvement_rounded, l10n.t('factorMindfulness')),
+                            _buildFactorChip('factorDeepWork', Icons.psychology_outlined, l10n.t('factorDeepWork')),
+                            _buildFactorChip('factorNature', Icons.park_outlined, l10n.t('factorNature')),
                           ],
                         ),
                       ],
@@ -409,7 +506,7 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
     );
   }
 
-  Widget _buildAtmosphereChip(
+  Widget _buildLevelItem(
     BuildContext context, {
     required String title,
     required IconData icon,
@@ -425,36 +522,33 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
         onTap: onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 180),
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs + 2),
           decoration: BoxDecoration(
             color: isSelected
-                ? color.withValues(alpha: isDark ? 0.25 : 0.18)
-                : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.25),
+                ? color.withValues(alpha: isDark ? 0.28 : 0.18)
+                : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.22),
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
             border: Border.all(
-              color: isSelected ? color : theme.colorScheme.outline.withValues(alpha: 0.25),
-              width: isSelected ? 1.6 : 1.0,
+              color: isSelected ? color : theme.colorScheme.outline.withValues(alpha: 0.20),
+              width: isSelected ? 1.8 : 1.0,
             ),
           ),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.xs),
-                decoration: BoxDecoration(
-                  color: isSelected ? color : color.withValues(alpha: 0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  icon,
-                  color: isSelected ? Colors.white : color,
-                  size: 20,
-                ),
+              Icon(
+                icon,
+                color: isSelected ? color : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                size: 20,
               ),
-              const SizedBox(height: AppSpacing.xxs),
+              const SizedBox(height: 2),
               Text(
                 title,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 10,
                   fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   color: isSelected ? color : theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
@@ -491,7 +585,7 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
     final isSelected = _selectedTags.contains(tagKey);
     return FilterChip(
       avatar: Icon(icon, size: 16),
-      label: Text(label),
+      label: Text(label, style: const TextStyle(fontSize: 12)),
       selected: isSelected,
       onSelected: (selected) {
         HapticsHelper.selection();

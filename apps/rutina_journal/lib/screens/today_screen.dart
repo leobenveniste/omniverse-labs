@@ -14,10 +14,11 @@ import '../theme/app_typography.dart';
 import '../utils/date_utils.dart';
 import '../utils/haptics_helper.dart';
 import '../widgets/habit_edit_dialog.dart';
-import '../widgets/heatmap_calendar.dart';
 import '../widgets/routine_edit_dialog.dart';
 import '../widgets/routine_runner_sheet.dart';
 import '../widgets/swipe_habit_card.dart';
+import '../widgets/paywall_sheet.dart';
+import 'settings_screen.dart';
 
 class TodayScreen extends StatefulWidget {
   final HabitService habitService;
@@ -136,6 +137,24 @@ class _TodayScreenState extends State<TodayScreen> {
             tooltip: l10n.t('newHabit'),
             onPressed: () => _openAddHabitDialog(context),
           ),
+          // Settings Button
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: l10n.t('navSettings'),
+            onPressed: () {
+              HapticsHelper.light();
+              final services = AppServices.of(context);
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => SettingsScreen(
+                    prefs: services.preferencesService,
+                    storage: services.storageService,
+                    habitService: widget.habitService,
+                  ),
+                ),
+              );
+            },
+          ),
         ],
       ),
       body: Container(
@@ -149,14 +168,12 @@ class _TodayScreenState extends State<TodayScreen> {
               _selectedDate.month,
               _selectedDate.day,
             );
-            final isToday = AppDateUtils.isSameDay(cleanSelected, DateTime.now());
             final dateKey = AppDateUtils.toDateKey(cleanSelected);
 
             final habits = widget.habitService.getHabitsForDate(cleanSelected);
             final doneCount = widget.habitService.getCompletedCountForDate(cleanSelected);
             final totalCount = habits.length;
             final completionRate = widget.habitService.getCompletionRateForDate(cleanSelected);
-            final heatmapData = widget.habitService.getHeatmapData(90);
 
             return ListView(
               padding: const EdgeInsets.only(bottom: 88),
@@ -169,62 +186,48 @@ class _TodayScreenState extends State<TodayScreen> {
                   const SizedBox(height: AppSpacing.xs),
                 ],
 
-                // Editorial Calm Header
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.t('todayCalmTitle'),
-                        style: AppTypography.display(theme.colorScheme.onSurface).copyWith(
-                          fontSize: 22,
-                          letterSpacing: -0.3,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        l10n.t('todayCalmSubtitle'),
-                        style: AppTypography.caption(
-                          theme.colorScheme.onSurface.withValues(alpha: 0.65),
-                          isMedium: true,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-
-                // Painted Linear Progress Banner
-                _buildLinearProgressBanner(context, l10n, doneCount, totalCount, completionRate, isToday, cleanSelected),
-                const SizedBox(height: AppSpacing.md),
-
                 // Icon-based Routine Launcher Row
                 if (widget.routineService.routines.isNotEmpty) ...[
                   _buildRoutineLauncherSection(context, l10n),
                   const SizedBox(height: AppSpacing.md),
                 ],
 
-                // Habits List Section Header
+                // Habits List Section Header with slender inline progress bar
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        '${l10n.t('habitsHeaderWithCount')} (${habits.length})',
-                        style: AppTypography.section(theme.colorScheme.onSurface),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '${l10n.t('habitsHeaderWithCount')} (${habits.length})',
+                            style: AppTypography.section(theme.colorScheme.onSurface),
+                          ),
+                          Text(
+                            totalCount > 0
+                                ? '$doneCount de $totalCount (${(completionRate * 100).toInt()}%)'
+                                : '0 / 0',
+                            style: AppTypography.caption(
+                              theme.colorScheme.primary,
+                              isMedium: true,
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        l10n.t('habitsCompletedFraction', args: {
-                          'done': doneCount,
-                          'total': totalCount,
-                        }),
-                        style: AppTypography.caption(
-                          theme.colorScheme.primary,
-                          isMedium: true,
+                      if (totalCount > 0) ...[
+                        const SizedBox(height: AppSpacing.xs),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(3),
+                          child: LinearProgressIndicator(
+                            value: completionRate.clamp(0.0, 1.0),
+                            backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.12),
+                            color: theme.colorScheme.primary,
+                            minHeight: 4,
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
@@ -254,13 +257,6 @@ class _TodayScreenState extends State<TodayScreen> {
                       ),
                     );
                   }),
-                const SizedBox(height: AppSpacing.lg),
-
-                // Zen 90-Day Consistency Bento Card
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                  child: HeatmapCalendar(data: heatmapData),
-                ),
               ],
             );
           },
@@ -417,133 +413,6 @@ class _TodayScreenState extends State<TodayScreen> {
     );
   }
 
-  /// Painted Linear Progress Banner
-  Widget _buildLinearProgressBanner(
-    BuildContext context,
-    AppLocalizations l10n,
-    int doneCount,
-    int totalCount,
-    double completionRate,
-    bool isToday,
-    DateTime cleanSelected,
-  ) {
-    final theme = Theme.of(context);
-    final percentage = (completionRate * 100).toInt();
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      child: Container(
-        height: 76,
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          border: Border.all(
-            color: completionRate == 1.0 && totalCount > 0
-                ? theme.colorScheme.primary
-                : theme.colorScheme.outline.withValues(alpha: 0.25),
-            width: completionRate == 1.0 && totalCount > 0 ? 1.5 : 1.0,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: theme.colorScheme.shadow.withValues(alpha: 0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Stack(
-          children: [
-            // Background Painted Progress Fill
-            TweenAnimationBuilder<double>(
-              tween: Tween<double>(begin: 0.0, end: completionRate),
-              duration: const Duration(milliseconds: 450),
-              curve: Curves.easeOutCubic,
-              builder: (context, val, _) {
-                return FractionallySizedBox(
-                  widthFactor: val.clamp(0.0, 1.0),
-                  alignment: Alignment.centerLeft,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          theme.colorScheme.primary.withValues(alpha: 0.16),
-                          theme.colorScheme.primary.withValues(alpha: 0.28),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-
-            // Content Overlay
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-              child: Row(
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: completionRate == 1.0 && totalCount > 0
-                          ? theme.colorScheme.primary
-                          : theme.colorScheme.primary.withValues(alpha: 0.12),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      completionRate == 1.0 && totalCount > 0
-                          ? Icons.stars_rounded
-                          : Icons.bolt_rounded,
-                      color: completionRate == 1.0 && totalCount > 0
-                          ? theme.colorScheme.onPrimary
-                          : theme.colorScheme.primary,
-                      size: 26,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          doneCount == totalCount && totalCount > 0
-                              ? l10n.t('allDone')
-                              : l10n.t('progressSummary', args: {
-                                  'done': doneCount,
-                                  'total': totalCount,
-                                }),
-                          style: AppTypography.body(theme.colorScheme.onSurface, isMedium: true),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          doneCount == totalCount && totalCount > 0
-                              ? DateFormat('EEEE, d MMMM', l10n.locale.languageCode).format(cleanSelected)
-                              : l10n.t('pendingHabits', args: {'count': '${totalCount - doneCount}'}),
-                          style: AppTypography.caption(
-                            theme.colorScheme.onSurface.withValues(alpha: 0.65),
-                            isMedium: true,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Text(
-                    '$percentage%',
-                    style: AppTypography.title(theme.colorScheme.primary).copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   /// Icon-based Routine Launcher Section
   Widget _buildRoutineLauncherSection(BuildContext context, AppLocalizations l10n) {
     final theme = Theme.of(context);
@@ -678,6 +547,15 @@ class _TodayScreenState extends State<TodayScreen> {
   }
 
   void _openAddHabitDialog(BuildContext context) {
+    final premiumService = AppServices.of(context).premiumService;
+    if (!premiumService.isPro && widget.habitService.habits.length >= 5) {
+      PaywallSheet.show(
+        context,
+        customReason: AppLocalizations.of(context).t('proLimitHabitsMsg'),
+      );
+      return;
+    }
+
     HabitEditDialog.show(
       context,
       onSave: ({
