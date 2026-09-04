@@ -82,7 +82,7 @@ class AboutDialogWidget extends StatelessWidget {
             _buildRow(
               context,
               label: 'Versión / Version:',
-              value: '1.0.0 (Build 1)',
+              value: '1.0.0 (Build 2)',
             ),
             const SizedBox(height: AppSpacing.xs),
             _buildRow(

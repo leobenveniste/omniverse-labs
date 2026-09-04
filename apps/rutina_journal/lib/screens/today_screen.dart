@@ -50,12 +50,27 @@ class _TodayScreenState extends State<TodayScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leadingWidth: 48,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: AppSpacing.sm, top: 8, bottom: 8),
+          child: Image.asset(
+            'assets/images/app_logo.png',
+            fit: BoxFit.contain,
+            errorBuilder: (_, __, ___) => Icon(
+              Icons.spa_rounded,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              l10n.t('todayTitle'),
-              style: AppTypography.display(theme.colorScheme.onSurface),
+              'Ritmo',
+              style: AppTypography.display(theme.colorScheme.onSurface).copyWith(
+                fontSize: 19,
+                fontWeight: FontWeight.w700,
+              ),
             ),
             Text(
               DateFormat('EEEE, d MMMM', l10n.locale.languageCode).format(cleanSelected),

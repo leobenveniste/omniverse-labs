@@ -63,74 +63,114 @@ class _SplashScreenState extends State<SplashScreen>
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: Center(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: ScaleTransition(
-            scale: _scaleAnimation,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Omniverse Labs mark
-                Container(
-                  width: 96,
-                  height: 96,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: theme.colorScheme.primary.withValues(alpha: 0.25),
-                        blurRadius: 32,
-                        spreadRadius: 4,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            // Centered Brand Content
+            Center(
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: ScaleTransition(
+                  scale: _scaleAnimation,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Official Ritmo App Logo
+                      Container(
+                        width: 124,
+                        height: 124,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: theme.colorScheme.primary.withValues(alpha: 0.16),
+                              blurRadius: 36,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: Image.asset(
+                          'assets/images/app_logo.png',
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) => Icon(
+                            Icons.spa_rounded,
+                            size: 64,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+
+                      // App Name
+                      Text(
+                        'RITMO',
+                        style: AppTypography.display(theme.colorScheme.onSurface).copyWith(
+                          letterSpacing: 4.0,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+
+                      Text(
+                        'Hábitos, Rutinas & Diario',
+                        style: AppTypography.caption(
+                          theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                          isMedium: true,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xl),
+
+                      // Subtle Progress Loader
+                      SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            theme.colorScheme.primary,
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                  child: Image.asset(
-                    isDark
-                        ? 'assets/images/omniverse_labs_white.png'
-                        : 'assets/images/omniverse_labs_color.png',
-                    errorBuilder: (_, __, ___) => Icon(
-                      Icons.all_inclusive_rounded,
-                      size: 64,
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
                 ),
-                const SizedBox(height: AppSpacing.lg),
-
-                // App Name
-                Text(
-                  'RITMO',
-                  style: AppTypography.display(theme.colorScheme.onSurface).copyWith(
-                    letterSpacing: 4.0,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.xs),
-
-                Text(
-                  'Hábitos, Rutinas & Diario',
-                  style: AppTypography.caption(
-                    theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                    isMedium: true,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.xxl),
-
-                // Subtle loader
-                SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.0,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      theme.colorScheme.primary,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
+
+            // Bottom Omniverse Labs mark
+            Positioned(
+              bottom: 24,
+              left: 0,
+              right: 0,
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      isDark
+                          ? 'assets/images/omniverse_labs_white.png'
+                          : 'assets/images/omniverse_labs_color.png',
+                      width: 18,
+                      height: 18,
+                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    Text(
+                      'OMNIVERSE LABS',
+                      style: AppTypography.caption(
+                        theme.colorScheme.onSurface.withValues(alpha: 0.45),
+                      ).copyWith(
+                        letterSpacing: 1.5,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -64,20 +64,56 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
         edit_id = edit_res["id"]
         print(f"Edit Session Created: {edit_id}")
 
-        if package_name == "com.omniverselabs.menu_listo":
-            icon_path = r"C:\Users\leobe\.gemini\antigravity\brain\dc1a3d74-c6b8-4283-b258-23b841335b2e\scratch\app_icon_512x512.png"
-            feature_path = r"C:\Users\leobe\.gemini\antigravity\brain\dc1a3d74-c6b8-4283-b258-23b841335b2e\feature_graphic_1024x500.png"
+        if package_name == "com.omniverselabs.ritmo":
+            icon_path = r"c:\Projects\Omniverse Labs\apps\rutina_journal\assets\images\store\app_icon_512x512.png"
+            feature_path = r"c:\Projects\Omniverse Labs\apps\rutina_journal\assets\images\store\feature_graphic_1024x500.jpg"
 
             try:
-                print("Updating Store Listing...")
+                print("Updating Store Listing for Ritmo...")
                 edits.listings().update(
                     packageName=package_name,
                     editId=edit_id,
                     language="es-419",
                     body={
-                        "title": "Menú Listo: Recetas y Compras",
-                        "shortDescription": "Planificador semanal de comidas, recetario inteligente y lista de compras.",
-                        "fullDescription": "Menú Listo es tu asistente culinario integral para organizar tus comidas semanales, guardar tus recetas favoritas, escanear fotos de libros de cocina con OCR y generar tu lista de compras sin duplicados de forma 100% privada y offline.",
+                        "title": "Ritmo: Hábitos & Diario",
+                        "shortDescription": "Construye hábitos atómicos, rutinas guiadas y un diario reflexivo 100% offline.",
+                        "fullDescription": (
+                            "Transforma tu día a día con Ritmo, la aplicación integral diseñada para ayudarte a cultivar hábitos conscientes, "
+                            "estructurar tus rutinas diarias y reflexionar con claridad mental, todo en una experiencia 100% privada, elegante y sin distracciones.\n\n"
+                            "Ya sea que busques calma y serenidad o energía y alto rendimiento, Ritmo se adapta a tu estilo personal con tres identidades visuales únicas y una interfaz táctil diseñada al detalle.\n\n"
+                            "✨ CARACTERÍSTICAS PRINCIPALES:\n\n"
+                            "1. 🎯 HÁBITOS ATÓMICOS & GESTOS TÁCTILES\n"
+                            "• Desliza para completar: Experimenta una respuesta táctil elástica y satisfactoria en cada logro.\n"
+                            "• Hábitos medibles y contadores: Registra vasos de agua, páginas leídas, minutos de meditación o pasos con incrementos rápidos.\n"
+                            "• Rachas y consistencia: Visualiza tu progreso con rachas actuales, mejores récords y un mapa de calor de 90 días.\n"
+                            "• Categorías temáticas: Organiza tus metas en Salud, Mente, Productividad, Sueño, Finanzas y Crecimiento Personal.\n\n"
+                            "2. ⏱️ RUTINAS SECUENCIALES & MODO ENFOQUE\n"
+                            "• Flujos paso a paso: Diseña rutinas estructuradas para la mañana, tu jornada laboral o la noche.\n"
+                            "• Temporizador de enfoque: Inicia el modo guiado con temporizadores automáticos que te acompañan paso a paso sin saturarte.\n"
+                            "• Vinculación inteligente: Al completar un paso de tu rutina, tu hábito correspondiente se marca automáticamente.\n\n"
+                            "3. 🌿 MICRO-DIARIO & ESFERAS DE ÁNIMO ATMOSFÉRICAS\n"
+                            "• Selector de ánimo luminoso: Registra cómo te sientes mediante orbs atmosféricos con luz difusa y control de energía.\n"
+                            "• Tres gratitudes diarias: Cultiva una mentalidad positiva anotando tres cosas buenas de tu jornada.\n"
+                            "• Victoria del día & notas: Captura tus mayores aprendizajes e intenciones en segundos.\n"
+                            "• Correlación inteligente: Descubre cómo el cumplimiento de tus hábitos impacta directamente en tu estado de ánimo.\n\n"
+                            "4. 🎨 3 PRESETS ESTÉTICOS INTERCAMBIABLES\n"
+                            "Elige el ambiente que mejor resuene contigo desde Ajustes:\n"
+                            "• Calm Sage: Inspirado en la serenidad orgánica con tonos lino, salvia profunda y terracota cálido.\n"
+                            "• Neo-Kinetic: Diseñado para el alto impulso y dinamismo con negro carbono, neo-menta y ámbar solar.\n"
+                            "• Midnight Bento: Una estética moderna y premium inspirada en tableros bento con pizarra medianoche y acentos joya.\n"
+                            "• Soporte completo para Modo Claro y Modo Oscuro en todos los temas.\n\n"
+                            "5. 🔔 RECORDATORIOS NATIVOS INTELIGENTES\n"
+                            "• Notificaciones locales precisas para recordarte tus hábitos y rutinas en el momento exacto.\n"
+                            "• Alerta de protección de racha para no perder tu constancia.\n"
+                            "• Reflexión nocturna suave para cerrar el día con gratitud.\n\n"
+                            "6. 🛡️ PRIVACIDAD ABSOLUTA & SOBERANÍA DE DATOS\n"
+                            "• 100% Offline-First: Tus datos se almacenan únicamente en la memoria interna de tu dispositivo.\n"
+                            "• Sin cuentas obligatorias, sin servidores externos y sin recopilación de datos personales.\n"
+                            "• Cero anuncios publicitarios y cero SDKs de rastreo o telemetría invasiva.\n"
+                            "• Exportación e importación JSON para respaldar tus datos libremente.\n\n"
+                            "7. 🌍 MULTI-IDIOMA INTEGRAL\n"
+                            "Disponible en 5 idiomas: Español, Inglés, Portugués, Francés e Italiano."
+                        ),
                     }
                 ).execute()
 
@@ -86,18 +122,54 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
                     editId=edit_id,
                     language="en-US",
                     body={
-                        "title": "Menú Listo: Recipe & Grocery",
-                        "shortDescription": "Weekly meal planner, smart recipe book, and grocery shopping list.",
-                        "fullDescription": "Menú Listo is your all-in-one culinary assistant to organize your weekly meals, save recipes, scan cookbook photos with on-device OCR, and generate deduplicated grocery shopping lists.",
+                        "title": "Ritmo: Habits & Journal",
+                        "shortDescription": "Build atomic habits, guided routines, and a mindful micro-journal 100% offline.",
+                        "fullDescription": (
+                            "Transform your daily life with Ritmo, the all-in-one companion designed to help you build positive habits, "
+                            "flow through guided daily routines, and reflect with mindful clarity—all in a private, distraction-free, and beautifully crafted offline experience.\n\n"
+                            "Whether you seek calm mindfulness or high-energy momentum, Ritmo adapts to your lifestyle with three distinct aesthetic identities and fluid tactile interactions.\n\n"
+                            "✨ CORE FEATURES:\n\n"
+                            "1. 🎯 ATOMIC HABITS & TACTILE SWIPES\n"
+                            "• Swipe to Complete: Satisfying elastic gestures with subtle haptic feedback make building consistency rewarding.\n"
+                            "• Measurable Counter Habits: Track glasses of water, pages read, meditation minutes, or workout sets with quick steppers.\n"
+                            "• Streaks & Momentum: Keep your drive alive with current streaks, personal bests, and a 90-day consistency heatmap.\n"
+                            "• Categorized Focus: Organize habits across Health, Mind, Productivity, Sleep, Finance, and Personal Growth.\n\n"
+                            "2. ⏱️ SEQUENTIAL ROUTINES & FOCUS RUNNER\n"
+                            "• Step-by-Step Flows: Structure Morning, Work, and Evening routines tailored to your lifestyle.\n"
+                            "• Focus Mode Runner: Launch hands-free guided sessions with integrated countdown timers for each step.\n"
+                            "• Smart Habit Linking: Completing a step in your routine automatically marks the corresponding daily habit.\n\n"
+                            "3. 🌿 MINDFUL MICRO-JOURNAL & GLOWING MOOD ORBS\n"
+                            "• Atmospheric Mood Selector: Log your emotional state with glowing gradient spheres and interactive energy sliders.\n"
+                            "• 3 Daily Gratitudes: Foster positive mindfulness by capturing three meaningful moments each day.\n"
+                            "• Daily Win & Reflection: Jot down your key achievement and freeform reflections in under two minutes.\n"
+                            "• Mood-Habit Insights: Understand how consistent habit completion uplifts your daily mood and well-being.\n\n"
+                            "4. 🎨 3 SWITCHABLE AESTHETIC PRESETS\n"
+                            "Customize your visual workspace anytime in Settings:\n"
+                            "• Calm Sage: Mindful organic warmth featuring soft linen, deep forest sage, and earthy terracotta.\n"
+                            "• Neo-Kinetic: High-momentum contrast crafted with carbon black, electric neo-mint, and solar amber.\n"
+                            "• Midnight Bento: Sleek luxury inspired by modular bento layouts with midnight slate and jewel tones.\n"
+                            "• Full support for seamless Light and Dark modes across all presets.\n\n"
+                            "5. 🔔 NATIVE OFFLINE NOTIFICATIONS\n"
+                            "• Exact local reminders schedule your habit cues and routine prompts precisely when you need them.\n"
+                            "• Streak-protection notifications ensure your consistency remains intact.\n"
+                            "• Gentle evening check-in alerts guide you through daily gratitude and reflection.\n\n"
+                            "6. 🛡️ ABSOLUTE PRIVACY & DATA SOVEREIGNTY\n"
+                            "• 100% Offline-First: All your habits, journals, streaks, and reflections remain stored strictly on your local device.\n"
+                            "• No accounts required, no cloud uploads, and no personal data collection.\n"
+                            "• Completely ad-free with zero telemetry, tracking SDKs, or behavioral profiling.\n"
+                            "• JSON Backup & Restore: Export your complete data archive anytime for total peace of mind.\n\n"
+                            "7. 🌍 5 GLOBAL LANGUAGES\n"
+                            "Full native localization with instant switching: English, Spanish, Portuguese, French, and Italian."
+                        ),
                     }
                 ).execute()
-                print("Store Listings Updated!")
+                print("Ritmo Store Listings Updated (es-419 & en-US)!")
             except Exception as e:
-                print(f"Listing notice: {e}")
+                print(f"Ritmo Listing notice: {e}")
 
             if os.path.exists(icon_path):
                 try:
-                    print("Uploading App Icon (512x512)...")
+                    print("Uploading Ritmo App Icon (512x512)...")
                     icon_media = MediaFileUpload(icon_path, mimetype="image/png")
                     edits.images().upload(
                         packageName=package_name,
@@ -106,14 +178,14 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
                         imageType="icon",
                         media_body=icon_media
                     ).execute()
-                    print("App Icon Uploaded!")
+                    print("Ritmo App Icon Uploaded!")
                 except Exception as e:
-                    print(f"Icon notice: {e}")
+                    print(f"Ritmo Icon notice: {e}")
 
             if os.path.exists(feature_path):
                 try:
-                    print("Uploading Feature Graphic (1024x500)...")
-                    feat_media = MediaFileUpload(feature_path, mimetype="image/png")
+                    print("Uploading Ritmo Feature Graphic (1024x500)...")
+                    feat_media = MediaFileUpload(feature_path, mimetype="image/jpeg")
                     edits.images().upload(
                         packageName=package_name,
                         editId=edit_id,
@@ -121,9 +193,9 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
                         imageType="featureGraphic",
                         media_body=feat_media
                     ).execute()
-                    print("Feature Graphic Uploaded!")
+                    print("Ritmo Feature Graphic Uploaded!")
                 except Exception as e:
-                    print(f"Feature Graphic notice: {e}")
+                    print(f"Ritmo Feature Graphic notice: {e}")
 
         print(f"Uploading App Bundle ({os.path.getsize(aab_path) / (1024*1024):.2f} MB)...")
         media = MediaFileUpload(aab_path, mimetype="application/octet-stream", chunksize=10*1024*1024, resumable=True)

@@ -1,11 +1,11 @@
 {
-    "name": "anotador_de_juegos",
-    "short_name": "anotador_de_juegos",
+    "name": "Central de Juegos",
+    "short_name": "Central de Juegos",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Central de Juegos - Omniverse Labs",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

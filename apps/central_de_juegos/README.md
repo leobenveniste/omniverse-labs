@@ -1,6 +1,6 @@
-# anotador_de_juegos
+# Central de Juegos
 
-A new Flutter project.
+Anotador digital todo en uno para juegos de mesa (Truco, Burako, Generala, Escoba del 15 y contador personalizado) con herramientas de juego integradas.
 
 ## Getting Started
 
