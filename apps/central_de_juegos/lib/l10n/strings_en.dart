@@ -115,4 +115,19 @@ const Map<String, String> stringsEn = {
   'winnerIs': '{name} takes the victory!',
   'playAgain': 'Play Again',
   'backToHome': 'Back to Menu',
+
+  // Settings Screen
+  'settingsTitle': 'Settings',
+  'appearanceSection': 'Appearance',
+  'themeTitle': 'Visual Theme',
+  'themeDark': 'Dark Mode',
+  'themeLight': 'Light Mode',
+  'themeSystem': 'System Default',
+  'languageSection': 'Language & Region',
+  'aboutSection': 'About',
+  'companyName': 'Omniverse Labs',
+  'developer': 'Developer',
+  'website': 'Website',
+  'privacyPolicy': 'Privacy Policy',
+  'termsOfService': 'Terms of Service',
 };

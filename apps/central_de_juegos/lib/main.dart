@@ -26,19 +26,30 @@ class _CentralDeJuegosAppState extends State<CentralDeJuegosApp> {
   ThemeMode _themeMode = ThemeMode.dark;
   Locale? _locale;
 
+  ThemeMode get themeMode => _themeMode;
+  Locale? get locale => _locale;
+
   @override
   void initState() {
     super.initState();
-    _loadLocale();
+    _loadPreferences();
   }
 
-  Future<void> _loadLocale() async {
+  Future<void> _loadPreferences() async {
     final code = await StorageService.getLanguageCode();
-    if (code != null) {
-      setState(() {
+    final themeStr = await StorageService.getThemeMode();
+    setState(() {
+      if (code != null) {
         _locale = Locale(code);
-      });
-    }
+      }
+      if (themeStr == 'light') {
+        _themeMode = ThemeMode.light;
+      } else if (themeStr == 'dark') {
+        _themeMode = ThemeMode.dark;
+      } else if (themeStr == 'system') {
+        _themeMode = ThemeMode.system;
+      }
+    });
   }
 
   void setLocale(Locale newLocale) async {
@@ -48,10 +59,21 @@ class _CentralDeJuegosAppState extends State<CentralDeJuegosApp> {
     await StorageService.setLanguageCode(newLocale.languageCode);
   }
 
-  void _toggleTheme() {
+  void setThemeMode(ThemeMode mode) async {
     setState(() {
-      _themeMode = _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+      _themeMode = mode;
     });
+    final modeStr = mode == ThemeMode.light
+        ? 'light'
+        : mode == ThemeMode.dark
+            ? 'dark'
+            : 'system';
+    await StorageService.setThemeMode(modeStr);
+  }
+
+  void _toggleTheme() {
+    final next = _themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark;
+    setThemeMode(next);
   }
 
   @override

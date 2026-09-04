@@ -85,4 +85,14 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyLanguageCode, code);
   }
+
+  static Future<String?> getThemeMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyThemeMode);
+  }
+
+  static Future<void> setThemeMode(String mode) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyThemeMode, mode);
+  }
 }

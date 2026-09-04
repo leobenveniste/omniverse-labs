@@ -101,10 +101,8 @@ class PremiumService extends ChangeNotifier {
         ),
       );
       if (response.productDetails.isNotEmpty) {
-        _proProduct = response.productDetails.firstWhere(
-          (p) => p.id == kRitmoProProductId,
-          orElse: () => response.productDetails.first,
-        );
+        final matches = response.productDetails.where((p) => p.id == kRitmoProProductId);
+        _proProduct = matches.isNotEmpty ? matches.first : response.productDetails.first;
       }
     } catch (e) {
       _isStoreAvailable = false;
@@ -143,10 +141,8 @@ class PremiumService extends ChangeNotifier {
         if (available) {
           final response = await _iap.queryProductDetails({kRitmoProProductId});
           if (response.productDetails.isNotEmpty) {
-            product = response.productDetails.firstWhere(
-              (p) => p.id == kRitmoProProductId,
-              orElse: () => response.productDetails.first,
-            );
+            final matches = response.productDetails.where((p) => p.id == kRitmoProProductId);
+            product = matches.isNotEmpty ? matches.first : response.productDetails.first;
             _proProduct = product;
           }
         }

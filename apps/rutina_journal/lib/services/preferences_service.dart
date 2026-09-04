@@ -11,6 +11,7 @@ class PreferencesService extends ChangeNotifier {
   static const String _keyNotifEvening = 'pref_notif_evening';
   static const String _keyWaterDate = 'pref_water_date';
   static const String _keyWaterCount = 'pref_water_count';
+  static const String _keyDevMode = 'pref_dev_mode_unlocked';
 
   final SharedPreferences _prefs;
 
@@ -20,6 +21,7 @@ class PreferencesService extends ChangeNotifier {
   bool _notifHabits = true;
   bool _notifStreak = true;
   bool _notifEvening = true;
+  bool _devMode = false;
   int _waterCount = 0;
   String _waterDate = '';
 
@@ -63,6 +65,15 @@ class PreferencesService extends ChangeNotifier {
     _notifEvening = _prefs.getBool(_keyNotifEvening) ?? true;
     _waterDate = _prefs.getString(_keyWaterDate) ?? '';
     _waterCount = _prefs.getInt(_keyWaterCount) ?? 0;
+    _devMode = _prefs.getBool(_keyDevMode) ?? false;
+  }
+
+  bool get isDevMode => _devMode;
+
+  Future<void> toggleDevMode() async {
+    _devMode = !_devMode;
+    await _prefs.setBool(_keyDevMode, _devMode);
+    notifyListeners();
   }
 
   Future<void> setThemePreset(AppThemePreset preset) async {

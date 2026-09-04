@@ -78,7 +78,7 @@ class AboutDialogWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('${l10n.t('versionLabel')}:', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                const Text('1.0.4 (Build 17)', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                const Text('1.0.4 (Build 18)', style: TextStyle(fontSize: 13, color: Colors.grey)),
               ],
             ),
             const SizedBox(height: 24),

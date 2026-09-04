@@ -101,5 +101,83 @@ class AppTheme {
     ),
   );
 
-  static ThemeData lightTheme = darkTheme; // Defaulting to the new cyber aesthetic
+  static const Color bgLight = Color(0xFFF6F8FA);
+  static const Color surfaceLight = Color(0xFFFFFFFF);
+  static const Color surfaceElevatedLight = Color(0xFFEDF2F7);
+  static const Color borderLight = Color(0xFFE2E8F0);
+
+  static ThemeData lightTheme = ThemeData(
+    useMaterial3: true,
+    brightness: Brightness.light,
+    colorScheme: const ColorScheme.light(
+      primary: Color(0xFFD9A000), // Slightly deeper gold for contrast on white
+      onPrimary: Colors.black,
+      primaryContainer: surfaceElevatedLight,
+      onPrimaryContainer: Colors.black,
+      secondary: Color(0xFFD9A000),
+      surface: surfaceLight,
+      onSurface: Color(0xFF1A202C),
+      surfaceContainerHighest: surfaceElevatedLight,
+      outline: borderLight,
+    ),
+    scaffoldBackgroundColor: bgLight,
+    appBarTheme: const AppBarTheme(
+      centerTitle: false,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      backgroundColor: bgLight,
+      titleTextStyle: TextStyle(
+        fontSize: 18,
+        fontWeight: FontWeight.w900,
+        color: Color(0xFF1A202C),
+        letterSpacing: 1.0,
+      ),
+      iconTheme: IconThemeData(color: Color(0xFF1A202C)),
+    ),
+    cardTheme: CardThemeData(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: borderLight, width: 1),
+      ),
+      color: surfaceLight,
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        backgroundColor: Color(0xFFD9A000),
+        foregroundColor: Colors.black,
+        elevation: 0,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        textStyle: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 0.5),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: Color(0xFFB8860B),
+        side: const BorderSide(color: Color(0xFFB8860B), width: 1.5),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+      ),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: surfaceElevatedLight,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: borderLight),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: borderLight),
+      ),
+      focusedBorder: const OutlineInputBorder(
+        borderRadius: BorderRadius.all(Radius.circular(12)),
+        borderSide: BorderSide(color: Color(0xFFD9A000), width: 2),
+      ),
+      hintStyle: const TextStyle(color: Color(0xFF718096)),
+    ),
+  );
 }

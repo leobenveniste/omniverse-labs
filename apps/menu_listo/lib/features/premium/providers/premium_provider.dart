@@ -78,10 +78,8 @@ class PremiumNotifier extends StateNotifier<PremiumState> {
 
       ProductDetails? product;
       if (response.productDetails.isNotEmpty) {
-        product = response.productDetails.firstWhere(
-          (p) => p.id == kProLifetimeProductId,
-          orElse: () => response.productDetails.first,
-        );
+        final matches = response.productDetails.where((p) => p.id == kProLifetimeProductId);
+        product = matches.isNotEmpty ? matches.first : response.productDetails.first;
       }
 
       state = state.copyWith(
@@ -105,10 +103,8 @@ class PremiumNotifier extends StateNotifier<PremiumState> {
         if (available) {
           final response = await _iap.queryProductDetails({kProLifetimeProductId});
           if (response.productDetails.isNotEmpty) {
-            product = response.productDetails.firstWhere(
-              (p) => p.id == kProLifetimeProductId,
-              orElse: () => response.productDetails.first,
-            );
+            final matches = response.productDetails.where((p) => p.id == kProLifetimeProductId);
+            product = matches.isNotEmpty ? matches.first : response.productDetails.first;
             state = state.copyWith(proProduct: product);
           }
         }

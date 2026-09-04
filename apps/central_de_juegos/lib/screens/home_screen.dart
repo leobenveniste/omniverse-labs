@@ -22,6 +22,7 @@ import 'burako_screen.dart';
 import 'escoba_screen.dart';
 import 'custom_counter_screen.dart';
 import 'history_screen.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final VoidCallback onToggleTheme;
@@ -260,14 +261,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         actions: [
-          // Language selector
-          IconButton(
-            icon: const Icon(Icons.language_rounded, color: Colors.white70),
-            tooltip: l10n.t('language'),
-            onPressed: () {
-              _showLanguageDialog(context, l10n);
-            },
-          ),
           if (_premiumService != null)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 2),
@@ -298,24 +291,28 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     onPressed: () => PaywallSheet.show(
-                      context,
-                      premiumService: _premiumService!,
+                       context,
+                       premiumService: _premiumService!,
                     ),
                   );
                 },
               ),
             ),
           IconButton(
-            icon: const Icon(Icons.info_outline, color: Colors.white70),
-            tooltip: l10n.t('aboutTitle'),
-            onPressed: () => AboutDialogWidget.show(context),
-          ),
-          IconButton(
             icon: const Icon(Icons.history, color: Colors.white70),
             tooltip: l10n.t('historyTitle'),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => HistoryScreen(premiumService: _premiumService),
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings_outlined, color: Colors.white70),
+            tooltip: l10n.t('settingsTitle'),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => SettingsScreen(premiumService: _premiumService),
               ),
             ),
           ),

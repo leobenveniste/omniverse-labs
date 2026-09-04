@@ -350,8 +350,8 @@ class PaywallSheet extends StatelessWidget {
                 ),
               ),
 
-              // Testing Toggle (GUARANTEED ONLY VISIBLE IN DEBUG BUILDS)
-              if (kDebugMode) ...[
+              // Testing Toggle (Visible in debug builds OR when Developer Mode is enabled via About build tap)
+              if (kDebugMode || AppServices.of(context).preferencesService.isDevMode) ...[
                 const SizedBox(height: AppSpacing.xxs),
                 TextButton.icon(
                   onPressed: () async {

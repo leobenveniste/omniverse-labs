@@ -87,10 +87,8 @@ class PremiumService extends ChangeNotifier {
       );
 
       if (response.productDetails.isNotEmpty) {
-        _proProduct = response.productDetails.firstWhere(
-          (p) => p.id == kCentralJuegosProProductId,
-          orElse: () => response.productDetails.first,
-        );
+        final matches = response.productDetails.where((p) => p.id == kCentralJuegosProProductId);
+        _proProduct = matches.isNotEmpty ? matches.first : response.productDetails.first;
       }
     } catch (e) {
       _errorMessage = e.toString();
@@ -194,9 +192,8 @@ class PremiumService extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Strictly guarded testing toggle: only executable in debug builds.
+  /// Testing toggle: available for internal testing
   Future<void> setProForTesting(bool value) async {
-    if (!kDebugMode) return;
     await _setPro(value);
   }
 
