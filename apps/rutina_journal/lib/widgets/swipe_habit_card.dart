@@ -29,11 +29,13 @@ class SwipeHabitCard extends StatefulWidget {
 }
 
 class _SwipeHabitCardState extends State<SwipeHabitCard>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   double _dragOffset = 0.0;
   bool _thresholdReached = false;
   late AnimationController _springController;
   late Animation<double> _springAnimation;
+  late AnimationController _pulseController;
+  late Animation<double> _pulseScale;
   bool _isPressed = false;
 
   @override
@@ -47,11 +49,32 @@ class _SwipeHabitCardState extends State<SwipeHabitCard>
       ..addListener(() {
         setState(() => _dragOffset = _springAnimation.value);
       });
+
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _pulseScale = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween<double>(begin: 1.0, end: 1.35).chain(CurveTween(curve: Curves.easeOutCubic)), weight: 40),
+      TweenSequenceItem(tween: Tween<double>(begin: 1.35, end: 0.90).chain(CurveTween(curve: Curves.easeInOut)), weight: 30),
+      TweenSequenceItem(tween: Tween<double>(begin: 0.90, end: 1.0).chain(CurveTween(curve: Curves.easeOutBack)), weight: 30),
+    ]).animate(_pulseController);
+  }
+
+  @override
+  void didUpdateWidget(covariant SwipeHabitCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final wasCompleted = oldWidget.log?.completed ?? false;
+    final isCompleted = widget.log?.completed ?? false;
+    if (!wasCompleted && isCompleted) {
+      _pulseController.forward(from: 0.0);
+    }
   }
 
   @override
   void dispose() {
     _springController.dispose();
+    _pulseController.dispose();
     super.dispose();
   }
 
@@ -111,19 +134,6 @@ class _SwipeHabitCardState extends State<SwipeHabitCard>
 
     final categoryColor = widget.habit.category.color;
     final undoColor = Colors.amber.shade700;
-
-    // Rich category-based card color tint
-    final cardBgColor = isCompleted
-        ? (isDark
-            ? categoryColor.withValues(alpha: 0.18)
-            : categoryColor.withValues(alpha: 0.12))
-        : (isDark
-            ? categoryColor.withValues(alpha: 0.28)
-            : categoryColor.withValues(alpha: 0.22));
-
-    final cardBorderColor = isCompleted
-        ? categoryColor.withValues(alpha: 0.4)
-        : categoryColor.withValues(alpha: 0.6);
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -194,28 +204,30 @@ class _SwipeHabitCardState extends State<SwipeHabitCard>
                 child: AnimatedScale(
                   scale: _isPressed ? 0.98 : 1.0,
                   duration: const Duration(milliseconds: 100),
-                  child: Container(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 350),
+                    curve: Curves.easeInOutCubic,
                     decoration: BoxDecoration(
-                      color: isDark
-                          ? (isCompleted
-                              ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.45)
-                              : theme.colorScheme.surface)
-                          : (isCompleted
-                              ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6)
-                              : theme.colorScheme.surface),
+                      color: isCompleted
+                          ? (isDark
+                              ? categoryColor.withValues(alpha: 0.32)
+                              : categoryColor.withValues(alpha: 0.22))
+                          : (isDark ? theme.colorScheme.surface : theme.colorScheme.surface),
                       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                       border: Border.all(
                         color: isCompleted
-                            ? theme.colorScheme.outline.withValues(alpha: isDark ? 0.35 : 0.5)
+                            ? categoryColor.withValues(alpha: isDark ? 0.65 : 0.5)
                             : (isDark
                                 ? theme.colorScheme.outline.withValues(alpha: 0.8)
                                 : theme.colorScheme.outline),
-                        width: 1.0,
+                        width: isCompleted ? 1.5 : 1.0,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.04),
-                          blurRadius: isDark ? 8 : 4,
+                          color: isCompleted
+                              ? categoryColor.withValues(alpha: isDark ? 0.25 : 0.12)
+                              : Colors.black.withValues(alpha: isDark ? 0.35 : 0.04),
+                          blurRadius: isCompleted ? 10 : (isDark ? 8 : 4),
                           offset: const Offset(0, 2),
                         ),
                       ],
@@ -251,13 +263,16 @@ class _SwipeHabitCardState extends State<SwipeHabitCard>
                               ),
                               child: Row(
                                 children: [
-                                  // Category Icon (larger, without background)
+                                  // Category Icon with satisfying pulse on completion
                                   Padding(
                                     padding: const EdgeInsets.only(left: 4, right: 8),
-                                    child: Icon(
-                                      widget.habit.category.icon,
-                                      size: 30,
-                                      color: categoryColor,
+                                    child: ScaleTransition(
+                                      scale: _pulseScale,
+                                      child: Icon(
+                                        widget.habit.category.icon,
+                                        size: 30,
+                                        color: categoryColor,
+                                      ),
                                     ),
                                   ),
                                   // Title and Info
@@ -267,137 +282,104 @@ class _SwipeHabitCardState extends State<SwipeHabitCard>
                                       children: [
                                         Text(
                                           widget.habit.title,
-                                      style: AppTypography.body(
-                                        isCompleted
-                                            ? theme.colorScheme.onSurface.withValues(alpha: 0.55)
-                                            : theme.colorScheme.onSurface,
-                                        isMedium: true,
-                                      ).copyWith(
-                                        decoration: isCompleted
-                                            ? TextDecoration.lineThrough
-                                            : TextDecoration.none,
-                                        fontWeight: isCompleted ? FontWeight.w500 : FontWeight.w600,
-                                      ),
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: AppSpacing.xxs),
-                                    Row(
-                                      children: [
-                                        // Streak badge
-                                        if (widget.streak.current > 0) ...[
-                                          const Icon(
-                                            Icons.local_fire_department_rounded,
-                                            size: 14,
-                                            color: Colors.deepOrange,
+                                          style: AppTypography.body(
+                                            isCompleted
+                                                ? (isDark ? Colors.white : theme.colorScheme.onSurface)
+                                                : theme.colorScheme.onSurface,
+                                            isMedium: true,
+                                          ).copyWith(
+                                            decoration: isCompleted
+                                                ? TextDecoration.lineThrough
+                                                : TextDecoration.none,
+                                            fontWeight: isCompleted ? FontWeight.w600 : FontWeight.w600,
                                           ),
-                                          const SizedBox(width: 2),
-                                          Text(
-                                            '${widget.streak.current}d',
-                                            style: AppTypography.caption(
-                                              Colors.deepOrange,
-                                              isMedium: true,
-                                            ),
-                                          ),
-                                          const SizedBox(width: AppSpacing.xs),
-                                        ],
-                                        // Counter progress or swipe hint
-                                        if (isCounter)
-                                          Text(
-                                            '${currentValue.toInt()} / ${widget.habit.targetValue.toInt()} ${widget.habit.unit}',
-                                            style: AppTypography.caption(
-                                              theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                                              isMedium: true,
-                                            ),
-                                          )
-                                        else if (!isCompleted)
-                                          Text(
-                                            l10n.t('swipeToCompleteHint'),
-                                            style: AppTypography.caption(
-                                              categoryColor.withValues(alpha: 0.8),
-                                              isMedium: true,
-                                            ),
-                                          )
-                                        else
-                                          Text(
-                                            l10n.t('swipeToUndoHint'),
-                                            style: AppTypography.caption(
-                                              theme.colorScheme.onSurface.withValues(alpha: 0.45),
-                                            ),
-                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: AppSpacing.xxs),
+                                        Row(
+                                          children: [
+                                            // Streak badge
+                                            if (widget.streak.current > 0) ...[
+                                              const Icon(
+                                                Icons.local_fire_department_rounded,
+                                                size: 14,
+                                                color: Colors.deepOrange,
+                                              ),
+                                              const SizedBox(width: 2),
+                                              Text(
+                                                '${widget.streak.current}d',
+                                                style: AppTypography.caption(
+                                                  Colors.deepOrange,
+                                                  isMedium: true,
+                                                ),
+                                              ),
+                                              const SizedBox(width: AppSpacing.xs),
+                                            ],
+                                            // Counter progress or swipe hint
+                                            if (isCounter)
+                                              Text(
+                                                '${currentValue.toInt()} / ${widget.habit.targetValue.toInt()} ${widget.habit.unit}',
+                                                style: AppTypography.caption(
+                                                  theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                                                  isMedium: true,
+                                                ),
+                                              )
+                                            else if (!isCompleted)
+                                              Text(
+                                                l10n.t('swipeToCompleteHint'),
+                                                style: AppTypography.caption(
+                                                  categoryColor.withValues(alpha: 0.8),
+                                                  isMedium: true,
+                                                ),
+                                              )
+                                            else
+                                              Text(
+                                                l10n.t('swipeToUndoHint'),
+                                                style: AppTypography.caption(
+                                                  theme.colorScheme.onSurface.withValues(alpha: 0.55),
+                                                ),
+                                              ),
+                                          ],
+                                        ),
                                       ],
                                     ),
-                                  ],
-                                ),
-                              ),
-
-                              // Quick action: Counter increments or Edit Button
-                              if (isCounter && !isCompleted && widget.onDelta != null) ...[
-                                IconButton(
-                                  icon: const Icon(Icons.add_circle_outline_rounded),
-                                  color: categoryColor,
-                                  iconSize: 24,
-                                  tooltip: '+1',
-                                  onPressed: () {
-                                    HapticsHelper.light();
-                                    widget.onDelta!(1.0);
-                                  },
-                                ),
-                              ],
-                              // Dedicated Edit Icon Button
-                              IconButton(
-                                icon: const Icon(Icons.edit_outlined),
-                                iconSize: 18,
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                                tooltip: l10n.t('actionEdit'),
-                                onPressed: () {
-                                  HapticsHelper.light();
-                                  widget.onEdit();
-                                },
-                              ),
-                              const SizedBox(width: AppSpacing.xxs),
-
-                              // Zen Circular Checkbox Button
-                              InkWell(
-                                onTap: () {
-                                  HapticsHelper.selection();
-                                  widget.onToggle();
-                                },
-                                borderRadius: BorderRadius.circular(16),
-                                child: Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: isCompleted
-                                        ? theme.colorScheme.primary
-                                        : Colors.transparent,
-                                    border: Border.all(
-                                      color: isCompleted
-                                          ? theme.colorScheme.primary
-                                          : theme.colorScheme.outline.withValues(alpha: 0.6),
-                                      width: 1.5,
-                                    ),
                                   ),
-                                  child: isCompleted
-                                      ? Icon(
-                                          Icons.check_rounded,
-                                          color: theme.colorScheme.onPrimary,
-                                          size: 18,
-                                        )
-                                      : null,
-                                ),
+
+                                  // Quick action: Counter increments
+                                  if (isCounter && !isCompleted && widget.onDelta != null) ...[
+                                    IconButton(
+                                      icon: const Icon(Icons.add_circle_outline_rounded),
+                                      color: categoryColor,
+                                      iconSize: 24,
+                                      tooltip: '+1',
+                                      onPressed: () {
+                                        HapticsHelper.light();
+                                        widget.onDelta!(1.0);
+                                      },
+                                    ),
+                                  ],
+                                  // Dedicated Edit Icon Button
+                                  IconButton(
+                                    icon: const Icon(Icons.edit_outlined),
+                                    iconSize: 18,
+                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                                    tooltip: l10n.t('actionEdit'),
+                                    onPressed: () {
+                                      HapticsHelper.light();
+                                      widget.onEdit();
+                                    },
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
         ],
         ),
       );

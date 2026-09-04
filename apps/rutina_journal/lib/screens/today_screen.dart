@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../l10n/app_localizations.dart';
 import '../models/habit.dart';
-import '../models/habit_category.dart';
-import '../models/routine.dart';
 import '../services/app_services.dart';
 import '../services/habit_service.dart';
-import '../services/preferences_service.dart';
 import '../services/routine_service.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_theme.dart';
@@ -14,7 +11,6 @@ import '../theme/app_typography.dart';
 import '../utils/date_utils.dart';
 import '../utils/haptics_helper.dart';
 import '../widgets/habit_edit_dialog.dart';
-import '../widgets/routine_edit_dialog.dart';
 import '../widgets/routine_runner_sheet.dart';
 import '../widgets/swipe_habit_card.dart';
 import '../widgets/paywall_sheet.dart';
@@ -424,38 +420,9 @@ class _TodayScreenState extends State<TodayScreen> {
     final theme = Theme.of(context);
     final routines = widget.routineService.routines;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                l10n.t('routinesTitle'),
-                style: AppTypography.section(theme.colorScheme.onSurface),
-              ),
-              IconButton(
-                icon: const Icon(Icons.add_rounded, size: 20),
-                tooltip: l10n.t('newRoutine'),
-                visualDensity: VisualDensity.compact,
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  HapticsHelper.light();
-                  RoutineEditDialog.show(
-                    context,
-                    onSave: (newRoutine) => widget.routineService.addRoutine(newRoutine),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: AppSpacing.xs),
-        SizedBox(
-          height: 60,
-          child: ListView.separated(
+    return SizedBox(
+      height: 60,
+      child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
             scrollDirection: Axis.horizontal,
             itemCount: routines.length,
@@ -518,9 +485,7 @@ class _TodayScreenState extends State<TodayScreen> {
               );
             },
           ),
-        ),
-      ],
-    );
+        );
   }
 
   Widget _buildEmptyState(BuildContext context, AppLocalizations l10n) {

@@ -54,11 +54,24 @@ class _RoutineEditDialogState extends State<RoutineEditDialog> {
     {'name': 'timer', 'icon': Icons.timer_rounded},
   ];
 
+  bool _initializedLocalized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initializedLocalized && widget.routine != null) {
+      final l10n = AppLocalizations.of(context);
+      _titleController.text = l10n.t(widget.routine!.title);
+      _descController.text = l10n.t(widget.routine!.description);
+      _initializedLocalized = true;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(text: widget.routine?.title ?? '');
-    _descController = TextEditingController(text: widget.routine?.description ?? '');
+    _titleController = TextEditingController();
+    _descController = TextEditingController();
     _selectedIconName = widget.routine?.iconName ?? 'wb_sunny';
     _steps = widget.routine != null
         ? widget.routine!.steps

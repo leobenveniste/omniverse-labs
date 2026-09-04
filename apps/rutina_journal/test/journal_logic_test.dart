@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:rutina_journal/models/journal_entry.dart';
 import 'package:rutina_journal/services/journal_service.dart';
 import 'package:rutina_journal/services/storage_service.dart';
 

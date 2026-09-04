@@ -194,6 +194,8 @@ const Map<String, String> stringsPt = {
   'focusPaused': 'Em pausa',
   'breathingInhaleExhale': 'Inspire profundamente • Segure • Expire',
   'focusMarkStepComplete': 'Marcar passo como concluído →',
+  'focusDndTitle': 'Modo Não Perturbe Recomendado',
+  'focusDndDesc': 'Silencia chamadas e notificações durante sua sessão. Ao terminar, seu celular volta ao normal.',
   'neuroLinkActiveTitle': 'Vinculação neuronal ativa',
   'neuroLinkActiveBody': 'Concluir este bloco aumenta em 84% a probabilidade de manter o ritmo nesta semana.',
   'todayCalmTitle': 'Cultive sua calma diária',

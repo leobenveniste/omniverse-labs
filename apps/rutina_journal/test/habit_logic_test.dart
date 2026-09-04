@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rutina_journal/models/habit.dart';
 import 'package:rutina_journal/models/habit_category.dart';
-import 'package:rutina_journal/models/habit_log.dart';
 import 'package:rutina_journal/services/habit_service.dart';
 import 'package:rutina_journal/services/notification_service.dart';
 import 'package:rutina_journal/services/storage_service.dart';

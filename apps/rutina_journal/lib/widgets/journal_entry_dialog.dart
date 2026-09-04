@@ -4,7 +4,6 @@ import '../models/journal_entry.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 import '../utils/haptics_helper.dart';
-import 'mood_orbs_selector.dart';
 
 class JournalEntryDialog extends StatefulWidget {
   final JournalEntry entry;
@@ -61,17 +60,6 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
   late TextEditingController _gratitude3Controller;
   late TextEditingController _dailyWinController;
   late TextEditingController _notesController;
-
-  final List<String> _availableTags = const [
-    'tagCalm',
-    'tagFocused',
-    'tagGrateful',
-    'tagEnergized',
-    'tagTired',
-    'tagStressed',
-    'tagInspired',
-    'tagPeaceful',
-  ];
 
   @override
   void initState() {

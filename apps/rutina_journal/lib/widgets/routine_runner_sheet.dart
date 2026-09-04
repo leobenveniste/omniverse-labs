@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
-import '../models/routine.dart';
 import '../services/routine_service.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';

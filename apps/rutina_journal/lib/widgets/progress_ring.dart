@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 
 class ProgressRing extends StatelessWidget {

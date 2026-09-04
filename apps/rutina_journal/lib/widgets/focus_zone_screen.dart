@@ -36,6 +36,9 @@ class FocusZoneScreen extends StatefulWidget {
 
 class _FocusZoneScreenState extends State<FocusZoneScreen>
     with SingleTickerProviderStateMixin {
+  // Preset breathing durations in minutes
+  static const List<int> _presetMinutes = [3, 5, 10, 15, 20];
+
   late int _remainingSeconds;
   late int _initialSeconds;
   bool _isRunning = true;
@@ -45,17 +48,10 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
   int _boxBreathingTick = 0;
   late AnimationController _breathingAnimController;
 
-  // Routine Step
-  int _currentStepIndex = 0;
-
   @override
   void initState() {
     super.initState();
-    final firstStepDuration = widget.routine?.steps.isNotEmpty == true
-        ? widget.routine!.steps.first.durationSeconds
-        : 10 * 60; // 10 minutes default focus
-
-    _remainingSeconds = firstStepDuration > 0 ? firstStepDuration : 600;
+    _remainingSeconds = 5 * 60; // 5 minutes default breathing session
     _initialSeconds = _remainingSeconds;
 
     // Smooth continuous controller for the 16-second box breathing loop
@@ -112,6 +108,20 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
     });
   }
 
+  void _setDuration(int minutes) {
+    HapticsHelper.light();
+    setState(() {
+      _remainingSeconds = minutes * 60;
+      _initialSeconds = _remainingSeconds;
+      _boxBreathingTick = 0;
+      if (!_isRunning) {
+        _isRunning = true;
+        _breathingAnimController.repeat();
+        _startTimer();
+      }
+    });
+  }
+
   void _adjustTime(int deltaSeconds) {
     HapticsHelper.light();
     setState(() {
@@ -122,42 +132,47 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
     });
   }
 
-  void _nextStep() {
-    if (widget.routine == null) return;
-    if (_currentStepIndex < widget.routine!.steps.length - 1) {
-      HapticsHelper.medium();
-      setState(() {
-        _currentStepIndex++;
-        final step = widget.routine!.steps[_currentStepIndex];
-        _remainingSeconds = step.durationSeconds;
-        _initialSeconds = _remainingSeconds;
-      });
-    } else {
-      HapticsHelper.heavy();
-      Navigator.of(context).pop();
-    }
-  }
-
   String _formatTime(int totalSecs) {
     final m = totalSecs ~/ 60;
     final s = totalSecs % 60;
     return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
 
+  Widget _buildArrowIndicator({
+    required IconData icon,
+    required bool isActive,
+    required Color activeColor,
+    required Color inactiveColor,
+  }) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      width: 24,
+      height: 24,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: isActive ? activeColor.withValues(alpha: 0.2) : Colors.transparent,
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        icon,
+        size: 16,
+        color: isActive ? activeColor : inactiveColor,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
 
-    final theme = Theme.of(context);
-    final bgDark = theme.scaffoldBackgroundColor;
-    final accentTerracotta = theme.colorScheme.primary;
-    final sageMuted = theme.colorScheme.onSurface.withValues(alpha: 0.75);
-    final sageSurface = theme.colorScheme.surface;
-
-    final routine = widget.routine;
-    final currentStep = routine != null && routine.steps.isNotEmpty
-        ? routine.steps[_currentStepIndex]
-        : null;
+    // Deep Dark Zen Focus Palette (enforced in all theme modes for minimum distraction)
+    const bgDark = Color(0xFF0E1310);
+    const cardBg = Color(0xFF171F1A);
+    const cardBorder = Color(0xFF28342B);
+    const textWhite = Color(0xFFF4F7F4);
+    const textMuted = Color(0xFFA3B0A5);
+    const accentTerracotta = Color(0xFFFF8A65);
+    const accentSage = Color(0xFF72D572);
 
     // Box Breathing Phase Calculation: 0..3 (Inhale), 4..7 (Hold), 8..11 (Exhale), 12..15 (Hold)
     final currentCycleSecond = _boxBreathingTick % 16;
@@ -180,6 +195,8 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
         break;
     }
 
+    final currentMinutes = (_remainingSeconds / 60).round();
+
     return Scaffold(
       backgroundColor: bgDark,
       body: SafeArea(
@@ -194,25 +211,25 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
                 child: IntrinsicHeight(
                   child: Column(
                     children: [
-                      // Top Bar
+                      // Top Bar with Zen Mode Pill, Relaxing Sound Toggle & Close
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xxs),
+                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm + 2, vertical: AppSpacing.xxs + 2),
                             decoration: BoxDecoration(
-                              color: sageSurface,
+                              color: cardBg,
                               borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-                              border: Border.all(color: sageMuted.withValues(alpha: 0.2)),
+                              border: Border.all(color: cardBorder),
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.spa_rounded, color: accentTerracotta, size: 14),
+                                const Icon(Icons.spa_rounded, color: accentSage, size: 15),
                                 const SizedBox(width: AppSpacing.xs),
                                 Text(
                                   l10n.t('focusModeTag'),
-                                  style: AppTypography.caption(sageMuted, isMedium: true),
+                                  style: AppTypography.caption(textMuted, isMedium: true),
                                 ),
                               ],
                             ),
@@ -224,9 +241,11 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
                                   AppServices.of(context).audioService.isSoundEnabled
                                       ? Icons.volume_up_rounded
                                       : Icons.volume_off_rounded,
-                                  color: Colors.white70,
+                                  color: AppServices.of(context).audioService.isSoundEnabled
+                                      ? accentSage
+                                      : textMuted,
                                 ),
-                                tooltip: 'Sonido zen',
+                                tooltip: 'Música relajante',
                                 onPressed: () {
                                   HapticsHelper.light();
                                   final audio = AppServices.of(context).audioService;
@@ -236,7 +255,7 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
                                 },
                               ),
                               IconButton(
-                                icon: const Icon(Icons.close_rounded, color: Colors.white70),
+                                icon: const Icon(Icons.close_rounded, color: textWhite),
                                 tooltip: l10n.t('actionClose'),
                                 onPressed: () {
                                   AppServices.of(context).audioService.stopAmbient();
@@ -247,24 +266,58 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
                           ),
                         ],
                       ),
-                      const SizedBox(height: AppSpacing.xs),
+                      const SizedBox(height: AppSpacing.sm),
 
                       // Title & Subtitle
                       Text(
-                        routine != null ? l10n.t(routine.title) : l10n.t('focusZoneTitle'),
+                        l10n.t('focusZoneTitle'),
                         textAlign: TextAlign.center,
-                        style: AppTypography.display(Colors.white).copyWith(
+                        style: AppTypography.display(textWhite).copyWith(
                           letterSpacing: 0.5,
-                          fontSize: 22,
+                          fontSize: 24,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.xxs),
                       Text(
-                        currentStep != null
-                            ? '${l10n.t('focusStepLabel')} ${_currentStepIndex + 1}: ${currentStep.title}'
-                            : l10n.t('boxBreatheGuide'),
+                        l10n.t('breathingInhaleExhale'),
                         textAlign: TextAlign.center,
-                        style: AppTypography.caption(sageMuted, isMedium: true),
+                        style: AppTypography.caption(textMuted, isMedium: true),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+
+                      // Duration Preset Chips (Time Selector)
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: _presetMinutes.map((minutes) {
+                            final isSelected = currentMinutes == minutes && _remainingSeconds % 60 == 0;
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
+                              child: ChoiceChip(
+                                label: Text(
+                                  '${minutes}m',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                    color: isSelected ? textWhite : textMuted,
+                                  ),
+                                ),
+                                selected: isSelected,
+                                selectedColor: accentSage.withValues(alpha: 0.3),
+                                backgroundColor: cardBg,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                                  side: BorderSide(
+                                    color: isSelected ? accentSage : cardBorder,
+                                    width: 1.2,
+                                  ),
+                                ),
+                                onSelected: (_) => _setDuration(minutes),
+                              ),
+                            );
+                          }).toList(),
+                        ),
                       ),
                       const SizedBox(height: AppSpacing.lg),
 
@@ -293,10 +346,10 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
                             );
                           },
                           child: Container(
-                            width: 200,
-                            height: 200,
+                            width: 220,
+                            height: 220,
                             decoration: BoxDecoration(
-                              color: sageSurface.withValues(alpha: 0.6),
+                              color: cardBg.withValues(alpha: 0.8),
                               borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
                               border: Border.all(
                                 color: accentTerracotta.withValues(alpha: _isRunning ? 0.75 : 0.35),
@@ -313,45 +366,41 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
                             child: Stack(
                               alignment: Alignment.center,
                               children: [
-                                // Inner geometric guide corner indicators
+                                // Standardized geometric guide arrows (all 4 with identical clean style)
                                 Positioned(
                                   top: 10,
-                                  child: Text(
-                                    phaseIndex == 0 ? '▲' : '•',
-                                    style: TextStyle(
-                                      color: phaseIndex == 0 ? accentTerracotta : sageMuted.withValues(alpha: 0.4),
-                                      fontSize: 12,
-                                    ),
+                                  child: _buildArrowIndicator(
+                                    icon: Icons.arrow_upward_rounded,
+                                    isActive: phaseIndex == 0,
+                                    activeColor: accentTerracotta,
+                                    inactiveColor: textMuted.withValues(alpha: 0.35),
                                   ),
                                 ),
                                 Positioned(
                                   right: 10,
-                                  child: Text(
-                                    phaseIndex == 1 ? '▶' : '•',
-                                    style: TextStyle(
-                                      color: phaseIndex == 1 ? accentTerracotta : sageMuted.withValues(alpha: 0.4),
-                                      fontSize: 12,
-                                    ),
+                                  child: _buildArrowIndicator(
+                                    icon: Icons.arrow_forward_rounded,
+                                    isActive: phaseIndex == 1,
+                                    activeColor: accentTerracotta,
+                                    inactiveColor: textMuted.withValues(alpha: 0.35),
                                   ),
                                 ),
                                 Positioned(
                                   bottom: 10,
-                                  child: Text(
-                                    phaseIndex == 2 ? '▼' : '•',
-                                    style: TextStyle(
-                                      color: phaseIndex == 2 ? accentTerracotta : sageMuted.withValues(alpha: 0.4),
-                                      fontSize: 12,
-                                    ),
+                                  child: _buildArrowIndicator(
+                                    icon: Icons.arrow_downward_rounded,
+                                    isActive: phaseIndex == 2,
+                                    activeColor: accentTerracotta,
+                                    inactiveColor: textMuted.withValues(alpha: 0.35),
                                   ),
                                 ),
                                 Positioned(
                                   left: 10,
-                                  child: Text(
-                                    phaseIndex == 3 ? '◀' : '•',
-                                    style: TextStyle(
-                                      color: phaseIndex == 3 ? accentTerracotta : sageMuted.withValues(alpha: 0.4),
-                                      fontSize: 12,
-                                    ),
+                                  child: _buildArrowIndicator(
+                                    icon: Icons.arrow_back_rounded,
+                                    isActive: phaseIndex == 3,
+                                    activeColor: accentTerracotta,
+                                    inactiveColor: textMuted.withValues(alpha: 0.35),
                                   ),
                                 ),
 
@@ -362,7 +411,7 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
                                     Text(
                                       _isRunning ? phaseLabel : l10n.t('focusPaused'),
                                       textAlign: TextAlign.center,
-                                      style: AppTypography.title(Colors.white).copyWith(
+                                      style: AppTypography.title(textWhite).copyWith(
                                         fontSize: 22,
                                         fontWeight: FontWeight.w700,
                                         letterSpacing: 0.8,
@@ -371,7 +420,7 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
                                     const SizedBox(height: AppSpacing.xs),
                                     if (_isRunning)
                                       Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                                         decoration: BoxDecoration(
                                           color: accentTerracotta.withValues(alpha: 0.2),
                                           borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
@@ -397,18 +446,18 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
                         decoration: BoxDecoration(
-                          color: sageSurface,
+                          color: cardBg,
                           borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-                          border: Border.all(color: sageMuted.withValues(alpha: 0.25)),
+                          border: Border.all(color: cardBorder),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.timer_outlined, color: sageMuted, size: 16),
+                            const Icon(Icons.timer_outlined, color: textMuted, size: 16),
                             const SizedBox(width: AppSpacing.xs),
                             Text(
                               _formatTime(_remainingSeconds),
-                              style: AppTypography.body(Colors.white, isMedium: true).copyWith(
+                              style: AppTypography.body(textWhite, isMedium: true).copyWith(
                                 letterSpacing: 1.2,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -417,7 +466,7 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
                         ),
                       ),
 
-                      const SizedBox(height: AppSpacing.lg),
+                      const SizedBox(height: AppSpacing.md),
 
                       // Time Adjust & Play / Pause Controls
                       Row(
@@ -425,14 +474,14 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
                         children: [
                           // Minus 1 min
                           Material(
-                            color: sageSurface,
+                            color: cardBg,
                             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                             child: InkWell(
                               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                               onTap: () => _adjustTime(-60),
                               child: const Padding(
                                 padding: EdgeInsets.all(AppSpacing.sm + 4),
-                                child: Icon(Icons.remove_rounded, color: Colors.white70, size: 20),
+                                child: Icon(Icons.remove_rounded, color: textWhite, size: 20),
                               ),
                             ),
                           ),
@@ -460,14 +509,14 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
 
                           // Plus 1 min
                           Material(
-                            color: sageSurface,
+                            color: cardBg,
                             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                             child: InkWell(
                               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                               onTap: () => _adjustTime(60),
                               child: const Padding(
                                 padding: EdgeInsets.all(AppSpacing.sm + 4),
-                                child: Icon(Icons.add_rounded, color: Colors.white70, size: 20),
+                                child: Icon(Icons.add_rounded, color: textWhite, size: 20),
                               ),
                             ),
                           ),
@@ -475,14 +524,14 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
                       ),
                       const SizedBox(height: AppSpacing.lg),
 
-                      // Mindful Neuro Insight Card (Safe wrapped, never overflows)
+                      // Do Not Disturb & Neuro Insight Card (Safe wrapped, never overflows)
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(AppSpacing.sm + 4),
                         decoration: BoxDecoration(
-                          color: sageSurface,
+                          color: cardBg,
                           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                          border: Border.all(color: sageMuted.withValues(alpha: 0.15)),
+                          border: Border.all(color: cardBorder),
                         ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -490,10 +539,10 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
                             Container(
                               padding: const EdgeInsets.all(AppSpacing.xs),
                               decoration: BoxDecoration(
-                                color: accentTerracotta.withValues(alpha: 0.2),
+                                color: accentSage.withValues(alpha: 0.18),
                                 shape: BoxShape.circle,
                               ),
-                              child: Icon(Icons.psychology_rounded, color: accentTerracotta, size: 18),
+                              child: const Icon(Icons.do_not_disturb_on_rounded, color: accentSage, size: 18),
                             ),
                             const SizedBox(width: AppSpacing.sm),
                             Expanded(
@@ -501,13 +550,13 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    l10n.t('neuroLinkActiveTitle'),
-                                    style: AppTypography.body(Colors.white, isMedium: true),
+                                    l10n.t('focusDndTitle'),
+                                    style: AppTypography.body(textWhite, isMedium: true),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    l10n.t('neuroLinkActiveBody'),
-                                    style: AppTypography.caption(sageMuted),
+                                    l10n.t('focusDndDesc'),
+                                    style: AppTypography.caption(textMuted),
                                   ),
                                 ],
                               ),
@@ -515,35 +564,6 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
                           ],
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.md),
-
-                      // Bottom Action Button (Next Step or Finish)
-                      if (routine != null && routine.steps.isNotEmpty)
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: accentTerracotta,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                              ),
-                            ),
-                            onPressed: _nextStep,
-                            icon: Icon(
-                              _currentStepIndex < routine.steps.length - 1
-                                  ? Icons.arrow_forward_rounded
-                                  : Icons.check_circle_outline_rounded,
-                            ),
-                            label: Text(
-                              _currentStepIndex < routine.steps.length - 1
-                                  ? l10n.t('focusMarkStepComplete')
-                                  : l10n.t('finishRoutine'),
-                              style: AppTypography.body(Colors.white, isMedium: true),
-                            ),
-                          ),
-                        ),
                     ],
                   ),
                 ),

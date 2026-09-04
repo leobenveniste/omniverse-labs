@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rutina_journal/main.dart';
@@ -7,6 +8,10 @@ import 'package:rutina_journal/services/app_services.dart';
 void main() {
   testWidgets('RitmoApp smoke test and splash screen display', (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({});
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(const MethodChannel('home_widget'), (call) async {
+      return null;
+    });
     final services = await AppServices.init();
 
     await tester.pumpWidget(RitmoApp(services: services));

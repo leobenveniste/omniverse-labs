@@ -85,17 +85,17 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
         height: 58,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFFE07A5F), // Terracotta accent
-              Color(0xFFC85A3B),
+              theme.colorScheme.primary,
+              theme.colorScheme.secondary,
             ],
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFC85A3B).withValues(alpha: 0.38),
+              color: theme.colorScheme.primary.withValues(alpha: 0.38),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -119,9 +119,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             },
             child: Tooltip(
               message: l10n.t('focusZoneTitle'),
-              child: const Icon(
+              child: Icon(
                 Icons.self_improvement_rounded,
-                color: Colors.white,
+                color: theme.colorScheme.onPrimary,
                 size: 28,
               ),
             ),
