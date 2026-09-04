@@ -74,8 +74,15 @@ class StorageService {
     return prefs.getBool(_keyKeepScreenAwake) ?? true;
   }
 
-  static Future<void> setKeepScreenAwake(bool value) async {
+  static const String _keyLanguageCode = 'app_language_code';
+
+  static Future<String?> getLanguageCode() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_keyKeepScreenAwake, value);
+    return prefs.getString(_keyLanguageCode);
+  }
+
+  static Future<void> setLanguageCode(String code) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyLanguageCode, code);
   }
 }

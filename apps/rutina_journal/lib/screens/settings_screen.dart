@@ -118,32 +118,57 @@ class SettingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.md),
 
-              // Language Selector (5 Languages!)
+              // Language Selector (5 Languages + Auto System Default)
               _buildSectionHeader(context, l10n.t('languageTitle')),
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(AppSpacing.sm),
                   child: Column(
-                    children: AppLocalizations.supportedLocales.map((loc) {
-                      final code = loc.languageCode;
-                      final isSelected = prefs.languageCode == code;
-                      final name = AppLocalizations.getLanguageName(code);
-
-                      return ListTile(
-                        leading: Text(
-                          _getFlag(code),
-                          style: const TextStyle(fontSize: 20),
+                    children: [
+                      // System Automatic Option
+                      ListTile(
+                        leading: const Text(
+                          '🌐',
+                          style: TextStyle(fontSize: 20),
                         ),
-                        title: Text(name, style: AppTypography.body(theme.colorScheme.onSurface, isMedium: isSelected)),
-                        trailing: isSelected
+                        title: Text(
+                          l10n.t('languageSystem'),
+                          style: AppTypography.body(theme.colorScheme.onSurface, isMedium: prefs.isAutoLanguage),
+                        ),
+                        subtitle: Text(
+                          l10n.t('languageAuto'),
+                          style: AppTypography.caption(theme.colorScheme.onSurfaceVariant),
+                        ),
+                        trailing: prefs.isAutoLanguage
                             ? Icon(Icons.check_circle_rounded, color: theme.colorScheme.primary)
                             : null,
                         onTap: () {
                           HapticsHelper.selection();
-                          prefs.setLanguage(code);
+                          prefs.setLanguage(null);
                         },
-                      );
-                    }).toList(),
+                      ),
+                      const Divider(height: 1),
+                      ...AppLocalizations.supportedLocales.map((loc) {
+                        final code = loc.languageCode;
+                        final isSelected = !prefs.isAutoLanguage && prefs.languageCode == code;
+                        final name = AppLocalizations.getLanguageName(code);
+
+                        return ListTile(
+                          leading: Text(
+                            _getFlag(code),
+                            style: const TextStyle(fontSize: 20),
+                          ),
+                          title: Text(name, style: AppTypography.body(theme.colorScheme.onSurface, isMedium: isSelected)),
+                          trailing: isSelected
+                              ? Icon(Icons.check_circle_rounded, color: theme.colorScheme.primary)
+                              : null,
+                          onTap: () {
+                            HapticsHelper.selection();
+                            prefs.setLanguage(code);
+                          },
+                        );
+                      }),
+                    ],
                   ),
                 ),
               ),

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/app_localizations.dart';
+import 'services/storage_service.dart';
 import 'theme/app_theme.dart';
 import 'screens/splash_screen.dart';
 import 'services/timer_service.dart';
@@ -14,10 +17,36 @@ class CentralDeJuegosApp extends StatefulWidget {
 
   @override
   State<CentralDeJuegosApp> createState() => _CentralDeJuegosAppState();
+
+  static _CentralDeJuegosAppState of(BuildContext context) =>
+      context.findAncestorStateOfType<_CentralDeJuegosAppState>()!;
 }
 
 class _CentralDeJuegosAppState extends State<CentralDeJuegosApp> {
   ThemeMode _themeMode = ThemeMode.dark;
+  Locale? _locale;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLocale();
+  }
+
+  Future<void> _loadLocale() async {
+    final code = await StorageService.getLanguageCode();
+    if (code != null) {
+      setState(() {
+        _locale = Locale(code);
+      });
+    }
+  }
+
+  void setLocale(Locale newLocale) async {
+    setState(() {
+      _locale = newLocale;
+    });
+    await StorageService.setLanguageCode(newLocale.languageCode);
+  }
 
   void _toggleTheme() {
     setState(() {
@@ -28,8 +57,16 @@ class _CentralDeJuegosAppState extends State<CentralDeJuegosApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Central de Juegos',
+      title: 'Game Night Hub',
       debugShowCheckedModeBanner: false,
+      locale: _locale,
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: _themeMode,

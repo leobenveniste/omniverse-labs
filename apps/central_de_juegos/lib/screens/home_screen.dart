@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
+import '../main.dart';
 import '../models/game_type.dart';
 import '../models/game_session.dart';
 import '../models/player.dart';
@@ -68,21 +70,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _discardActiveSession() async {
+    final l10n = AppLocalizations.of(context);
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.surfaceDark,
-        title: const Text('Descartar Partida', style: TextStyle(color: Colors.white)),
-        content: const Text('¿Estás seguro de que deseas descartar la partida en curso?', style: TextStyle(color: Colors.white70)),
+        title: Text(l10n.t('discardMatchTitle'), style: const TextStyle(color: Colors.white)),
+        content: Text(l10n.t('discardMatchConfirm'), style: const TextStyle(color: Colors.white70)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancelar'),
+            child: Text(l10n.t('cancel')),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Descartar'),
+            child: Text(l10n.t('discardMatch')),
           ),
         ],
       ),
@@ -92,6 +95,48 @@ class _HomeScreenState extends State<HomeScreen> {
       await StorageService.clearActiveSession();
       _loadActiveSession();
     }
+  }
+
+  void _showLanguageDialog(BuildContext context, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: AppTheme.surfaceDark,
+          title: Text(
+            l10n.t('selectLanguage'),
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text(l10n.t('languageEs'), style: const TextStyle(color: Colors.white)),
+                leading: const Text('🇪🇸', style: TextStyle(fontSize: 20)),
+                onTap: () {
+                  CentralDeJuegosApp.of(context).setLocale(const Locale('es'));
+                  Navigator.of(ctx).pop();
+                },
+              ),
+              ListTile(
+                title: Text(l10n.t('languageEn'), style: const TextStyle(color: Colors.white)),
+                leading: const Text('🇺🇸', style: TextStyle(fontSize: 20)),
+                onTap: () {
+                  CentralDeJuegosApp.of(context).setLocale(const Locale('en'));
+                  Navigator.of(ctx).pop();
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(l10n.t('close')),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _openGame(GameType type, {GameSession? existingSession}) async {
@@ -178,13 +223,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     final List<String> navTitles = [
-      'TIRADOR_DADOS',
-      'QUIEN_EMPIEZA',
-      'CENTRAL_DE_JUEGOS',
-      'TEMPORIZADOR',
-      'LANZADOR_MONEDA',
+      l10n.t('navDice'),
+      l10n.t('navWhoStarts'),
+      l10n.t('navGames'),
+      l10n.t('navTimer'),
+      l10n.t('navCoin'),
     ];
 
     return Scaffold(
@@ -214,9 +260,17 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         actions: [
+          // Language selector
+          IconButton(
+            icon: const Icon(Icons.language_rounded, color: Colors.white70),
+            tooltip: l10n.t('language'),
+            onPressed: () {
+              _showLanguageDialog(context, l10n);
+            },
+          ),
           if (_premiumService != null)
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 2),
               child: AnimatedBuilder(
                 animation: _premiumService!,
                 builder: (context, _) {
@@ -253,12 +307,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           IconButton(
             icon: const Icon(Icons.info_outline, color: Colors.white70),
-            tooltip: 'Acerca de Omniverse Labs',
+            tooltip: l10n.t('aboutTitle'),
             onPressed: () => AboutDialogWidget.show(context),
           ),
           IconButton(
             icon: const Icon(Icons.history, color: Colors.white70),
-            tooltip: 'Historial de Partidas',
+            tooltip: l10n.t('historyTitle'),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (_) => HistoryScreen(premiumService: _premiumService),
@@ -368,6 +422,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildActiveMatchCard(ThemeData theme) {
     final session = _activeSession!;
+    final l10n = AppLocalizations.of(context);
 
     return Card(
       color: AppTheme.surfaceElevated,
@@ -388,14 +443,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: AppTheme.cyberGold,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.play_arrow, size: 14, color: Colors.black),
-                      SizedBox(width: 4),
+                      const Icon(Icons.play_arrow, size: 14, color: Colors.black),
+                      const SizedBox(width: 4),
                       Text(
-                        'PARTIDA EN CURSO',
-                        style: TextStyle(
+                        l10n.t('activeMatch'),
+                        style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w900,
                           color: Colors.black,
@@ -407,7 +462,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Spacer(),
                 IconButton(
                   icon: const Icon(Icons.delete_outline, color: Colors.red),
-                  tooltip: 'Descartar Partida',
+                  tooltip: l10n.t('discardMatch'),
                   onPressed: _discardActiveSession,
                 ),
               ],
@@ -423,7 +478,10 @@ class _HomeScreenState extends State<HomeScreen> {
               child: FilledButton.icon(
                 onPressed: () => _openGame(session.gameType, existingSession: session),
                 icon: const Icon(Icons.play_arrow, color: Colors.black),
-                label: const Text('Reanudar Partida', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900)),
+                label: Text(
+                  l10n.t('resumeMatch'),
+                  style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w900),
+                ),
                 style: FilledButton.styleFrom(backgroundColor: AppTheme.cyberGold),
               ),
             ),

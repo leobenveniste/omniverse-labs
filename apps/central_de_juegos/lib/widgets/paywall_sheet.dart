@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../services/premium_service.dart';
 import '../theme/app_theme.dart';
 
@@ -36,6 +37,7 @@ class PaywallSheet extends StatefulWidget {
 class _PaywallSheetState extends State<PaywallSheet> {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final service = widget.premiumService;
     final isPro = service.isPro;
     final priceStr = service.proProduct?.price ?? '\$2.49 USD';
@@ -88,14 +90,14 @@ class _PaywallSheetState extends State<PaywallSheet> {
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: AppTheme.cyberGold, width: 1),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.workspace_premium_rounded, color: AppTheme.cyberGold, size: 18),
-                      SizedBox(width: 6),
+                      const Icon(Icons.workspace_premium_rounded, color: AppTheme.cyberGold, size: 18),
+                      const SizedBox(width: 6),
                       Text(
-                        'CENTRAL DE JUEGOS • MESA PRO',
-                        style: TextStyle(
+                        '${l10n.t('appName').toUpperCase()} • ${l10n.t('proBadge')}',
+                        style: const TextStyle(
                           color: AppTheme.cyberGold,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 1.2,
@@ -108,10 +110,10 @@ class _PaywallSheetState extends State<PaywallSheet> {
                 const SizedBox(height: 14),
 
                 // Headline
-                const Text(
-                  'Desbloquea el Nivel Máximo en tu Mesa',
+                Text(
+                  l10n.t('proTitle'),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 22,
                     fontWeight: FontWeight.w900,
@@ -122,8 +124,7 @@ class _PaywallSheetState extends State<PaywallSheet> {
 
                 // Subtitle or custom reason
                 Text(
-                  widget.customReason ??
-                      'Un solo pago de por vida para jugar sin límites, llevar estadísticas de rivalidad y personalizar cada partida.',
+                  widget.customReason ?? l10n.t('proDefaultSubtitle'),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Colors.white70,
@@ -137,29 +138,29 @@ class _PaywallSheetState extends State<PaywallSheet> {
                 _buildFeatureTile(
                   icon: Icons.emoji_events_rounded,
                   color: AppTheme.cyberGold,
-                  title: 'Salón de la Fama & Rivalidades',
-                  subtitle: 'Podio de jugadores, Win-Rate (%), récord de puntuación y quién es el rey de la mesa.',
+                  title: l10n.t('proBenefitFameTitle'),
+                  subtitle: l10n.t('proBenefitFameSub'),
                 ),
                 const SizedBox(height: 10),
                 _buildFeatureTile(
                   icon: Icons.all_inclusive_rounded,
                   color: const Color(0xFF00E676),
-                  title: 'Historial Ilimitado de Partidas',
-                  subtitle: 'Guarda todas las noches de juego para siempre sin límite de 5 partidas.',
+                  title: l10n.t('proBenefitHistoryTitle'),
+                  subtitle: l10n.t('proBenefitHistorySub'),
                 ),
                 const SizedBox(height: 10),
                 _buildFeatureTile(
                   icon: Icons.palette_outlined,
                   color: const Color(0xFF29B6F6),
-                  title: 'Tapetes y Estilos Exclusivos',
-                  subtitle: 'Personaliza con Casino Felt Green, Madera Caoba, Neón Synthwave y Cuero Vintage.',
+                  title: l10n.t('proBenefitMatsTitle'),
+                  subtitle: l10n.t('proBenefitMatsSub'),
                 ),
                 const SizedBox(height: 10),
                 _buildFeatureTile(
                   icon: Icons.share_rounded,
                   color: const Color(0xFFFF5252),
-                  title: 'Comparte Tarjetas de Victoria',
-                  subtitle: 'Crea imágenes de gloria estilizadas para mandar directo a WhatsApp o Instagram.',
+                  title: l10n.t('proBenefitShareTitle'),
+                  subtitle: l10n.t('proBenefitShareSub'),
                 ),
                 const SizedBox(height: 24),
 
@@ -173,14 +174,14 @@ class _PaywallSheetState extends State<PaywallSheet> {
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: AppTheme.cyberGold),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.verified_rounded, color: AppTheme.cyberGold),
-                        SizedBox(width: 8),
+                        const Icon(Icons.verified_rounded, color: AppTheme.cyberGold),
+                        const SizedBox(width: 8),
                         Text(
-                          '¡Ya eres Miembro Mesa Pro Vitalicio!',
-                          style: TextStyle(
+                          l10n.t('proAlreadyMember'),
+                          style: const TextStyle(
                             color: AppTheme.cyberGold,
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
@@ -219,7 +220,7 @@ class _PaywallSheetState extends State<PaywallSheet> {
                               child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black),
                             )
                           : Text(
-                              'Desbloquear de por Vida • $priceStr',
+                              l10n.t('proUnlockBtn', {'price': priceStr}),
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w900,
@@ -234,17 +235,17 @@ class _PaywallSheetState extends State<PaywallSheet> {
                     children: [
                       TextButton(
                         onPressed: service.isLoading ? null : () => service.restorePurchases(),
-                        child: const Text(
-                          'Restaurar Compras',
-                          style: TextStyle(color: Colors.white60, fontSize: 12),
+                        child: Text(
+                          l10n.t('restorePurchases'),
+                          style: const TextStyle(color: Colors.white60, fontSize: 12),
                         ),
                       ),
                       const Text('•', style: TextStyle(color: Colors.white24)),
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: const Text(
-                          'Quizás más tarde',
-                          style: TextStyle(color: Colors.white60, fontSize: 12),
+                        child: Text(
+                          l10n.t('maybeLater'),
+                          style: const TextStyle(color: Colors.white60, fontSize: 12),
                         ),
                       ),
                     ],
@@ -260,7 +261,7 @@ class _PaywallSheetState extends State<PaywallSheet> {
                     ),
                     icon: Icon(isPro ? Icons.lock_open_rounded : Icons.science_outlined, size: 16),
                     label: Text(
-                      isPro ? '🧪 Desactivar Pro (Testing)' : '🧪 Activar Pro (Testing)',
+                      isPro ? l10n.t('testProDisable') : l10n.t('testProEnable'),
                       style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                     ),
                     onPressed: () async {
@@ -269,7 +270,7 @@ class _PaywallSheetState extends State<PaywallSheet> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              !isPro ? '🧪 Modo Mesa Pro Activado' : '🧪 Modo Mesa Pro Desactivado',
+                              !isPro ? l10n.t('proActivatedToast') : l10n.t('proDeactivatedToast'),
                             ),
                             duration: const Duration(seconds: 2),
                           ),

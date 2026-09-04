@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../l10n/app_localizations.dart';
 import '../models/game_session.dart';
 import '../models/game_type.dart';
 import '../services/premium_service.dart';
@@ -53,18 +54,19 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
   }
 
   void _clearAll() async {
+    final l10n = AppLocalizations.of(context);
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.surfaceDark,
-        title: const Text('Borrar Historial', style: TextStyle(color: Colors.white)),
-        content: const Text('¿Estás seguro de que deseas eliminar todo el historial de partidas?', style: TextStyle(color: Colors.white70)),
+        title: Text(l10n.t('clearAll'), style: const TextStyle(color: Colors.white)),
+        content: Text(l10n.t('clearHistoryConfirm'), style: const TextStyle(color: Colors.white70)),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancelar')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text(l10n.t('cancel'))),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Borrar Todo'),
+            child: Text(l10n.t('clearAll')),
           ),
         ],
       ),
@@ -79,6 +81,7 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final premium = _premiumService;
     final isPro = premium?.isPro ?? false;
 
@@ -86,7 +89,7 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
       backgroundColor: AppTheme.bgDark,
       appBar: AppBar(
         backgroundColor: AppTheme.bgDark,
-        title: const Text('Historial & Estadísticas'),
+        title: Text(l10n.t('historyTitle')),
         actions: [
           if (!isPro && premium != null)
             Padding(
@@ -95,9 +98,9 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                 backgroundColor: AppTheme.cyberGold.withValues(alpha: 0.15),
                 side: const BorderSide(color: AppTheme.cyberGold, width: 1),
                 avatar: const Icon(Icons.workspace_premium_rounded, color: AppTheme.cyberGold, size: 16),
-                label: const Text(
-                  'MESA PRO',
-                  style: TextStyle(
+                label: Text(
+                  l10n.t('proBadge'),
+                  style: const TextStyle(
                     color: AppTheme.cyberGold,
                     fontSize: 11,
                     fontWeight: FontWeight.w900,
@@ -106,14 +109,14 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                 onPressed: () => PaywallSheet.show(
                   context,
                   premiumService: premium,
-                  customReason: 'Desbloquea el Salón de la Fama y el historial ilimitado de tu mesa.',
+                  customReason: l10n.t('proDefaultSubtitle'),
                 ),
               ),
             ),
           if (_history.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.delete_sweep, color: Colors.white70),
-              tooltip: 'Borrar Todo',
+              tooltip: l10n.t('clearAll'),
               onPressed: _clearAll,
             ),
         ],
@@ -122,9 +125,9 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
           indicatorColor: AppTheme.cyberGold,
           labelColor: AppTheme.cyberGold,
           unselectedLabelColor: Colors.white60,
-          tabs: const [
-            Tab(icon: Icon(Icons.history_rounded), text: 'Partidas'),
-            Tab(icon: Icon(Icons.emoji_events_rounded), text: 'Salón de la Fama'),
+          tabs: [
+            Tab(icon: const Icon(Icons.history_rounded), text: l10n.t('tabMatches')),
+            Tab(icon: const Icon(Icons.emoji_events_rounded), text: l10n.t('tabHallOfFame')),
           ],
         ),
       ),
@@ -141,6 +144,7 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
   }
 
   Widget _buildMatchesTab(ThemeData theme, bool isPro) {
+    final l10n = AppLocalizations.of(context);
     if (_history.isEmpty) {
       return Center(
         child: Column(
@@ -149,15 +153,15 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
             Icon(Icons.history_toggle_off, size: 72, color: theme.disabledColor),
             const SizedBox(height: 16),
             Text(
-              'No hay partidas finalizadas aún',
+              l10n.t('noMatchesYet'),
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 4),
-            const Text(
-              'Las partidas completadas aparecerán aquí',
-              style: TextStyle(fontSize: 13, color: Colors.grey),
+            Text(
+              l10n.t('noMatchesSub'),
+              style: const TextStyle(fontSize: 13, color: Colors.grey),
             ),
           ],
         ),
@@ -189,13 +193,13 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Mostrando 5 de ${_history.length} partidas',
+                        l10n.t('showingCountOf', {'count': '5', 'total': _history.length.toString()}),
                         style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                       ),
                       const SizedBox(height: 2),
-                      const Text(
-                        'Desbloquea Mesa Pro para acceder al historial infinito.',
-                        style: TextStyle(fontSize: 11, color: Colors.white70),
+                      Text(
+                        l10n.t('unlockInfiniteHistory'),
+                        style: const TextStyle(fontSize: 11, color: Colors.white70),
                       ),
                     ],
                   ),
@@ -205,9 +209,9 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                   onPressed: () => PaywallSheet.show(
                     context,
                     premiumService: _premiumService!,
-                    customReason: 'Guarda todas las partidas de tus noches de juego para siempre.',
+                    customReason: l10n.t('unlockInfiniteHistory'),
                   ),
-                  child: const Text('VER MÁS', style: TextStyle(fontWeight: FontWeight.bold)),
+                  child: Text(l10n.t('seeMore'), style: const TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
@@ -250,7 +254,7 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                         const Icon(Icons.emoji_events, size: 16, color: AppTheme.cyberGold),
                         const SizedBox(width: 4),
                         Text(
-                          'Ganador: ${session.winnerName}',
+                          l10n.t('winnerLabel', {'name': session.winnerName!}),
                           style: const TextStyle(fontWeight: FontWeight.w600, color: AppTheme.cyberGold),
                         ),
                       ],
@@ -271,8 +275,8 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
       ],
     );
   }
-
   Widget _buildLeaderboardTab(ThemeData theme, bool isPro) {
+    final l10n = AppLocalizations.of(context);
     final stats = StatsService.computeStats(_history);
 
     if (!isPro && _premiumService != null) {
@@ -292,34 +296,34 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                 child: const Icon(Icons.emoji_events_rounded, size: 48, color: AppTheme.cyberGold),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Salón de la Fama • Mesa Pro',
+              Text(
+                l10n.t('hallOfFameTitle'),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 22,
                   fontWeight: FontWeight.w900,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                '¿Quién es el verdadero rey de la mesa? Descubre el Win-Rate (%), podio de victorias históricas y récords por jugador.',
+              Text(
+                l10n.t('hallOfFameDesc'),
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+                style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
               ),
               const SizedBox(height: 24),
 
               // Locked Preview Bento Cards
               _buildLockedStatPreview(
                 icon: Icons.military_tech_rounded,
-                title: 'Podio de Ganadores',
-                desc: 'Ranking automático de jugadores con mayor cantidad de victorias.',
+                title: l10n.t('podiumPreviewTitle'),
+                desc: l10n.t('podiumPreviewDesc'),
               ),
               const SizedBox(height: 10),
               _buildLockedStatPreview(
                 icon: Icons.percent_rounded,
-                title: 'Efectividad & Win-Rate',
-                desc: 'Porcentaje de victorias sobre partidas jugadas para cada rival.',
+                title: l10n.t('winRatePreviewTitle'),
+                desc: l10n.t('winRatePreviewDesc'),
               ),
               const SizedBox(height: 24),
 
@@ -331,11 +335,11 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
                 icon: const Icon(Icons.workspace_premium_rounded),
-                label: const Text('DESBLOQUEAR SALÓN DE LA FAMA', style: TextStyle(fontWeight: FontWeight.w900)),
+                label: Text(l10n.t('unlockHallOfFameBtn'), style: const TextStyle(fontWeight: FontWeight.w900)),
                 onPressed: () => PaywallSheet.show(
                   context,
                   premiumService: _premiumService!,
-                  customReason: 'Conoce las estadísticas de todos tus jugadores de por vida.',
+                  customReason: l10n.t('hallOfFameDesc'),
                 ),
               ),
             ],
@@ -351,14 +355,14 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
           children: [
             Icon(Icons.emoji_events_outlined, size: 64, color: theme.disabledColor),
             const SizedBox(height: 16),
-            const Text(
-              'Aún no hay campeones registrados',
-              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+            Text(
+              l10n.t('noChampionsYet'),
+              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
-            const Text(
-              'Completa partidas y registra al ganador para armar el podio.',
-              style: TextStyle(fontSize: 13, color: Colors.grey),
+            Text(
+              l10n.t('noChampionsSub'),
+              style: const TextStyle(fontSize: 13, color: Colors.grey),
             ),
           ],
         ),
@@ -390,9 +394,9 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'REY DE LA MESA',
-                        style: TextStyle(
+                      Text(
+                        l10n.t('kingOfTheTable'),
+                        style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w900,
                           color: AppTheme.cyberGold,
@@ -408,7 +412,10 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                         ),
                       ),
                       Text(
-                        '${stats.leaderboard.first.totalWins} victorias • ${stats.leaderboard.first.winRate}% efectividad',
+                        l10n.t('winsEffectiveness', {
+                          'wins': stats.leaderboard.first.totalWins.toString(),
+                          'rate': stats.leaderboard.first.winRate.toString(),
+                        }),
                         style: const TextStyle(fontSize: 12, color: Colors.white70),
                       ),
                     ],
@@ -419,9 +426,9 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
           ),
         const SizedBox(height: 16),
 
-        const Text(
-          'RANKING DE JUGADORES',
-          style: TextStyle(
+        Text(
+          l10n.t('playerRanking'),
+          style: const TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w900,
             letterSpacing: 1.2,
@@ -487,7 +494,10 @@ class _HistoryScreenState extends State<HistoryScreen> with SingleTickerProvider
                         ),
                       ),
                       Text(
-                        '${player.totalWins} victorias de ${player.totalGamesPlayed} partidas',
+                        l10n.t('winsRatioText', {
+                          'wins': player.totalWins.toString(),
+                          'games': player.totalGamesPlayed.toString(),
+                        }),
                         style: const TextStyle(fontSize: 12, color: Colors.white60),
                       ),
                     ],

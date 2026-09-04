@@ -127,6 +127,8 @@ const Map<String, String> stringsIt = {
   'themeLight': 'Chiaro',
   'themeDark': 'Scuro',
   'languageTitle': 'Lingua',
+  'languageSystem': 'Predefinito di Sistema',
+  'languageAuto': 'Automatico',
   'notificationsTitle': 'Promemoria & Notifiche',
   'notifHabitReminders': 'Promemoria per singole abitudini',
   'notifStreakWarning': 'Avviso salvaguardia serie',

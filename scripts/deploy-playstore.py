@@ -236,6 +236,74 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
                         print(f"Ritmo Feature Graphic notice ({lang}): {e}")
             print("Ritmo Icons & Graphics synced across all locales!")
 
+        if package_name == "com.omniverselabs.anotadordejuegos":
+            try:
+                print("Updating Store Listing for Central de Juegos / Game Night Hub...")
+                # es-419
+                edits.listings().update(
+                    packageName=package_name,
+                    editId=edit_id,
+                    language="es-419",
+                    body={
+                        "title": "Central de Juegos",
+                        "shortDescription": "Anotadores y utilidades de mesa: Truco, Generala, Burako, dados y ruleta.",
+                        "fullDescription": (
+                            "Central de Juegos es la suite definitiva e imprescindible para tus noches de juegos de mesa, cartas y reuniones con amigos y familia.\n\n"
+                            "Olvídate de buscar papel, lápiz o discutir por el puntaje: reúne en una sola app anotadores oficiales especializados, un contador libre multi-jugador y todas las utilidades que tu mesa necesita, 100% offline y sin publicidad.\n\n"
+                            "🎲 ANOTADORES ESPECIALIZADOS INCLUIDOS:\n\n"
+                            "• Truco Argentino: Anotador oficial a 30 puntos con fósforos tradicionales o visualización numérica directa, control de buenas/malas y deshacer.\n"
+                            "• Generala: Planilla completa con cálculo automático de categorías (1 al 6), Escalera, Full, Poker, Generala y Doble Generala, distinguiendo jugadas servidas.\n"
+                            "• Diez Mil (10.000): Anotador con calculadora de tiros, apertura mínima configurable (500, 750 o 1.000 pts) y plantada por ronda.\n"
+                            "• Burako: Planilla de Base y Puntos con indicador de salida limpia, canastas puras/impuras y meta a 3.000 puntos.\n"
+                            "• Escoba del 15: Conteo de escobas, 7 de oro, oros, setenta y mayoría de cartas.\n"
+                            "• Contador Libre (1 a 12 jugadores): Marcador universal con sumas y restas rápidas por toque (+1, +5, +10, -1) para cualquier juego de mesa.\n\n"
+                            "🛠️ UTILIDADES DE MESA INTEGRADAS:\n\n"
+                            "• Tirador de Dados 3D: Lanza de 1 a 6 dados con físicas y sonidos realistas.\n"
+                            "• ¿Quién Empieza? (Ruleta de Dedos): Cada jugador apoya su dedo en la pantalla y la ruleta elige al azar al que inicia la ronda.\n"
+                            "• Temporizador de Turno: Tiempos predefinidos (30s, 60s, 90s, 120s) con alarma para mantener el ritmo de la partida.\n"
+                            "• Lanzador de Moneda: Cara o ceca con animación fluida para resolver disputas al instante.\n\n"
+                            "⭐ MESA PRO (OPCIONAL DE POR VIDA):\n\n"
+                            "• Salón de la Fama: Ranking automático con podio de victorias históricas y Win-Rate (%) por jugador.\n"
+                            "• Historial Ilimitado: Guarda todas las noches de juego para siempre sin límite.\n"
+                            "• 100% Offline y Privado: Tus partidas y estadísticas se quedan exclusivamente en tu dispositivo."
+                        ),
+                    }
+                ).execute()
+
+                # en-US
+                edits.listings().update(
+                    packageName=package_name,
+                    editId=edit_id,
+                    language="en-US",
+                    body={
+                        "title": "Game Night Hub: Score Tracker",
+                        "shortDescription": "The ultimate offline board game companion: scorekeeper, dice, timer & roulette.",
+                        "fullDescription": (
+                            "Game Night Hub is the ultimate all-in-one companion for your board game sessions, card games, and tabletop nights with family and friends.\n\n"
+                            "Say goodbye to missing pens, scratch paper, and scorekeeping arguments. Game Night Hub brings together dedicated official scorekeepers, a universal multi-player counter, and essential tabletop utilities in a single, beautiful offline app with zero ads.\n\n"
+                            "🎲 BUILT-IN SCOREKEEPERS:\n\n"
+                            "• Free Score Tracker (1 to 12 Players): Universal score counter with one-tap increments (+1, +5, +10, -1) for any card or board game.\n"
+                            "• Farkle / Ten Thousand (10,000): Official scorekeeper with roll calculator, customizable entry thresholds, and bank tracking.\n"
+                            "• Generala (Dice Poker): Complete digital scorecard with automatic sum calculations for numbers, Straight, Full House, Four of a Kind, and Generala bonuses.\n"
+                            "• Burako / Rummikub: Meld & base scorecard with clean opening indicators and 3,000-point goal tracking.\n"
+                            "• Truco: Traditional South American 30-point matchstick scorekeeper with buenas/malas tracking.\n"
+                            "• Escoba (Broom of 15): Track cards, coins, seven of coins, and prime effortlessly.\n\n"
+                            "🛠️ ESSENTIAL TABLETOP TOOLS:\n\n"
+                            "• 3D Dice Roller: Roll 1 to 6 dice simultaneously with realistic physics and sound.\n"
+                            "• Who Starts? (Finger Roulette): Everyone places a finger on the screen, and the hub selects the starting player at random.\n"
+                            "• Turn Timer: Preset turn countdowns (30s, 60s, 90s, 120s) with alerts to keep game rounds snappy.\n"
+                            "• Coin Flipper: Flip heads or tails with smooth haptics to resolve quick decisions.\n\n"
+                            "⭐ MESA PRO (ONE-TIME LIFETIME UNLOCK):\n\n"
+                            "• Hall of Fame Leaderboard: Automatic win-rate (%) and victory podium tracking across all your game night rivals.\n"
+                            "• Unlimited Match History: Preserve every single game session forever with zero caps.\n"
+                            "• 100% Offline & Private: No accounts, no data harvesting, and complete privacy."
+                        ),
+                    }
+                ).execute()
+                print("Central de Juegos / Game Night Hub Store Listings Updated (es-419 & en-US)!")
+            except Exception as e:
+                print(f"Central de Juegos Listing notice: {e}")
+
         print(f"Uploading App Bundle ({os.path.getsize(aab_path) / (1024*1024):.2f} MB)...")
         media = MediaFileUpload(aab_path, mimetype="application/octet-stream", chunksize=10*1024*1024, resumable=True)
         bundle_req = edits.bundles().upload(packageName=package_name, editId=edit_id, media_body=media)

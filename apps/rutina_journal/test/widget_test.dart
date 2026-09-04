@@ -18,13 +18,33 @@ void main() {
 
     // Pump past the 1800ms timer and 500ms transition
     await tester.pump(const Duration(milliseconds: 2000));
-    await tester.pump(const Duration(milliseconds: 600));
+    await tester.pumpAndSettle();
 
     // Verify main navigation loaded with tabs and elevated focus button
-    expect(find.text('Hoy'), findsWidgets);
-    expect(find.text('Rutinas'), findsWidgets);
-    expect(find.text('Diario'), findsWidgets);
-    expect(find.text('Progreso'), findsWidgets);
+    expect(
+      find.byWidgetPredicate(
+        (w) => w is Text && (w.data == 'Hoy' || w.data == 'Today'),
+      ),
+      findsWidgets,
+    );
+    expect(
+      find.byWidgetPredicate(
+        (w) => w is Text && (w.data == 'Rutinas' || w.data == 'Routines'),
+      ),
+      findsWidgets,
+    );
+    expect(
+      find.byWidgetPredicate(
+        (w) => w is Text && (w.data == 'Diario' || w.data == 'Journal'),
+      ),
+      findsWidgets,
+    );
+    expect(
+      find.byWidgetPredicate(
+        (w) => w is Text && (w.data == 'Progreso' || w.data == 'Progress'),
+      ),
+      findsWidgets,
+    );
     expect(find.byIcon(Icons.self_improvement_rounded), findsOneWidget);
   });
 }

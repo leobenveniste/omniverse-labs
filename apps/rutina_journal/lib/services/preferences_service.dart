@@ -16,7 +16,7 @@ class PreferencesService extends ChangeNotifier {
 
   AppThemePreset _themePreset = AppThemePreset.calmSage;
   ThemeMode _themeMode = ThemeMode.system;
-  String _languageCode = 'es';
+  String? _languageCode;
   bool _notifHabits = true;
   bool _notifStreak = true;
   bool _notifEvening = true;
@@ -29,8 +29,9 @@ class PreferencesService extends ChangeNotifier {
 
   AppThemePreset get themePreset => _themePreset;
   ThemeMode get themeMode => _themeMode;
-  String get languageCode => _languageCode;
-  Locale get locale => Locale(_languageCode);
+  String? get languageCode => _languageCode;
+  bool get isAutoLanguage => _languageCode == null || _languageCode == 'auto';
+  Locale? get locale => isAutoLanguage ? null : Locale(_languageCode!);
   bool get notifHabits => _notifHabits;
   bool get notifStreak => _notifStreak;
   bool get notifEvening => _notifEvening;
@@ -56,7 +57,7 @@ class PreferencesService extends ChangeNotifier {
       _themeMode = ThemeMode.values[modeIndex];
     }
 
-    _languageCode = _prefs.getString(_keyLanguage) ?? 'es';
+    _languageCode = _prefs.getString(_keyLanguage);
     _notifHabits = _prefs.getBool(_keyNotifHabits) ?? true;
     _notifStreak = _prefs.getBool(_keyNotifStreak) ?? true;
     _notifEvening = _prefs.getBool(_keyNotifEvening) ?? true;
@@ -78,10 +79,15 @@ class PreferencesService extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setLanguage(String code) async {
-    if (_languageCode == code) return;
-    _languageCode = code;
-    await _prefs.setString(_keyLanguage, code);
+  Future<void> setLanguage(String? code) async {
+    final effectiveCode = (code == null || code == 'auto') ? null : code;
+    if (_languageCode == effectiveCode) return;
+    _languageCode = effectiveCode;
+    if (effectiveCode == null) {
+      await _prefs.remove(_keyLanguage);
+    } else {
+      await _prefs.setString(_keyLanguage, effectiveCode);
+    }
     notifyListeners();
   }
 

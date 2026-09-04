@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../models/player.dart';
 import '../services/sound_haptics_service.dart';
 
@@ -53,6 +54,7 @@ class _WinnerDialogState extends State<WinnerDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -75,7 +77,7 @@ class _WinnerDialogState extends State<WinnerDialog> {
             ),
             const SizedBox(height: 16),
             Text(
-              '¡Tenemos Ganador!',
+              l10n.t('winnerDialogTitle'),
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -104,7 +106,7 @@ class _WinnerDialogState extends State<WinnerDialog> {
                 Expanded(
                   child: OutlinedButton.icon(
                     icon: const Icon(Icons.replay),
-                    label: const Text('Revancha'),
+                    label: Text(l10n.t('playAgain')),
                     onPressed: () {
                       Navigator.of(context).pop();
                       widget.onRematch();
@@ -115,7 +117,7 @@ class _WinnerDialogState extends State<WinnerDialog> {
                 Expanded(
                   child: FilledButton.icon(
                     icon: const Icon(Icons.add),
-                    label: const Text('Nueva'),
+                    label: Text(l10n.t('startGame')),
                     onPressed: () {
                       Navigator.of(context).pop();
                       widget.onNewGame();
@@ -130,7 +132,7 @@ class _WinnerDialogState extends State<WinnerDialog> {
                 Navigator.of(context).pop();
                 widget.onExit();
               },
-              child: const Text('Volver al Menú Principal'),
+              child: Text(l10n.t('backToHome')),
             ),
           ],
         ),

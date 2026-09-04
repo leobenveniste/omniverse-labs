@@ -30,6 +30,17 @@ class RitmoApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             locale: prefs.locale,
             supportedLocales: AppLocalizations.supportedLocales,
+            localeResolutionCallback: (locale, supportedLocales) {
+              if (prefs.locale != null) return prefs.locale;
+              if (locale != null) {
+                for (final supported in supportedLocales) {
+                  if (supported.languageCode == locale.languageCode) {
+                    return supported;
+                  }
+                }
+              }
+              return const Locale('es');
+            },
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,

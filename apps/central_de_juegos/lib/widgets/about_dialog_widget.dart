@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 
 class AboutDialogWidget extends StatelessWidget {
   const AboutDialogWidget({super.key});
@@ -14,6 +15,7 @@ class AboutDialogWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -41,7 +43,7 @@ class AboutDialogWidget extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Creadores de herramientas digitales, utilidades y experiencias móviles de alta calidad diseñadas para acompañar tu día a día.',
+              l10n.t('aboutDesc'),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13,
@@ -58,11 +60,11 @@ class AboutDialogWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text(
-                  'Aplicación:',
+                  'App:',
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
                 ),
                 Text(
-                  'Central de Juegos',
+                  l10n.locale.languageCode == 'en' ? 'Game Night Hub' : 'Central de Juegos',
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
@@ -72,19 +74,11 @@ class AboutDialogWidget extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 6),
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Versión:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                Text('1.0.2 (Build 3)', style: TextStyle(fontSize: 13, color: Colors.grey)),
-              ],
-            ),
-            const SizedBox(height: 6),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Lanzamiento:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                Text('Septiembre 2026', style: TextStyle(fontSize: 13, color: Colors.grey)),
+                Text('${l10n.t('versionLabel')}:', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                const Text('1.0.4 (Build 17)', style: TextStyle(fontSize: 13, color: Colors.grey)),
               ],
             ),
             const SizedBox(height: 24),
@@ -93,7 +87,7 @@ class AboutDialogWidget extends StatelessWidget {
               width: double.infinity,
               child: FilledButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Cerrar'),
+                child: Text(l10n.t('close')),
               ),
             ),
           ],

@@ -1,3 +1,6 @@
+import 'package:flutter/widgets.dart';
+import '../l10n/app_localizations.dart';
+
 enum GameType {
   custom,
   truco,
@@ -8,6 +11,42 @@ enum GameType {
 }
 
 extension GameTypeExtension on GameType {
+  String localizedName(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    switch (this) {
+      case GameType.custom:
+        return l10n.t('gameCustom');
+      case GameType.truco:
+        return l10n.t('gameTruco');
+      case GameType.generala:
+        return l10n.t('gameGenerala');
+      case GameType.diezMil:
+        return l10n.t('gameDiezMil');
+      case GameType.burako:
+        return l10n.t('gameBurako');
+      case GameType.escoba:
+        return l10n.t('gameEscoba');
+    }
+  }
+
+  String localizedDescription(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    switch (this) {
+      case GameType.custom:
+        return l10n.t('gameCustomDesc');
+      case GameType.truco:
+        return l10n.t('gameTrucoDesc');
+      case GameType.generala:
+        return l10n.t('gameGeneralaDesc');
+      case GameType.diezMil:
+        return l10n.t('gameDiezMilDesc');
+      case GameType.burako:
+        return l10n.t('gameBurakoDesc');
+      case GameType.escoba:
+        return l10n.t('gameEscobaDesc');
+    }
+  }
+
   String get displayName {
     switch (this) {
       case GameType.custom:

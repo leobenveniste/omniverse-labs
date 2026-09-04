@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
@@ -13,6 +14,7 @@ class CustomBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     const navBgColor = AppTheme.surfaceDark;
     const goldColor = AppTheme.cyberGold;
 
@@ -49,14 +51,14 @@ class CustomBottomNavBar extends StatelessWidget {
                   index: 0,
                   icon: Icons.casino_outlined,
                   activeIcon: Icons.casino,
-                  label: 'Dados',
+                  label: l10n.t('bottomDice'),
                 ),
                 // Left 2: Quién Empieza
                 _buildNavItem(
                   index: 1,
                   icon: Icons.touch_app_outlined,
                   activeIcon: Icons.touch_app,
-                  label: 'Quién',
+                  label: l10n.t('bottomWhoStarts'),
                 ),
 
                 // Center Spacer for elevated button
@@ -67,14 +69,14 @@ class CustomBottomNavBar extends StatelessWidget {
                   index: 3,
                   icon: Icons.timer_outlined,
                   activeIcon: Icons.timer,
-                  label: 'Tiempo',
+                  label: l10n.t('bottomTimer'),
                 ),
                 // Right 2: Moneda
                 _buildNavItem(
                   index: 4,
                   icon: Icons.monetization_on_outlined,
                   activeIcon: Icons.monetization_on,
-                  label: 'Moneda',
+                  label: l10n.t('bottomCoin'),
                 ),
               ],
             ),
