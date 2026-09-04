@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rutina_journal/main.dart';
@@ -19,11 +20,11 @@ void main() {
     await tester.pump(const Duration(milliseconds: 2000));
     await tester.pumpAndSettle();
 
-    // Verify main navigation loaded with 'Hoy' tab
+    // Verify main navigation loaded with tabs and elevated focus button
     expect(find.text('Hoy'), findsWidgets);
     expect(find.text('Rutinas'), findsWidgets);
     expect(find.text('Diario'), findsWidgets);
     expect(find.text('Progreso'), findsWidgets);
-    expect(find.text('Ajustes'), findsWidgets);
+    expect(find.byIcon(Icons.self_improvement_rounded), findsOneWidget);
   });
 }

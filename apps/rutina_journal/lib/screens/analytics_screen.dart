@@ -2,18 +2,26 @@ import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../services/habit_service.dart';
 import '../services/journal_service.dart';
+import '../services/preferences_service.dart';
+import '../services/storage_service.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
+import '../utils/haptics_helper.dart';
 import '../widgets/heatmap_calendar.dart';
+import 'settings_screen.dart';
 
 class AnalyticsScreen extends StatelessWidget {
   final HabitService habitService;
   final JournalService journalService;
+  final PreferencesService? prefs;
+  final StorageService? storage;
 
   const AnalyticsScreen({
     super.key,
     required this.habitService,
     required this.journalService,
+    this.prefs,
+    this.storage,
   });
 
   @override
@@ -27,6 +35,25 @@ class AnalyticsScreen extends StatelessWidget {
           l10n.t('analyticsTitle'),
           style: AppTypography.display(theme.colorScheme.onSurface),
         ),
+        actions: [
+          if (prefs != null && storage != null)
+            IconButton(
+              icon: const Icon(Icons.settings_outlined),
+              tooltip: l10n.t('navSettings'),
+              onPressed: () {
+                HapticsHelper.light();
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => SettingsScreen(
+                      prefs: prefs!,
+                      storage: storage!,
+                      habitService: habitService,
+                    ),
+                  ),
+                );
+              },
+            ),
+        ],
       ),
       body: AnimatedBuilder(
         animation: Listenable.merge([habitService, journalService]),
@@ -237,6 +264,47 @@ class AnalyticsScreen extends StatelessWidget {
                     },
                   ),
                 ),
+              if (prefs != null && storage != null) ...[
+                const SizedBox(height: AppSpacing.lg),
+                Card(
+                  child: ListTile(
+                    leading: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.tune_rounded,
+                        size: 20,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    title: Text(
+                      l10n.t('navSettings'),
+                      style: AppTypography.body(theme.colorScheme.onSurface, isMedium: true),
+                    ),
+                    subtitle: Text(
+                      l10n.t('aestheticPresetTitle'),
+                      style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                    ),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () {
+                      HapticsHelper.light();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => SettingsScreen(
+                            prefs: prefs!,
+                            storage: storage!,
+                            habitService: habitService,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ],
           );
         },

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../theme/app_spacing.dart';
 
 class HeatmapCalendar extends StatelessWidget {
@@ -29,86 +30,96 @@ class HeatmapCalendar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final sortedDates = data.keys.toList()..sort((a, b) => a.compareTo(b));
-
-    // 7 rows (one for each weekday), each tile is 14x14 with 3px gap:
-    // Total height = (7 * 14) + (6 * 3) + 4 = 120px
-    const double tileHeight = 14;
-    const double tileSpacing = 3;
-    const double gridHeight = (7 * tileHeight) + (6 * tileSpacing) + 2;
 
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            const int rows = 7;
+            const int weeks = 13; // ~91 days
+            const double spacing = 3.0;
+
+            final availableWidth = constraints.maxWidth;
+            final double computedTileSize = ((availableWidth - ((weeks - 1) * spacing)) / weeks).clamp(10.0, 24.0);
+            final double gridHeight = (rows * computedTileSize) + ((rows - 1) * spacing);
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  'Consistencia diaria',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Menos ',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                        fontSize: 10,
+                      l10n.t('consistencyTitle'),
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    _buildLegendTile(theme.colorScheme.surfaceContainerHighest),
-                    const SizedBox(width: 3),
-                    _buildLegendTile(theme.colorScheme.primary.withValues(alpha: 0.3)),
-                    const SizedBox(width: 3),
-                    _buildLegendTile(theme.colorScheme.primary.withValues(alpha: 0.6)),
-                    const SizedBox(width: 3),
-                    _buildLegendTile(theme.colorScheme.primary),
-                    Text(
-                      ' Más',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                        fontSize: 10,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          '${l10n.t('consistencyLess')} ',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                            fontSize: 10,
+                          ),
+                        ),
+                        _buildLegendTile(theme.colorScheme.surfaceContainerHighest),
+                        const SizedBox(width: 3),
+                        _buildLegendTile(theme.colorScheme.primary.withValues(alpha: 0.3)),
+                        const SizedBox(width: 3),
+                        _buildLegendTile(theme.colorScheme.primary.withValues(alpha: 0.6)),
+                        const SizedBox(width: 3),
+                        _buildLegendTile(theme.colorScheme.primary),
+                        Text(
+                          ' ${l10n.t('consistencyMore')}',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.md),
+                const SizedBox(height: AppSpacing.sm),
 
-            // Strictly height-constrained Grid of tiles
-            SizedBox(
-              height: gridHeight,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                reverse: true,
-                child: Wrap(
-                  direction: Axis.vertical,
-                  spacing: tileSpacing,
-                  runSpacing: tileSpacing,
-                  children: List.generate(sortedDates.length, (i) {
-                    final date = sortedDates[i];
-                    final rate = data[date] ?? 0.0;
-                    final color = _getColorForIntensity(context, rate);
+                // Full-width fitted Heatmap Grid
+                SizedBox(
+                  height: gridHeight,
+                  width: double.infinity,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    reverse: true,
+                    physics: const BouncingScrollPhysics(),
+                    child: Wrap(
+                      direction: Axis.vertical,
+                      spacing: spacing,
+                      runSpacing: spacing,
+                      children: List.generate(sortedDates.length, (i) {
+                        final date = sortedDates[i];
+                        final rate = data[date] ?? 0.0;
+                        final color = _getColorForIntensity(context, rate);
 
-                    return Container(
-                      width: tileHeight,
-                      height: tileHeight,
-                      decoration: BoxDecoration(
-                        color: color,
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                    );
-                  }),
+                        return Container(
+                          width: computedTileSize,
+                          height: computedTileSize,
+                          decoration: BoxDecoration(
+                            color: color,
+                            borderRadius: BorderRadius.circular(2.5),
+                          ),
+                        );
+                      }),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          ],
+              ],
+            );
+          },
         ),
       ),
     );

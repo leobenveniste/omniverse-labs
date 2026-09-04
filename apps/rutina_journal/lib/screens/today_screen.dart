@@ -35,7 +35,7 @@ class TodayScreen extends StatefulWidget {
 
 class _TodayScreenState extends State<TodayScreen> {
   DateTime _selectedDate = DateTime.now();
-  HabitCategory? _selectedCategory; // null means 'All'
+  bool _showWeekStrip = false;
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +77,60 @@ class _TodayScreenState extends State<TodayScreen> {
           ],
         ),
         actions: [
+          // Header Streak Pill
+          AnimatedBuilder(
+            animation: widget.habitService,
+            builder: (context, _) {
+              int maxStreak = 0;
+              for (final h in widget.habitService.habits) {
+                final s = widget.habitService.calculateStreak(h.id);
+                if (s.current > maxStreak) maxStreak = s.current;
+              }
+              return Container(
+                margin: const EdgeInsets.symmetric(vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFC85A3B).withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: const Color(0xFFC85A3B).withValues(alpha: 0.32),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.local_fire_department_rounded,
+                      color: Color(0xFFC85A3B),
+                      size: 17,
+                    ),
+                    const SizedBox(width: 3),
+                    Text(
+                      '$maxStreak',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFFC85A3B),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          // Header Date Picker Toggle
+          IconButton(
+            icon: Icon(
+              _showWeekStrip ? Icons.calendar_month_rounded : Icons.calendar_month_outlined,
+              color: _showWeekStrip ? theme.colorScheme.primary : null,
+            ),
+            tooltip: l10n.t('calendarDate'),
+            onPressed: () {
+              HapticsHelper.selection();
+              setState(() => _showWeekStrip = !_showWeekStrip);
+            },
+          ),
+          // Single New Habit Button
           IconButton(
             icon: const Icon(Icons.add_rounded),
             tooltip: l10n.t('newHabit'),
@@ -98,29 +152,22 @@ class _TodayScreenState extends State<TodayScreen> {
             final isToday = AppDateUtils.isSameDay(cleanSelected, DateTime.now());
             final dateKey = AppDateUtils.toDateKey(cleanSelected);
 
-            final allHabits = widget.habitService.getHabitsForDate(cleanSelected);
-            final habits = _selectedCategory == null
-                ? allHabits
-                : allHabits.where((h) => h.category == _selectedCategory).toList();
+            final habits = widget.habitService.getHabitsForDate(cleanSelected);
             final doneCount = widget.habitService.getCompletedCountForDate(cleanSelected);
-            final totalCount = allHabits.length;
+            final totalCount = habits.length;
             final completionRate = widget.habitService.getCompletionRateForDate(cleanSelected);
             final heatmapData = widget.habitService.getHeatmapData(90);
-
-            // Best streak among all habits
-            int maxStreak = 0;
-            for (final h in allHabits) {
-              final s = widget.habitService.calculateStreak(h.id);
-              if (s.current > maxStreak) maxStreak = s.current;
-            }
 
             return ListView(
               padding: const EdgeInsets.only(bottom: 88),
               children: [
-                const SizedBox(height: AppSpacing.xs),
-                // Monday-start 7-day full width week strip
-                _buildWeekStrip(context),
-                const SizedBox(height: AppSpacing.md),
+                if (_showWeekStrip) ...[
+                  const SizedBox(height: AppSpacing.xs),
+                  _buildWeekStrip(context),
+                  const SizedBox(height: AppSpacing.sm),
+                ] else ...[
+                  const SizedBox(height: AppSpacing.xs),
+                ],
 
                 // Editorial Calm Header
                 Padding(
@@ -148,22 +195,14 @@ class _TodayScreenState extends State<TodayScreen> {
                 ),
                 const SizedBox(height: AppSpacing.md),
 
-                // Top Bento Row: Streak Card + Hydration Tracker Card
-                _buildTopBentoRow(context, l10n, maxStreak, prefs),
-                const SizedBox(height: AppSpacing.md),
-
                 // Painted Linear Progress Banner
                 _buildLinearProgressBanner(context, l10n, doneCount, totalCount, completionRate, isToday, cleanSelected),
-                const SizedBox(height: AppSpacing.md),
-
-                // Category Chips Filter
-                _buildCategoryChips(context, l10n),
                 const SizedBox(height: AppSpacing.md),
 
                 // Icon-based Routine Launcher Row
                 if (widget.routineService.routines.isNotEmpty) ...[
                   _buildRoutineLauncherSection(context, l10n),
-                  const SizedBox(height: AppSpacing.lg),
+                  const SizedBox(height: AppSpacing.md),
                 ],
 
                 // Habits List Section Header
@@ -226,12 +265,6 @@ class _TodayScreenState extends State<TodayScreen> {
             );
           },
         ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'today_fab',
-        onPressed: () => _openAddHabitDialog(context),
-        icon: const Icon(Icons.add_rounded),
-        label: Text(l10n.t('newHabit')),
       ),
     );
   }
@@ -485,11 +518,12 @@ class _TodayScreenState extends State<TodayScreen> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          isToday
-                              ? l10n.t('swipeToComplete')
-                              : DateFormat('d MMM').format(cleanSelected),
+                          doneCount == totalCount && totalCount > 0
+                              ? DateFormat('EEEE, d MMMM', l10n.locale.languageCode).format(cleanSelected)
+                              : l10n.t('pendingHabits', args: {'count': '${totalCount - doneCount}'}),
                           style: AppTypography.caption(
-                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                            theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                            isMedium: true,
                           ),
                         ),
                       ],
@@ -611,215 +645,6 @@ class _TodayScreenState extends State<TodayScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildTopBentoRow(
-    BuildContext context,
-    AppLocalizations l10n,
-    int maxStreak,
-    PreferencesService prefs,
-  ) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final waterCount = prefs.waterCount;
-    const maxWater = 8;
-    final waterProgress = (waterCount / maxWater).clamp(0.0, 1.0);
-
-    const terracotta = Color(0xFFC85A3B);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-      child: Row(
-        children: [
-          // Streak Bento Card
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF1D2420) : const Color(0xFFEFF5F0),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                border: Border.all(
-                  color: isDark ? const Color(0xFF2E3832) : const Color(0xFFD6E4D8),
-                  width: 1.0,
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Icon(
-                        Icons.local_fire_department_rounded,
-                        color: theme.colorScheme.primary,
-                        size: 24,
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          l10n.t('streakCardTitle'),
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: theme.colorScheme.primary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    '$maxStreak ${l10n.t('streakDays', args: {'count': ''}).trim()}',
-                    style: AppTypography.display(theme.colorScheme.onSurface).copyWith(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    l10n.t('streakCardSubtitle'),
-                    style: AppTypography.caption(
-                      theme.colorScheme.onSurface.withValues(alpha: 0.65),
-                      isMedium: true,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-
-          // Hydration Quick-Tracker Bento Card
-          Expanded(
-            child: InkWell(
-              onTap: () {
-                HapticsHelper.selection();
-                prefs.incrementWater();
-              },
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              child: Container(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF241E1C) : const Color(0xFFFAF0EB),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                  border: Border.all(
-                    color: isDark ? const Color(0xFF3B2D27) : const Color(0xFFF0D5C7),
-                    width: 1.0,
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Icon(
-                          Icons.water_drop_rounded,
-                          color: terracotta,
-                          size: 24,
-                        ),
-                        Text(
-                          l10n.t('waterGlassesCount', args: {
-                            'current': '$waterCount',
-                            'target': '$maxWater',
-                          }),
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: terracotta,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      l10n.t('waterCardTitle'),
-                      style: AppTypography.title(theme.colorScheme.onSurface).copyWith(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    // Terracotta mini progress bar
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: LinearProgressIndicator(
-                        value: waterProgress,
-                        backgroundColor: terracotta.withValues(alpha: 0.2),
-                        color: terracotta,
-                        minHeight: 6,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCategoryChips(BuildContext context, AppLocalizations l10n) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    final categories = [null, ...HabitCategory.values];
-
-    return SizedBox(
-      height: 38,
-      child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-        scrollDirection: Axis.horizontal,
-        itemCount: categories.length,
-        separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.xs),
-        itemBuilder: (context, index) {
-          final cat = categories[index];
-          final isSelected = _selectedCategory == cat;
-          final label = cat == null ? l10n.t('filterAll') : l10n.t(cat.localizationKey);
-
-          return GestureDetector(
-            onTap: () {
-              HapticsHelper.selection();
-              setState(() => _selectedCategory = cat);
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? (isDark ? const Color(0xFF2E3832) : const Color(0xFF234E35))
-                    : (isDark ? const Color(0xFF1E221E) : const Color(0xFFEBE6DD)),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-                border: Border.all(
-                  color: isSelected
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.outline.withValues(alpha: 0.3),
-                  width: isSelected ? 1.5 : 1.0,
-                ),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                  color: isSelected
-                      ? Colors.white
-                      : theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
     );
   }
 

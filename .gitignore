@@ -37,3 +37,7 @@ build/
 **/android/fastlane/Preview.html
 **/android/fastlane/screenshots
 **/android/fastlane/test_output
+
+# Python
+__pycache__/
+*.py[cod]
