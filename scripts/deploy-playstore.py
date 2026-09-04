@@ -64,65 +64,66 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
         edit_id = edit_res["id"]
         print(f"Edit Session Created: {edit_id}")
 
-        icon_path = r"C:\Users\leobe\.gemini\antigravity\brain\dc1a3d74-c6b8-4283-b258-23b841335b2e\scratch\app_icon_512x512.png"
-        feature_path = r"C:\Users\leobe\.gemini\antigravity\brain\dc1a3d74-c6b8-4283-b258-23b841335b2e\feature_graphic_1024x500.png"
+        if package_name == "com.omniverselabs.menu_listo":
+            icon_path = r"C:\Users\leobe\.gemini\antigravity\brain\dc1a3d74-c6b8-4283-b258-23b841335b2e\scratch\app_icon_512x512.png"
+            feature_path = r"C:\Users\leobe\.gemini\antigravity\brain\dc1a3d74-c6b8-4283-b258-23b841335b2e\feature_graphic_1024x500.png"
 
-        try:
-            print("Updating Store Listing...")
-            edits.listings().update(
-                packageName=package_name,
-                editId=edit_id,
-                language="es-419",
-                body={
-                    "title": "Menú Listo: Recetas y Compras",
-                    "shortDescription": "Planificador semanal de comidas, recetario inteligente y lista de compras.",
-                    "fullDescription": "Menú Listo es tu asistente culinario integral para organizar tus comidas semanales, guardar tus recetas favoritas, escanear fotos de libros de cocina con OCR y generar tu lista de compras sin duplicados de forma 100% privada y offline.",
-                }
-            ).execute()
-
-            edits.listings().update(
-                packageName=package_name,
-                editId=edit_id,
-                language="en-US",
-                body={
-                    "title": "Menú Listo: Recipe & Grocery",
-                    "shortDescription": "Weekly meal planner, smart recipe book, and grocery shopping list.",
-                    "fullDescription": "Menú Listo is your all-in-one culinary assistant to organize your weekly meals, save recipes, scan cookbook photos with on-device OCR, and generate deduplicated grocery shopping lists.",
-                }
-            ).execute()
-            print("Store Listings Updated!")
-        except Exception as e:
-            print(f"Listing notice: {e}")
-
-        if os.path.exists(icon_path):
             try:
-                print("Uploading App Icon (512x512)...")
-                icon_media = MediaFileUpload(icon_path, mimetype="image/png")
-                edits.images().upload(
+                print("Updating Store Listing...")
+                edits.listings().update(
                     packageName=package_name,
                     editId=edit_id,
                     language="es-419",
-                    imageType="icon",
-                    media_body=icon_media
+                    body={
+                        "title": "Menú Listo: Recetas y Compras",
+                        "shortDescription": "Planificador semanal de comidas, recetario inteligente y lista de compras.",
+                        "fullDescription": "Menú Listo es tu asistente culinario integral para organizar tus comidas semanales, guardar tus recetas favoritas, escanear fotos de libros de cocina con OCR y generar tu lista de compras sin duplicados de forma 100% privada y offline.",
+                    }
                 ).execute()
-                print("App Icon Uploaded!")
-            except Exception as e:
-                print(f"Icon notice: {e}")
 
-        if os.path.exists(feature_path):
-            try:
-                print("Uploading Feature Graphic (1024x500)...")
-                feat_media = MediaFileUpload(feature_path, mimetype="image/png")
-                edits.images().upload(
+                edits.listings().update(
                     packageName=package_name,
                     editId=edit_id,
-                    language="es-419",
-                    imageType="featureGraphic",
-                    media_body=feat_media
+                    language="en-US",
+                    body={
+                        "title": "Menú Listo: Recipe & Grocery",
+                        "shortDescription": "Weekly meal planner, smart recipe book, and grocery shopping list.",
+                        "fullDescription": "Menú Listo is your all-in-one culinary assistant to organize your weekly meals, save recipes, scan cookbook photos with on-device OCR, and generate deduplicated grocery shopping lists.",
+                    }
                 ).execute()
-                print("Feature Graphic Uploaded!")
+                print("Store Listings Updated!")
             except Exception as e:
-                print(f"Feature Graphic notice: {e}")
+                print(f"Listing notice: {e}")
+
+            if os.path.exists(icon_path):
+                try:
+                    print("Uploading App Icon (512x512)...")
+                    icon_media = MediaFileUpload(icon_path, mimetype="image/png")
+                    edits.images().upload(
+                        packageName=package_name,
+                        editId=edit_id,
+                        language="es-419",
+                        imageType="icon",
+                        media_body=icon_media
+                    ).execute()
+                    print("App Icon Uploaded!")
+                except Exception as e:
+                    print(f"Icon notice: {e}")
+
+            if os.path.exists(feature_path):
+                try:
+                    print("Uploading Feature Graphic (1024x500)...")
+                    feat_media = MediaFileUpload(feature_path, mimetype="image/png")
+                    edits.images().upload(
+                        packageName=package_name,
+                        editId=edit_id,
+                        language="es-419",
+                        imageType="featureGraphic",
+                        media_body=feat_media
+                    ).execute()
+                    print("Feature Graphic Uploaded!")
+                except Exception as e:
+                    print(f"Feature Graphic notice: {e}")
 
         print(f"Uploading App Bundle ({os.path.getsize(aab_path) / (1024*1024):.2f} MB)...")
         media = MediaFileUpload(aab_path, mimetype="application/octet-stream", chunksize=10*1024*1024, resumable=True)
@@ -137,9 +138,18 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
         version_code = response["versionCode"]
         print(f"Bundle Uploaded Successfully! (Version Code: {version_code})")
 
-        rel_name = release_name or f"1.1.7 (Build {version_code})"
-        rel_notes_es = notes_es or "Modo de pruebas para versión Pro en Ajustes y Paywall. Mejoras en la validación de funciones avanzadas y modo cocina."
-        rel_notes_en = notes_en or "In-app testing mode for Pro version in Settings and Paywall. Enhanced testing controls for advanced features and cook mode."
+        if package_name == "com.omniverselabs.ritmo":
+            rel_name = release_name or f"1.0.0 (Build {version_code})"
+            rel_notes_es = notes_es or "Lanzamiento inicial de Ritmo: Hábitos atómicos, rutinas guiadas y micro-diario reflexivo con 3 temas estéticos y 5 idiomas."
+            rel_notes_en = notes_en or "Initial release of Ritmo: Atomic habit tracking, sequential routines, and mindful micro-journal with 3 aesthetic themes and 5 languages."
+        elif package_name == "com.omniverselabs.anotadordejuegos":
+            rel_name = release_name or f"1.0.2 (Build {version_code})"
+            rel_notes_es = notes_es or "Anotador digital todo en uno para juegos de mesa por Omniverse Labs."
+            rel_notes_en = notes_en or "All-in-one tabletop games scorekeeper by Omniverse Labs."
+        else:
+            rel_name = release_name or f"1.2.9 (Build {version_code})"
+            rel_notes_es = notes_es or "Actualizaciones y mejoras continuas de rendimiento y estabilidad."
+            rel_notes_en = notes_en or "Continuous performance and stability enhancements."
 
         # Deploy to specified track(s)
         tracks_to_deploy = [t.strip() for t in track.split(",") if t.strip()]

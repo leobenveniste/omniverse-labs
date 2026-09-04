@@ -1,0 +1,246 @@
+import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
+import '../services/habit_service.dart';
+import '../services/journal_service.dart';
+import '../theme/app_spacing.dart';
+import '../theme/app_typography.dart';
+import '../widgets/heatmap_calendar.dart';
+
+class AnalyticsScreen extends StatelessWidget {
+  final HabitService habitService;
+  final JournalService journalService;
+
+  const AnalyticsScreen({
+    super.key,
+    required this.habitService,
+    required this.journalService,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          l10n.t('analyticsTitle'),
+          style: AppTypography.display(theme.colorScheme.onSurface),
+        ),
+      ),
+      body: AnimatedBuilder(
+        animation: Listenable.merge([habitService, journalService]),
+        builder: (context, _) {
+          final heatmapData = habitService.getHeatmapData(90);
+          final habits = habitService.habits;
+
+          // Compute average completion rate over past 7 days
+          final past7 = heatmapData.entries.toList().reversed.take(7);
+          final avg7 = past7.isEmpty
+              ? 0.0
+              : past7.fold<double>(0.0, (acc, e) => acc + e.value) / past7.length;
+
+          final consistencyPercent = (avg7 * 100).toInt();
+
+          return ListView(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            children: [
+              // Metric cards row
+              Row(
+                children: [
+                  Expanded(
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.t('consistencyScore'),
+                              style: AppTypography.caption(
+                                theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                isMedium: true,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            Text(
+                              '$consistencyPercent%',
+                              style: AppTypography.display(theme.colorScheme.primary),
+                            ),
+                            Text(
+                              'Últimos 7 días',
+                              style: AppTypography.caption(
+                                theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Ánimo promedio',
+                              style: AppTypography.caption(
+                                theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                isMedium: true,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            Text(
+                              '${journalService.getAverageMood().toStringAsFixed(1)} / 5',
+                              style: AppTypography.display(theme.colorScheme.secondary),
+                            ),
+                            Text(
+                              'Registro reflexivo',
+                              style: AppTypography.caption(
+                                theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.md),
+
+              // 90-Day Heatmap
+              Text(
+                l10n.t('heatmapTitle'),
+                style: AppTypography.section(theme.colorScheme.onSurface),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              HeatmapCalendar(data: heatmapData),
+              const SizedBox(height: AppSpacing.md),
+
+              // Mood Correlation Insight Card
+              Card(
+                color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.insights_rounded,
+                        color: theme.colorScheme.primary,
+                        size: 28,
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.t('moodCorrelationTitle'),
+                              style: AppTypography.body(
+                                theme.colorScheme.onSurface,
+                                isMedium: true,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              l10n.t('moodCorrelationInsight'),
+                              style: AppTypography.caption(
+                                theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+
+              // Top Streaks Leaderboard
+              Text(
+                l10n.t('bestStreaks'),
+                style: AppTypography.section(theme.colorScheme.onSurface),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              if (habits.isEmpty)
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Center(
+                      child: Text(
+                        'Agrega hábitos para ver tus mejores rachas.',
+                        style: AppTypography.body(
+                          theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              else
+                Card(
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: habits.length,
+                    separatorBuilder: (_, __) => Divider(
+                      height: 1,
+                      color: theme.colorScheme.outline.withValues(alpha: 0.5),
+                    ),
+                    itemBuilder: (context, idx) {
+                      final habit = habits[idx];
+                      final streak = habitService.calculateStreak(habit.id);
+
+                      return ListTile(
+                        leading: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: habit.category.color.withValues(alpha: 0.12),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            habit.category.icon,
+                            size: 16,
+                            color: habit.category.color,
+                          ),
+                        ),
+                        title: Text(
+                          habit.title,
+                          style: AppTypography.body(theme.colorScheme.onSurface, isMedium: true),
+                        ),
+                        subtitle: Text(
+                          'Mejor: ${streak.best} días',
+                          style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.local_fire_department_rounded,
+                              color: Colors.deepOrange,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 2),
+                            Text(
+                              '${streak.current}d',
+                              style: AppTypography.body(Colors.deepOrange, isMedium: true),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}

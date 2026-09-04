@@ -351,6 +351,9 @@ switch ($Command) {
         if ($App -eq "anotador_de_juegos" -or $App -eq "central_de_juegos") { 
             $pkgName = "com.omniverselabs.anotadordejuegos" 
         }
+        if ($App -eq "rutina_journal") { 
+            $pkgName = "com.omniverselabs.ritmo" 
+        }
 
         if (Test-Path $deployPy) {
             python $deployPy --package $pkgName --aab $aabPath --track $Track

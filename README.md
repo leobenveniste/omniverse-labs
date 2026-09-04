@@ -34,7 +34,9 @@ Omniverse Labs/
 
 | App | Package Name | Version | Description |
 | :--- | :--- | :---: | :--- |
-| **Menú Listo** | `com.omniverselabs.menu_listo` | `1.0.4+5` | Asistente culinario integral, planificador de comidas, recetario con OCR, timers interactivos y lista de compras inteligente. |
+| **Central de Juegos** | `com.omniverselabs.anotadordejuegos` | `1.0.2+15` | Anotador digital todo en uno para juegos de mesa (Truco, Burako, Generala, Escoba del 15 y contador personalizado) con herramientas de juego. |
+| **Menú Listo** | `com.omniverselabs.menu_listo` | `1.2.9+25` | Asistente culinario integral, planificador de comidas, recetario con OCR, timers interactivos y lista de compras inteligente. |
+| **Ritmo: Hábitos & Diario** | `com.omniverselabs.ritmo` | `1.0.0+1` | Aplicación integral de hábitos atómicos, rutinas secuenciales y micro-diario con recordatorios nativos y 5 idiomas. |
 
 ---
 
