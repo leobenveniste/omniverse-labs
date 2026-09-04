@@ -18,6 +18,7 @@ class AppSpacing {
   static const double radiusSm = 12.0;
   static const double radiusMd = 16.0;
   static const double radiusLg = 24.0;
+  static const double radiusXl = 28.0;
   static const double radiusFull = 999.0;
 
   // Standard EdgeInsets

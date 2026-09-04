@@ -22,6 +22,14 @@ class AppTypography {
         color: color,
       );
 
+  static TextStyle title(Color color) => TextStyle(
+        fontSize: sizeSection,
+        fontWeight: weightBold,
+        height: 24.0 / sizeSection,
+        letterSpacing: -0.2,
+        color: color,
+      );
+
   static TextStyle section(Color color) => TextStyle(
         fontSize: sizeSection,
         fontWeight: weightBold,

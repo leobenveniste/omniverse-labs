@@ -5,6 +5,7 @@ import '../services/routine_service.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 import '../utils/haptics_helper.dart';
+import '../widgets/routine_edit_dialog.dart';
 import '../widgets/routine_runner_sheet.dart';
 import '../widgets/state_button.dart';
 
@@ -27,6 +28,19 @@ class RoutinesScreen extends StatelessWidget {
           l10n.t('routinesTitle'),
           style: AppTypography.display(theme.colorScheme.onSurface),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add_rounded),
+            tooltip: l10n.t('newRoutine'),
+            onPressed: () {
+              HapticsHelper.light();
+              RoutineEditDialog.show(
+                context,
+                onSave: (newRoutine) => routineService.addRoutine(newRoutine),
+              );
+            },
+          ),
+        ],
       ),
       body: AnimatedBuilder(
         animation: routineService,
@@ -62,19 +76,16 @@ class RoutinesScreen extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  width: 44,
-                  height: 44,
+                  width: 48,
+                  height: 48,
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primary.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                   ),
                   child: Icon(
-                    routine.title.contains('Morning')
-                        ? Icons.wb_sunny_rounded
-                        : routine.title.contains('Evening')
-                            ? Icons.bedtime_rounded
-                            : Icons.work_outline_rounded,
+                    routine.icon,
                     color: theme.colorScheme.primary,
+                    size: 26,
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
@@ -111,13 +122,33 @@ class RoutinesScreen extends StatelessWidget {
                     ],
                   ),
                 ),
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined, size: 20),
+                  onPressed: () {
+                    HapticsHelper.light();
+                    RoutineEditDialog.show(
+                      context,
+                      routine: routine,
+                      onSave: (updated) => routineService.updateRoutine(updated),
+                    );
+                  },
+                ),
+                IconButton(
+                  icon: Icon(Icons.delete_outline_rounded, size: 20, color: theme.colorScheme.error.withValues(alpha: 0.7)),
+                  onPressed: () {
+                    HapticsHelper.medium();
+                    _confirmDelete(context, routine);
+                  },
+                ),
               ],
             ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              localizedDesc,
-              style: AppTypography.body(theme.colorScheme.onSurface.withValues(alpha: 0.8)),
-            ),
+            if (localizedDesc.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                localizedDesc,
+                style: AppTypography.body(theme.colorScheme.onSurface.withValues(alpha: 0.8)),
+              ),
+            ],
             const SizedBox(height: AppSpacing.md),
 
             // Step list preview
@@ -177,6 +208,31 @@ class RoutinesScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _confirmDelete(BuildContext context, Routine routine) {
+    final l10n = AppLocalizations.of(context);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.t('deleteRoutineConfirm')),
+        content: Text(l10n.t(routine.title)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.t('cancel')),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
+            onPressed: () {
+              routineService.deleteRoutine(routine.id);
+              Navigator.of(ctx).pop();
+            },
+            child: Text(l10n.t('delete')),
+          ),
+        ],
       ),
     );
   }

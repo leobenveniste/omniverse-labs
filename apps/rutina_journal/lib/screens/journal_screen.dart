@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../l10n/app_localizations.dart';
 import '../models/journal_entry.dart';
+import '../services/app_services.dart';
 import '../services/journal_service.dart';
 import '../theme/app_spacing.dart';
+import '../theme/app_theme.dart';
 import '../theme/app_typography.dart';
 import '../utils/date_utils.dart';
 import '../utils/haptics_helper.dart';
-import '../widgets/mood_orbs_selector.dart';
-import '../widgets/state_button.dart';
+import '../widgets/journal_entry_dialog.dart';
 
-class JournalScreen extends StatefulWidget {
+class JournalScreen extends StatelessWidget {
   final JournalService journalService;
 
   const JournalScreen({
@@ -19,278 +20,448 @@ class JournalScreen extends StatefulWidget {
   });
 
   @override
-  State<JournalScreen> createState() => _JournalScreenState();
-}
-
-class _JournalScreenState extends State<JournalScreen> {
-  final DateTime _currentDate = DateTime.now();
-  late String _dateKey;
-
-  int _selectedMood = 4;
-  int _energyLevel = 3;
-  List<String> _selectedTags = [];
-
-  final TextEditingController _gratitude1Controller = TextEditingController();
-  final TextEditingController _gratitude2Controller = TextEditingController();
-  final TextEditingController _gratitude3Controller = TextEditingController();
-  final TextEditingController _dailyWinController = TextEditingController();
-  final TextEditingController _notesController = TextEditingController();
-
-  ButtonState _saveButtonState = ButtonState.idle;
-
-  final List<String> _availableTags = [
-    'tagCalm',
-    'tagFocused',
-    'tagGrateful',
-    'tagEnergized',
-    'tagTired',
-    'tagStressed',
-    'tagInspired',
-    'tagPeaceful',
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _dateKey = AppDateUtils.toDateKey(_currentDate);
-    _loadEntryForToday();
-  }
-
-  void _loadEntryForToday() {
-    final entry = widget.journalService.getEntryForDate(_currentDate);
-    _selectedMood = entry.moodLevel;
-    _energyLevel = entry.energyLevel;
-    _selectedTags = List.from(entry.tags);
-    _gratitude1Controller.text = entry.gratitude1;
-    _gratitude2Controller.text = entry.gratitude2;
-    _gratitude3Controller.text = entry.gratitude3;
-    _dailyWinController.text = entry.dailyWin;
-    _notesController.text = entry.notes;
-  }
-
-  @override
-  void dispose() {
-    _gratitude1Controller.dispose();
-    _gratitude2Controller.dispose();
-    _gratitude3Controller.dispose();
-    _dailyWinController.dispose();
-    _notesController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _saveEntry() async {
-    setState(() => _saveButtonState = ButtonState.loading);
-    try {
-      await widget.journalService.saveEntry(
-        dateKey: _dateKey,
-        moodLevel: _selectedMood,
-        energyLevel: _energyLevel,
-        tags: _selectedTags,
-        gratitude1: _gratitude1Controller.text,
-        gratitude2: _gratitude2Controller.text,
-        gratitude3: _gratitude3Controller.text,
-        dailyWin: _dailyWinController.text,
-        notes: _notesController.text,
-      );
-
-      HapticsHelper.light();
-      if (mounted) {
-        setState(() => _saveButtonState = ButtonState.idle);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context).t('journalSaved')),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    } catch (_) {
-      if (mounted) {
-        setState(() => _saveButtonState = ButtonState.error);
-      }
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
+    final prefs = AppServices.of(context).preferencesService;
+    final today = DateTime.now();
+    final todayKey = AppDateUtils.toDateKey(today);
 
     return Scaffold(
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l10n.t('journalTitle'),
-              style: AppTypography.display(theme.colorScheme.onSurface),
-            ),
-            Text(
-              DateFormat('d MMMM yyyy', l10n.locale.languageCode).format(_currentDate),
-              style: AppTypography.caption(
-                theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                isMedium: true,
+        title: Text(
+          l10n.t('journalTitle'),
+          style: AppTypography.display(theme.colorScheme.onSurface),
+        ),
+      ),
+      body: Container(
+        decoration: AppTheme.getAtmosphericBackground(context, prefs.themePreset),
+        child: AnimatedBuilder(
+          animation: journalService,
+          builder: (context, _) {
+            final todayEntry = journalService.getEntryForDate(today);
+            final entries = journalService.allEntries;
+
+            return ListView(
+              padding: const EdgeInsets.only(
+                left: AppSpacing.md,
+                right: AppSpacing.md,
+                top: AppSpacing.sm,
+                bottom: 88,
               ),
+              children: [
+                // Today's Status / Check-in Hero Card
+                _buildTodayHeroCard(context, l10n, todayEntry),
+                const SizedBox(height: AppSpacing.lg),
+
+                // Timeline Feed Header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      l10n.t('pastEntries'),
+                      style: AppTypography.section(theme.colorScheme.onSurface),
+                    ),
+                    Text(
+                      '${entries.length} ${entries.length == 1 ? "registro" : "registros"}',
+                      style: AppTypography.caption(
+                        theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                        isMedium: true,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.sm),
+
+                // Feed List
+                if (entries.isEmpty)
+                  _buildEmptyState(context, l10n)
+                else
+                  ...entries.map((entry) => _buildEntryFeedCard(context, l10n, entry)),
+              ],
+            );
+          },
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'journal_fab',
+        onPressed: () {
+          HapticsHelper.medium();
+          final todayEntry = journalService.getEntryForDate(today);
+          JournalEntryDialog.show(
+            context,
+            entry: todayEntry,
+            onSave: ({
+              required moodLevel,
+              required energyLevel,
+              required tags,
+              required gratitude1,
+              required gratitude2,
+              required gratitude3,
+              required dailyWin,
+              required notes,
+            }) {
+              journalService.saveEntry(
+                dateKey: todayKey,
+                moodLevel: moodLevel,
+                energyLevel: energyLevel,
+                tags: tags,
+                gratitude1: gratitude1,
+                gratitude2: gratitude2,
+                gratitude3: gratitude3,
+                dailyWin: dailyWin,
+                notes: notes,
+              );
+            },
+          );
+        },
+        icon: const Icon(Icons.edit_calendar_rounded),
+        label: Text(l10n.t('saveJournal')),
+      ),
+    );
+  }
+
+  Widget _buildTodayHeroCard(BuildContext context, AppLocalizations l10n, JournalEntry todayEntry) {
+    final theme = Theme.of(context);
+    final hasLogged = !todayEntry.isEmpty;
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        side: BorderSide(
+          color: hasLogged
+              ? theme.colorScheme.primary
+              : theme.colorScheme.outline.withValues(alpha: 0.3),
+          width: hasLogged ? 1.5 : 1.0,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: hasLogged
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.primary.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                hasLogged ? _getMoodIcon(todayEntry.moodLevel) : Icons.add_reaction_outlined,
+                color: hasLogged ? theme.colorScheme.onPrimary : theme.colorScheme.primary,
+                size: 26,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    hasLogged ? 'Check-in de hoy completado' : l10n.t('howAreYouFeeling'),
+                    style: AppTypography.body(theme.colorScheme.onSurface, isMedium: true),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    hasLogged
+                        ? 'Ánimo: ${_getMoodLabel(l10n, todayEntry.moodLevel)} • Energía: ${todayEntry.energyLevel}/5'
+                        : 'Dedica 2 minutos para registrar tu estado y gratitudes.',
+                    style: AppTypography.caption(
+                      theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: AppSpacing.xs),
+            FilledButton.tonal(
+              onPressed: () {
+                HapticsHelper.selection();
+                JournalEntryDialog.show(
+                  context,
+                  entry: todayEntry,
+                  onSave: ({
+                    required moodLevel,
+                    required energyLevel,
+                    required tags,
+                    required gratitude1,
+                    required gratitude2,
+                    required gratitude3,
+                    required dailyWin,
+                    required notes,
+                  }) {
+                    journalService.saveEntry(
+                      dateKey: todayEntry.dateKey,
+                      moodLevel: moodLevel,
+                      energyLevel: energyLevel,
+                      tags: tags,
+                      gratitude1: gratitude1,
+                      gratitude2: gratitude2,
+                      gratitude3: gratitude3,
+                      dailyWin: dailyWin,
+                      notes: notes,
+                    );
+                  },
+                );
+              },
+              child: Text(hasLogged ? 'Editar' : 'Registrar'),
             ),
           ],
         ),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        children: [
-          // Atmospheric Glowing Mood Orbs Card
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: MoodOrbsSelector(
-                selectedMood: _selectedMood,
-                energyLevel: _energyLevel,
-                onMoodChanged: (mood) => setState(() => _selectedMood = mood),
-                onEnergyChanged: (energy) => setState(() => _energyLevel = energy),
-              ),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
+    );
+  }
 
-          // Emotion Tags Selector
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Etiquetas de estado',
-                    style: AppTypography.body(theme.colorScheme.onSurface, isMedium: true),
-                  ),
+  Widget _buildEntryFeedCard(BuildContext context, AppLocalizations l10n, JournalEntry entry) {
+    final theme = Theme.of(context);
+    final parsedDate = DateTime.tryParse(entry.dateKey) ?? entry.createdAt;
+    final dateStr = DateFormat('EEEE, d MMMM yyyy', l10n.locale.languageCode).format(parsedDate);
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: Card(
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+          onTap: () {
+            HapticsHelper.selection();
+            JournalEntryDialog.show(
+              context,
+              entry: entry,
+              onSave: ({
+                required moodLevel,
+                required energyLevel,
+                required tags,
+                required gratitude1,
+                required gratitude2,
+                required gratitude3,
+                required dailyWin,
+                required notes,
+              }) {
+                journalService.saveEntry(
+                  dateKey: entry.dateKey,
+                  moodLevel: moodLevel,
+                  energyLevel: energyLevel,
+                  tags: tags,
+                  gratitude1: gratitude1,
+                  gratitude2: gratitude2,
+                  gratitude3: gratitude3,
+                  dailyWin: dailyWin,
+                  notes: notes,
+                );
+              },
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header: Mood Orb + Date + Energy
+                Row(
+                  children: [
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: _getMoodColor(entry.moodLevel).withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        _getMoodIcon(entry.moodLevel),
+                        color: _getMoodColor(entry.moodLevel),
+                        size: 18,
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            dateStr,
+                            style: AppTypography.body(theme.colorScheme.onSurface, isMedium: true),
+                          ),
+                          Text(
+                            '${_getMoodLabel(l10n, entry.moodLevel)} • Energía ${entry.energyLevel}/5',
+                            style: AppTypography.caption(
+                              theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.edit_outlined,
+                      size: 18,
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                    ),
+                  ],
+                ),
+
+                // Tags
+                if (entry.tags.isNotEmpty) ...[
                   const SizedBox(height: AppSpacing.xs),
                   Wrap(
-                    spacing: AppSpacing.xs,
-                    runSpacing: AppSpacing.xs,
-                    children: _availableTags.map((tagKey) {
-                      final isSelected = _selectedTags.contains(tagKey);
-                      return FilterChip(
-                        label: Text(l10n.t(tagKey)),
-                        selected: isSelected,
-                        onSelected: (selected) {
-                          HapticsHelper.selection();
-                          setState(() {
-                            if (selected) {
-                              _selectedTags.add(tagKey);
-                            } else {
-                              _selectedTags.remove(tagKey);
-                            }
-                          });
-                        },
+                    spacing: 4,
+                    runSpacing: 4,
+                    children: entry.tags.map((t) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceContainerHighest,
+                          borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
+                        ),
+                        child: Text(
+                          l10n.t(t),
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                          ),
+                        ),
                       );
                     }).toList(),
                   ),
                 ],
-              ),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
 
-          // Gratitude Prompts Card
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.t('gratitudePrompt'),
-                    style: AppTypography.section(theme.colorScheme.onSurface),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  TextField(
-                    controller: _gratitude1Controller,
-                    decoration: InputDecoration(
-                      hintText: l10n.t('gratitudeHint1'),
-                      prefixIcon: const Icon(Icons.favorite_outline_rounded, size: 18),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  TextField(
-                    controller: _gratitude2Controller,
-                    decoration: InputDecoration(
-                      hintText: l10n.t('gratitudeHint2'),
-                      prefixIcon: const Icon(Icons.star_outline_rounded, size: 18),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  TextField(
-                    controller: _gratitude3Controller,
-                    decoration: InputDecoration(
-                      hintText: l10n.t('gratitudeHint3'),
-                      prefixIcon: const Icon(Icons.wb_sunny_outlined, size: 18),
-                    ),
+                // Daily Win
+                if (entry.dailyWin.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.emoji_events_outlined, size: 16, color: Colors.amber.shade700),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          entry.dailyWin,
+                          style: AppTypography.body(theme.colorScheme.onSurface).copyWith(
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
-              ),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
 
-          // Daily Win Card
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+                // Gratitudes Preview
+                if (entry.gratitude1.isNotEmpty || entry.gratitude2.isNotEmpty || entry.gratitude3.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.xs),
+                  if (entry.gratitude1.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 2),
+                      child: Text('• ${entry.gratitude1}',
+                          style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.8))),
+                    ),
+                  if (entry.gratitude2.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 2),
+                      child: Text('• ${entry.gratitude2}',
+                          style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.8))),
+                    ),
+                  if (entry.gratitude3.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 2),
+                      child: Text('• ${entry.gratitude3}',
+                          style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.8))),
+                    ),
+                ],
+
+                // Notes Preview
+                if (entry.notes.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacing.xs),
                   Text(
-                    l10n.t('dailyWinPrompt'),
-                    style: AppTypography.section(theme.colorScheme.onSurface),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  TextField(
-                    controller: _dailyWinController,
+                    entry.notes,
                     maxLines: 2,
-                    decoration: InputDecoration(
-                      hintText: l10n.t('dailyWinHint'),
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.caption(
+                      theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
-              ),
+              ],
             ),
           ),
-          const SizedBox(height: AppSpacing.md),
-
-          // Freeform Notes Card
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Pensamientos & Notas libres',
-                    style: AppTypography.section(theme.colorScheme.onSurface),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  TextField(
-                    controller: _notesController,
-                    maxLines: 4,
-                    decoration: const InputDecoration(
-                      hintText: 'Escribe libremente cualquier reflexión de tu día...',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-
-          // Save Button
-          StateButton(
-            label: l10n.t('saveJournal'),
-            state: _saveButtonState,
-            icon: Icons.check_circle_outline_rounded,
-            onPressed: _saveEntry,
-          ),
-          const SizedBox(height: AppSpacing.xxl),
-        ],
+        ),
       ),
     );
+  }
+
+  Widget _buildEmptyState(BuildContext context, AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxl),
+      child: Center(
+        child: Column(
+          children: [
+            Icon(
+              Icons.menu_book_outlined,
+              size: 48,
+              color: theme.colorScheme.primary.withValues(alpha: 0.4),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              'No hay entradas registradas aún',
+              style: AppTypography.body(theme.colorScheme.onSurface, isMedium: true),
+            ),
+            const SizedBox(height: AppSpacing.xxs),
+            Text(
+              'Presiona el botón inferior para comenzar tu diario reflexivo.',
+              style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  IconData _getMoodIcon(int level) {
+    switch (level) {
+      case 5:
+        return Icons.sentiment_very_satisfied_rounded;
+      case 4:
+        return Icons.sentiment_satisfied_rounded;
+      case 3:
+        return Icons.sentiment_neutral_rounded;
+      case 2:
+        return Icons.sentiment_dissatisfied_rounded;
+      case 1:
+      default:
+        return Icons.sentiment_very_dissatisfied_rounded;
+    }
+  }
+
+  Color _getMoodColor(int level) {
+    switch (level) {
+      case 5:
+        return Colors.amber;
+      case 4:
+        return Colors.lightGreen;
+      case 3:
+        return Colors.blueGrey;
+      case 2:
+        return Colors.orange;
+      case 1:
+      default:
+        return Colors.blueGrey.shade300;
+    }
+  }
+
+  String _getMoodLabel(AppLocalizations l10n, int level) {
+    switch (level) {
+      case 5:
+        return l10n.t('moodRadiant');
+      case 4:
+        return l10n.t('moodGood');
+      case 3:
+        return l10n.t('moodNeutral');
+      case 2:
+        return l10n.t('moodLow');
+      case 1:
+      default:
+        return l10n.t('moodDifficult');
+    }
   }
 }

@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../l10n/app_localizations.dart';
 import '../models/habit.dart';
+import '../models/routine.dart';
+import '../services/app_services.dart';
 import '../services/habit_service.dart';
 import '../services/routine_service.dart';
 import '../theme/app_spacing.dart';
+import '../theme/app_theme.dart';
 import '../theme/app_typography.dart';
 import '../utils/date_utils.dart';
 import '../utils/haptics_helper.dart';
 import '../widgets/habit_edit_dialog.dart';
-import '../widgets/progress_ring.dart';
 import '../widgets/routine_runner_sheet.dart';
 import '../widgets/swipe_habit_card.dart';
 
@@ -34,19 +36,7 @@ class _TodayScreenState extends State<TodayScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
-
-    final cleanSelected = DateTime(
-      _selectedDate.year,
-      _selectedDate.month,
-      _selectedDate.day,
-    );
-    final isToday = AppDateUtils.isSameDay(cleanSelected, DateTime.now());
-    final dateKey = AppDateUtils.toDateKey(cleanSelected);
-
-    final habits = widget.habitService.getHabitsForDate(cleanSelected);
-    final doneCount = widget.habitService.getCompletedCountForDate(cleanSelected);
-    final totalCount = habits.length;
-    final completionRate = widget.habitService.getCompletionRateForDate(cleanSelected);
+    final prefs = AppServices.of(context).preferencesService;
 
     return Scaffold(
       appBar: AppBar(
@@ -68,12 +58,12 @@ class _TodayScreenState extends State<TodayScreen> {
             Text(
               'Ritmo',
               style: AppTypography.display(theme.colorScheme.onSurface).copyWith(
-                fontSize: 19,
+                fontSize: 20,
                 fontWeight: FontWeight.w700,
               ),
             ),
             Text(
-              DateFormat('EEEE, d MMMM', l10n.locale.languageCode).format(cleanSelected),
+              DateFormat('EEEE, d MMMM', l10n.locale.languageCode).format(_selectedDate),
               style: AppTypography.caption(
                 theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 isMedium: true,
@@ -89,144 +79,97 @@ class _TodayScreenState extends State<TodayScreen> {
           ),
         ],
       ),
-      body: AnimatedBuilder(
-        animation: Listenable.merge([widget.habitService, widget.routineService]),
-        builder: (context, _) {
-          return ListView(
-            padding: const EdgeInsets.only(bottom: 80),
-            children: [
-              // Horizontal Date Selector Strip
-              _buildDateStrip(context),
-              const SizedBox(height: AppSpacing.md),
+      body: Container(
+        decoration: AppTheme.getAtmosphericBackground(context, prefs.themePreset),
+        child: AnimatedBuilder(
+          animation: Listenable.merge([widget.habitService, widget.routineService]),
+          builder: (context, _) {
+            // Evaluated INSIDE the builder so it immediately reacts to habit updates
+            final cleanSelected = DateTime(
+              _selectedDate.year,
+              _selectedDate.month,
+              _selectedDate.day,
+            );
+            final isToday = AppDateUtils.isSameDay(cleanSelected, DateTime.now());
+            final dateKey = AppDateUtils.toDateKey(cleanSelected);
 
-              // Progress Hero Card
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.md),
-                    child: Row(
-                      children: [
-                        ProgressRing(
-                          progress: completionRate,
-                          size: 68,
-                          strokeWidth: 6,
-                        ),
-                        const SizedBox(width: AppSpacing.md),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                doneCount == totalCount && totalCount > 0
-                                    ? l10n.t('allDone')
-                                    : l10n.t('progressSummary', args: {
-                                        'done': doneCount,
-                                        'total': totalCount,
-                                      }),
-                                style: AppTypography.body(
-                                  theme.colorScheme.onSurface,
-                                  isMedium: true,
-                                ),
-                              ),
-                              const SizedBox(height: AppSpacing.xxs),
-                              Text(
-                                isToday
-                                    ? l10n.t('swipeToComplete')
-                                    : DateFormat('d MMM').format(cleanSelected),
-                                style: AppTypography.caption(
-                                  theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.md),
+            final habits = widget.habitService.getHabitsForDate(cleanSelected);
+            final doneCount = widget.habitService.getCompletedCountForDate(cleanSelected);
+            final totalCount = habits.length;
+            final completionRate = widget.habitService.getCompletionRateForDate(cleanSelected);
 
-              // Quick Routines Row
-              if (widget.routineService.routines.isNotEmpty) ...[
+            return ListView(
+              padding: const EdgeInsets.only(bottom: 88),
+              children: [
+                const SizedBox(height: AppSpacing.xs),
+                // Monday-start 7-day full width week strip
+                _buildWeekStrip(context),
+                const SizedBox(height: AppSpacing.md),
+
+                // Painted Linear Progress Banner
+                _buildLinearProgressBanner(context, l10n, doneCount, totalCount, completionRate, isToday, cleanSelected),
+                const SizedBox(height: AppSpacing.lg),
+
+                // Icon-based Routine Launcher Row
+                if (widget.routineService.routines.isNotEmpty) ...[
+                  _buildRoutineLauncherSection(context, l10n),
+                  const SizedBox(height: AppSpacing.lg),
+                ],
+
+                // Habits List Section Header
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        l10n.t('quickRoutines'),
+                        '${l10n.t('habitsTitle')} ($totalCount)',
                         style: AppTypography.section(theme.colorScheme.onSurface),
                       ),
+                      if (doneCount > 0)
+                        Text(
+                          '$doneCount / $totalCount',
+                          style: AppTypography.caption(
+                            theme.colorScheme.primary,
+                            isMedium: true,
+                          ),
+                        ),
                     ],
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xs),
-                SizedBox(
-                  height: 48,
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: widget.routineService.routines.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.xs),
-                    itemBuilder: (context, idx) {
-                      final routine = widget.routineService.routines[idx];
-                      final localizedTitle = l10n.t(routine.title);
-                      return ActionChip(
-                        avatar: const Icon(Icons.play_arrow_rounded, size: 16),
-                        label: Text(localizedTitle),
-                        onPressed: () {
-                          HapticsHelper.selection();
-                          widget.routineService.startRoutine(routine);
-                          RoutineRunnerSheet.show(context, widget.routineService);
-                        },
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
+
+                // Habits List or Empty state
+                if (habits.isEmpty)
+                  _buildEmptyState(context, l10n)
+                else
+                  ...habits.map((habit) {
+                    final log = widget.habitService.getLog(habit.id, dateKey);
+                    final streak = widget.habitService.calculateStreak(habit.id);
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.xxs,
+                      ),
+                      child: SwipeHabitCard(
+                        habit: habit,
+                        log: log,
+                        streak: streak,
+                        onToggle: () => widget.habitService.toggleHabit(habit.id, cleanSelected),
+                        onDelta: (delta) =>
+                            widget.habitService.updateCounter(habit.id, cleanSelected, delta),
+                        onEdit: () => _openEditHabitDialog(context, habit),
+                      ),
+                    );
+                  }),
               ],
-
-              // Habits List Section Header
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                child: Text(
-                  'Hábitos (${habits.length})',
-                  style: AppTypography.section(theme.colorScheme.onSurface),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-
-              // Empty state or habits list
-              if (habits.isEmpty)
-                _buildEmptyState(context, l10n)
-              else
-                ...habits.map((habit) {
-                  final log = widget.habitService.getLog(habit.id, dateKey);
-                  final streak = widget.habitService.calculateStreak(habit.id);
-
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.md,
-                      vertical: AppSpacing.xxs,
-                    ),
-                    child: SwipeHabitCard(
-                      habit: habit,
-                      log: log,
-                      streak: streak,
-                      onToggle: () => widget.habitService.toggleHabit(habit.id, cleanSelected),
-                      onDelta: (delta) =>
-                          widget.habitService.updateCounter(habit.id, cleanSelected, delta),
-                      onEdit: () => _openEditHabitDialog(context, habit),
-                    ),
-                  );
-                }),
-            ],
-          );
-        },
+            );
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'today_fab',
         onPressed: () => _openAddHabitDialog(context),
         icon: const Icon(Icons.add_rounded),
         label: Text(l10n.t('newHabit')),
@@ -234,71 +177,375 @@ class _TodayScreenState extends State<TodayScreen> {
     );
   }
 
-  Widget _buildDateStrip(BuildContext context) {
+  /// 7-day Monday-to-Sunday full width strip (no horizontal scroll)
+  Widget _buildWeekStrip(BuildContext context) {
     final theme = Theme.of(context);
-    final days = AppDateUtils.getWeekDaysAround(DateTime.now(), daysBefore: 5, daysAfter: 1);
+    final l10n = AppLocalizations.of(context);
 
-    return SizedBox(
-      height: 72,
-      child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-        scrollDirection: Axis.horizontal,
-        itemCount: days.length,
-        separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.xs),
-        itemBuilder: (context, index) {
-          final day = days[index];
-          final isSelected = AppDateUtils.isSameDay(day, _selectedDate);
-          final isToday = AppDateUtils.isSameDay(day, DateTime.now());
+    // Calculate Monday of the current selected date's week
+    final weekday = _selectedDate.weekday; // Monday is 1, Sunday is 7
+    final monday = _selectedDate.subtract(Duration(days: weekday - 1));
+    final weekDays = List.generate(7, (i) => monday.add(Duration(days: i)));
 
-          return GestureDetector(
-            onTap: () {
-              HapticsHelper.selection();
-              setState(() => _selectedDate = day);
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: 52,
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? theme.colorScheme.primary
-                    : isToday
-                        ? theme.colorScheme.surfaceContainerHighest
-                        : theme.colorScheme.surface,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-                border: Border.all(
-                  color: isSelected
-                      ? theme.colorScheme.primary
-                      : theme.colorScheme.outline,
+    final dayLetters = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+    if (l10n.locale.languageCode == 'en') {
+      dayLetters[0] = 'M';
+      dayLetters[1] = 'T';
+      dayLetters[2] = 'W';
+      dayLetters[3] = 'T';
+      dayLetters[4] = 'F';
+      dayLetters[5] = 'S';
+      dayLetters[6] = 'S';
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+      child: Column(
+        children: [
+          // Week navigation controls
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.chevron_left_rounded, size: 22),
+                padding: EdgeInsets.zero,
+                visualDensity: VisualDensity.compact,
+                onPressed: () {
+                  HapticsHelper.selection();
+                  setState(() => _selectedDate = _selectedDate.subtract(const Duration(days: 7)));
+                },
+              ),
+              Text(
+                DateFormat('MMMM yyyy', l10n.locale.languageCode).format(_selectedDate).toUpperCase(),
+                style: AppTypography.caption(
+                  theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  isMedium: true,
                 ),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    DateFormat('E').format(day).toUpperCase(),
-                    style: AppTypography.caption(
-                      isSelected
-                          ? theme.colorScheme.onPrimary
-                          : theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                      isMedium: true,
+              IconButton(
+                icon: const Icon(Icons.chevron_right_rounded, size: 22),
+                padding: EdgeInsets.zero,
+                visualDensity: VisualDensity.compact,
+                onPressed: () {
+                  HapticsHelper.selection();
+                  setState(() => _selectedDate = _selectedDate.add(const Duration(days: 7)));
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          // 7 equal items in a Row
+          Row(
+            children: List.generate(7, (idx) {
+              final day = weekDays[idx];
+              final isSelected = AppDateUtils.isSameDay(day, _selectedDate);
+              final isToday = AppDateUtils.isSameDay(day, DateTime.now());
+              final isWeekend = day.weekday == DateTime.saturday || day.weekday == DateTime.sunday;
+
+              return Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      HapticsHelper.selection();
+                      setState(() => _selectedDate = day);
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? theme.colorScheme.primary
+                            : isToday
+                                ? theme.colorScheme.primary.withValues(alpha: 0.15)
+                                : isWeekend
+                                    ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
+                                    : theme.colorScheme.surface,
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                        border: Border.all(
+                          color: isSelected
+                              ? theme.colorScheme.primary
+                              : isToday
+                                  ? theme.colorScheme.primary.withValues(alpha: 0.5)
+                                  : isWeekend
+                                      ? theme.colorScheme.outline.withValues(alpha: 0.4)
+                                      : theme.colorScheme.outline.withValues(alpha: 0.2),
+                          width: isSelected || isToday ? 1.5 : 1.0,
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            dayLetters[idx],
+                            style: AppTypography.caption(
+                              isSelected
+                                  ? theme.colorScheme.onPrimary
+                                  : isWeekend
+                                      ? theme.colorScheme.primary.withValues(alpha: 0.8)
+                                      : theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                              isMedium: true,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            day.day.toString(),
+                            style: AppTypography.body(
+                              isSelected
+                                  ? theme.colorScheme.onPrimary
+                                  : theme.colorScheme.onSurface,
+                              isMedium: true,
+                            ).copyWith(
+                              fontWeight: isSelected || isToday ? FontWeight.w700 : FontWeight.w500,
+                            ),
+                          ),
+                          if (isToday)
+                            Container(
+                              margin: const EdgeInsets.only(top: 2),
+                              width: 4,
+                              height: 4,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: isSelected
+                                    ? theme.colorScheme.onPrimary
+                                    : theme.colorScheme.primary,
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    day.day.toString(),
-                    style: AppTypography.body(
-                      isSelected
+                ),
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Painted Linear Progress Banner
+  Widget _buildLinearProgressBanner(
+    BuildContext context,
+    AppLocalizations l10n,
+    int doneCount,
+    int totalCount,
+    double completionRate,
+    bool isToday,
+    DateTime cleanSelected,
+  ) {
+    final theme = Theme.of(context);
+    final percentage = (completionRate * 100).toInt();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+      child: Container(
+        height: 76,
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+          border: Border.all(
+            color: completionRate == 1.0 && totalCount > 0
+                ? theme.colorScheme.primary
+                : theme.colorScheme.outline.withValues(alpha: 0.25),
+            width: completionRate == 1.0 && totalCount > 0 ? 1.5 : 1.0,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: theme.colorScheme.shadow.withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          children: [
+            // Background Painted Progress Fill
+            TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0.0, end: completionRate),
+              duration: const Duration(milliseconds: 450),
+              curve: Curves.easeOutCubic,
+              builder: (context, val, _) {
+                return FractionallySizedBox(
+                  widthFactor: val.clamp(0.0, 1.0),
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          theme.colorScheme.primary.withValues(alpha: 0.16),
+                          theme.colorScheme.primary.withValues(alpha: 0.28),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+
+            // Content Overlay
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+              child: Row(
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: completionRate == 1.0 && totalCount > 0
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.primary.withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      completionRate == 1.0 && totalCount > 0
+                          ? Icons.stars_rounded
+                          : Icons.bolt_rounded,
+                      color: completionRate == 1.0 && totalCount > 0
                           ? theme.colorScheme.onPrimary
-                          : theme.colorScheme.onSurface,
-                      isMedium: true,
+                          : theme.colorScheme.primary,
+                      size: 26,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          doneCount == totalCount && totalCount > 0
+                              ? l10n.t('allDone')
+                              : l10n.t('progressSummary', args: {
+                                  'done': doneCount,
+                                  'total': totalCount,
+                                }),
+                          style: AppTypography.body(theme.colorScheme.onSurface, isMedium: true),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          isToday
+                              ? l10n.t('swipeToComplete')
+                              : DateFormat('d MMM').format(cleanSelected),
+                          style: AppTypography.caption(
+                            theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    '$percentage%',
+                    style: AppTypography.title(theme.colorScheme.primary).copyWith(
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ],
               ),
             ),
-          );
-        },
+          ],
+        ),
       ),
+    );
+  }
+
+  /// Icon-based Routine Launcher Section
+  Widget _buildRoutineLauncherSection(BuildContext context, AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    final routines = widget.routineService.routines;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+          child: Text(
+            l10n.t('routinesTitle'),
+            style: AppTypography.section(theme.colorScheme.onSurface),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        SizedBox(
+          height: 64,
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+            scrollDirection: Axis.horizontal,
+            itemCount: routines.length,
+            separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.sm),
+            itemBuilder: (context, idx) {
+              final routine = routines[idx];
+              final title = l10n.t(routine.title);
+
+              return GestureDetector(
+                onTap: () {
+                  HapticsHelper.selection();
+                  widget.routineService.startRoutine(routine);
+                  RoutineRunnerSheet.show(context, widget.routineService);
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surface,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                    border: Border.all(
+                      color: theme.colorScheme.outline.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          routine.icon,
+                          color: theme.colorScheme.primary,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.xs),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: AppTypography.caption(theme.colorScheme.onSurface, isMedium: true),
+                          ),
+                          Text(
+                            '${routine.totalMinutes}m',
+                            style: AppTypography.caption(
+                              theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: AppSpacing.xs),
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.play_arrow_rounded,
+                          color: theme.colorScheme.onPrimary,
+                          size: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 

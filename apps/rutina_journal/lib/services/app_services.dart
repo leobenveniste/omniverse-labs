@@ -26,6 +26,10 @@ class AppServices {
     required this.journalService,
   });
 
+  static AppServices of(BuildContext context) {
+    return AppServicesScope.of(context);
+  }
+
   static Future<AppServices> init() async {
     final prefs = await SharedPreferences.getInstance();
     final storage = StorageService(prefs);

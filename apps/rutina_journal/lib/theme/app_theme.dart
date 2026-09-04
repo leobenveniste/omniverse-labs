@@ -33,7 +33,7 @@ class AppTheme {
         surfaceContainerHighest: colors.surfaceVariant,
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: colors.background,
+        backgroundColor: Colors.transparent,
         foregroundColor: colors.textPrimary,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -44,8 +44,8 @@ class AppTheme {
         color: colors.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          side: BorderSide(color: colors.outline, width: 1.0),
+          borderRadius: BorderRadius.circular(colors.cardBorderRadius),
+          side: BorderSide(color: colors.outline, width: colors.cardBorderWidth),
         ),
         margin: EdgeInsets.zero,
       ),
@@ -58,49 +58,62 @@ class AppTheme {
         ),
         hintStyle: AppTypography.body(colors.textTertiary),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-          borderSide: BorderSide(color: colors.outline),
+          borderRadius: BorderRadius.circular(colors.cardBorderRadius * 0.75),
+          borderSide: BorderSide(color: colors.outline, width: colors.cardBorderWidth),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-          borderSide: BorderSide(color: colors.outline),
+          borderRadius: BorderRadius.circular(colors.cardBorderRadius * 0.75),
+          borderSide: BorderSide(color: colors.outline, width: colors.cardBorderWidth),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-          borderSide: BorderSide(color: colors.primary, width: 1.5),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-          borderSide: BorderSide(color: colors.error, width: 1.5),
+          borderRadius: BorderRadius.circular(colors.cardBorderRadius * 0.75),
+          borderSide: BorderSide(color: colors.primary, width: colors.cardBorderWidth + 0.5),
         ),
       ),
-      filledButtonTheme: FilledButtonThemeData(
-        style: FilledButton.styleFrom(
-          backgroundColor: colors.primary,
-          foregroundColor: colors.onPrimary,
-          minimumSize: const Size(double.infinity, AppSpacing.xxl),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+      dialogTheme: DialogThemeData(
+        backgroundColor: colors.surface,
+        elevation: 6,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(colors.cardBorderRadius + 4),
+          side: BorderSide(color: colors.outline, width: colors.cardBorderWidth),
+        ),
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: colors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(colors.cardBorderRadius + 4),
           ),
-          textStyle: AppTypography.body(colors.onPrimary, isMedium: true),
+          side: BorderSide(color: colors.outline, width: colors.cardBorderWidth),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: colors.surface,
-        indicatorColor: colors.primary.withValues(alpha: 0.15),
+        indicatorColor: colors.primary.withValues(alpha: 0.16),
         elevation: 2,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return AppTypography.caption(colors.primary, isMedium: true);
-          }
-          return AppTypography.caption(colors.textSecondary);
+          final isSelected = states.contains(WidgetState.selected);
+          return TextStyle(
+            fontSize: 11,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+            color: isSelected ? colors.primary : colors.textSecondary,
+          );
         }),
-        iconTheme: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return IconThemeData(color: colors.primary);
-          }
-          return IconThemeData(color: colors.textSecondary);
-        }),
+      ),
+    );
+  }
+
+  /// Helper to wrap screens with the preset's distinctive sunshine/atmospheric gradient
+  static BoxDecoration getAtmosphericBackground(BuildContext context, AppThemePreset preset) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = AppColors.of(preset, isDark);
+
+    return BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: colors.backgroundGradient,
+        stops: const [0.0, 0.55, 1.0],
       ),
     );
   }

@@ -231,6 +231,15 @@ class RoutineService extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> updateRoutine(Routine routine) async {
+    final index = _routines.indexWhere((r) => r.id == routine.id);
+    if (index != -1) {
+      _routines[index] = routine;
+      await _storage.saveRoutines(_routines);
+      notifyListeners();
+    }
+  }
+
   Future<void> deleteRoutine(String routineId) async {
     _routines.removeWhere((r) => r.id == routineId);
     await _storage.saveRoutines(_routines);

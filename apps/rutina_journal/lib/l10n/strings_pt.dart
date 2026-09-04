@@ -65,6 +65,16 @@ const Map<String, String> stringsPt = {
   'congratsRoutine': 'Rotina concluída com sucesso!',
   'nextStep': 'Próximo',
   'prevStep': 'Anterior',
+  'newRoutine': 'Nova Rotina',
+  'editRoutine': 'Editar Rotina',
+  'routineNameHint': 'Nome da rotina...',
+  'routineDescHint': 'Breve descrição ou propósito...',
+  'routineIcon': 'Ícone',
+  'routineStepsTitle': 'Passos da rotina',
+  'addStep': 'Adicionar passo',
+  'stepNameHint': 'Nome do passo...',
+  'stepMinutes': 'Minutos',
+  'deleteRoutineConfirm': 'Excluir esta rotina?',
 
   // Journal
   'journalTitle': 'Diário e Reflexão',

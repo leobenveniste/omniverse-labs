@@ -31,6 +31,12 @@ class HeatmapCalendar extends StatelessWidget {
     final theme = Theme.of(context);
     final sortedDates = data.keys.toList()..sort((a, b) => a.compareTo(b));
 
+    // 7 rows (one for each weekday), each tile is 14x14 with 3px gap:
+    // Total height = (7 * 14) + (6 * 3) + 4 = 120px
+    const double tileHeight = 14;
+    const double tileSpacing = 3;
+    const double gridHeight = (7 * tileHeight) + (6 * tileSpacing) + 2;
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
@@ -75,28 +81,31 @@ class HeatmapCalendar extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.md),
 
-            // Grid of tiles
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              reverse: true,
-              child: Wrap(
-                direction: Axis.vertical,
-                spacing: AppSpacing.xxs,
-                runSpacing: AppSpacing.xxs,
-                children: List.generate(sortedDates.length, (i) {
-                  final date = sortedDates[i];
-                  final rate = data[date] ?? 0.0;
-                  final color = _getColorForIntensity(context, rate);
+            // Strictly height-constrained Grid of tiles
+            SizedBox(
+              height: gridHeight,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                reverse: true,
+                child: Wrap(
+                  direction: Axis.vertical,
+                  spacing: tileSpacing,
+                  runSpacing: tileSpacing,
+                  children: List.generate(sortedDates.length, (i) {
+                    final date = sortedDates[i];
+                    final rate = data[date] ?? 0.0;
+                    final color = _getColorForIntensity(context, rate);
 
-                  return Container(
-                    width: 14,
-                    height: 14,
-                    decoration: BoxDecoration(
-                      color: color,
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                  );
-                }),
+                    return Container(
+                      width: tileHeight,
+                      height: tileHeight,
+                      decoration: BoxDecoration(
+                        color: color,
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    );
+                  }),
+                ),
               ),
             ),
           ],
