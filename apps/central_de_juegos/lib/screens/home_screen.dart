@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/game_type.dart';
 import '../models/game_session.dart';
 import '../models/player.dart';
+import '../services/premium_service.dart';
 import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/about_dialog_widget.dart';
@@ -10,6 +11,7 @@ import '../widgets/finger_roulette_widget.dart';
 import '../widgets/turn_timer_widget.dart';
 import '../widgets/coin_flipper_widget.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
+import '../widgets/paywall_sheet.dart';
 import 'game_setup_screen.dart';
 import 'truco_screen.dart';
 import 'generala_screen.dart';
@@ -35,13 +37,25 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   GameSession? _activeSession;
+  PremiumService? _premiumService;
   bool _isLoading = true;
   int _currentNavIndex = 2; // Default to central "Juegos" tab
 
   @override
   void initState() {
     super.initState();
-    _loadActiveSession();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    _premiumService = await PremiumService.getInstance();
+    final session = await StorageService.loadActiveSession();
+    if (mounted) {
+      setState(() {
+        _activeSession = session;
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _loadActiveSession() async {
@@ -49,7 +63,6 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) {
       setState(() {
         _activeSession = session;
-        _isLoading = false;
       });
     }
   }
@@ -201,6 +214,43 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         actions: [
+          if (_premiumService != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+              child: AnimatedBuilder(
+                animation: _premiumService!,
+                builder: (context, _) {
+                  final isPro = _premiumService!.isPro;
+                  return ActionChip(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    backgroundColor: isPro
+                        ? AppTheme.cyberGold.withValues(alpha: 0.2)
+                        : Colors.white.withValues(alpha: 0.08),
+                    side: BorderSide(
+                      color: isPro ? AppTheme.cyberGold : Colors.white24,
+                      width: 1,
+                    ),
+                    avatar: Icon(
+                      isPro ? Icons.workspace_premium_rounded : Icons.star_border_rounded,
+                      color: isPro ? AppTheme.cyberGold : Colors.white70,
+                      size: 16,
+                    ),
+                    label: Text(
+                      isPro ? 'PRO' : 'PRO',
+                      style: TextStyle(
+                        color: isPro ? AppTheme.cyberGold : Colors.white70,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    onPressed: () => PaywallSheet.show(
+                      context,
+                      premiumService: _premiumService!,
+                    ),
+                  );
+                },
+              ),
+            ),
           IconButton(
             icon: const Icon(Icons.info_outline, color: Colors.white70),
             tooltip: 'Acerca de Omniverse Labs',
@@ -210,7 +260,9 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: const Icon(Icons.history, color: Colors.white70),
             tooltip: 'Historial de Partidas',
             onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const HistoryScreen()),
+              MaterialPageRoute(
+                builder: (_) => HistoryScreen(premiumService: _premiumService),
+              ),
             ),
           ),
         ],
