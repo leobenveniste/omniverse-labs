@@ -304,6 +304,39 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
             except Exception as e:
                 print(f"Central de Juegos Listing notice: {e}")
 
+        if package_name == "com.omniverselabs.menu_listo":
+            icon_path = r"c:\Projects\Omniverse Labs\apps\menu_listo\assets\images\store\app_icon_512x512.png"
+            feature_path = r"c:\Projects\Omniverse Labs\apps\menu_listo\assets\images\store\feature_graphic_1024x500.png"
+            all_langs = ["es-419", "en-US"]
+            for lang in all_langs:
+                if os.path.exists(icon_path):
+                    try:
+                        icon_media = MediaFileUpload(icon_path, mimetype="image/png")
+                        edits.images().upload(
+                            packageName=package_name,
+                            editId=edit_id,
+                            language=lang,
+                            imageType="icon",
+                            media_body=icon_media
+                        ).execute()
+                        print(f"Menú Listo Icon updated for {lang}")
+                    except Exception as e:
+                        print(f"Menú Listo Icon notice ({lang}): {e}")
+
+                if os.path.exists(feature_path):
+                    try:
+                        feat_media = MediaFileUpload(feature_path, mimetype="image/png")
+                        edits.images().upload(
+                            packageName=package_name,
+                            editId=edit_id,
+                            language=lang,
+                            imageType="featureGraphic",
+                            media_body=feat_media
+                        ).execute()
+                        print(f"Menú Listo Feature Graphic updated for {lang}")
+                    except Exception as e:
+                        print(f"Menú Listo Feature Graphic notice ({lang}): {e}")
+
         print(f"Uploading App Bundle ({os.path.getsize(aab_path) / (1024*1024):.2f} MB)...")
         media = MediaFileUpload(aab_path, mimetype="application/octet-stream", chunksize=10*1024*1024, resumable=True)
         bundle_req = edits.bundles().upload(packageName=package_name, editId=edit_id, media_body=media)
@@ -326,9 +359,9 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
             rel_notes_es = notes_es or "Anotador digital todo en uno para juegos de mesa por Omniverse Labs."
             rel_notes_en = notes_en or "All-in-one tabletop games scorekeeper by Omniverse Labs."
         else:
-            rel_name = release_name or f"1.2.9 (Build {version_code})"
-            rel_notes_es = notes_es or "Actualizaciones y mejoras continuas de rendimiento y estabilidad."
-            rel_notes_en = notes_en or "Continuous performance and stability enhancements."
+            rel_name = release_name or f"1.2.10 (Build {version_code})"
+            rel_notes_es = notes_es or "Nuevo diseño de identidad visual y logotipo de Menú Listo, optimizaciones de rendimiento y estabilidad."
+            rel_notes_en = notes_en or "Fresh new logo and visual identity for Menú Listo, along with continuous performance and stability improvements."
 
         # Deploy to specified track(s)
         tracks_to_deploy = [t.strip() for t in track.split(",") if t.strip()]
