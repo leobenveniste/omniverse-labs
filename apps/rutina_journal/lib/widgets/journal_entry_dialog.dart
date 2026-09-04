@@ -157,6 +157,7 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
               ),
               IconButton(
                 onPressed: () => Navigator.of(context).pop(),
+                tooltip: l10n.t('actionClose'),
                 icon: const Icon(Icons.close_rounded),
               ),
             ],
@@ -180,7 +181,7 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
 
                   // State Tags
                   Text(
-                    'Etiquetas de estado',
+                    l10n.t('stateTagsLabel'),
                     style: AppTypography.caption(
                       theme.colorScheme.onSurface.withValues(alpha: 0.7),
                       isMedium: true,
@@ -258,15 +259,15 @@ class _JournalEntryDialogState extends State<JournalEntryDialog> {
 
                   // Freeform Notes
                   Text(
-                    'Pensamientos & Notas libres',
+                    l10n.t('freeformNotesLabel'),
                     style: AppTypography.section(theme.colorScheme.onSurface),
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   TextField(
                     controller: _notesController,
                     maxLines: 3,
-                    decoration: const InputDecoration(
-                      hintText: 'Escribe libremente cualquier reflexión...',
+                    decoration: InputDecoration(
+                      hintText: l10n.t('freeformNotesHint'),
                     ),
                   ),
                 ],

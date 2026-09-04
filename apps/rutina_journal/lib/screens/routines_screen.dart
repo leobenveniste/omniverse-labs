@@ -157,7 +157,7 @@ class RoutinesScreen extends StatelessWidget {
               final step = entry.value;
               final min = (step.durationSeconds / 60).ceil();
               return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 3),
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
                 child: Row(
                   children: [
                     Container(
@@ -222,7 +222,7 @@ class RoutinesScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.t('cancel')),
+            child: Text(l10n.t('actionCancel')),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
@@ -230,7 +230,7 @@ class RoutinesScreen extends StatelessWidget {
               routineService.deleteRoutine(routine.id);
               Navigator.of(ctx).pop();
             },
-            child: Text(l10n.t('delete')),
+            child: Text(l10n.t('actionDelete')),
           ),
         ],
       ),

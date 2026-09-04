@@ -194,6 +194,7 @@ class _RoutineEditDialogState extends State<RoutineEditDialog> {
               ),
               IconButton(
                 onPressed: () => Navigator.of(context).pop(),
+                tooltip: l10n.t('actionClose'),
                 icon: const Icon(Icons.close_rounded),
               ),
             ],
@@ -257,7 +258,7 @@ class _RoutineEditDialogState extends State<RoutineEditDialog> {
                     controller: _titleController,
                     decoration: InputDecoration(
                       hintText: l10n.t('routineNameHint'),
-                      labelText: l10n.t('title'),
+                      labelText: l10n.t('inputTitle'),
                       prefixIcon: const Icon(Icons.title_rounded),
                     ),
                   ),
@@ -268,7 +269,7 @@ class _RoutineEditDialogState extends State<RoutineEditDialog> {
                     controller: _descController,
                     decoration: InputDecoration(
                       hintText: l10n.t('routineDescHint'),
-                      labelText: l10n.t('description'),
+                      labelText: l10n.t('inputDescription'),
                       prefixIcon: const Icon(Icons.notes_rounded),
                     ),
                   ),
@@ -323,19 +324,19 @@ class _RoutineEditDialogState extends State<RoutineEditDialog> {
                               controller: step.titleController,
                               decoration: InputDecoration(
                                 hintText: l10n.t('stepNameHint'),
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                               ),
                             ),
                           ),
                           const SizedBox(width: AppSpacing.xs),
                           SizedBox(
-                            width: 70,
+                            width: 72,
                             child: TextField(
                               controller: step.minutesController,
                               keyboardType: TextInputType.number,
                               decoration: const InputDecoration(
                                 suffixText: 'm',
-                                contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                               ),
                             ),
                           ),
@@ -343,6 +344,7 @@ class _RoutineEditDialogState extends State<RoutineEditDialog> {
                             IconButton(
                               icon: Icon(Icons.remove_circle_outline_rounded,
                                   color: theme.colorScheme.error, size: 20),
+                              tooltip: l10n.t('actionDelete'),
                               onPressed: () => _removeStep(index),
                             ),
                         ],
@@ -362,7 +364,7 @@ class _RoutineEditDialogState extends State<RoutineEditDialog> {
             height: 48,
             child: FilledButton(
               onPressed: _save,
-              child: Text(l10n.t('save')),
+              child: Text(l10n.t('actionSave')),
             ),
           ),
         ],

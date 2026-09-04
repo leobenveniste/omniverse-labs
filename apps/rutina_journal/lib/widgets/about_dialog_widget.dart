@@ -68,27 +68,27 @@ class AboutDialogWidget extends StatelessWidget {
             // App details
             _buildRow(
               context,
-              label: 'Aplicación / App:',
+              label: l10n.t('appDetailsLabel'),
               value: 'Ritmo',
               isBold: true,
             ),
             const SizedBox(height: AppSpacing.xs),
             _buildRow(
               context,
-              label: 'Package ID:',
+              label: l10n.t('packageIdLabel'),
               value: 'com.omniverselabs.ritmo',
             ),
             const SizedBox(height: AppSpacing.xs),
             _buildRow(
               context,
-              label: 'Versión / Version:',
-              value: '1.0.0 (Build 2)',
+              label: l10n.t('versionLabel'),
+              value: '1.0.0 (Build 4)',
             ),
             const SizedBox(height: AppSpacing.xs),
             _buildRow(
               context,
-              label: 'Lanzamiento / Release:',
-              value: 'Septiembre 2026',
+              label: l10n.t('releaseDateLabel'),
+              value: l10n.t('releaseDateValue'),
             ),
             const SizedBox(height: AppSpacing.md),
 

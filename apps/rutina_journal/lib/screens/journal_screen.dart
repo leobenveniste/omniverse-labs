@@ -63,7 +63,7 @@ class JournalScreen extends StatelessWidget {
                       style: AppTypography.section(theme.colorScheme.onSurface),
                     ),
                     Text(
-                      '${entries.length} ${entries.length == 1 ? "registro" : "registros"}',
+                      l10n.t('journalEntriesCount', args: {'count': '${entries.length}'}),
                       style: AppTypography.caption(
                         theme.colorScheme.onSurface.withValues(alpha: 0.5),
                         isMedium: true,
@@ -116,7 +116,7 @@ class JournalScreen extends StatelessWidget {
           );
         },
         icon: const Icon(Icons.edit_calendar_rounded),
-        label: Text(l10n.t('saveJournal')),
+        label: Text(l10n.t('newEntry')),
       ),
     );
   }
@@ -124,17 +124,29 @@ class JournalScreen extends StatelessWidget {
   Widget _buildTodayHeroCard(BuildContext context, AppLocalizations l10n, JournalEntry todayEntry) {
     final theme = Theme.of(context);
     final hasLogged = !todayEntry.isEmpty;
+    final energyColor = _getEnergyColor(todayEntry.energyLevel);
 
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
+    return Container(
+      decoration: BoxDecoration(
+        color: hasLogged
+            ? energyColor.withValues(alpha: 0.12)
+            : theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        side: BorderSide(
+        border: Border.all(
           color: hasLogged
-              ? theme.colorScheme.primary
+              ? energyColor.withValues(alpha: 0.5)
               : theme.colorScheme.outline.withValues(alpha: 0.3),
           width: hasLogged ? 1.5 : 1.0,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: hasLogged
+                ? energyColor.withValues(alpha: 0.08)
+                : theme.colorScheme.shadow.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
@@ -145,13 +157,13 @@ class JournalScreen extends StatelessWidget {
               height: 48,
               decoration: BoxDecoration(
                 color: hasLogged
-                    ? theme.colorScheme.primary
+                    ? energyColor
                     : theme.colorScheme.primary.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 hasLogged ? _getMoodIcon(todayEntry.moodLevel) : Icons.add_reaction_outlined,
-                color: hasLogged ? theme.colorScheme.onPrimary : theme.colorScheme.primary,
+                color: hasLogged ? Colors.white : theme.colorScheme.primary,
                 size: 26,
               ),
             ),
@@ -170,7 +182,7 @@ class JournalScreen extends StatelessWidget {
                         ? 'Ánimo: ${_getMoodLabel(l10n, todayEntry.moodLevel)} • Energía: ${todayEntry.energyLevel}/5'
                         : 'Dedica 2 minutos para registrar tu estado y gratitudes.',
                     style: AppTypography.caption(
-                      theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                      theme.colorScheme.onSurface.withValues(alpha: 0.65),
                     ),
                   ),
                 ],
@@ -217,12 +229,34 @@ class JournalScreen extends StatelessWidget {
 
   Widget _buildEntryFeedCard(BuildContext context, AppLocalizations l10n, JournalEntry entry) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final parsedDate = DateTime.tryParse(entry.dateKey) ?? entry.createdAt;
     final dateStr = DateFormat('EEEE, d MMMM yyyy', l10n.locale.languageCode).format(parsedDate);
+    final energyColor = _getEnergyColor(entry.energyLevel);
+
+    // Tint card based on energy level
+    final cardBgColor = isDark
+        ? energyColor.withValues(alpha: 0.16)
+        : energyColor.withValues(alpha: 0.10);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: Card(
+      child: Container(
+        decoration: BoxDecoration(
+          color: cardBgColor,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+          border: Border.all(
+            color: energyColor.withValues(alpha: 0.45),
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: energyColor.withValues(alpha: 0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
         child: InkWell(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           onTap: () {
@@ -259,20 +293,20 @@ class JournalScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header: Mood Orb + Date + Energy
+                // Header: Mood Orb + Date + Energy Pill
                 Row(
                   children: [
                     Container(
-                      width: 32,
-                      height: 32,
+                      width: 34,
+                      height: 34,
                       decoration: BoxDecoration(
-                        color: _getMoodColor(entry.moodLevel).withValues(alpha: 0.15),
+                        color: _getMoodColor(entry.moodLevel).withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         _getMoodIcon(entry.moodLevel),
                         color: _getMoodColor(entry.moodLevel),
-                        size: 18,
+                        size: 20,
                       ),
                     ),
                     const SizedBox(width: AppSpacing.xs),
@@ -284,11 +318,31 @@ class JournalScreen extends StatelessWidget {
                             dateStr,
                             style: AppTypography.body(theme.colorScheme.onSurface, isMedium: true),
                           ),
-                          Text(
-                            '${_getMoodLabel(l10n, entry.moodLevel)} • Energía ${entry.energyLevel}/5',
-                            style: AppTypography.caption(
-                              theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                            ),
+                          Row(
+                            children: [
+                              Text(
+                                _getMoodLabel(l10n, entry.moodLevel),
+                                style: AppTypography.caption(
+                                  theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                                ),
+                              ),
+                              const SizedBox(width: AppSpacing.xs),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                decoration: BoxDecoration(
+                                  color: energyColor.withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
+                                ),
+                                child: Text(
+                                  l10n.t('energyPill', args: {'level': '${entry.energyLevel}'}),
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    color: energyColor,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -296,7 +350,7 @@ class JournalScreen extends StatelessWidget {
                     Icon(
                       Icons.edit_outlined,
                       size: 18,
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                     ),
                   ],
                 ),
@@ -311,14 +365,17 @@ class JournalScreen extends StatelessWidget {
                       return Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceContainerHighest,
+                          color: theme.colorScheme.surface.withValues(alpha: 0.7),
                           borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
+                          border: Border.all(
+                            color: energyColor.withValues(alpha: 0.25),
+                          ),
                         ),
                         child: Text(
                           l10n.t(t),
                           style: TextStyle(
                             fontSize: 11,
-                            color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.85),
                           ),
                         ),
                       );
@@ -332,7 +389,7 @@ class JournalScreen extends StatelessWidget {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.emoji_events_outlined, size: 16, color: Colors.amber.shade700),
+                      Icon(Icons.emoji_events_outlined, size: 16, color: Colors.amber.shade800),
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
@@ -353,19 +410,19 @@ class JournalScreen extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 2),
                       child: Text('• ${entry.gratitude1}',
-                          style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.8))),
+                          style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.85))),
                     ),
                   if (entry.gratitude2.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 2),
                       child: Text('• ${entry.gratitude2}',
-                          style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.8))),
+                          style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.85))),
                     ),
                   if (entry.gratitude3.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 2),
                       child: Text('• ${entry.gratitude3}',
-                          style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.8))),
+                          style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.85))),
                     ),
                 ],
 
@@ -377,7 +434,7 @@ class JournalScreen extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: AppTypography.caption(
-                      theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                      theme.colorScheme.onSurface.withValues(alpha: 0.75),
                     ),
                   ),
                 ],
@@ -417,6 +474,22 @@ class JournalScreen extends StatelessWidget {
     );
   }
 
+  Color _getEnergyColor(int energy) {
+    switch (energy) {
+      case 5:
+        return const Color(0xFFE65100); // Solar Orange/Gold (Maximum vitality)
+      case 4:
+        return const Color(0xFF2E7D32); // Deep Energetic Emerald
+      case 3:
+        return const Color(0xFF0288D1); // Focus Teal / Sky Blue
+      case 2:
+        return const Color(0xFF5C6BC0); // Twilight Indigo
+      case 1:
+      default:
+        return const Color(0xFF607D8B); // Slate / Restful Calm
+    }
+  }
+
   IconData _getMoodIcon(int level) {
     switch (level) {
       case 5:
@@ -436,16 +509,16 @@ class JournalScreen extends StatelessWidget {
   Color _getMoodColor(int level) {
     switch (level) {
       case 5:
-        return Colors.amber;
+        return Colors.amber.shade700;
       case 4:
-        return Colors.lightGreen;
+        return Colors.green.shade700;
       case 3:
-        return Colors.blueGrey;
+        return Colors.teal.shade700;
       case 2:
-        return Colors.orange;
+        return Colors.orange.shade800;
       case 1:
       default:
-        return Colors.blueGrey.shade300;
+        return Colors.blueGrey;
     }
   }
 

@@ -50,7 +50,7 @@ class SettingsScreen extends StatelessWidget {
                       _buildPresetTile(
                         context,
                         title: l10n.t('presetCalmSage'),
-                        subtitle: 'Lino, salvia profunda y terracota',
+                        subtitle: l10n.t('presetCalmSageDesc'),
                         icon: Icons.spa_rounded,
                         preset: AppThemePreset.calmSage,
                       ),
@@ -58,7 +58,7 @@ class SettingsScreen extends StatelessWidget {
                       _buildPresetTile(
                         context,
                         title: l10n.t('presetNeoKinetic'),
-                        subtitle: 'Carbono, neo-menta y ámbar solar',
+                        subtitle: l10n.t('presetNeoKineticDesc'),
                         icon: Icons.bolt_rounded,
                         preset: AppThemePreset.neoKinetic,
                       ),
@@ -66,7 +66,7 @@ class SettingsScreen extends StatelessWidget {
                       _buildPresetTile(
                         context,
                         title: l10n.t('presetMidnightBento'),
-                        subtitle: 'Pizarra, zafiro, amatista y esmeralda',
+                        subtitle: l10n.t('presetMidnightBentoDesc'),
                         icon: Icons.grid_view_rounded,
                         preset: AppThemePreset.midnightBento,
                       ),
@@ -191,7 +191,7 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(height: AppSpacing.md),
 
               // About Modal Trigger
-              _buildSectionHeader(context, 'Acerca de'),
+              _buildSectionHeader(context, l10n.t('aboutSection')),
               Card(
                 child: ListTile(
                   leading: Image.asset(
@@ -222,7 +222,7 @@ class SettingsScreen extends StatelessWidget {
   Widget _buildSectionHeader(BuildContext context, String title) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: AppSpacing.xs),
+      padding: const EdgeInsets.only(left: AppSpacing.xs, bottom: AppSpacing.xs),
       child: Text(
         title,
         style: AppTypography.caption(theme.colorScheme.primary, isMedium: true),

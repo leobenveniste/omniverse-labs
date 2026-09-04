@@ -167,35 +167,35 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
             except Exception as e:
                 print(f"Ritmo Listing notice: {e}")
 
-            if os.path.exists(icon_path):
-                try:
-                    print("Uploading Ritmo App Icon (512x512)...")
-                    icon_media = MediaFileUpload(icon_path, mimetype="image/png")
-                    edits.images().upload(
-                        packageName=package_name,
-                        editId=edit_id,
-                        language="es-419",
-                        imageType="icon",
-                        media_body=icon_media
-                    ).execute()
-                    print("Ritmo App Icon Uploaded!")
-                except Exception as e:
-                    print(f"Ritmo Icon notice: {e}")
+            # Sync graphics and listings across English and Spanish locales
+            all_langs = ["es-419", "en-US", "en-GB", "es-ES"]
+            for lang in all_langs:
+                if os.path.exists(icon_path):
+                    try:
+                        icon_media = MediaFileUpload(icon_path, mimetype="image/png")
+                        edits.images().upload(
+                            packageName=package_name,
+                            editId=edit_id,
+                            language=lang,
+                            imageType="icon",
+                            media_body=icon_media
+                        ).execute()
+                    except Exception as e:
+                        print(f"Ritmo Icon notice ({lang}): {e}")
 
-            if os.path.exists(feature_path):
-                try:
-                    print("Uploading Ritmo Feature Graphic (1024x500)...")
-                    feat_media = MediaFileUpload(feature_path, mimetype="image/jpeg")
-                    edits.images().upload(
-                        packageName=package_name,
-                        editId=edit_id,
-                        language="es-419",
-                        imageType="featureGraphic",
-                        media_body=feat_media
-                    ).execute()
-                    print("Ritmo Feature Graphic Uploaded!")
-                except Exception as e:
-                    print(f"Ritmo Feature Graphic notice: {e}")
+                if os.path.exists(feature_path):
+                    try:
+                        feat_media = MediaFileUpload(feature_path, mimetype="image/jpeg")
+                        edits.images().upload(
+                            packageName=package_name,
+                            editId=edit_id,
+                            language=lang,
+                            imageType="featureGraphic",
+                            media_body=feat_media
+                        ).execute()
+                    except Exception as e:
+                        print(f"Ritmo Feature Graphic notice ({lang}): {e}")
+            print("Ritmo Icons & Graphics synced across all locales!")
 
         print(f"Uploading App Bundle ({os.path.getsize(aab_path) / (1024*1024):.2f} MB)...")
         media = MediaFileUpload(aab_path, mimetype="application/octet-stream", chunksize=10*1024*1024, resumable=True)

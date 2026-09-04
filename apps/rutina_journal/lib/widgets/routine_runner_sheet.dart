@@ -87,13 +87,17 @@ class RoutineRunnerSheet extends StatelessWidget {
             children: [
               IconButton(
                 icon: const Icon(Icons.close_rounded),
+                tooltip: l10n.t('actionClose'),
                 onPressed: () {
                   routineService.stopRoutine();
                   Navigator.of(context).pop();
                 },
               ),
               Text(
-                'Paso ${stepIndex + 1} de $totalSteps',
+                l10n.t('routineStepCounter', args: {
+                  'current': '${stepIndex + 1}',
+                  'total': '$totalSteps',
+                }),
                 style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.7), isMedium: true),
               ),
               const SizedBox(width: 48), // spacer balance
@@ -159,6 +163,7 @@ class RoutineRunnerSheet extends StatelessWidget {
               IconButton.filledTonal(
                 iconSize: 24,
                 icon: const Icon(Icons.skip_previous_rounded),
+                tooltip: l10n.t('prevStep'),
                 onPressed: stepIndex > 0
                     ? () {
                         HapticsHelper.light();
@@ -183,6 +188,7 @@ class RoutineRunnerSheet extends StatelessWidget {
               IconButton.filledTonal(
                 iconSize: 24,
                 icon: const Icon(Icons.skip_next_rounded),
+                tooltip: l10n.t('nextStep'),
                 onPressed: () {
                   HapticsHelper.light();
                   if (stepIndex + 1 == totalSteps) {

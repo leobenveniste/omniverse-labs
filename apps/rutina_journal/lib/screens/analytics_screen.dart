@@ -68,7 +68,7 @@ class AnalyticsScreen extends StatelessWidget {
                               style: AppTypography.display(theme.colorScheme.primary),
                             ),
                             Text(
-                              'Últimos 7 días',
+                              l10n.t('last7Days'),
                               style: AppTypography.caption(
                                 theme.colorScheme.onSurface.withValues(alpha: 0.5),
                               ),
@@ -87,7 +87,7 @@ class AnalyticsScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Ánimo promedio',
+                              l10n.t('avgMood'),
                               style: AppTypography.caption(
                                 theme.colorScheme.onSurface.withValues(alpha: 0.6),
                                 isMedium: true,
@@ -99,7 +99,7 @@ class AnalyticsScreen extends StatelessWidget {
                               style: AppTypography.display(theme.colorScheme.secondary),
                             ),
                             Text(
-                              'Registro reflexivo',
+                              l10n.t('reflectiveLog'),
                               style: AppTypography.caption(
                                 theme.colorScheme.onSurface.withValues(alpha: 0.5),
                               ),
@@ -174,7 +174,7 @@ class AnalyticsScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     child: Center(
                       child: Text(
-                        'Agrega hábitos para ver tus mejores rachas.',
+                        l10n.t('noStreaksYet'),
                         style: AppTypography.body(
                           theme.colorScheme.onSurface.withValues(alpha: 0.6),
                         ),
@@ -215,7 +215,7 @@ class AnalyticsScreen extends StatelessWidget {
                           style: AppTypography.body(theme.colorScheme.onSurface, isMedium: true),
                         ),
                         subtitle: Text(
-                          'Mejor: ${streak.best} días',
+                          l10n.t('bestStreakDays', args: {'days': '${streak.best}'}),
                           style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                         ),
                         trailing: Row(

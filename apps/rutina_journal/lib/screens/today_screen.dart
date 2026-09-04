@@ -12,6 +12,7 @@ import '../theme/app_typography.dart';
 import '../utils/date_utils.dart';
 import '../utils/haptics_helper.dart';
 import '../widgets/habit_edit_dialog.dart';
+import '../widgets/routine_edit_dialog.dart';
 import '../widgets/routine_runner_sheet.dart';
 import '../widgets/swipe_habit_card.dart';
 
@@ -150,7 +151,7 @@ class _TodayScreenState extends State<TodayScreen> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.md,
-                        vertical: AppSpacing.xxs,
+                        vertical: AppSpacing.xs,
                       ),
                       child: SwipeHabitCard(
                         habit: habit,
@@ -203,37 +204,38 @@ class _TodayScreenState extends State<TodayScreen> {
       child: Column(
         children: [
           // Week navigation controls
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.chevron_left_rounded, size: 22),
-                padding: EdgeInsets.zero,
-                visualDensity: VisualDensity.compact,
-                onPressed: () {
-                  HapticsHelper.selection();
-                  setState(() => _selectedDate = _selectedDate.subtract(const Duration(days: 7)));
-                },
-              ),
-              Text(
-                DateFormat('MMMM yyyy', l10n.locale.languageCode).format(_selectedDate).toUpperCase(),
-                style: AppTypography.caption(
-                  theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                  isMedium: true,
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.chevron_left_rounded, size: 24),
+                  tooltip: l10n.t('prevStep'),
+                  onPressed: () {
+                    HapticsHelper.selection();
+                    setState(() => _selectedDate = _selectedDate.subtract(const Duration(days: 7)));
+                  },
                 ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.chevron_right_rounded, size: 22),
-                padding: EdgeInsets.zero,
-                visualDensity: VisualDensity.compact,
-                onPressed: () {
-                  HapticsHelper.selection();
-                  setState(() => _selectedDate = _selectedDate.add(const Duration(days: 7)));
-                },
-              ),
-            ],
+                Text(
+                  DateFormat('MMMM yyyy', l10n.locale.languageCode).format(_selectedDate).toUpperCase(),
+                  style: AppTypography.caption(
+                    theme.colorScheme.onSurface.withValues(alpha: 0.75),
+                    isMedium: true,
+                  ).copyWith(letterSpacing: 1.2),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.chevron_right_rounded, size: 24),
+                  tooltip: l10n.t('nextStep'),
+                  onPressed: () {
+                    HapticsHelper.selection();
+                    setState(() => _selectedDate = _selectedDate.add(const Duration(days: 7)));
+                  },
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xxs),
           // 7 equal items in a Row
           Row(
             children: List.generate(7, (idx) {
@@ -460,85 +462,90 @@ class _TodayScreenState extends State<TodayScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-          child: Text(
-            l10n.t('routinesTitle'),
-            style: AppTypography.section(theme.colorScheme.onSurface),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                l10n.t('routinesTitle'),
+                style: AppTypography.section(theme.colorScheme.onSurface),
+              ),
+              IconButton(
+                icon: const Icon(Icons.add_rounded, size: 20),
+                tooltip: l10n.t('newRoutine'),
+                visualDensity: VisualDensity.compact,
+                padding: EdgeInsets.zero,
+                onPressed: () {
+                  HapticsHelper.light();
+                  RoutineEditDialog.show(
+                    context,
+                    onSave: (newRoutine) => widget.routineService.addRoutine(newRoutine),
+                  );
+                },
+              ),
+            ],
           ),
         ),
         const SizedBox(height: AppSpacing.xs),
         SizedBox(
-          height: 64,
+          height: 60,
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
             scrollDirection: Axis.horizontal,
             itemCount: routines.length,
-            separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.sm),
+            separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.xs),
             itemBuilder: (context, idx) {
               final routine = routines[idx];
               final title = l10n.t(routine.title);
 
-              return GestureDetector(
-                onTap: () {
-                  HapticsHelper.selection();
-                  widget.routineService.startRoutine(routine);
-                  RoutineRunnerSheet.show(context, widget.routineService);
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surface,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-                    border: Border.all(
-                      color: theme.colorScheme.outline.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 36,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withValues(alpha: 0.12),
-                          shape: BoxShape.circle,
+              return Tooltip(
+                message: '$title (${routine.totalMinutes}m)',
+                child: Semantics(
+                  button: true,
+                  label: '$title, ${routine.totalMinutes}m',
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                    onTap: () {
+                      HapticsHelper.medium();
+                      widget.routineService.startRoutine(routine);
+                      RoutineRunnerSheet.show(context, widget.routineService);
+                    },
+                    child: Container(
+                      width: 56,
+                      height: 58,
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.surface,
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                        border: Border.all(
+                          color: theme.colorScheme.outline.withValues(alpha: 0.3),
                         ),
-                        child: Icon(
-                          routine.icon,
-                          color: theme.colorScheme.primary,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.xs),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            style: AppTypography.caption(theme.colorScheme.onSurface, isMedium: true),
+                        boxShadow: [
+                          BoxShadow(
+                            color: theme.colorScheme.shadow.withValues(alpha: 0.03),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
                           ),
+                        ],
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            routine.icon,
+                            color: theme.colorScheme.primary,
+                            size: 22,
+                          ),
+                          const SizedBox(height: 2),
                           Text(
                             '${routine.totalMinutes}m',
-                            style: AppTypography.caption(
-                              theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(width: AppSpacing.xs),
-                      Container(
-                        width: 28,
-                        height: 28,
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.play_arrow_rounded,
-                          color: theme.colorScheme.onPrimary,
-                          size: 18,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               );
