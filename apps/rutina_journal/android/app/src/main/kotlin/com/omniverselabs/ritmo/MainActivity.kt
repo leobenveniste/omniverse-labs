@@ -12,7 +12,30 @@ import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
     private val DND_CHANNEL = "com.omniverselabs.ritmo/dnd"
+    private val WIDGETS_CHANNEL = "com.omniverselabs.ritmo/widgets"
     private var previousInterruptionFilter: Int? = null
+    private var pendingOpenScreen: String? = null
+
+    override fun onCreate(savedInstanceState: android.os.Bundle?) {
+        super.onCreate(savedInstanceState)
+        handleOpenScreenIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleOpenScreenIntent(intent)
+    }
+
+    private fun handleOpenScreenIntent(intent: Intent?) {
+        val screen = intent?.getStringExtra("open_screen")
+        if (!screen.isNullOrEmpty()) {
+            pendingOpenScreen = screen
+            // Also store in SharedPreferences so HomeWidget plugin or Flutter can read it reliably
+            val prefs = getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
+            prefs.edit().putString("flutter.pending_open_screen", screen).apply()
+        }
+    }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -107,6 +130,13 @@ class MainActivity : FlutterActivity() {
                     } else {
                         result.success(false)
                     }
+                }
+                "consumePendingOpenScreen" -> {
+                    val screen = pendingOpenScreen
+                    pendingOpenScreen = null
+                    val prefs = getSharedPreferences("FlutterSharedPreferences", Context.MODE_PRIVATE)
+                    prefs.edit().remove("flutter.pending_open_screen").apply()
+                    result.success(screen)
                 }
                 else -> {
                     result.notImplemented()

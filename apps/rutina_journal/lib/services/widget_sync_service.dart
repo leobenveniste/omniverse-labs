@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:home_widget/home_widget.dart';
 import '../services/habit_service.dart';
 import '../services/preferences_service.dart';
@@ -138,5 +139,26 @@ class WidgetSyncService {
         print('handlePendingWidgetLaunch error: $e');
       }
     }
+  }
+
+  /// Checks if a widget triggered a deep link to open a specific screen (e.g. Focus Zone)
+  Future<String?> checkPendingOpenScreen() async {
+    try {
+      const channel = MethodChannel('com.omniverselabs.ritmo/widgets');
+      final screenFromChannel = await channel.invokeMethod<String>('consumePendingOpenScreen');
+      if (screenFromChannel != null && screenFromChannel.isNotEmpty) {
+        return screenFromChannel;
+      }
+      final widgetScreen = await HomeWidget.getWidgetData<String>('pending_open_screen');
+      if (widgetScreen != null && widgetScreen.isNotEmpty) {
+        await HomeWidget.saveWidgetData<String>('pending_open_screen', '');
+        return widgetScreen;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('checkPendingOpenScreen error: $e');
+      }
+    }
+    return null;
   }
 }

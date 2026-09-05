@@ -34,8 +34,55 @@ class MainNavigationScreen extends StatefulWidget {
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
 
-class _MainNavigationScreenState extends State<MainNavigationScreen> {
+class _MainNavigationScreenState extends State<MainNavigationScreen>
+    with WidgetsBindingObserver {
   int _currentIndex = 0;
+  bool _handledInitialWidgetLaunch = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkWidgetDeepLink();
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      _checkWidgetDeepLink();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  Future<void> _checkWidgetDeepLink() async {
+    if (!mounted) return;
+    try {
+      final syncService = AppServices.of(context).widgetSyncService;
+      final targetScreen = await syncService.checkPendingOpenScreen();
+      if (!mounted) return;
+
+      if (targetScreen == 'focus_zone') {
+        final premiumService = AppServices.of(context).premiumService;
+        if (premiumService.canStartFocusSession) {
+          FocusZoneScreen.show(context);
+        } else {
+          final l10n = AppLocalizations.of(context);
+          PaywallSheet.show(
+            context,
+            customReason: l10n.t('proLimitFocusMsg'),
+          );
+        }
+      }
+    } catch (_) {}
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -258,6 +258,24 @@ class RoutinesScreen extends StatelessWidget {
                               isMedium: true,
                             ),
                           ),
+                          if (routine.reminderEnabled && routine.reminderTime != null && routine.reminderTime!.isNotEmpty) ...[
+                            const SizedBox(width: AppSpacing.xs),
+                            const Text('•'),
+                            const SizedBox(width: AppSpacing.xs),
+                            Icon(
+                              Icons.alarm_rounded,
+                              size: 13,
+                              color: theme.colorScheme.primary,
+                            ),
+                            const SizedBox(width: 2),
+                            Text(
+                              routine.reminderTime!,
+                              style: AppTypography.caption(
+                                theme.colorScheme.primary,
+                                isMedium: true,
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ],

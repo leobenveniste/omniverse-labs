@@ -77,6 +77,9 @@ const Map<String, String> stringsEn = {
   'stepNameHint': 'Step title...',
   'stepMinutes': 'Minutes',
   'deleteRoutineConfirm': 'Delete this routine?',
+  'routineReminderLabel': 'Schedule daily reminder',
+  'routineReminderPrompt': 'Daily reminder',
+  'routineNotificationBody': 'Time for your routine: {title}',
 
   // Journal
   'journalTitle': 'Journal & Reflection',

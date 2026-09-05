@@ -49,7 +49,7 @@ class AppServices {
     final premium = PremiumService(prefs);
     await premium.init();
     final habit = HabitService(storage, notif);
-    final routine = RoutineService(storage, habit);
+    final routine = RoutineService(storage, habit, notif);
     final journal = JournalService(storage);
     final audio = AudioService();
     final widgetSync = WidgetSyncService(habit, premium, preferences);

@@ -53,6 +53,9 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
   late AnimationController _breathingAnimController;
   late AnimationController _bgAnimController;
 
+  AppServices? _appServices;
+  bool _cleanedUp = false;
+
   @override
   void initState() {
     super.initState();
@@ -86,6 +89,32 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    try {
+      _appServices = AppServices.of(context);
+    } catch (_) {}
+  }
+
+  void _cleanupSessionResources() {
+    if (_cleanedUp) return;
+    _cleanedUp = true;
+
+    _timer?.cancel();
+    if (_breathingAnimController.isAnimating) {
+      _breathingAnimController.stop();
+    }
+
+    try {
+      _appServices?.audioService.stopAmbient();
+    } catch (_) {}
+
+    try {
+      DndService.disableDnd();
+    } catch (_) {}
+  }
+
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.paused ||
@@ -100,7 +129,7 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
         });
       }
       try {
-        AppServices.of(context).audioService.stopAmbient();
+        _appServices?.audioService.stopAmbient();
       } catch (_) {}
     }
   }
@@ -108,15 +137,9 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _timer?.cancel();
+    _cleanupSessionResources();
     _breathingAnimController.dispose();
     _bgAnimController.dispose();
-    try {
-      AppServices.of(context).audioService.stopAmbient();
-    } catch (_) {}
-    try {
-      DndService.disableDnd();
-    } catch (_) {}
     super.dispose();
   }
 
@@ -278,18 +301,23 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
         break;
     }
 
-    return Scaffold(
-      backgroundColor: bgDark,
-      body: Stack(
-        children: [
-          // 1. Subtle, Calm Animated Abstract Mesh / Orbs Background
-          Positioned.fill(
-            child: _AbstractBreathingBackground(
-              animation: _bgAnimController,
-              primary: accentPrimary,
-              secondary: accentSecondary,
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, _) {
+        _cleanupSessionResources();
+      },
+      child: Scaffold(
+        backgroundColor: bgDark,
+        body: Stack(
+          children: [
+            // 1. Subtle, Calm Animated Abstract Mesh / Orbs Background
+            Positioned.fill(
+              child: _AbstractBreathingBackground(
+                animation: _bgAnimController,
+                primary: accentPrimary,
+                secondary: accentSecondary,
+              ),
             ),
-          ),
 
           // 2. Interactive Foreground Content
           SafeArea(
@@ -359,7 +387,7 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
                                     icon: Icon(Icons.close_rounded, color: textWhite),
                                     tooltip: l10n.t('actionClose'),
                                     onPressed: () {
-                                      audio.stopAmbient();
+                                      _cleanupSessionResources();
                                       Navigator.of(context).pop();
                                     },
                                   ),
@@ -721,6 +749,7 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
             ),
           ),
         ],
+      ),
       ),
     );
   }

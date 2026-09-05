@@ -77,6 +77,9 @@ const Map<String, String> stringsIt = {
   'stepNameHint': 'Titolo del passaggio...',
   'stepMinutes': 'Minuti',
   'deleteRoutineConfirm': 'Eliminare questa routine?',
+  'routineReminderLabel': 'Pianifica promemoria giornaliero',
+  'routineReminderPrompt': 'Promemoria giornaliero',
+  'routineNotificationBody': 'Momento per la tua routine: {title}',
 
   // Journal
   'journalTitle': 'Diario & Riflessione',

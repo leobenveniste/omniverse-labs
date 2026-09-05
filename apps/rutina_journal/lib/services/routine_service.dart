@@ -4,10 +4,12 @@ import 'package:uuid/uuid.dart';
 import '../models/routine.dart';
 import 'storage_service.dart';
 import 'habit_service.dart';
+import 'notification_service.dart';
 
 class RoutineService extends ChangeNotifier {
   final StorageService _storage;
   final HabitService _habitService;
+  final NotificationService? _notificationService;
   final Uuid _uuid = const Uuid();
 
   List<Routine> _routines = [];
@@ -20,7 +22,7 @@ class RoutineService extends ChangeNotifier {
   bool _isRunning = false;
   Timer? _timer;
 
-  RoutineService(this._storage, this._habitService) {
+  RoutineService(this._storage, this._habitService, [this._notificationService]) {
     load();
   }
 
@@ -81,7 +83,40 @@ class RoutineService extends ChangeNotifier {
     }
 
     _isLoading = false;
+    _syncAllRoutineReminders();
     notifyListeners();
+  }
+
+  void _syncAllRoutineReminders() {
+    if (_notificationService == null) return;
+    for (final r in _routines) {
+      _scheduleRoutineReminderIfNeeded(r);
+    }
+  }
+
+  void _scheduleRoutineReminderIfNeeded(Routine routine) {
+    if (_notificationService == null) return;
+    // Routine IDs use routine.id.hashCode & 0x7FFFFFFF so they don't collide with habit IDs
+    final notifId = (routine.id.hashCode & 0x7FFFFFFF);
+
+    if (routine.reminderEnabled && routine.reminderTime != null && routine.reminderTime!.isNotEmpty) {
+      final parts = routine.reminderTime!.split(':');
+      if (parts.length == 2) {
+        final hour = int.tryParse(parts[0]) ?? 8;
+        final minute = int.tryParse(parts[1]) ?? 0;
+        _notificationService.scheduleDaily(
+          id: notifId,
+          channelId: 'routine_prompts',
+          channelName: 'Promociones de Rutinas',
+          title: routine.title,
+          body: 'Momento para tu rutina: ${routine.title}',
+          hour: hour,
+          minute: minute,
+        );
+      }
+    } else {
+      _notificationService.cancel(notifId);
+    }
   }
 
   List<Routine> _buildDefaultRoutines() {
@@ -338,6 +373,7 @@ class RoutineService extends ChangeNotifier {
   Future<void> addRoutine(Routine routine) async {
     _routines.add(routine);
     await _storage.saveRoutines(_routines);
+    _scheduleRoutineReminderIfNeeded(routine);
     notifyListeners();
   }
 
@@ -346,6 +382,7 @@ class RoutineService extends ChangeNotifier {
     if (index != -1) {
       _routines[index] = routine;
       await _storage.saveRoutines(_routines);
+      _scheduleRoutineReminderIfNeeded(routine);
       notifyListeners();
     }
   }
@@ -353,6 +390,7 @@ class RoutineService extends ChangeNotifier {
   Future<void> deleteRoutine(String routineId) async {
     _routines.removeWhere((r) => r.id == routineId);
     await _storage.saveRoutines(_routines);
+    _notificationService?.cancel(routineId.hashCode & 0x7FFFFFFF);
     notifyListeners();
   }
 

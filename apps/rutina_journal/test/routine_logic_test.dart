@@ -19,7 +19,7 @@ void main() {
     storage = StorageService(prefs);
     final notif = NotificationService();
     habitService = HabitService(storage, notif);
-    routineService = RoutineService(storage, habitService);
+    routineService = RoutineService(storage, habitService, notif);
     await routineService.load();
   });
 
@@ -50,12 +50,14 @@ void main() {
       expect(routineService.isRunning, isFalse);
     });
 
-    test('Can add, update, and delete custom routines', () async {
+    test('Can add, update, and delete custom routines with reminders', () async {
       final newRoutine = Routine(
         id: 'test_routine_1',
         title: 'Deep Work Sprint',
         description: 'Focus session',
         iconName: 'laptop_mac',
+        reminderTime: '09:00',
+        reminderEnabled: true,
         steps: const [
           RoutineStep(id: 's1', title: 'Prepare workspace', durationSeconds: 120),
           RoutineStep(id: 's2', title: 'Deep coding', durationSeconds: 1500),
@@ -65,10 +67,13 @@ void main() {
       await routineService.addRoutine(newRoutine);
       expect(routineService.routines.length, 7);
       expect(routineService.routines.any((r) => r.id == 'test_routine_1'), isTrue);
+      expect(routineService.routines.firstWhere((r) => r.id == 'test_routine_1').reminderEnabled, isTrue);
+      expect(routineService.routines.firstWhere((r) => r.id == 'test_routine_1').reminderTime, '09:00');
 
-      final updated = newRoutine.copyWith(title: 'Deep Work Sprint 2.0');
+      final updated = newRoutine.copyWith(title: 'Deep Work Sprint 2.0', reminderEnabled: false);
       await routineService.updateRoutine(updated);
       expect(routineService.routines.firstWhere((r) => r.id == 'test_routine_1').title, 'Deep Work Sprint 2.0');
+      expect(routineService.routines.firstWhere((r) => r.id == 'test_routine_1').reminderEnabled, isFalse);
 
       await routineService.deleteRoutine('test_routine_1');
       expect(routineService.routines.length, 6);

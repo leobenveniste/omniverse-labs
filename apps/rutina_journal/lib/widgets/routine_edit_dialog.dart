@@ -41,6 +41,8 @@ class _RoutineEditDialogState extends State<RoutineEditDialog> {
   late TextEditingController _descController;
   late String _selectedIconName;
   late List<_StepDraft> _steps;
+  late bool _reminderEnabled;
+  late TimeOfDay _reminderTime;
 
   final List<Map<String, dynamic>> _iconOptions = const [
     {'name': 'wb_sunny', 'icon': Icons.wb_sunny_rounded},
@@ -75,6 +77,22 @@ class _RoutineEditDialogState extends State<RoutineEditDialog> {
     _titleController = TextEditingController();
     _descController = TextEditingController();
     _selectedIconName = widget.routine?.iconName ?? 'wb_sunny';
+    _reminderEnabled = widget.routine?.reminderEnabled ?? false;
+
+    if (widget.routine?.reminderTime != null) {
+      final parts = widget.routine!.reminderTime!.split(':');
+      if (parts.length == 2) {
+        _reminderTime = TimeOfDay(
+          hour: int.tryParse(parts[0]) ?? 8,
+          minute: int.tryParse(parts[1]) ?? 0,
+        );
+      } else {
+        _reminderTime = const TimeOfDay(hour: 8, minute: 0);
+      }
+    } else {
+      _reminderTime = const TimeOfDay(hour: 8, minute: 0);
+    }
+
     _steps = widget.routine != null
         ? widget.routine!.steps
             .map((s) => _StepDraft(
@@ -146,6 +164,10 @@ class _RoutineEditDialogState extends State<RoutineEditDialog> {
       ));
     }
 
+    final timeStr = _reminderEnabled
+        ? '${_reminderTime.hour.toString().padLeft(2, '0')}:${_reminderTime.minute.toString().padLeft(2, '0')}'
+        : null;
+
     final newRoutine = Routine(
       id: widget.routine?.id ?? const Uuid().v4(),
       title: title,
@@ -153,8 +175,8 @@ class _RoutineEditDialogState extends State<RoutineEditDialog> {
       iconName: _selectedIconName,
       steps: parsedSteps,
       tiedHabitIds: widget.routine?.tiedHabitIds ?? const [],
-      reminderTime: widget.routine?.reminderTime,
-      reminderEnabled: widget.routine?.reminderEnabled ?? false,
+      reminderTime: timeStr,
+      reminderEnabled: _reminderEnabled,
     );
 
     HapticsHelper.medium();
@@ -366,6 +388,54 @@ class _RoutineEditDialogState extends State<RoutineEditDialog> {
                       ),
                     );
                   }),
+                  const SizedBox(height: AppSpacing.md),
+
+                  // Routine Reminder Toggle & Time Picker
+                  Container(
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                      border: Border.all(
+                        color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                      ),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                    child: SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      secondary: Icon(
+                        Icons.alarm_rounded,
+                        color: _reminderEnabled ? theme.colorScheme.primary : theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                      ),
+                      title: Text(
+                        l10n.t('routineReminderLabel'),
+                        style: AppTypography.body(theme.colorScheme.onSurface, isMedium: true),
+                      ),
+                      subtitle: _reminderEnabled
+                          ? Text(
+                              _reminderTime.format(context),
+                              style: AppTypography.caption(theme.colorScheme.primary, isMedium: true),
+                            )
+                          : null,
+                      value: _reminderEnabled,
+                      onChanged: (val) async {
+                        HapticsHelper.selection();
+                        if (val) {
+                          final picked = await showTimePicker(
+                            context: context,
+                            initialTime: _reminderTime,
+                          );
+                          if (picked != null) {
+                            setState(() {
+                              _reminderTime = picked;
+                              _reminderEnabled = true;
+                            });
+                          }
+                        } else {
+                          setState(() => _reminderEnabled = false);
+                        }
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),
