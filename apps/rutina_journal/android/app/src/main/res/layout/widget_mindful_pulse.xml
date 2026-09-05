@@ -50,7 +50,7 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- Center: Mindful Completion Percentage & Progress -->
+    <!-- Center 1: Normal In-Progress Stats -->
     <LinearLayout
         android:id="@+id/pulse_center_stats"
         android:layout_width="match_parent"
@@ -89,7 +89,77 @@
             android:progressTint="#2D4A2B" />
     </LinearLayout>
 
-    <!-- Bottom: Zen Intention / Focus Action Trigger -->
+    <!-- Center 2: Completed State (Celebration) -->
+    <LinearLayout
+        android:id="@+id/pulse_completed_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🏆"
+            android:textSize="28sp" />
+
+        <TextView
+            android:id="@+id/pulse_completed_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="¡Día Completado!"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#2E7D32" />
+
+        <TextView
+            android:id="@+id/pulse_completed_sub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Todos tus hábitos listos"
+            android:textSize="11sp"
+            android:textColor="#5A665D" />
+    </LinearLayout>
+
+    <!-- Center 3: Empty State (No habits today) -->
+    <LinearLayout
+        android:id="@+id/pulse_empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🌱"
+            android:textSize="24sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Sin hábitos para hoy"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="#1B221C" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Toca para planificar tu día"
+            android:textSize="10sp"
+            android:textColor="#8A968C" />
+    </LinearLayout>
+
+    <!-- Bottom: Zen Quote / Motivation -->
     <TextView
         android:id="@+id/pulse_zen_quote"
         android:layout_width="match_parent"

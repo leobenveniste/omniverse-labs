@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
 import '../services/habit_service.dart';
+import '../services/preferences_service.dart';
 import '../services/premium_service.dart';
 import '../utils/date_utils.dart';
 
@@ -8,11 +10,18 @@ class WidgetSyncService {
   static const String appGroupId = 'group.com.omniverselabs.ritmo';
   static const String androidPulseWidget = 'RitmoPulseWidgetProvider';
   static const String androidBentoWidget = 'RitmoBentoWidgetProvider';
+  static const String androidBreathingWidget = 'RitmoBreathingWidgetProvider';
+  static const String androidMiniPulseWidget = 'RitmoMiniPulseWidgetProvider';
 
   final HabitService _habitService;
   final PremiumService _premiumService;
+  final PreferencesService? _preferencesService;
 
-  WidgetSyncService(this._habitService, this._premiumService) {
+  WidgetSyncService(
+    this._habitService,
+    this._premiumService, [
+    this._preferencesService,
+  ]) {
     _init();
   }
 
@@ -20,6 +29,7 @@ class WidgetSyncService {
     HomeWidget.setAppGroupId(appGroupId);
     _habitService.addListener(syncWidgets);
     _premiumService.addListener(syncWidgets);
+    _preferencesService?.addListener(syncWidgets);
     syncWidgets();
   }
 
@@ -48,30 +58,41 @@ class WidgetSyncService {
 
       final phase = _calculateCircadianPhase();
       final isPro = _premiumService.isPro;
+      final allCompleted = doneCount >= totalCount && totalCount > 0;
+      final hasHabits = totalCount > 0;
+      final themePreset = _preferencesService?.themePreset.name ?? 'calmSage';
+      final isDark = _preferencesService?.themeMode == ThemeMode.dark;
+      final breathingMinutes = _premiumService.todayFocusSessionsCount * 5;
 
-      // Common Pulse data
+      // Common Widget data
       await HomeWidget.saveWidgetData<int>('pulse_streak', maxStreak);
       await HomeWidget.saveWidgetData<int>('pulse_done_count', doneCount);
       await HomeWidget.saveWidgetData<int>('pulse_total_count', totalCount);
+      await HomeWidget.saveWidgetData<bool>('all_completed', allCompleted);
+      await HomeWidget.saveWidgetData<bool>('has_habits', hasHabits);
       await HomeWidget.saveWidgetData<String>('circadian_phase', phase);
+      await HomeWidget.saveWidgetData<String>('theme_preset', themePreset);
+      await HomeWidget.saveWidgetData<bool>('is_dark', isDark);
       await HomeWidget.saveWidgetData<bool>('is_pro', isPro);
+      await HomeWidget.saveWidgetData<int>('breathing_minutes', breathingMinutes);
 
-      // Top 3 habits for Bento Matrix
+      // Top 3 habits for Bento Matrix (fixed key indexing)
       for (int i = 0; i < 3; i++) {
+        final slotIndex = i + 1;
         if (i < habits.length) {
           final h = habits[i];
           final done = _habitService.isCompleted(h.id, dateKey);
-          await HomeWidget.saveWidgetData<String>('bento_habit__title', h.title);
-          await HomeWidget.saveWidgetData<bool>('bento_habit__done', done);
-          await HomeWidget.saveWidgetData<String>('bento_habit__id', h.id);
+          await HomeWidget.saveWidgetData<String>('bento_habit_${slotIndex}_title', h.title);
+          await HomeWidget.saveWidgetData<bool>('bento_habit_${slotIndex}_done', done);
+          await HomeWidget.saveWidgetData<String>('bento_habit_${slotIndex}_id', h.id);
         } else {
-          await HomeWidget.saveWidgetData<String>('bento_habit__title', '');
-          await HomeWidget.saveWidgetData<bool>('bento_habit__done', false);
-          await HomeWidget.saveWidgetData<String>('bento_habit__id', '');
+          await HomeWidget.saveWidgetData<String>('bento_habit_${slotIndex}_title', '');
+          await HomeWidget.saveWidgetData<bool>('bento_habit_${slotIndex}_done', false);
+          await HomeWidget.saveWidgetData<String>('bento_habit_${slotIndex}_id', '');
         }
       }
 
-      // Trigger native widget update
+      // Trigger updates across all native widget providers
       await HomeWidget.updateWidget(
         name: androidPulseWidget,
         androidName: androidPulseWidget,
@@ -80,14 +101,22 @@ class WidgetSyncService {
         name: androidBentoWidget,
         androidName: androidBentoWidget,
       );
+      await HomeWidget.updateWidget(
+        name: androidBreathingWidget,
+        androidName: androidBreathingWidget,
+      );
+      await HomeWidget.updateWidget(
+        name: androidMiniPulseWidget,
+        androidName: androidMiniPulseWidget,
+      );
     } catch (e) {
       if (kDebugMode) {
-        print('WidgetSyncService error: ');
+        print('WidgetSyncService error: $e');
       }
     }
   }
 
-  /// Checks if the widget requested an interactive toggle while the app was brought up
+  /// Checks and reconciles all pending toggles from the interactive home widget
   Future<void> handlePendingWidgetLaunch() async {
     try {
       final pendingHabitId = await HomeWidget.getWidgetData<String>('pending_toggle_habit_id');
@@ -95,9 +124,18 @@ class WidgetSyncService {
         await HomeWidget.saveWidgetData<String>('pending_toggle_habit_id', '');
         await _habitService.toggleHabit(pendingHabitId, DateTime.now());
       }
+
+      final pendingBatch = await HomeWidget.getWidgetData<String>('pending_toggle_batch');
+      if (pendingBatch != null && pendingBatch.isNotEmpty) {
+        await HomeWidget.saveWidgetData<String>('pending_toggle_batch', '');
+        final ids = pendingBatch.split(',').where((id) => id.isNotEmpty);
+        for (final id in ids) {
+          await _habitService.toggleHabit(id, DateTime.now());
+        }
+      }
     } catch (e) {
       if (kDebugMode) {
-        print('handlePendingWidgetLaunch error: ');
+        print('handlePendingWidgetLaunch error: $e');
       }
     }
   }

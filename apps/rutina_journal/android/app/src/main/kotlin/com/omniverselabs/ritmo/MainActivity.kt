@@ -1,6 +1,7 @@
 package com.omniverselabs.ritmo
 
 import android.app.NotificationManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -61,6 +62,47 @@ class MainActivity : FlutterActivity() {
                             result.success(true)
                         } catch (e: Exception) {
                             result.error("RESTORE_DND_FAILED", e.message, null)
+                        }
+                    } else {
+                        result.success(false)
+                    }
+                }
+                else -> {
+                    result.notImplemented()
+                }
+            }
+        }
+
+        // Widget Pinning Channel
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.omniverselabs.ritmo/widgets").setMethodCallHandler { call, result ->
+            val appWidgetManager = getSystemService(Context.APPWIDGET_SERVICE) as? android.appwidget.AppWidgetManager
+            if (appWidgetManager == null) {
+                result.error("UNAVAILABLE", "AppWidgetManager unavailable", null)
+                return@setMethodCallHandler
+            }
+
+            when (call.method) {
+                "isPinningSupported" -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        result.success(appWidgetManager.isRequestPinAppWidgetSupported)
+                    } else {
+                        result.success(false)
+                    }
+                }
+                "pinWidget" -> {
+                    val providerName = call.argument<String>("provider")
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && providerName != null) {
+                        try {
+                            val providerClass = Class.forName("com.omniverselabs.ritmo.$providerName")
+                            val providerComponent = ComponentName(this, providerClass)
+                            if (appWidgetManager.isRequestPinAppWidgetSupported) {
+                                val success = appWidgetManager.requestPinAppWidget(providerComponent, null, null)
+                                result.success(success)
+                            } else {
+                                result.success(false)
+                            }
+                        } catch (e: Exception) {
+                            result.error("PIN_FAILED", e.message, null)
                         }
                     } else {
                         result.success(false)

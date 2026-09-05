@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_breathing_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@drawable/widget_bg_card">
+
+    <!-- Top Header: Zen Pill -->
+    <LinearLayout
+        android:id="@+id/breathing_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/breathing_tag"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="🧘 RITMO • CALMA"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#2D4A2B"
+            android:maxLines="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🌙 DND"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:textColor="#72D572"
+            android:background="@drawable/widget_item_bg"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp" />
+    </LinearLayout>
+
+    <!-- Center: Breathing Orb Button -->
+    <LinearLayout
+        android:id="@+id/breathing_center_cta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/breathing_circle_btn"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="@drawable/widget_circle_accent"
+            android:gravity="center"
+            android:text="✦"
+            android:textColor="#FFFFFF"
+            android:textSize="26sp" />
+
+        <TextView
+            android:id="@+id/breathing_cta_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Toca para Respirar"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#1B221C" />
+    </LinearLayout>
+
+    <!-- Bottom: Today Session Summary -->
+    <TextView
+        android:id="@+id/breathing_session_minutes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:text="Pausa guiada • 4-4-4-4"
+        android:textSize="11sp"
+        android:textColor="#5A665D"
+        android:maxLines="1"
+        android:ellipsize="end" />
+
+</RelativeLayout>

@@ -299,4 +299,9 @@ const Map<String, String> stringsEn = {
   'routineWorkoutWarmupDesc': 'Dynamic mobility and mental focus for energized training.',
   'allHabitsCompletedTitle': 'All Habits Conquered!',
   'allHabitsCompletedSubtitle': 'You completed all your habits for today. Consistency builds your best self.',
+  'widgetsGalleryTitle': 'Home Screen Widgets',
+  'widgetsGalleryHeader': 'Your habits on your screen',
+  'widgetsGallerySub': 'Add widgets to track your streak and breathe with 1 tap.',
+  'widgetsOptionTitle': 'Android Widgets',
+  'widgetsOptionSubtitle': 'Mindful Pulse, Bento Matrix, Breathing and Mini Streak.',
 };

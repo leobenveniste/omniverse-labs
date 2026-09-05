@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_mini_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="8dp"
+    android:background="@drawable/widget_bg_card">
+
+    <!-- Center Content: Flame + Streak + Mini Percent -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/mini_flame"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🔥"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/mini_streak_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="7"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#C85A3B" />
+
+        <TextView
+            android:id="@+id/mini_fraction_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="3/4"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:textColor="#2D4A2B" />
+    </LinearLayout>
+
+</RelativeLayout>

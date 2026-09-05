@@ -299,4 +299,9 @@ const Map<String, String> stringsFr = {
   'routineWorkoutWarmupDesc': 'Mobilité dynamique et concentration pour un entraînement énergique.',
   'allHabitsCompletedTitle': 'Tous les Habitudes Accomplies !',
   'allHabitsCompletedSubtitle': 'Vous avez complété toutes vos habitudes du jour. La constance construit votre meilleure version.',
+  'widgetsGalleryTitle': 'Widgets de l’Écran d’Accueil',
+  'widgetsGalleryHeader': 'Vos habitudes sur votre écran',
+  'widgetsGallerySub': 'Ajoutez des widgets pour suivre votre série et respirer en 1 geste.',
+  'widgetsOptionTitle': 'Widgets pour Android',
+  'widgetsOptionSubtitle': 'Pouls Quotidien, Matrice Bento, Respiration et Mini Série.',
 };

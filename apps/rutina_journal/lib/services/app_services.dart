@@ -52,7 +52,7 @@ class AppServices {
     final routine = RoutineService(storage, habit);
     final journal = JournalService(storage);
     final audio = AudioService();
-    final widgetSync = WidgetSyncService(habit, premium);
+    final widgetSync = WidgetSyncService(habit, premium, preferences);
     await widgetSync.handlePendingWidgetLaunch();
 
     return AppServices._(

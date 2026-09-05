@@ -13,6 +13,7 @@ import '../theme/app_typography.dart';
 import '../utils/haptics_helper.dart';
 import '../widgets/about_dialog_widget.dart';
 import '../widgets/paywall_sheet.dart';
+import 'widgets_gallery_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   final PreferencesService prefs;
@@ -114,6 +115,40 @@ class SettingsScreen extends StatelessWidget {
                       _buildThemeChip(context, ThemeMode.dark, l10n.t('themeDark'), Icons.dark_mode_rounded),
                     ],
                   ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+
+              // Android Widgets Gallery
+              _buildSectionHeader(context, l10n.t('widgetsOptionTitle')),
+              Card(
+                child: ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(Icons.widgets_rounded, color: theme.colorScheme.primary),
+                  ),
+                  title: Text(
+                    l10n.t('widgetsGalleryTitle'),
+                    style: AppTypography.body(theme.colorScheme.onSurface, isMedium: true),
+                  ),
+                  subtitle: Text(
+                    l10n.t('widgetsOptionSubtitle'),
+                    style: AppTypography.caption(theme.colorScheme.onSurfaceVariant),
+                  ),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () {
+                    HapticsHelper.selection();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => WidgetsGalleryScreen(premiumService: premiumService),
+                      ),
+                    );
+                  },
                 ),
               ),
               const SizedBox(height: AppSpacing.md),
