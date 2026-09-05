@@ -54,15 +54,15 @@ class RitmoPulseWidgetProvider : AppWidgetProvider() {
             // Circadian Palette Adjustment
             when (phase) {
                 "afternoon" -> {
-                    views.setTextViewText(R.id.pulse_time_greeting, "Ritmo • Tarde solar")
+                    views.setTextViewText(R.id.pulse_time_greeting, "Ritmo • Tarde")
                     views.setTextColor(R.id.pulse_time_greeting, Color.parseColor("#C85A3B"))
                 }
                 "night" -> {
-                    views.setTextViewText(R.id.pulse_time_greeting, "Ritmo • Serenidad nocturna")
+                    views.setTextViewText(R.id.pulse_time_greeting, "Ritmo • Noche")
                     views.setTextColor(R.id.pulse_time_greeting, Color.parseColor("#5C6BC0"))
                 }
                 else -> {
-                    views.setTextViewText(R.id.pulse_time_greeting, "Ritmo • Mañana zen")
+                    views.setTextViewText(R.id.pulse_time_greeting, "Ritmo • Mañana")
                     views.setTextColor(R.id.pulse_time_greeting, Color.parseColor("#2D4A2B"))
                 }
             }
@@ -172,7 +172,8 @@ class RitmoBentoWidgetProvider : AppWidgetProvider() {
             val allCompleted = widgetData.getBoolean("all_completed", false)
             val hasHabits = widgetData.getBoolean("has_habits", totalCount > 0)
 
-            views.setTextViewText(R.id.bento_streak_text, "$streak días")
+            val streakLabel = if (streak == 1) "1 día" else "$streak días"
+            views.setTextViewText(R.id.bento_streak_text, streakLabel)
 
             when (phase) {
                 "afternoon" -> views.setTextViewText(R.id.bento_circadian_tag, "RITMO • TARDE")

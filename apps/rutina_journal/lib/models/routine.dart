@@ -58,12 +58,14 @@ class Routine {
     switch (iconName) {
       case 'nightlight_round':
       case 'bedtime':
-        return Icons.nightlight_round;
+        return Icons.bedtime_rounded;
       case 'laptop_mac':
       case 'work':
         return Icons.laptop_mac_rounded;
       case 'fitness_center':
         return Icons.fitness_center_rounded;
+      case 'directions_run':
+        return Icons.directions_run_rounded;
       case 'coffee':
         return Icons.coffee_rounded;
       case 'menu_book':
@@ -72,6 +74,8 @@ class Routine {
         return Icons.spa_rounded;
       case 'self_improvement':
         return Icons.self_improvement_rounded;
+      case 'center_focus_strong':
+        return Icons.center_focus_strong_rounded;
       case 'timer':
         return Icons.timer_rounded;
       case 'wb_sunny':

@@ -3,7 +3,7 @@
     android:id="@+id/widget_pulse_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
+    android:padding="12dp"
     android:background="@drawable/widget_bg_card">
 
     <!-- Top Row: Circadian Greeting & Flame Streak -->
@@ -20,23 +20,30 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Ritmo • Hoy"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:textStyle="bold"
             android:textColor="#2D4A2B"
             android:maxLines="1"
+            android:singleLine="true"
             android:ellipsize="end" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:background="@drawable/widget_item_bg"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="🔥"
-                android:textSize="12sp" />
+                android:textSize="10sp" />
 
             <TextView
                 android:id="@+id/pulse_streak_count"
@@ -44,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="2dp"
                 android:text="7"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:textStyle="bold"
                 android:textColor="#C85A3B" />
         </LinearLayout>
@@ -64,7 +71,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="75%"
-            android:textSize="32sp"
+            android:textSize="28sp"
             android:textStyle="bold"
             android:textColor="#1B221C" />
 
@@ -74,7 +81,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:text="3 de 4 completados"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:textColor="#5A665D" />
 
         <!-- Slender Progress Bar -->
@@ -82,8 +89,8 @@
             android:id="@+id/pulse_progress_bar"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="6dp"
-            android:layout_marginTop="8dp"
+            android:layout_height="5dp"
+            android:layout_marginTop="6dp"
             android:max="100"
             android:progress="75"
             android:progressTint="#2D4A2B" />
@@ -103,15 +110,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="🏆"
-            android:textSize="28sp" />
+            android:textSize="22sp" />
 
         <TextView
             android:id="@+id/pulse_completed_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="2dp"
             android:text="¡Día Completado!"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:textStyle="bold"
             android:textColor="#2E7D32" />
 
@@ -119,9 +126,9 @@
             android:id="@+id/pulse_completed_sub"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="1dp"
             android:text="Todos tus hábitos listos"
-            android:textSize="11sp"
+            android:textSize="10sp"
             android:textColor="#5A665D" />
     </LinearLayout>
 
@@ -139,12 +146,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="🌱"
-            android:textSize="24sp" />
+            android:textSize="20sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="2dp"
             android:text="Sin hábitos para hoy"
             android:textSize="12sp"
             android:textStyle="bold"
@@ -153,8 +160,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text="Toca para planificar tu día"
+            android:layout_marginTop="1dp"
+            android:text="Toca para planificar"
             android:textSize="10sp"
             android:textColor="#8A968C" />
     </LinearLayout>
@@ -167,9 +174,10 @@
         android:layout_alignParentBottom="true"
         android:gravity="center"
         android:text="🌿 Un pequeño paso para tu paz"
-        android:textSize="11sp"
+        android:textSize="10sp"
         android:textColor="#8A968C"
         android:maxLines="1"
+        android:singleLine="true"
         android:ellipsize="end" />
 
 </RelativeLayout>

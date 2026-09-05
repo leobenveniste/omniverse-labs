@@ -38,7 +38,7 @@ class FocusZoneScreen extends StatefulWidget {
 }
 
 class _FocusZoneScreenState extends State<FocusZoneScreen>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   // Preset breathing durations in minutes
   static const List<int> _presetMinutes = [3, 5, 10, 15, 20];
 
@@ -56,6 +56,7 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _remainingSeconds = _selectedDurationMinutes * 60;
 
     // Continuous controller for box breathing loop (cycle = 4 * section duration)
@@ -85,10 +86,34 @@ class _FocusZoneScreenState extends State<FocusZoneScreen>
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden) {
+      // User left the app or switched tasks: immediately stop sound & pause timer
+      if (_isRunning) {
+        setState(() {
+          _isRunning = false;
+          _breathingAnimController.stop();
+          _timer?.cancel();
+        });
+      }
+      try {
+        AppServices.of(context).audioService.stopAmbient();
+      } catch (_) {}
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     _breathingAnimController.dispose();
     _bgAnimController.dispose();
+    try {
+      AppServices.of(context).audioService.stopAmbient();
+    } catch (_) {}
     try {
       DndService.disableDnd();
     } catch (_) {}

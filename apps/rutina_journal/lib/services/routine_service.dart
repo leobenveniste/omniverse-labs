@@ -56,14 +56,26 @@ class RoutineService extends ChangeNotifier {
       // Seamlessly merge new default routines if not already added
       final existingTitles = _routines.map((r) => r.title).toSet();
       final defaults = _buildDefaultRoutines();
-      bool addedNew = false;
+      bool modified = false;
+      // Ensure existing default routines have their specialized icons updated
+      final defaultIconMap = {
+        for (final d in defaults) d.title: d.iconName,
+      };
+      _routines = _routines.map((r) {
+        if (defaultIconMap.containsKey(r.title) && r.iconName != defaultIconMap[r.title]) {
+          modified = true;
+          return r.copyWith(iconName: defaultIconMap[r.title]);
+        }
+        return r;
+      }).toList();
+
       for (final def in defaults) {
         if (!existingTitles.contains(def.title)) {
           _routines.add(def);
-          addedNew = true;
+          modified = true;
         }
       }
-      if (addedNew) {
+      if (modified) {
         await _storage.saveRoutines(_routines);
       }
     }
@@ -78,6 +90,7 @@ class RoutineService extends ChangeNotifier {
         id: _uuid.v4(),
         title: 'routineMorning',
         description: 'routineMorningDesc',
+        iconName: 'wb_sunny',
         reminderTime: '07:00',
         reminderEnabled: true,
         steps: [
@@ -105,6 +118,7 @@ class RoutineService extends ChangeNotifier {
         id: _uuid.v4(),
         title: 'routineEvening',
         description: 'routineEveningDesc',
+        iconName: 'nightlight_round',
         reminderTime: '21:30',
         reminderEnabled: true,
         steps: [
@@ -132,6 +146,7 @@ class RoutineService extends ChangeNotifier {
         id: _uuid.v4(),
         title: 'routineWork',
         description: 'routineWorkDesc',
+        iconName: 'laptop_mac',
         reminderTime: '18:00',
         steps: [
           RoutineStep(
@@ -158,6 +173,7 @@ class RoutineService extends ChangeNotifier {
         id: _uuid.v4(),
         title: 'routineDeepFocus',
         description: 'routineDeepFocusDesc',
+        iconName: 'center_focus_strong',
         reminderTime: '10:00',
         steps: [
           RoutineStep(
@@ -184,6 +200,7 @@ class RoutineService extends ChangeNotifier {
         id: _uuid.v4(),
         title: 'routineMiddayReset',
         description: 'routineMiddayResetDesc',
+        iconName: 'coffee',
         reminderTime: '14:00',
         steps: [
           RoutineStep(
@@ -210,6 +227,7 @@ class RoutineService extends ChangeNotifier {
         id: _uuid.v4(),
         title: 'routineWorkoutWarmup',
         description: 'routineWorkoutWarmupDesc',
+        iconName: 'fitness_center',
         reminderTime: '18:30',
         steps: [
           RoutineStep(

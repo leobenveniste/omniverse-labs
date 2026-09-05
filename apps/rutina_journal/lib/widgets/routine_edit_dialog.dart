@@ -44,13 +44,15 @@ class _RoutineEditDialogState extends State<RoutineEditDialog> {
 
   final List<Map<String, dynamic>> _iconOptions = const [
     {'name': 'wb_sunny', 'icon': Icons.wb_sunny_rounded},
-    {'name': 'nightlight_round', 'icon': Icons.nightlight_round},
+    {'name': 'nightlight_round', 'icon': Icons.bedtime_rounded},
     {'name': 'laptop_mac', 'icon': Icons.laptop_mac_rounded},
-    {'name': 'fitness_center', 'icon': Icons.fitness_center_rounded},
+    {'name': 'center_focus_strong', 'icon': Icons.center_focus_strong_rounded},
     {'name': 'coffee', 'icon': Icons.coffee_rounded},
-    {'name': 'menu_book', 'icon': Icons.menu_book_rounded},
+    {'name': 'fitness_center', 'icon': Icons.fitness_center_rounded},
+    {'name': 'directions_run', 'icon': Icons.directions_run_rounded},
     {'name': 'spa', 'icon': Icons.spa_rounded},
     {'name': 'self_improvement', 'icon': Icons.self_improvement_rounded},
+    {'name': 'menu_book', 'icon': Icons.menu_book_rounded},
     {'name': 'timer', 'icon': Icons.timer_rounded},
   ];
 

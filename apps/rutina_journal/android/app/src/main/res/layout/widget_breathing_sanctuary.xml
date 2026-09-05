@@ -3,7 +3,7 @@
     android:id="@+id/widget_breathing_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
+    android:padding="12dp"
     android:background="@drawable/widget_bg_card">
 
     <!-- Top Header: Zen Pill -->
@@ -19,19 +19,22 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="🧘 RITMO • CALMA"
+            android:text="🧘 CALMA"
             android:textSize="11sp"
             android:textStyle="bold"
             android:textColor="#2D4A2B"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:singleLine="true"
+            android:ellipsize="end" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
             android:text="🌙 DND"
-            android:textSize="10sp"
+            android:textSize="9sp"
             android:textStyle="bold"
-            android:textColor="#72D572"
+            android:textColor="#2E7D32"
             android:background="@drawable/widget_item_bg"
             android:paddingStart="6dp"
             android:paddingEnd="6dp"
@@ -50,21 +53,21 @@
 
         <TextView
             android:id="@+id/breathing_circle_btn"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
             android:background="@drawable/widget_circle_accent"
             android:gravity="center"
             android:text="✦"
             android:textColor="#FFFFFF"
-            android:textSize="26sp" />
+            android:textSize="22sp" />
 
         <TextView
             android:id="@+id/breathing_cta_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
             android:text="Toca para Respirar"
-            android:textSize="13sp"
+            android:textSize="12sp"
             android:textStyle="bold"
             android:textColor="#1B221C" />
     </LinearLayout>
@@ -77,9 +80,10 @@
         android:layout_alignParentBottom="true"
         android:gravity="center"
         android:text="Pausa guiada • 4-4-4-4"
-        android:textSize="11sp"
+        android:textSize="10sp"
         android:textColor="#5A665D"
         android:maxLines="1"
+        android:singleLine="true"
         android:ellipsize="end" />
 
 </RelativeLayout>

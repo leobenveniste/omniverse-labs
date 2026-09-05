@@ -3,12 +3,12 @@
     android:id="@+id/widget_mini_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="8dp"
+    android:padding="6dp"
     android:background="@drawable/widget_bg_card">
 
     <!-- Center Content: Flame + Streak + Mini Percent -->
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:gravity="center"
@@ -19,25 +19,31 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="🔥"
-            android:textSize="18sp" />
+            android:textSize="15sp"
+            android:includeFontPadding="false" />
 
         <TextView
             android:id="@+id/mini_streak_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
             android:text="7"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:textStyle="bold"
+            android:includeFontPadding="false"
             android:textColor="#C85A3B" />
 
         <TextView
             android:id="@+id/mini_fraction_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="1dp"
             android:text="3/4"
             android:textSize="10sp"
             android:textStyle="bold"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:singleLine="true"
             android:textColor="#2D4A2B" />
     </LinearLayout>
 
