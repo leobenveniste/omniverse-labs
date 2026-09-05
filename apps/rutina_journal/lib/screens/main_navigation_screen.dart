@@ -37,7 +37,6 @@ class MainNavigationScreen extends StatefulWidget {
 class _MainNavigationScreenState extends State<MainNavigationScreen>
     with WidgetsBindingObserver {
   int _currentIndex = 0;
-  bool _handledInitialWidgetLaunch = false;
 
   @override
   void initState() {
@@ -45,6 +44,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen>
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkWidgetDeepLink();
+      _handlePendingWidgetActions();
     });
   }
 
@@ -53,7 +53,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen>
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
       _checkWidgetDeepLink();
+      _handlePendingWidgetActions();
     }
+  }
+
+  Future<void> _handlePendingWidgetActions() async {
+    if (!mounted) return;
+    try {
+      final syncService = AppServices.of(context).widgetSyncService;
+      await syncService.handlePendingWidgetLaunch();
+    } catch (_) {}
   }
 
   @override

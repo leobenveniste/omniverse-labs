@@ -279,7 +279,9 @@ class _WidgetsGalleryScreenState extends State<WidgetsGalleryScreen> {
                   size: 18,
                 ),
                 label: Text(
-                  isLocked ? 'Desbloquear con Ritmo Pro' : 'Añadir a pantalla de inicio',
+                  isLocked
+                      ? 'Desbloquear con Ritmo Pro'
+                      : (_isPinningSupported ? 'Añadir a pantalla de inicio' : 'Cómo añadir widget'),
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 style: FilledButton.styleFrom(

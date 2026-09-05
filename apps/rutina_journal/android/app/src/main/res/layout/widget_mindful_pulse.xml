@@ -149,6 +149,7 @@
             android:textSize="20sp" />
 
         <TextView
+            android:id="@+id/pulse_empty_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
@@ -158,6 +159,7 @@
             android:textColor="#1B221C" />
 
         <TextView
+            android:id="@+id/pulse_empty_subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="1dp"

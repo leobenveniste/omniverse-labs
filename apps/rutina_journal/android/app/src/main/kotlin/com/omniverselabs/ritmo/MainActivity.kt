@@ -11,10 +11,35 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
+    companion object {
+        var activeInstance: MainActivity? = null
+    }
+
     private val DND_CHANNEL = "com.omniverselabs.ritmo/dnd"
     private val WIDGETS_CHANNEL = "com.omniverselabs.ritmo/widgets"
     private var previousInterruptionFilter: Int? = null
     private var pendingOpenScreen: String? = null
+
+    override fun onResume() {
+        super.onResume()
+        activeInstance = this
+        notifyWidgetAction()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (activeInstance == this) {
+            activeInstance = null
+        }
+    }
+
+    fun notifyWidgetAction() {
+        try {
+            flutterEngine?.dartExecutor?.binaryMessenger?.let { messenger ->
+                MethodChannel(messenger, WIDGETS_CHANNEL).invokeMethod("onWidgetSyncRequired", null)
+            }
+        } catch (_: Exception) {}
+    }
 
     override fun onCreate(savedInstanceState: android.os.Bundle?) {
         super.onCreate(savedInstanceState)

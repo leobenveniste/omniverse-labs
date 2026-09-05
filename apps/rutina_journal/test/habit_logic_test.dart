@@ -93,5 +93,28 @@ void main() {
       expect(streak.current, 2);
       expect(streak.best, 2);
     });
+
+    test('Can explicitly set habit completion state idempotently', () async {
+      await service.addHabit(
+        title: 'Caminar',
+        category: HabitCategory.health,
+      );
+
+      final habit = service.habits.first;
+      final now = DateTime.now();
+      final dateKey = AppDateUtils.toDateKey(now);
+
+      // Set true
+      await service.setHabitCompletion(habit.id, now, true);
+      expect(service.isCompleted(habit.id, dateKey), isTrue);
+
+      // Idempotent call
+      await service.setHabitCompletion(habit.id, now, true);
+      expect(service.isCompleted(habit.id, dateKey), isTrue);
+
+      // Set false
+      await service.setHabitCompletion(habit.id, now, false);
+      expect(service.isCompleted(habit.id, dateKey), isFalse);
+    });
   });
 }

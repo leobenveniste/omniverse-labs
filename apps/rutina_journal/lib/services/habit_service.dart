@@ -73,9 +73,39 @@ class HabitService extends ChangeNotifier {
     return done / scheduled.length;
   }
 
+  // Explicitly set completion state (e.g. from home widgets or sync reconciliation)
+  Future<void> setHabitCompletion(String habitId, DateTime date, bool completed) async {
+    final habit = _habits.where((h) => h.id == habitId).firstOrNull;
+    if (habit == null) return;
+
+    final dateKey = AppDateUtils.toDateKey(date);
+    final key = _makeLogKey(habitId, dateKey);
+    final existing = _logs[key];
+
+    if ((existing?.completed ?? false) == completed) {
+      return;
+    }
+
+    final newValue = completed ? habit.targetValue : 0.0;
+    final updatedLog = HabitLog(
+      id: existing?.id ?? _uuid.v4(),
+      habitId: habitId,
+      dateKey: dateKey,
+      currentValue: newValue,
+      completed: completed,
+      completedAt: completed ? DateTime.now() : null,
+      note: existing?.note,
+    );
+
+    _logs[key] = updatedLog;
+    notifyListeners();
+    await _persistLogs();
+  }
+
   // Toggle boolean or mark complete/incomplete
   Future<void> toggleHabit(String habitId, DateTime date) async {
-    final habit = _habits.firstWhere((h) => h.id == habitId);
+    final habit = _habits.where((h) => h.id == habitId).firstOrNull;
+    if (habit == null) return;
     final dateKey = AppDateUtils.toDateKey(date);
     final key = _makeLogKey(habitId, dateKey);
     final existing = _logs[key];
@@ -100,7 +130,8 @@ class HabitService extends ChangeNotifier {
 
   // Update numeric counter habits
   Future<void> updateCounter(String habitId, DateTime date, double delta) async {
-    final habit = _habits.firstWhere((h) => h.id == habitId);
+    final habit = _habits.where((h) => h.id == habitId).firstOrNull;
+    if (habit == null) return;
     final dateKey = AppDateUtils.toDateKey(date);
     final key = _makeLogKey(habitId, dateKey);
     final existing = _logs[key];

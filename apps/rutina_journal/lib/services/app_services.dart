@@ -49,8 +49,11 @@ class AppServices {
     final premium = PremiumService(prefs);
     await premium.init();
     final habit = HabitService(storage, notif);
+    await habit.load();
     final routine = RoutineService(storage, habit, notif);
+    await routine.load();
     final journal = JournalService(storage);
+    await journal.load();
     final audio = AudioService();
     final widgetSync = WidgetSyncService(habit, premium, preferences);
     await widgetSync.handlePendingWidgetLaunch();

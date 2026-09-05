@@ -31,7 +31,17 @@ class WidgetSyncService {
     _habitService.addListener(syncWidgets);
     _premiumService.addListener(syncWidgets);
     _preferencesService?.addListener(syncWidgets);
+    _setupMethodChannel();
     syncWidgets();
+  }
+
+  void _setupMethodChannel() {
+    const channel = MethodChannel('com.omniverselabs.ritmo/widgets');
+    channel.setMethodCallHandler((call) async {
+      if (call.method == 'onWidgetSyncRequired') {
+        await handlePendingWidgetLaunch();
+      }
+    });
   }
 
   String _calculateCircadianPhase() {
@@ -62,7 +72,13 @@ class WidgetSyncService {
       final allCompleted = doneCount >= totalCount && totalCount > 0;
       final hasHabits = totalCount > 0;
       final themePreset = _preferencesService?.themePreset.name ?? 'calmSage';
-      final isDark = _preferencesService?.themeMode == ThemeMode.dark;
+      final themeMode = _preferencesService?.themeMode ?? ThemeMode.system;
+      final themeModeStr = switch (themeMode) {
+        ThemeMode.dark => 'dark',
+        ThemeMode.light => 'light',
+        _ => 'system',
+      };
+      final isDark = themeMode == ThemeMode.dark;
       final breathingMinutes = _premiumService.todayFocusSessionsCount * 5;
 
       // Common Widget data
@@ -73,6 +89,7 @@ class WidgetSyncService {
       await HomeWidget.saveWidgetData<bool>('has_habits', hasHabits);
       await HomeWidget.saveWidgetData<String>('circadian_phase', phase);
       await HomeWidget.saveWidgetData<String>('theme_preset', themePreset);
+      await HomeWidget.saveWidgetData<String>('theme_mode', themeModeStr);
       await HomeWidget.saveWidgetData<bool>('is_dark', isDark);
       await HomeWidget.saveWidgetData<bool>('is_pro', isPro);
       await HomeWidget.saveWidgetData<int>('breathing_minutes', breathingMinutes);
@@ -121,17 +138,33 @@ class WidgetSyncService {
   Future<void> handlePendingWidgetLaunch() async {
     try {
       final pendingHabitId = await HomeWidget.getWidgetData<String>('pending_toggle_habit_id');
+      final pendingBatch = await HomeWidget.getWidgetData<String>('pending_toggle_batch');
+
+      // Clear immediately to avoid duplicate processing
       if (pendingHabitId != null && pendingHabitId.isNotEmpty) {
         await HomeWidget.saveWidgetData<String>('pending_toggle_habit_id', '');
-        await _habitService.toggleHabit(pendingHabitId, DateTime.now());
       }
-
-      final pendingBatch = await HomeWidget.getWidgetData<String>('pending_toggle_batch');
       if (pendingBatch != null && pendingBatch.isNotEmpty) {
         await HomeWidget.saveWidgetData<String>('pending_toggle_batch', '');
-        final ids = pendingBatch.split(',').where((id) => id.isNotEmpty);
-        for (final id in ids) {
-          await _habitService.toggleHabit(id, DateTime.now());
+      }
+
+      final now = DateTime.now();
+
+      if (pendingHabitId != null && pendingHabitId.isNotEmpty) {
+        await _habitService.toggleHabit(pendingHabitId, now);
+      }
+
+      if (pendingBatch != null && pendingBatch.isNotEmpty) {
+        final entries = pendingBatch.split(',').where((e) => e.trim().isNotEmpty);
+        for (final entry in entries) {
+          if (entry.contains(':')) {
+            final parts = entry.split(':');
+            final id = parts[0].trim();
+            final targetDone = parts[1].trim().toLowerCase() == 'true';
+            await _habitService.setHabitCompletion(id, now, targetDone);
+          } else {
+            await _habitService.toggleHabit(entry.trim(), now);
+          }
         }
       }
     } catch (e) {
