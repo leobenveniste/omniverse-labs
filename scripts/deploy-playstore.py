@@ -64,6 +64,110 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
         edit_id = edit_res["id"]
         print(f"Edit Session Created: {edit_id}")
 
+        if package_name == "com.omniverselabs.empacarte":
+            icon_path = r"c:\Projects\Omniverse Labs\apps\empacarte\assets\images\store\app_icon_512x512.png"
+            feature_path = r"c:\Projects\Omniverse Labs\apps\empacarte\assets\images\store\feature_graphic_1024x500.jpg"
+
+            try:
+                print("Updating Store Listing for EmpacArte...")
+                edits.listings().update(
+                    packageName=package_name,
+                    editId=edit_id,
+                    language="es-419",
+                    body={
+                        "title": "EmpacArte: Valija & Pasaporte",
+                        "shortDescription": "El arte de empacar con listas inteligentes, pasaporte e itinerario de viaje.",
+                        "fullDescription": (
+                            "EmpacArte es tu compañero de viaje definitivo, diseñado para que empacar y organizar cada aventura sea un placer ordenado, elegante y sin estrés.\n\n"
+                            "Con una estética artesanal en cuero burdeos y detalles en oro, EmpacArte combina un potente organizador de equipaje con recomendaciones según clima y días, pasaporte táctil personalizable, sellos consulares coleccionables, pases de abordar y herramientas esenciales para aeropuertos y mochileros, 100% offline y privado.\n\n"
+                            "✈️ CARACTERÍSTICAS PRINCIPALES:\n\n"
+                            "1. 🧳 ESTUDIO DE PACKING INTELIGENTE\n"
+                            "• Listas recomendadas automáticas según los días de viaje y el clima del destino (cálido, templado, frío, lluvia, nieve).\n"
+                            "• División de equipaje por bultos: Valija / Mochila Principal, Equipaje de Mano (Carry-On) y Artículo Personal.\n"
+                            "• Artículos esenciales permanentes: Marca 'Siempre llevo esto' para que nunca falten en tus futuros viajes.\n"
+                            "• Progreso visual y feedback háptico al marcar cada prenda o accesorio empacado.\n\n"
+                            "2. 🛂 PASAPORTE TÁCTIL & SELLOS CONSULARES\n"
+                            "• Tu propio pasaporte digital con diseño biométrico y zona MRZ estilizada.\n"
+                            "• Colecciona sellos de aduana y visados exclusivos de destinos icónicos de todo el mundo.\n\n"
+                            "3. 🎫 PASES DE ABORDAR E ITINERARIOS MULTI-DESTINO\n"
+                            "• Crea y consulta tus tarjetas de embarque con código de barras simulado, terminal, puerta, asiento y hora límite de abordaje.\n"
+                            "• Soporte completo para viajes con múltiples tramos y escalas.\n\n"
+                            "4. 🛠️ HERRAMIENTAS ESENCIALES PARA VIAJEROS\n"
+                            "• Convertidor de divisas offline con calculadora rápida.\n"
+                            "• Lista de verificación para salida de aeropuerto y aduanas.\n"
+                            "• Normativas de líquidos (100ml) y baterías en equipaje de mano.\n\n"
+                            "5. 🌍 6 IDIOMAS Y 100% PRIVADO\n"
+                            "• Disponible en Español, Inglés, Portugués, Francés, Alemán e Italiano.\n"
+                            "• Sin registros, sin rastreadores ni anuncios: tus datos quedan exclusivamente en tu teléfono."
+                        ),
+                    }
+                ).execute()
+
+                edits.listings().update(
+                    packageName=package_name,
+                    editId=edit_id,
+                    language="en-US",
+                    body={
+                        "title": "EmpacArte: Packing & Passport",
+                        "shortDescription": "The art of packing, smart luggage checklists, itinerary and travel passport.",
+                        "fullDescription": (
+                            "EmpacArte is your ultimate travel companion, crafted to make packing and organizing every journey an elegant, organized, and stress-free experience.\n\n"
+                            "Featuring a rich burgundy leather aesthetic with gold foil accents, EmpacArte unites smart luggage packing with climate and duration recommendations, a tactile customizable passport, collectible consular stamps, simulated boarding passes, and essential airport travel tools—100% offline and private.\n\n"
+                            "✈️ KEY FEATURES:\n\n"
+                            "1. 🧳 SMART PACKING STUDIO\n"
+                            "• Automated packing recommendations tailored to trip duration and destination weather (warm, mild, cold, rain, snow).\n"
+                            "• Bag segregation: Checked Bag, Carry-On, and Personal Item.\n"
+                            "• Permanent essentials: Flag items with 'Always pack this' so they automatically appear in future trips.\n"
+                            "• Visual progress and tactile haptic feedback as you pack.\n\n"
+                            "2. 🛂 TACTILE PASSPORT & COLLECTIBLE STAMPS\n"
+                            "• Your own digital passport card with biometric styling and MRZ code.\n"
+                            "• Collect customs stamps and consular visas from iconic destinations worldwide.\n\n"
+                            "3. 🎫 BOARDING PASSES & MULTI-CITY ITINERARIES\n"
+                            "• Interactive boarding pass cards with departure countdowns, terminal, gate, seat, and boarding limits.\n"
+                            "• Full multi-destination itinerary support for road trips and connecting flights.\n\n"
+                            "4. 🛠️ ESSENTIAL TRAVELER TOOLS\n"
+                            "• Offline currency calculator.\n"
+                            "• Airport checklist and customs baggage restrictions (100ml liquids, power banks).\n\n"
+                            "5. 🌍 6 GLOBAL LANGUAGES & 100% PRIVATE\n"
+                            "• Localized in English, Spanish, Portuguese, French, German, and Italian.\n"
+                            "• Zero accounts, zero ads, zero telemetry: your travel plans belong strictly to you."
+                        ),
+                    }
+                ).execute()
+                print("EmpacArte Store Listings Updated (es-419 & en-US)!")
+            except Exception as e:
+                print(f"EmpacArte Listing notice: {e}")
+
+            all_langs = ["es-419", "en-US"]
+            for lang in all_langs:
+                if os.path.exists(icon_path):
+                    try:
+                        icon_media = MediaFileUpload(icon_path, mimetype="image/png")
+                        edits.images().upload(
+                            packageName=package_name,
+                            editId=edit_id,
+                            language=lang,
+                            imageType="icon",
+                            media_body=icon_media
+                        ).execute()
+                        print(f"EmpacArte Icon updated for {lang}")
+                    except Exception as e:
+                        print(f"EmpacArte Icon notice ({lang}): {e}")
+
+                if os.path.exists(feature_path):
+                    try:
+                        feat_media = MediaFileUpload(feature_path, mimetype="image/jpeg")
+                        edits.images().upload(
+                            packageName=package_name,
+                            editId=edit_id,
+                            language=lang,
+                            imageType="featureGraphic",
+                            media_body=feat_media
+                        ).execute()
+                        print(f"EmpacArte Feature Graphic updated for {lang}")
+                    except Exception as e:
+                        print(f"EmpacArte Feature Graphic notice ({lang}): {e}")
+
         if package_name == "com.omniverselabs.ritmo":
             icon_path = r"c:\Projects\Omniverse Labs\apps\rutina_journal\assets\images\store\app_icon_512x512.png"
             feature_path = r"c:\Projects\Omniverse Labs\apps\rutina_journal\assets\images\store\feature_graphic_1024x500.jpg"
@@ -337,6 +441,129 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
                     except Exception as e:
                         print(f"Menú Listo Feature Graphic notice ({lang}): {e}")
 
+        if package_name == "com.omniverselabs.charlemos":
+            icon_path = r"c:\Projects\Omniverse Labs\apps\charlemos\assets\store_listing\app_icon_512x512.png"
+            feature_path = r"c:\Projects\Omniverse Labs\apps\charlemos\assets\store_listing\feature_graphic_1024x500.png"
+            ss1_path = r"c:\Projects\Omniverse Labs\apps\charlemos\assets\store_listing\screenshot_01_gameplay.png"
+            ss2_path = r"c:\Projects\Omniverse Labs\apps\charlemos\assets\store_listing\screenshot_02_decks.png"
+
+            try:
+                print("Updating Store Listing for Charlemos...")
+                # es-419
+                edits.listings().update(
+                    packageName=package_name,
+                    editId=edit_id,
+                    language="es-419",
+                    body={
+                        "title": "Charlemos: Juego de Cartas",
+                        "shortDescription": "Preguntas para conectar: 185+ cartas, 3 niveles y retos 100% offline.",
+                        "fullDescription": (
+                            "Charlemos es el juego de cartas conversacional diseñado para transformar cualquier encuentro, cita o sobremesa en una charla inolvidable, profunda y llena de complicidad.\n\n"
+                            "Inspirado en la magia de las preguntas auténticas, Charlemos reúne más de 185 cartas cuidadosamente creadas y organizadas en distintos niveles de profundidad emocional y dinamismo lúdico, 100% offline y sin anuncios.\n\n"
+                            "🎴 NIVELES DE CONVERSACIÓN:\n\n"
+                            "• Nivel 1 • Rompehielos: Preguntas ligeras, anécdotas divertidas y temas casuales para comenzar a hablar sin timidez.\n"
+                            "• Nivel 2 • Profundo: Exploración de valores, decisiones de vida, aprendizajes y recuerdos que forjaron tu personalidad.\n"
+                            "• Nivel 3 • Intimidad: Vulnerabilidad, emociones sinceras, deseos y reflexiones de corazón a corazón.\n"
+                            "• Nivel 4 • Retos & Dinámicas: Desafíos espontáneos, consignas en grupo y dinámicas audaces para divertirse.\n\n"
+                            "📑 MAZOS TEMÁTICOS PARA CADA OCASIÓN:\n\n"
+                            "• Citas & Primeras Salidas: Ideal para romper el hielo y conocer a fondo a esa persona especial desde el primer momento.\n"
+                            "• Parejas & Complicidad: Diseñado para profundizar la confianza mutua, reavivar el fuego y proyectar juntos.\n"
+                            "• Amigos & Sobremesas: Perfecto para previas, asados, viajes y reuniones donde las risas y las historias no tienen fin.\n"
+                            "• Retos & Juegos: Para cuando el grupo quiere dinamismo, risas y desafíos inesperados.\n"
+                            "• Mis Preguntas Personalizadas: Crea y guarda tus propias preguntas a medida para ocasiones únicas.\n\n"
+                            "✨ EXPERIENCIA CUIDADA & MINIMALISTA:\n\n"
+                            "• Botón de Mezcla Rápida: Toca el botón central o desliza la carta para pasar a la siguiente pregunta al instante.\n"
+                            "• Favoritas: Guarda con una estrella las preguntas que más te inspiraron para volver a ellas cuando quieras.\n"
+                            "• Compartir al Instante: Envía cualquier pregunta a tus redes, WhatsApp o mensajes con un solo toque.\n"
+                            "• 3 Paletas Estéticas: Elige entre Desert Rose, Midnight Bento y Calm Sage en Modo Claro y Oscuro.\n"
+                            "• 100% Offline & Privado: Sin cuentas, sin registros y sin recolección de datos.\n"
+                            "• 5 Idiomas Globales: Disponible en Español, Inglés, Portugués, Francés e Italiano."
+                        ),
+                    }
+                ).execute()
+
+                # en-US
+                edits.listings().update(
+                    packageName=package_name,
+                    editId=edit_id,
+                    language="en-US",
+                    body={
+                        "title": "Charlemos: Deep Questions",
+                        "shortDescription": "Meaningful questions to connect: 185+ cards, 3 depth levels & dares.",
+                        "fullDescription": (
+                            "Charlemos is the conversational card game crafted to turn any date, gathering, or late-night talk into an unforgettable, deep, and genuine connection.\n\n"
+                            "Inspired by the power of sincere questions, Charlemos features over 185 carefully curated cards across distinct emotional depths and playful dynamics, 100% offline and completely ad-free.\n\n"
+                            "🎴 CONVERSATION TIERS:\n\n"
+                            "• Level 1 • Icebreaker: Casual prompts, fun anecdotes, and light topics to ease in naturally.\n"
+                            "• Level 2 • Deep: Core values, pivotal life choices, personal lessons, and formative memories.\n"
+                            "• Level 3 • Intimacy: Vulnerability, heartfelt emotions, deep desires, and soul-to-soul reflections.\n"
+                            "• Level 4 • Challenges: Spontaneous party dares, bold prompts, and playful group dynamics.\n\n"
+                            "📑 THEMATIC DECKS FOR EVERY OCCASION:\n\n"
+                            "• Dates & First Encounters: Break the ice effortlessly and get to know each other authentically.\n"
+                            "• Couples & Intimacy: Deepen mutual trust, rekindle chemistry, and dream of the future together.\n"
+                            "• Friends & Gatherings: Perfect for dinner parties, road trips, and evenings where stories never end.\n"
+                            "• Dares & Fun: For when you want high energy, playful laughter, and unexpected moments.\n"
+                            "• Custom Questions: Write and save your own tailored prompts for any special gathering.\n\n"
+                            "✨ CRAFTED USER EXPERIENCE:\n\n"
+                            "• Rapid Shuffle: Tap the glowing center button or swipe cards smoothly with haptic feedback.\n"
+                            "• Star Favorites: Save the most memorable questions to revisit them whenever you wish.\n"
+                            "• Instant Share: Share any prompt to messaging apps or social stories with a single tap.\n"
+                            "• 3 Aesthetic Themes: Switch between Desert Rose, Midnight Bento, and Calm Sage in Light and Dark modes.\n"
+                            "• 100% Offline & Private: No accounts required, no tracking, and total data sovereignty.\n"
+                            "• 5 Global Languages: Fully localized in English, Spanish, Portuguese, French, and Italian."
+                        ),
+                    }
+                ).execute()
+                print("Charlemos Store Listings Updated (es-419 & en-US)!")
+            except Exception as e:
+                print(f"Charlemos Listing notice: {e}")
+
+            all_langs = ["es-419", "en-US"]
+            for lang in all_langs:
+                if os.path.exists(icon_path):
+                    try:
+                        icon_media = MediaFileUpload(icon_path, mimetype="image/png")
+                        edits.images().upload(
+                            packageName=package_name,
+                            editId=edit_id,
+                            language=lang,
+                            imageType="icon",
+                            media_body=icon_media
+                        ).execute()
+                        print(f"Charlemos Icon updated for {lang}")
+                    except Exception as e:
+                        print(f"Charlemos Icon notice ({lang}): {e}")
+
+                if os.path.exists(feature_path):
+                    try:
+                        feat_media = MediaFileUpload(feature_path, mimetype="image/png")
+                        edits.images().upload(
+                            packageName=package_name,
+                            editId=edit_id,
+                            language=lang,
+                            imageType="featureGraphic",
+                            media_body=feat_media
+                        ).execute()
+                        print(f"Charlemos Feature Graphic updated for {lang}")
+                    except Exception as e:
+                        print(f"Charlemos Feature Graphic notice ({lang}): {e}")
+
+                for ss_file in [ss1_path, ss2_path]:
+                    if os.path.exists(ss_file):
+                        try:
+                            ss_media = MediaFileUpload(ss_file, mimetype="image/png")
+                            edits.images().upload(
+                                packageName=package_name,
+                                editId=edit_id,
+                                language=lang,
+                                imageType="phoneScreenshots",
+                                media_body=ss_media
+                            ).execute()
+                            print(f"Charlemos Screenshot {os.path.basename(ss_file)} updated for {lang}")
+                        except Exception as e:
+                            print(f"Charlemos Screenshot notice ({lang}): {e}")
+
+
         print(f"Uploading App Bundle ({os.path.getsize(aab_path) / (1024*1024):.2f} MB)...")
         media = MediaFileUpload(aab_path, mimetype="application/octet-stream", chunksize=10*1024*1024, resumable=True)
         bundle_req = edits.bundles().upload(packageName=package_name, editId=edit_id, media_body=media)
@@ -350,7 +577,11 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
         version_code = response["versionCode"]
         print(f"Bundle Uploaded Successfully! (Version Code: {version_code})")
 
-        if package_name == "com.omniverselabs.ritmo":
+        if package_name == "com.omniverselabs.empacarte":
+            rel_name = release_name or f"1.0.0 (Build {version_code})"
+            rel_notes_es = notes_es or "Lanzamiento inicial de EmpacArte: El arte de empacar con pasaporte táctil, sellos consulares, tarjetas de embarque y 6 idiomas."
+            rel_notes_en = notes_en or "Initial release of EmpacArte: The art of packing with tactile passport, collectible stamps, boarding passes, and 6 languages."
+        elif package_name == "com.omniverselabs.ritmo":
             rel_name = release_name or f"1.0.0 (Build {version_code})"
             rel_notes_es = notes_es or "Lanzamiento inicial de Ritmo: Hábitos atómicos, rutinas guiadas y micro-diario reflexivo con 3 temas estéticos y 5 idiomas."
             rel_notes_en = notes_en or "Initial release of Ritmo: Atomic habit tracking, sequential routines, and mindful micro-journal with 3 aesthetic themes and 5 languages."
