@@ -456,26 +456,29 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
                     language="es-419",
                     body={
                         "title": "Charlemos: Juego de Cartas",
-                        "shortDescription": "Preguntas para conectar: 185+ cartas, 3 niveles y retos 100% offline.",
+                        "shortDescription": "Preguntas para conectar: 490+ cartas, 13 mazos y retos 100% offline.",
                         "fullDescription": (
-                            "Charlemos es el juego de cartas conversacional diseñado para transformar cualquier encuentro, cita o sobremesa en una charla inolvidable, profunda y llena de complicidad.\n\n"
-                            "Inspirado en la magia de las preguntas auténticas, Charlemos reúne más de 185 cartas cuidadosamente creadas y organizadas en distintos niveles de profundidad emocional y dinamismo lúdico, 100% offline y sin anuncios.\n\n"
-                            "🎴 NIVELES DE CONVERSACIÓN:\n\n"
-                            "• Nivel 1 • Rompehielos: Preguntas ligeras, anécdotas divertidas y temas casuales para comenzar a hablar sin timidez.\n"
-                            "• Nivel 2 • Profundo: Exploración de valores, decisiones de vida, aprendizajes y recuerdos que forjaron tu personalidad.\n"
-                            "• Nivel 3 • Intimidad: Vulnerabilidad, emociones sinceras, deseos y reflexiones de corazón a corazón.\n"
-                            "• Nivel 4 • Retos & Dinámicas: Desafíos espontáneos, consignas en grupo y dinámicas audaces para divertirse.\n\n"
-                            "📑 MAZOS TEMÁTICOS PARA CADA OCASIÓN:\n\n"
-                            "• Citas & Primeras Salidas: Ideal para romper el hielo y conocer a fondo a esa persona especial desde el primer momento.\n"
-                            "• Parejas & Complicidad: Diseñado para profundizar la confianza mutua, reavivar el fuego y proyectar juntos.\n"
-                            "• Amigos & Sobremesas: Perfecto para previas, asados, viajes y reuniones donde las risas y las historias no tienen fin.\n"
-                            "• Retos & Juegos: Para cuando el grupo quiere dinamismo, risas y desafíos inesperados.\n"
-                            "• Mis Preguntas Personalizadas: Crea y guarda tus propias preguntas a medida para ocasiones únicas.\n\n"
+                            "Charlemos es el juego de cartas conversacional diseñado para transformar cualquier encuentro, cita, sobremesa o fiesta en una charla inolvidable, profunda y llena de complicidad.\n\n"
+                            "Inspirado en la magia de las preguntas auténticas, Charlemos reúne más de 490 cartas cuidadosamente creadas y organizadas en 13 mazos temáticos y distintos niveles de profundidad emocional, 100% offline y sin anuncios.\n\n"
+                            "🎴 13 MAZOS TEMÁTICOS PARA CADA OCASIÓN:\n\n"
+                            "• Citas & Primeras Salidas: Romper el hielo y conocerse con naturalidad.\n"
+                            "• Parejas & Complicidad: Confianza mutua, acuerdos y proyectos compartidos.\n"
+                            "• Fuego & Fantasías (+18): Intimidad, sensualidad y deseos para parejas.\n"
+                            "• Picante & Tabú (+18): Verdades candentes sin filtro y confesiones íntimas.\n"
+                            "• Retos Picantes (+18): Desafíos atrevidos, miradas fijas, susurros y penitencias.\n"
+                            "• ¿Quién es más probable? (5-10 amigos): Votación simultánea señalando con el dedo.\n"
+                            "• Yo Nunca Nunca (5-10 amigos): Confesiones grupales, tragos y revelaciones.\n"
+                            "• Amigos & Sobremesas: Risas, anécdotas memorables y complicidad.\n"
+                            "• La Previa & Fiesta: Juegos, momentos desinhibidos y risas en grupo.\n"
+                            "• Retos & Dinámicas: Desafíos espontáneos y consignas activas.\n"
+                            "• Dilemas & Filosofía: ¿Qué prefieres? y debates apasionados.\n"
+                            "• Viajes & Rutas: Choques culturales, mochilazos y anécdotas en ruta.\n"
+                            "• Familia & Raíces: Infancia, recuerdos y tradiciones familiares.\n\n"
                             "✨ EXPERIENCIA CUIDADA & MINIMALISTA:\n\n"
-                            "• Botón de Mezcla Rápida: Toca el botón central o desliza la carta para pasar a la siguiente pregunta al instante.\n"
-                            "• Favoritas: Guarda con una estrella las preguntas que más te inspiraron para volver a ellas cuando quieras.\n"
-                            "• Compartir al Instante: Envía cualquier pregunta a tus redes, WhatsApp o mensajes con un solo toque.\n"
-                            "• 3 Paletas Estéticas: Elige entre Desert Rose, Midnight Bento y Calm Sage en Modo Claro y Oscuro.\n"
+                            "• Una Sola Pantalla Limpia: Desliza o toca para pasar a la siguiente pregunta al instante.\n"
+                            "• Selector Rápido de Mazos: Mezcla solo las categorías que quieras para la ocasión.\n"
+                            "• Compartir al Instante: Envía cualquier pregunta a tus redes o chats con un toque.\n"
+                            "• 3 Paletas Estéticas: Coral Mist, Plum Orchid y Sunset Slate en Modo Claro y Oscuro.\n"
                             "• 100% Offline & Privado: Sin cuentas, sin registros y sin recolección de datos.\n"
                             "• 5 Idiomas Globales: Disponible en Español, Inglés, Portugués, Francés e Italiano."
                         ),
@@ -489,27 +492,31 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
                     language="en-US",
                     body={
                         "title": "Charlemos: Deep Questions",
-                        "shortDescription": "Meaningful questions to connect: 185+ cards, 3 depth levels & dares.",
+                        "shortDescription": "Meaningful questions to connect: 490+ cards, 13 decks & dares.",
                         "fullDescription": (
-                            "Charlemos is the conversational card game crafted to turn any date, gathering, or late-night talk into an unforgettable, deep, and genuine connection.\n\n"
-                            "Inspired by the power of sincere questions, Charlemos features over 185 carefully curated cards across distinct emotional depths and playful dynamics, 100% offline and completely ad-free.\n\n"
-                            "🎴 CONVERSATION TIERS:\n\n"
-                            "• Level 1 • Icebreaker: Casual prompts, fun anecdotes, and light topics to ease in naturally.\n"
-                            "• Level 2 • Deep: Core values, pivotal life choices, personal lessons, and formative memories.\n"
-                            "• Level 3 • Intimacy: Vulnerability, heartfelt emotions, deep desires, and soul-to-soul reflections.\n"
-                            "• Level 4 • Challenges: Spontaneous party dares, bold prompts, and playful group dynamics.\n\n"
-                            "📑 THEMATIC DECKS FOR EVERY OCCASION:\n\n"
-                            "• Dates & First Encounters: Break the ice effortlessly and get to know each other authentically.\n"
-                            "• Couples & Intimacy: Deepen mutual trust, rekindle chemistry, and dream of the future together.\n"
-                            "• Friends & Gatherings: Perfect for dinner parties, road trips, and evenings where stories never end.\n"
-                            "• Dares & Fun: For when you want high energy, playful laughter, and unexpected moments.\n"
-                            "• Custom Questions: Write and save your own tailored prompts for any special gathering.\n\n"
-                            "✨ CRAFTED USER EXPERIENCE:\n\n"
-                            "• Rapid Shuffle: Tap the glowing center button or swipe cards smoothly with haptic feedback.\n"
-                            "• Star Favorites: Save the most memorable questions to revisit them whenever you wish.\n"
-                            "• Instant Share: Share any prompt to messaging apps or social stories with a single tap.\n"
-                            "• 3 Aesthetic Themes: Switch between Desert Rose, Midnight Bento, and Calm Sage in Light and Dark modes.\n"
-                            "• 100% Offline & Private: No accounts required, no tracking, and total data sovereignty.\n"
+                            "Charlemos is the conversational card game crafted to turn any date, gathering, late-night talk, or party into an unforgettable, deep, and genuine connection.\n\n"
+                            "Featuring over 490 carefully curated cards across 13 thematic decks and distinct emotional depths, Charlemos is 100% offline and completely ad-free.\n\n"
+                            "🎴 13 THEMATIC DECKS FOR EVERY OCCASION:\n\n"
+                            "• Dates & First Encounters: Break the ice and get to know each other authentically.\n"
+                            "• Couples & Intimacy: Deepen trust, shared dreams, and mutual understanding.\n"
+                            "• Fire & Desires (+18): Sensuality, unspoken fantasies, and passion for couples.\n"
+                            "• Spicy & Taboo (+18): Unfiltered intimate truths and bold confessions.\n"
+                            "• Spicy Dares (+18): Seductive dares, intense eye contact, whispers, and penalties.\n"
+                            "• Most Likely To (5-10 friends): Simultaneous group voting game.\n"
+                            "• Never Have I Ever (5-10 friends): Party confessions, sips, and secrets.\n"
+                            "• Friends & Gatherings: Great laughter, road trip memories, and late-night talks.\n"
+                            "• Pre-Party & Fun: Spontaneous games, wild laughs, and unhinged moments.\n"
+                            "• Dares & Games: Bold prompts and active playful challenges.\n"
+                            "• Dilemmas & Debates: Would you rather? and captivating discussions.\n"
+                            "• Travel & Adventures: Route stories, culture shocks, and dream destinations.\n"
+                            "• Family & Roots: Childhood stories, nostalgia, and beloved traditions.\n\n"
+                            "• Family & Roots: Childhood stories, nostalgia, and beloved traditions.\n\n"
+                            "✨ MINIMALIST CRAFTED EXPERIENCE:\n\n"
+                            "• Pure Single Screen: Tap or swipe smoothly between cards with subtle haptics.\n"
+                            "• Quick Deck Mixer: Choose and combine exactly the decks you want for the night.\n"
+                            "• Instant Share: Share any prompt to messaging apps or social stories with one tap.\n"
+                            "• 3 Aesthetic Themes: Coral Mist, Plum Orchid, and Sunset Slate in Light and Dark.\n"
+                            "• 100% Offline & Private: No accounts required, no tracking, total data privacy.\n"
                             "• 5 Global Languages: Fully localized in English, Spanish, Portuguese, French, and Italian."
                         ),
                     }
@@ -548,6 +555,17 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
                     except Exception as e:
                         print(f"Charlemos Feature Graphic notice ({lang}): {e}")
 
+                # Clear previous screenshots first to avoid exceeding the max 8 screenshots limit
+                try:
+                    edits.images().deleteall(
+                        packageName=package_name,
+                        editId=edit_id,
+                        language=lang,
+                        imageType="phoneScreenshots"
+                    ).execute()
+                except Exception as e:
+                    pass
+
                 for ss_file in [ss1_path, ss2_path]:
                     if os.path.exists(ss_file):
                         try:
@@ -564,47 +582,60 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
                             print(f"Charlemos Screenshot notice ({lang}): {e}")
 
 
+        version_code = None
+        existing_bundles = edits.bundles().list(packageName=package_name, editId=edit_id).execute().get("bundles", [])
+        
         print(f"Uploading App Bundle ({os.path.getsize(aab_path) / (1024*1024):.2f} MB)...")
         media = MediaFileUpload(aab_path, mimetype="application/octet-stream", chunksize=10*1024*1024, resumable=True)
         bundle_req = edits.bundles().upload(packageName=package_name, editId=edit_id, media_body=media)
         
         response = None
-        while response is None:
-            status, response = bundle_req.next_chunk(num_retries=5)
-            if status:
-                print(f"Uploaded {int(status.progress() * 100)}%...")
+        try:
+            while response is None:
+                status, response = bundle_req.next_chunk(num_retries=5)
+                if status:
+                    print(f"Uploaded {int(status.progress() * 100)}%...")
 
-        version_code = response["versionCode"]
-        print(f"Bundle Uploaded Successfully! (Version Code: {version_code})")
+            version_code = response["versionCode"]
+            print(f"Bundle Uploaded Successfully! (Version Code: {version_code})")
+        except HttpError as e:
+            error_data = json.loads(e.content.decode("utf-8")) if e.content else {}
+            err_msg = error_data.get("error", {}).get("message", str(e))
+            if "already been used" in err_msg.lower() and existing_bundles:
+                version_code = max([b["versionCode"] for b in existing_bundles])
+                print(f"Notice: Bundle already uploaded. Reusing latest existing Version Code: {version_code}")
+            else:
+                raise e
 
         if package_name == "com.omniverselabs.empacarte":
             rel_name = release_name or f"1.0.0 (Build {version_code})"
             rel_notes_es = notes_es or "Lanzamiento inicial de EmpacArte: El arte de empacar con pasaporte táctil, sellos consulares, tarjetas de embarque y 6 idiomas."
             rel_notes_en = notes_en or "Initial release of EmpacArte: The art of packing with tactile passport, collectible stamps, boarding passes, and 6 languages."
         elif package_name == "com.omniverselabs.ritmo":
-            rel_name = release_name or f"1.0.0 (Build {version_code})"
-            rel_notes_es = notes_es or "Lanzamiento inicial de Ritmo: Hábitos atómicos, rutinas guiadas y micro-diario reflexivo con 3 temas estéticos y 5 idiomas."
-            rel_notes_en = notes_en or "Initial release of Ritmo: Atomic habit tracking, sequential routines, and mindful micro-journal with 3 aesthetic themes and 5 languages."
+            rel_name = release_name or f"1.0.1 (Build {version_code})"
+            rel_notes_es = notes_es or "Tour guiado interactivo de bienvenida, insignia PRO visible en cabecera, modal de contacto directo y mejoras generales."
+            rel_notes_en = notes_en or "Interactive guided onboarding tour, visible PRO badge in header, direct contact modal and general performance improvements."
         elif package_name == "com.omniverselabs.anotadordejuegos":
-            rel_name = release_name or f"1.0.2 (Build {version_code})"
-            rel_notes_es = notes_es or "Anotador digital todo en uno para juegos de mesa por Omniverse Labs."
-            rel_notes_en = notes_en or "All-in-one tabletop games scorekeeper by Omniverse Labs."
+            rel_name = release_name or f"1.0.5 (Build {version_code})"
+            rel_notes_es = notes_es or "Insignia MESA PRO visible en cabecera principal, modal de contacto y sugerencias directo con el desarrollador, optimizaciones de interfaz."
+            rel_notes_en = notes_en or "Visible MESA PRO badge in home header, direct developer contact and feedback modal, UI improvements."
+        elif package_name == "com.omniverselabs.charlemos":
+            rel_name = release_name or f"1.0.7 (Build {version_code})"
+            rel_notes_es = notes_es or "Gran actualización: Picante & Tabú renovado al 100% (sexy y atrevido), nuevo mazo de Retos Picantes, y 2 nuevas secciones para grupos de 5 a 10 amigos (¿Quién es más probable? y Yo Nunca Nunca). 490+ cartas en 13 mazos temáticos."
+            rel_notes_en = notes_en or "Major update: Revamped Spicy & Taboo deck (sexy & bold), new Spicy Dares deck, and 2 new sections for 5-10 friends (Most Likely To and Never Have I Ever). 490+ cards across 13 themed decks."
         else:
             rel_name = release_name or f"1.2.10 (Build {version_code})"
             rel_notes_es = notes_es or "Nuevo diseño de identidad visual y logotipo de Menú Listo, optimizaciones de rendimiento y estabilidad."
             rel_notes_en = notes_en or "Fresh new logo and visual identity for Menú Listo, along with continuous performance and stability improvements."
 
-        # Deploy to specified track(s)
-        tracks_to_deploy = [t.strip() for t in track.split(",") if t.strip()]
-        for t in tracks_to_deploy:
-            print(f"Assigning Version Code {version_code} to track '{t}'...")
-            track_body = {
-                "track": t,
+        def make_track_body(t_name, status_val):
+            return {
+                "track": t_name,
                 "releases": [
                     {
                         "name": rel_name,
                         "versionCodes": [str(version_code)],
-                        "status": "completed",
+                        "status": status_val,
                         "releaseNotes": [
                             {
                                 "language": "es-419",
@@ -618,13 +649,39 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
                     }
                 ]
             }
+
+        # Deploy to specified track(s)
+        tracks_to_deploy = [t.strip() for t in track.split(",") if t.strip()]
+        for t in tracks_to_deploy:
+            print(f"Assigning Version Code {version_code} to track '{t}'...")
             edits.tracks().update(
                 packageName=package_name,
                 editId=edit_id,
                 track=t,
-                body=track_body
+                body=make_track_body(t, "completed")
             ).execute()
-            print(f"Track '{t}' configured successfully!")
+            print(f"Track '{t}' assigned.")
+
+        # Validate edit session before committing
+        print("Validating Edit session...")
+        try:
+            edits.validate(packageName=package_name, editId=edit_id).execute()
+        except HttpError as val_err:
+            err_json = json.loads(val_err.content.decode("utf-8")) if val_err.content else {}
+            err_str = err_json.get("error", {}).get("message", str(val_err))
+            if "status draft" in err_str.lower():
+                print("Notice: App is in draft mode on Google Play Console. Converting release to 'draft' status...")
+                for t in tracks_to_deploy:
+                    edits.tracks().update(
+                        packageName=package_name,
+                        editId=edit_id,
+                        track=t,
+                        body=make_track_body(t, "draft")
+                    ).execute()
+                edits.validate(packageName=package_name, editId=edit_id).execute()
+                print("Validation succeeded with 'draft' release status.")
+            else:
+                raise val_err
 
         print("Committing and Publishing Edit to Google Play...")
         commit_res = edits.commit(packageName=package_name, editId=edit_id).execute()

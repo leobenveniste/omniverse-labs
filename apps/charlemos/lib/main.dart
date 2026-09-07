@@ -1,0 +1,65 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'core/theme/app_theme.dart';
+import 'l10n/app_localizations.dart';
+import 'screens/splash_screen.dart';
+import 'services/app_services.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final services = await AppServices.init();
+  runApp(CharlemosApp(services: services));
+}
+
+class CharlemosApp extends StatelessWidget {
+  final AppServices services;
+
+  const CharlemosApp({super.key, required this.services});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppServicesScope(
+      services: services,
+      child: AnimatedBuilder(
+        animation: services.preferencesService,
+        builder: (context, _) {
+          final prefs = services.preferencesService;
+
+          return MaterialApp(
+            title: 'Charlemos',
+            debugShowCheckedModeBanner: false,
+            locale: prefs.locale,
+            supportedLocales: AppLocalizations.supportedLocales,
+            localeResolutionCallback: (locale, supportedLocales) {
+              if (prefs.locale != null) return prefs.locale;
+              if (locale != null) {
+                for (final supported in supportedLocales) {
+                  if (supported.languageCode == locale.languageCode) {
+                    return supported;
+                  }
+                }
+              }
+              return const Locale('es');
+            },
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            themeMode: prefs.themeMode,
+            theme: AppTheme.buildTheme(
+              preset: prefs.themePreset,
+              isDark: false,
+            ),
+            darkTheme: AppTheme.buildTheme(
+              preset: prefs.themePreset,
+              isDark: true,
+            ),
+            home: const SplashScreen(),
+          );
+        },
+      ),
+    );
+  }
+}
