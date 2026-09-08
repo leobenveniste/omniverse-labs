@@ -21,6 +21,10 @@ class CardService extends ChangeNotifier {
   Set<String> _activeMultiCategories = {}; // For multi-category group games
   CardItem? _currentCard;
 
+  // Session history for previous/back navigation
+  final List<CardItem> _history = [];
+  int _historyIndex = -1;
+
   bool _isLoading = true;
 
   CardService(this._prefs) {
@@ -33,6 +37,9 @@ class CardService extends ChangeNotifier {
   Set<String> get activeMultiCategories => _activeMultiCategories;
   CardItem? get currentCard => _currentCard;
   List<CardItem> get customCards => _customCards;
+  bool get canGoPrevious => _historyIndex > 0;
+  int get historyIndex => _historyIndex;
+  int get historyLength => _history.length;
 
   List<CardItem> get favoriteCards =>
       _allCards.where((c) => _favoriteIds.contains(c.id)).toList();
@@ -99,6 +106,8 @@ class CardService extends ChangeNotifier {
 
   void setLevelFilter(int level) {
     _selectedLevel = level;
+    _history.clear();
+    _historyIndex = -1;
     drawNextCard();
     notifyListeners();
   }
@@ -106,6 +115,8 @@ class CardService extends ChangeNotifier {
   void setCategoryFilter(String category) {
     _selectedCategory = category;
     _activeMultiCategories.clear();
+    _history.clear();
+    _historyIndex = -1;
     drawNextCard();
     notifyListeners();
   }
@@ -113,11 +124,21 @@ class CardService extends ChangeNotifier {
   void setMultiCategoryFilter(Set<String> categories) {
     _activeMultiCategories = Set.from(categories);
     _selectedCategory = 'all';
+    _history.clear();
+    _historyIndex = -1;
     drawNextCard();
     notifyListeners();
   }
 
   void drawNextCard() {
+    // If user navigated backwards into history, moving forward revisits already drawn cards
+    if (_historyIndex >= 0 && _historyIndex < _history.length - 1) {
+      _historyIndex++;
+      _currentCard = _history[_historyIndex];
+      notifyListeners();
+      return;
+    }
+
     final pool = filteredPool;
     if (pool.isEmpty) {
       _currentCard = null;
@@ -139,8 +160,23 @@ class CardService extends ChangeNotifier {
     if (_currentCard != null) {
       _playedCardIds.add(_currentCard!.id);
       _prefs.setStringList(_keyPlayedHistory, _playedCardIds.toList());
+
+      // Append to session history (capped at last 50 cards to remain lightweight)
+      _history.add(_currentCard!);
+      if (_history.length > 50) {
+        _history.removeAt(0);
+      }
+      _historyIndex = _history.length - 1;
     }
     notifyListeners();
+  }
+
+  bool goToPreviousCard() {
+    if (!canGoPrevious) return false;
+    _historyIndex--;
+    _currentCard = _history[_historyIndex];
+    notifyListeners();
+    return true;
   }
 
   Future<void> toggleFavorite(CardItem card) async {
@@ -211,6 +247,8 @@ class CardService extends ChangeNotifier {
   void resetHistory() {
     _playedCardIds.clear();
     _prefs.setStringList(_keyPlayedHistory, []);
+    _history.clear();
+    _historyIndex = -1;
     drawNextCard();
     notifyListeners();
   }

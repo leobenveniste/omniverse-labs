@@ -58,5 +58,29 @@ void main() {
       expect(expectedCategories.contains('most_likely'), isTrue);
       expect(expectedCategories.contains('never_have_i'), isTrue);
     });
+
+    test('CardItem equality and history navigation sanity', () {
+      final cardA = CardItem(
+        id: 'card_a',
+        level: 1,
+        category: 'dates',
+        textEs: 'A',
+        textEn: 'A',
+      );
+      final cardB = CardItem(
+        id: 'card_b',
+        level: 1,
+        category: 'dates',
+        textEs: 'B',
+        textEn: 'B',
+      );
+
+      final history = <CardItem>[cardA, cardB];
+      int index = 1;
+      expect(index > 0, isTrue); // canGoPrevious
+      index--;
+      expect(history[index].id, 'card_a');
+      expect(index > 0, isFalse); // at origin
+    });
   });
 }

@@ -34,6 +34,11 @@ class _GamePlayScreenState extends State<GamePlayScreen>
   late Animation<double> _exitRotationAnimation;
   late Animation<double> _exitFadeAnimation;
 
+  late AnimationController _reverseSlideController;
+  late Animation<Offset> _reverseExitSlideAnimation;
+  late Animation<double> _reverseExitRotationAnimation;
+  late Animation<double> _reverseExitFadeAnimation;
+
   late AnimationController _enterController;
   late Animation<double> _enterScaleAnimation;
   late Animation<Offset> _enterSlideAnimation;
@@ -76,6 +81,33 @@ class _GamePlayScreenState extends State<GamePlayScreen>
       CurvedAnimation(parent: _slideController, curve: Curves.easeInQuad),
     );
 
+    // Reverse Exit controller: Card flies away to the right when rewinding to previous question
+    _reverseSlideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 220),
+    );
+
+    _reverseExitSlideAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(1.35, 0.04),
+    ).animate(
+      CurvedAnimation(parent: _reverseSlideController, curve: Curves.easeInCubic),
+    );
+
+    _reverseExitRotationAnimation = Tween<double>(
+      begin: 0.0,
+      end: 0.14, // natural clockwise tilt when flying right
+    ).animate(
+      CurvedAnimation(parent: _reverseSlideController, curve: Curves.easeIn),
+    );
+
+    _reverseExitFadeAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.0,
+    ).animate(
+      CurvedAnimation(parent: _reverseSlideController, curve: Curves.easeInQuad),
+    );
+
     // Enter controller: Next card emerges from bottom/center
     _enterController = AnimationController(
       vsync: this,
@@ -109,6 +141,7 @@ class _GamePlayScreenState extends State<GamePlayScreen>
   @override
   void dispose() {
     _slideController.dispose();
+    _reverseSlideController.dispose();
     _enterController.dispose();
     super.dispose();
   }
@@ -126,6 +159,29 @@ class _GamePlayScreenState extends State<GamePlayScreen>
       _slideController.reset();
 
       // Animate new card entering
+      _enterController.forward(from: 0.0).then((_) {
+        if (mounted) {
+          setState(() {
+            _isAnimating = false;
+          });
+        }
+      });
+    });
+  }
+
+  void _onPreviousCard(CardService cardService) {
+    if (_isAnimating || !cardService.canGoPrevious) return;
+    _isAnimating = true;
+    HapticsHelper.selection();
+
+    // Trigger smooth fly away to the right
+    _reverseSlideController.forward(from: 0.0).then((_) {
+      if (!mounted) return;
+      // Go back to previous card
+      cardService.goToPreviousCard();
+      _reverseSlideController.reset();
+
+      // Animate restored card entering
       _enterController.forward(from: 0.0).then((_) {
         if (mounted) {
           setState(() {
@@ -335,21 +391,45 @@ class _GamePlayScreenState extends State<GamePlayScreen>
                         : GestureDetector(
                             onTap: () => _onNextCard(cardService),
                             onHorizontalDragEnd: (details) {
-                              if (details.primaryVelocity != null && details.primaryVelocity!.abs() > 150) {
-                                _onNextCard(cardService);
+                              if (details.primaryVelocity != null) {
+                                if (details.primaryVelocity! < -150) {
+                                  // Swiped Left -> Next Card
+                                  _onNextCard(cardService);
+                                } else if (details.primaryVelocity! > 150) {
+                                  // Swiped Right -> Previous Card
+                                  if (cardService.canGoPrevious) {
+                                    _onPreviousCard(cardService);
+                                  }
+                                }
                               }
                             },
                             child: AnimatedBuilder(
-                              animation: Listenable.merge([_slideController, _enterController]),
+                              animation: Listenable.merge([
+                                _slideController,
+                                _reverseSlideController,
+                                _enterController,
+                              ]),
                               builder: (context, child) {
                                 if (_slideController.isAnimating) {
-                                  // Exit animation: Fly away to left with rotation and fade
+                                  // Exit animation (Next): Fly away to left with rotation and fade
                                   return SlideTransition(
                                     position: _exitSlideAnimation,
                                     child: Transform.rotate(
                                       angle: _exitRotationAnimation.value,
                                       child: FadeTransition(
                                         opacity: _exitFadeAnimation,
+                                        child: child,
+                                      ),
+                                    ),
+                                  );
+                                } else if (_reverseSlideController.isAnimating) {
+                                  // Reverse Exit animation (Back): Fly away to right with rotation and fade
+                                  return SlideTransition(
+                                    position: _reverseExitSlideAnimation,
+                                    child: Transform.rotate(
+                                      angle: _reverseExitRotationAnimation.value,
+                                      child: FadeTransition(
+                                        opacity: _reverseExitFadeAnimation,
                                         child: child,
                                       ),
                                     ),
@@ -379,7 +459,7 @@ class _GamePlayScreenState extends State<GamePlayScreen>
                   ),
                 ),
 
-                // Bottom Hint & "Cambiar mazos" Button
+                // Bottom Action Bar: "Anterior", Hint, & "Cambiar mazos" Button
                 Padding(
                   padding: const EdgeInsets.only(
                     left: AppSpacing.lg,
@@ -389,15 +469,54 @@ class _GamePlayScreenState extends State<GamePlayScreen>
                   ),
                   child: Row(
                     children: [
+                      // "Anterior" Button (Undo / Previous Question)
+                      Tooltip(
+                        message: l10n.t('previousCard'),
+                        child: OutlinedButton(
+                          onPressed: cardService.canGoPrevious && !_isAnimating
+                              ? () => _onPreviousCard(cardService)
+                              : null,
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: theme.colorScheme.primary,
+                            disabledForegroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.25),
+                            side: BorderSide(
+                              color: cardService.canGoPrevious
+                                  ? theme.colorScheme.primary.withValues(alpha: 0.5)
+                                  : theme.colorScheme.outline.withValues(alpha: 0.2),
+                              width: 1.2,
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.undo_rounded, size: 18),
+                              const SizedBox(width: 6),
+                              Text(
+                                l10n.t('previousCard'),
+                                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+
                       // Subtitle hint
                       Expanded(
                         child: Text(
                           l10n.t('tapOrSwipeNext'),
+                          textAlign: TextAlign.center,
                           style: AppTypography.caption(
                             theme.colorScheme.onSurface.withValues(alpha: 0.65),
                           ),
                         ),
                       ),
+                      const SizedBox(width: 12),
+
                       // "Cambiar mazos" Button
                       ElevatedButton.icon(
                         onPressed: _openCategorySelector,
