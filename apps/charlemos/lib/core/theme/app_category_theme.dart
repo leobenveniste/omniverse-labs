@@ -177,6 +177,17 @@ class AppCategoryTheme {
     icon: Icons.sports_bar_rounded,
   );
 
+  // 15. Retos en Pareja (couples_challenges) - Complicidad y Dinámicas Románticas
+  static const CategoryStyle couplesChallenges = CategoryStyle(
+    primary: Color(0xFFD946EF),          // Fucsia Pasión Radiante
+    backgroundLight: Color(0xFFFDF4FF),  // Soft fuchsia glow
+    backgroundDark: Color(0xFF2C0A33),   // Deep fuchsia velvet
+    borderLight: Color(0xFFF5D0FE),
+    borderDark: Color(0xFF701A75),
+    onPrimary: Colors.white,
+    icon: Icons.favorite_border_rounded,
+  );
+
   static CategoryStyle of(String category) {
     switch (category) {
       case 'dates':
@@ -185,6 +196,8 @@ class AppCategoryTheme {
         return couples;
       case 'spicy':
         return spicy;
+      case 'couples_challenges':
+        return couplesChallenges;
       case 'hot_takes':
         return hotTakes;
       case 'party':

@@ -46,13 +46,14 @@ void main() {
       expect(revived.isCustom, true);
     });
 
-    test('All 13 category deck types are configured with metadata and styles', () {
+    test('All 14 category deck types are configured with metadata and styles', () {
       final expectedCategories = [
-        'dates', 'couples', 'spicy', 'hot_takes', 'friends',
+        'dates', 'couples', 'spicy', 'couples_challenges', 'hot_takes', 'friends',
         'party', 'challenges', 'debates', 'travel', 'family',
         'spicy_challenges', 'most_likely', 'never_have_i',
       ];
-      expect(expectedCategories.length, 13);
+      expect(expectedCategories.length, 14);
+      expect(expectedCategories.contains('couples_challenges'), isTrue);
       expect(expectedCategories.contains('spicy_challenges'), isTrue);
       expect(expectedCategories.contains('most_likely'), isTrue);
       expect(expectedCategories.contains('never_have_i'), isTrue);

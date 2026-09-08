@@ -25,24 +25,66 @@ class _DeckMeta {
   });
 }
 
-// All decks in unified sequence (Free then PRO, but shown in a single seamless catalog)
-const List<_DeckMeta> _allDecks = [
-  // Core Free Decks
-  _DeckMeta(id: 'dates', titleKey: 'deckDates', descKey: 'deckDatesDesc', isProOnly: false),
-  _DeckMeta(id: 'friends', titleKey: 'deckFriends', descKey: 'deckFriendsDesc', isProOnly: false),
-  _DeckMeta(id: 'debates', titleKey: 'deckDebates', descKey: 'deckDebatesDesc', isProOnly: false),
-  _DeckMeta(id: 'family', titleKey: 'deckFamily', descKey: 'deckFamilyDesc', isProOnly: false),
-  // PRO Decks
-  _DeckMeta(id: 'spicy', titleKey: 'deckSpicy', descKey: 'deckSpicyDesc', isProOnly: true),
-  _DeckMeta(id: 'hot_takes', titleKey: 'deckHotTakes', descKey: 'deckHotTakesDesc', isProOnly: true),
-  _DeckMeta(id: 'spicy_challenges', titleKey: 'deckSpicyChallenges', descKey: 'deckSpicyChallengesDesc', isProOnly: true),
-  _DeckMeta(id: 'most_likely', titleKey: 'deckMostLikely', descKey: 'deckMostLikelyDesc', isProOnly: true),
-  _DeckMeta(id: 'never_have_i', titleKey: 'deckNeverHaveI', descKey: 'deckNeverHaveIDesc', isProOnly: true),
-  _DeckMeta(id: 'couples', titleKey: 'deckCouples', descKey: 'deckCouplesDesc', isProOnly: true),
-  _DeckMeta(id: 'party', titleKey: 'deckParty', descKey: 'deckPartyDesc', isProOnly: true),
-  _DeckMeta(id: 'challenges', titleKey: 'deckChallenges', descKey: 'deckChallengesDesc', isProOnly: true),
-  _DeckMeta(id: 'travel', titleKey: 'deckTravel', descKey: 'deckTravelDesc', isProOnly: true),
+class _DeckSection {
+  final String titleKey;
+  final String subKey;
+  final String emoji;
+  final List<_DeckMeta> decks;
+
+  const _DeckSection({
+    required this.titleKey,
+    required this.subKey,
+    required this.emoji,
+    required this.decks,
+  });
+}
+
+// Grouped Decks by Social Dynamics (Opción A)
+const List<_DeckSection> _deckSections = [
+  // 1. De a 2 • Parejas y Citas
+  _DeckSection(
+    titleKey: 'sectionCouplesAndDates',
+    subKey: 'sectionCouplesAndDatesSub',
+    emoji: '👩‍❤️‍👨',
+    decks: [
+      _DeckMeta(id: 'dates', titleKey: 'deckDates', descKey: 'deckDatesDesc', isProOnly: false),
+      _DeckMeta(id: 'couples', titleKey: 'deckCouples', descKey: 'deckCouplesDesc', isProOnly: true),
+      _DeckMeta(id: 'spicy', titleKey: 'deckSpicy', descKey: 'deckSpicyDesc', isProOnly: true),
+      _DeckMeta(id: 'couples_challenges', titleKey: 'deckCouplesChallenges', descKey: 'deckCouplesChallengesDesc', isProOnly: true),
+    ],
+  ),
+
+  // 2. Con Amigos & Fiesta
+  _DeckSection(
+    titleKey: 'sectionFriendsAndParty',
+    subKey: 'sectionFriendsAndPartySub',
+    emoji: '🍻',
+    decks: [
+      _DeckMeta(id: 'friends', titleKey: 'deckFriends', descKey: 'deckFriendsDesc', isProOnly: false),
+      _DeckMeta(id: 'hot_takes', titleKey: 'deckHotTakes', descKey: 'deckHotTakesDesc', isProOnly: true),
+      _DeckMeta(id: 'most_likely', titleKey: 'deckMostLikely', descKey: 'deckMostLikelyDesc', isProOnly: true),
+      _DeckMeta(id: 'never_have_i', titleKey: 'deckNeverHaveI', descKey: 'deckNeverHaveIDesc', isProOnly: true),
+      _DeckMeta(id: 'party', titleKey: 'deckParty', descKey: 'deckPartyDesc', isProOnly: true),
+      _DeckMeta(id: 'debates', titleKey: 'deckDebates', descKey: 'deckDebatesDesc', isProOnly: false),
+      _DeckMeta(id: 'challenges', titleKey: 'deckChallenges', descKey: 'deckChallengesDesc', isProOnly: true),
+      _DeckMeta(id: 'spicy_challenges', titleKey: 'deckSpicyChallenges', descKey: 'deckSpicyChallengesDesc', isProOnly: true),
+    ],
+  ),
+
+  // 3. Familia & Todos
+  _DeckSection(
+    titleKey: 'sectionFamilyAndAll',
+    subKey: 'sectionFamilyAndAllSub',
+    emoji: '🏡',
+    decks: [
+      _DeckMeta(id: 'family', titleKey: 'deckFamily', descKey: 'deckFamilyDesc', isProOnly: false),
+      _DeckMeta(id: 'travel', titleKey: 'deckTravel', descKey: 'deckTravelDesc', isProOnly: true),
+    ],
+  ),
 ];
+
+// Flat list helper for modal lookup and backwards compatibility
+List<_DeckMeta> get _allDecks => _deckSections.expand((s) => s.decks).toList();
 
 class DecksScreen extends StatelessWidget {
   const DecksScreen({super.key});
@@ -81,7 +123,7 @@ class DecksScreen extends StatelessWidget {
     required bool isPro,
   }) {
     final l10n = AppLocalizations.of(context);
-    const proSet = {'couples', 'spicy', 'hot_takes', 'spicy_challenges', 'most_likely', 'never_have_i', 'party', 'challenges', 'travel'};
+    const proSet = {'couples', 'spicy', 'couples_challenges', 'hot_takes', 'spicy_challenges', 'most_likely', 'never_have_i', 'party', 'challenges', 'travel'};
     final needsPro = categories.any(proSet.contains);
 
     if (needsPro && !isPro) {
@@ -216,36 +258,133 @@ class DecksScreen extends StatelessWidget {
               const SizedBox(height: AppSpacing.sm),
 
               // ==========================================
-              // UNIFIED DECKS CATALOG (NOT SPLIT)
+              // GROUPED SECTIONS (OPCIÓN A)
               // ==========================================
-              ..._allDecks.map((deck) {
-                final count = cardService.countByCategory(deck.id);
-                final title = l10n.t(deck.titleKey);
-                final desc = l10n.t(deck.descKey);
-                final isLocked = deck.isProOnly && !isPro;
-
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                  child: _buildCategoryDeckCard(
-                    context,
-                    categoryId: deck.id,
-                    title: title,
-                    description: desc,
-                    count: count,
-                    isLocked: isLocked,
-                    onTap: () => _openDeck(
-                      context,
-                      categoryId: deck.id,
-                      title: title,
-                      isProOnly: deck.isProOnly,
-                      isPro: isPro,
+              ..._deckSections.map((section) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Section Header
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: AppSpacing.sm,
+                        bottom: AppSpacing.xs,
+                        left: AppSpacing.xs,
+                        right: AppSpacing.xs,
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 34,
+                            height: 34,
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primaryContainer.withValues(alpha: 0.35),
+                              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(section.emoji, style: const TextStyle(fontSize: 18)),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.t(section.titleKey),
+                                  style: AppTypography.title(theme.colorScheme.onSurface).copyWith(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Text(
+                                  l10n.t(section.subKey),
+                                  style: AppTypography.caption(theme.colorScheme.onSurfaceVariant),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: AppSpacing.xs),
+
+                    // Section Decks Cards
+                    ...section.decks.map((deck) {
+                      final count = cardService.countByCategory(deck.id);
+                      final title = l10n.t(deck.titleKey);
+                      final desc = l10n.t(deck.descKey);
+                      final isLocked = deck.isProOnly && !isPro;
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                        child: _buildCategoryDeckCard(
+                          context,
+                          categoryId: deck.id,
+                          title: title,
+                          description: desc,
+                          count: count,
+                          isLocked: isLocked,
+                          onTap: () => _openDeck(
+                            context,
+                            categoryId: deck.id,
+                            title: title,
+                            isProOnly: deck.isProOnly,
+                            isPro: isPro,
+                          ),
+                        ),
+                      );
+                    }),
+                    const SizedBox(height: AppSpacing.xs),
+                  ],
                 );
               }),
 
               // Custom user cards deck (if any exists)
-              if (cardService.customCards.isNotEmpty)
+              if (cardService.customCards.isNotEmpty) ...[
+                Padding(
+                  padding: const EdgeInsets.only(
+                    top: AppSpacing.sm,
+                    bottom: AppSpacing.xs,
+                    left: AppSpacing.xs,
+                    right: AppSpacing.xs,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primaryContainer.withValues(alpha: 0.35),
+                          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                        ),
+                        alignment: Alignment.center,
+                        child: const Text('✍️', style: TextStyle(fontSize: 18)),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.t('sectionCustomDecks'),
+                              style: AppTypography.title(theme.colorScheme.onSurface).copyWith(
+                                fontSize: 16,
+                              ),
+                            ),
+                            Text(
+                              l10n.t('sectionCustomDecksSub'),
+                              style: AppTypography.caption(theme.colorScheme.onSurfaceVariant),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.xs),
                 Padding(
                   padding: const EdgeInsets.only(bottom: AppSpacing.sm),
                   child: _buildCategoryDeckCard(
@@ -264,6 +403,7 @@ class DecksScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+              ],
 
               const SizedBox(height: AppSpacing.md),
             ],

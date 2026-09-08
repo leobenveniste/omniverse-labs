@@ -71,12 +71,13 @@ class _CategorySelectModalState extends State<CategorySelectModal> {
       if (cardService.customCards.isNotEmpty)
         {'id': 'custom', 'name': l10n.t('deckCustom'), 'desc': l10n.t('deckCustomDesc'), 'isPro': false},
       // Pro Decks
+      {'id': 'couples', 'name': l10n.t('deckCouples'), 'desc': l10n.t('deckCouplesDesc'), 'isPro': true},
       {'id': 'spicy', 'name': l10n.t('deckSpicy'), 'desc': l10n.t('deckSpicyDesc'), 'isPro': true},
+      {'id': 'couples_challenges', 'name': l10n.t('deckCouplesChallenges'), 'desc': l10n.t('deckCouplesChallengesDesc'), 'isPro': true},
       {'id': 'hot_takes', 'name': l10n.t('deckHotTakes'), 'desc': l10n.t('deckHotTakesDesc'), 'isPro': true},
       {'id': 'spicy_challenges', 'name': l10n.t('deckSpicyChallenges'), 'desc': l10n.t('deckSpicyChallengesDesc'), 'isPro': true},
       {'id': 'most_likely', 'name': l10n.t('deckMostLikely'), 'desc': l10n.t('deckMostLikelyDesc'), 'isPro': true},
       {'id': 'never_have_i', 'name': l10n.t('deckNeverHaveI'), 'desc': l10n.t('deckNeverHaveIDesc'), 'isPro': true},
-      {'id': 'couples', 'name': l10n.t('deckCouples'), 'desc': l10n.t('deckCouplesDesc'), 'isPro': true},
       {'id': 'party', 'name': l10n.t('deckParty'), 'desc': l10n.t('deckPartyDesc'), 'isPro': true},
       {'id': 'challenges', 'name': l10n.t('deckChallenges'), 'desc': l10n.t('deckChallengesDesc'), 'isPro': true},
       {'id': 'travel', 'name': l10n.t('deckTravel'), 'desc': l10n.t('deckTravelDesc'), 'isPro': true},
@@ -398,8 +399,8 @@ class _CategorySelectModalState extends State<CategorySelectModal> {
           ElevatedButton(
             onPressed: () {
               HapticsHelper.medium();
-              widget.onCategoriesSelected(_selected);
               Navigator.pop(context);
+              widget.onCategoriesSelected(_selected);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.colorScheme.primary,

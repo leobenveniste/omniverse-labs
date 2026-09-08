@@ -521,11 +521,119 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
                         ),
                     }
                 ).execute()
-                print("Charlemos Store Listings Updated (es-419 & en-US)!")
+                # pt-BR
+                edits.listings().update(
+                    packageName=package_name,
+                    editId=edit_id,
+                    language="pt-BR",
+                    body={
+                        "title": "Charlemos: Jogo de Cartas",
+                        "shortDescription": "Perguntas para conectar: 490+ cartas, 13 baralhos e desafios 100% offline.",
+                        "fullDescription": (
+                            "Charlemos é o jogo de cartas conversacional criado para transformar qualquer encontro, date, mesa com amigos ou festa em uma conversa inesquecível, profunda e cheia de cumplicidade.\n\n"
+                            "Inspirado no poder das perguntas autênticas, Charlemos reúne mais de 490 cartas cuidadosamente elaboradas e organizadas em 13 baralhos temáticos e diferentes níveis de profundidade emocional, 100% offline e sem anúncios.\n\n"
+                            "🎴 13 BARALHOS TEMÁTICOS PARA CADA OCASIÃO:\n\n"
+                            "• Encontros & Primeiros Dates: Quebre o gelo e conheça alguém com total naturalidade.\n"
+                            "• Casais & Cumplicidade: Confiança mútua, intimidade, sonhos e projetos a dois.\n"
+                            "• Fogo & Fantasias (+18): Sensualidade, desejos ocultos e paixão para casais.\n"
+                            "• Picante & Tabu (+18): Verdades íntimas sem filtro e confissões ousadas.\n"
+                            "• Desafios Picantes (+18): Prendas atrevidas, contato visual intenso e sussurros ao pé do ouvido.\n"
+                            "• Quem é mais provável? (5-10 amigos): Votação simultânea apontando o dedo na contagem de 3.\n"
+                            "• Eu Nunca (5-10 amigos): Confissões em grupo, risadas e segredos revelados.\n"
+                            "• Amigos & Resenhas: Histórias marcantes, gargalhadas e momentos inesquecíveis.\n"
+                            "• O Esquenta & Festa: Jogos de festa, dinâmicas e momentos descontraídos.\n"
+                            "• Desafios & Dinâmicas: Desafios espontâneos e tarefas divertidas.\n"
+                            "• Dilemas & Filosofia: \"O que você prefere?\" e debates apaixonados.\n"
+                            "• Viagens & Aventuras: Histórias de estrada, choques culturais e destinos dos sonhos.\n"
+                            "• Família & Raízes: Infância, lembranças e tradições queridas.\n\n"
+                            "✨ EXPERIÊNCIA ELEGANTE & MINIMALISTA:\n\n"
+                            "• Tela Única e Fluida: Deslize ou toque para passar para a próxima pergunta com resposta tátil háptica.\n"
+                            "• Misturador Rápido de Baralhos: Combine apenas as categorias que você deseja para a ocasião.\n"
+                            "• Compartilhe no Instante: Envie qualquer pergunta para redes sociais ou chats com um toque.\n"
+                            "• 3 Paletas Estéticas: Coral Mist, Plum Orchid e Sunset Slate em Modo Claro e Escuro.\n"
+                            "• 100% Offline & Privado: Sem necessidade de cadastro, contas ou coleta de dados.\n"
+                            "• 5 Idiomas Globais: Totalmente localizado em Português, Espanhol, Inglês, Francês e Italiano."
+                        ),
+                    }
+                ).execute()
+
+                # fr-FR
+                edits.listings().update(
+                    packageName=package_name,
+                    editId=edit_id,
+                    language="fr-FR",
+                    body={
+                        "title": "Charlemos: Jeu de Cartes",
+                        "shortDescription": "Questions pour connecter : 490+ cartes, 13 jeux et défis 100% hors-ligne.",
+                        "fullDescription": (
+                            "Charlemos est le jeu de cartes conversationnel conçu pour transformer n'importe quel rendez-vous amoureux, apéro entre amis, fin de repas ou soirée en une discussion inoubliable, profonde et sincère.\n\n"
+                            "Inspiré par la magie des questions authentiques, Charlemos réunit plus de 490 cartes soigneusement rédigées et réparties en 13 thématiques et différents niveaux de profondeur émotionnelle, 100% hors-ligne et sans publicité.\n\n"
+                            "🎴 13 JEUX THÉMATIQUES POUR TOUTES LES OCCASIONS :\n\n"
+                            "• Rendez-vous & Premières Rencontres : Briser la glace et apprendre à se connaître naturellement.\n"
+                            "• Couples & Complicité : Confiance mutuelle, intimité, projets communs et accords à deux.\n"
+                            "• Flamme & Désirs (+18) : Sensualité, fantasmes inavoués et passion amoureuse.\n"
+                            "• Piquant & Tabou (+18) : Vérités intimes sans filtre et confessions osées.\n"
+                            "• Défis Piquants (+18) : Gages audacieux, regards intenses, murmures et défis coquins.\n"
+                            "• Qui est le plus susceptible de... (5-10 amis) : Vote simultané en pointant du doigt à 3.\n"
+                            "• Je n'ai jamais (5-10 amis) : Le classique des soirées, confessions et fous rires.\n"
+                            "• Amis & Retrouvailles : Souvenirs marquants, rires partagés et discussions nocturnes.\n"
+                            "• L'Apéro & Fête : Jeux festifs, ambiance chaleureuse et moments décomplexés.\n"
+                            "• Défis & Gages : Défis spontanés et consignes dynamiques.\n"
+                            "• Dilemmes & Débats : \"Tu préfères ?\" et débats passionnants pendant des heures.\n"
+                            "• Voyages & Aventures : Récits de route, chocs culturels et destinations de rêve.\n"
+                            "• Famille & Racines : Souvenirs d'enfance, nostalgie et traditions familiales.\n\n"
+                            "✨ EXPÉRIENCE ÉPURÉE & MINIMALISTE :\n\n"
+                            "• Écran Unique & Fluide : Balayez ou touchez pour passer à la carte suivante avec retour haptique subtil.\n"
+                            "• Sélecteur Rapide de Jeux : Mélangez uniquement les thèmes souhaités pour votre soirée.\n"
+                            "• Partage Instantané : Partagez n'importe quelle question sur vos réseaux ou messageries en un clic.\n"
+                            "• 3 Thèmes Esthétiques : Coral Mist, Plum Orchid et Sunset Slate en Mode Clair et Sombre.\n"
+                            "• 100% Hors-Ligne & Privé : Aucun compte requis, aucune collecte de données personnelles.\n"
+                            "• 5 Langues Mondiales : Entièrement disponible en Français, Espagnol, Anglais, Portugais et Italien."
+                        ),
+                    }
+                ).execute()
+
+                # it-IT
+                edits.listings().update(
+                    packageName=package_name,
+                    editId=edit_id,
+                    language="it-IT",
+                    body={
+                        "title": "Charlemos: Gioco di Carte",
+                        "shortDescription": "Domande per connettersi: 490+ carte, 13 mazzi e sfide 100% offline.",
+                        "fullDescription": (
+                            "Charlemos è il gioco di carte conversazionale pensato per trasformare ogni appuntamento, cena con amici, dopocena o festa in una conversazione indimenticabile, profonda e complice.\n\n"
+                            "Ispirato al potere delle domande autentiche, Charlemos raccoglie oltre 490 carte accuratamente create e organizzate in 13 mazzi tematici e vari livelli di profondità emotiva, 100% offline e senza pubblicità.\n\n"
+                            "🎴 13 MAZZI TEMATICI PER OGNI OCCASIONE:\n\n"
+                            "• Appuntamenti & Primi Incontri: Rompere il ghiaccio e conoscersi con spontaneità.\n"
+                            "• Coppie & Complicità: Fiducia reciproca, intimità, desideri e progetti condivisi.\n"
+                            "• Fuoco & Fantasie (+18): Sensualità, desideri nascosti e passione di coppia.\n"
+                            "• Piccante & Tabù (+18): Verità intime senza filtri e confessioni proibite.\n"
+                            "• Sfide Piccanti (+18): Sfide audaci, sguardi intensi, sussurri e penitenze piccanti.\n"
+                            "• Chi è più probabile che... (5-10 amici): Votazione simultanea indicando a dito al conto di 3.\n"
+                            "• Non ho mai (5-10 amici): Il classico dei pre-serata: confessioni, risate e segreti svelati.\n"
+                            "• Amici & Serate Insieme: Aneddoti memorabili, risate a non finire e discorsi a cuore aperto.\n"
+                            "• Pre-Serata & Festa: Giochi di gruppo, spensieratezza e atmosfera da festa.\n"
+                            "• Sfide & Dinamiche: Prove spontanee e sfide divertenti.\n"
+                            "• Dilemmi & Filosofia: \"Cosa preferisci?\" e accesi dibattiti per ore.\n"
+                            "• Viaggi & Avventure: Avventure on the road, shock culturali e mete da sogno.\n"
+                            "• Famiglia & Radici: Infanzia, ricordi cari e tradizioni di famiglia.\n\n"
+                            "✨ ESPERIENZA CURATA & MINIMALISTA:\n\n"
+                            "• Schermo Singolo Pulito: Scorri o tocca per passare alla carta successiva con feedback aptico delicato.\n"
+                            "• Mixer Rapido dei Mazzi: Mescola solo le categorie desiderate per la serata.\n"
+                            "• Condivisione Istantanea: Invia qualsiasi domanda sulle tue storie o app di messaggistica con un tocco.\n"
+                            "• 3 Palette di Colore: Coral Mist, Plum Orchid e Sunset Slate in modalità Chiara e Scura.\n"
+                            "• 100% Offline & Privato: Nessun account richiesto, zero tracciamento, totale privacy dei dati.\n"
+                            "• 5 Lingue Globali: Interamente tradotto in Italiano, Spagnolo, Inglese, Portoghese e Francese."
+                        ),
+                    }
+                ).execute()
+
+                print("Charlemos Store Listings Updated (es-419, en-US, pt-BR, fr-FR, it-IT)!")
             except Exception as e:
                 print(f"Charlemos Listing notice: {e}")
 
-            all_langs = ["es-419", "en-US"]
+            all_langs = ["es-419", "en-US", "pt-BR", "fr-FR", "it-IT"]
             for lang in all_langs:
                 if os.path.exists(icon_path):
                     try:
@@ -566,7 +674,18 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
                 except Exception as e:
                     pass
 
-                for ss_file in [ss1_path, ss2_path]:
+                charlemos_screenshots = [
+                    os.path.join(r"c:\Projects\Omniverse Labs\apps\charlemos\assets\store_listing", f)
+                    for f in [
+                        "screenshot_01_decks.png",
+                        "screenshot_02_gameplay_familia.png",
+                        "screenshot_03_gameplay_parejas.png",
+                        "screenshot_04_gameplay_amigos.png",
+                        "screenshot_05_gameplay_yonunca.png",
+                    ]
+                ]
+
+                for ss_file in charlemos_screenshots:
                     if os.path.exists(ss_file):
                         try:
                             ss_media = MediaFileUpload(ss_file, mimetype="image/png")
@@ -620,15 +739,28 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
             rel_notes_es = notes_es or "Insignia MESA PRO visible en cabecera principal, modal de contacto y sugerencias directo con el desarrollador, optimizaciones de interfaz."
             rel_notes_en = notes_en or "Visible MESA PRO badge in home header, direct developer contact and feedback modal, UI improvements."
         elif package_name == "com.omniverselabs.charlemos":
-            rel_name = release_name or f"1.0.7 (Build {version_code})"
-            rel_notes_es = notes_es or "Gran actualización: Picante & Tabú renovado al 100% (sexy y atrevido), nuevo mazo de Retos Picantes, y 2 nuevas secciones para grupos de 5 a 10 amigos (¿Quién es más probable? y Yo Nunca Nunca). 490+ cartas en 13 mazos temáticos."
-            rel_notes_en = notes_en or "Major update: Revamped Spicy & Taboo deck (sexy & bold), new Spicy Dares deck, and 2 new sections for 5-10 friends (Most Likely To and Never Have I Ever). 490+ cards across 13 themed decks."
+            rel_name = release_name or f"1.0.9 (Build {version_code})"
+            rel_notes_es = notes_es or "Soporte completo y nativo para Portugués, Francés e Italiano en las 529 cartas y fichas de la tienda, optimización de mazos temáticos y mejoras de estabilidad."
+            rel_notes_en = notes_en or "Full native support for Portuguese, French, and Italian across all 529 cards and store listings, deck optimizations and stability enhancements."
+            rel_notes_pt = "Suporte nativo completo para Português em todas as 529 cartas, baralhos temáticos e ficha da loja, com melhorias de estabilidade."
+            rel_notes_fr = "Prise en charge native complète du Français sur l'ensemble des 529 cartes, des jeux thématiques et de la fiche du Play Store."
+            rel_notes_it = "Supporto nativo completo per l'Italiano su tutte le 529 carte, i mazzi tematici e la scheda del Play Store."
         else:
             rel_name = release_name or f"1.2.10 (Build {version_code})"
             rel_notes_es = notes_es or "Nuevo diseño de identidad visual y logotipo de Menú Listo, optimizaciones de rendimiento y estabilidad."
             rel_notes_en = notes_en or "Fresh new logo and visual identity for Menú Listo, along with continuous performance and stability improvements."
 
         def make_track_body(t_name, status_val):
+            r_notes = [
+                {"language": "es-419", "text": rel_notes_es},
+                {"language": "en-US", "text": rel_notes_en},
+            ]
+            if package_name == "com.omniverselabs.charlemos":
+                r_notes.extend([
+                    {"language": "pt-BR", "text": rel_notes_pt},
+                    {"language": "fr-FR", "text": rel_notes_fr},
+                    {"language": "it-IT", "text": rel_notes_it},
+                ])
             return {
                 "track": t_name,
                 "releases": [
@@ -636,16 +768,7 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
                         "name": rel_name,
                         "versionCodes": [str(version_code)],
                         "status": status_val,
-                        "releaseNotes": [
-                            {
-                                "language": "es-419",
-                                "text": rel_notes_es
-                            },
-                            {
-                                "language": "en-US",
-                                "text": rel_notes_en
-                            }
-                        ]
+                        "releaseNotes": r_notes
                     }
                 ]
             }

@@ -55,9 +55,9 @@
     "category": "dates",
     "text_es": "¿Cuál es una canción o artista que amas en secreto y casi nadie sabe?",
     "text_en": "What is a guilty pleasure song or artist you love in secret?",
-    "text_pt": "Cuál es una canción o artista que amas em segredo y casi nadie sabe?",
-    "text_fr": "Quel est una canción o artista que amas en secreto y casi nadie sabe?",
-    "text_it": "Qual è una canción o artista que amas in segreto y casi nadie sabe?"
+    "text_pt": "Qual é a música ou artista que você ama secretamente e que quase ninguém conhece?",
+    "text_fr": "Quelle est une chanson ou un artiste que vous aimez secrètement et que presque personne ne connaît ?",
+    "text_it": "Qual è una canzone o un artista che ami segretamente e di cui quasi nessuno sa?"
   },
   {
     "id": "c1_7",
@@ -65,9 +65,9 @@
     "category": "couples",
     "text_es": "¿Qué hábito o manía pequeña tienes en tu casa que a otros les parecería extraño?",
     "text_en": "What small habit or quirk in your home would seem strange to others?",
-    "text_pt": "Qué hábito o manía pequeña tienes en tu casa que a otros les parecería extraño?",
-    "text_fr": "Qué hábito o manía pequeña tienes en tu casa que a otros les parecería extraño?",
-    "text_it": "Qué hábito o manía pequeña tienes en tu casa que a otros les parecería extraño?"
+    "text_pt": "Que hábito ou pequeno hábito você tem em sua casa que outras pessoas achariam estranho?",
+    "text_fr": "Quelle habitude ou petite habitude avez-vous chez vous et que d’autres trouveraient étrange ?",
+    "text_it": "Quale abitudine o piccola abitudine hai in casa che gli altri troverebbero strana?"
   },
   {
     "id": "c1_8",
@@ -75,9 +75,9 @@
     "category": "dates",
     "text_es": "¿Prefieres un viaje hiperplanificado minuto a minuto o llegar a un destino sin reservas y ver qué pasa?",
     "text_en": "Do you prefer an itinerary planned to the minute, or arriving with zero bookings to see what happens?",
-    "text_pt": "Prefieres un viaje hiperplanificado minuto a minuto o llegar a un destino sin reservas y ver qué pasa?",
+    "text_pt": "Você prefere uma viagem hiperplanejada minuto a minuto ou chegar ao destino sem reservas e ver o que acontece?",
     "text_fr": "Préfères-tu an itinerary planned to the minute, or arriving with zero bookings to see what happens?",
-    "text_it": "Preferisci un viaje hiperplanificado minuto a minuto o llegar a un destino sin reservas y ver qué pasa?"
+    "text_it": "Preferisci un viaggio iperpianificato minuto per minuto oppure arrivare a destinazione senza prenotazioni e vedere cosa succede?"
   },
   {
     "id": "c1_9",
@@ -85,9 +85,9 @@
     "category": "friends",
     "text_es": "¿Cuál es la peor película que viste entera en el cine solo por no irte?",
     "text_en": "What is the worst movie you watched all the way through in the cinema just to avoid leaving?",
-    "text_pt": "Cuál es la peor película que viste entera en el cine solo por no irte?",
+    "text_pt": "Qual foi o pior filme que você viu inteiro no cinema só para não sair?",
     "text_fr": "Quel est le worst movie you watched all the way through in the cinema just to avoid leaving?",
-    "text_it": "Qual è la peor película que viste entera en el cine solo por no irte?"
+    "text_it": "Qual è il film peggiore che hai visto intero al cinema solo per non andartene?"
   },
   {
     "id": "c1_10",
@@ -95,9 +95,9 @@
     "category": "dates",
     "text_es": "Si tuvieras que comer el mismo plato todos los días por un mes, ¿cuál sería?",
     "text_en": "If you had to eat the exact same meal every day for a month, what would it be?",
-    "text_pt": "Se você tivesse que comer el mismo plato todos los días por un mes, ¿cuál sería?",
+    "text_pt": "Se você tivesse que comer o mesmo prato todos os dias durante um mês, qual seria?",
     "text_fr": "Si tu devais eat the exact same meal every day for a month, what would it be?",
-    "text_it": "Se dovessi comer el mismo plato todos los días por un mes, cuál sería?"
+    "text_it": "Se dovessi mangiare lo stesso piatto ogni giorno per un mese, quale sarebbe?"
   },
   {
     "id": "c1_11",
@@ -105,9 +105,9 @@
     "category": "dates",
     "text_es": "¿Qué serie o libro sentiste que cambió tu humor durante semanas?",
     "text_en": "What TV series or book genuinely changed your mood for weeks?",
-    "text_pt": "Qué serie o libro sentiste que cambió tu humor durante semanas?",
-    "text_fr": "Qué serie o libro sentiste que cambió tu humor durante semanas?",
-    "text_it": "Qué serie o libro sentiste que cambió tu humor durante semanas?"
+    "text_pt": "Que série ou livro você sentiu que mudou seu humor durante semanas?",
+    "text_fr": "Selon vous, quelle série ou quel livre a changé votre humeur pendant des semaines ?",
+    "text_it": "Quale serie o libro hai sentito ha cambiato il tuo umore per settimane?"
   },
   {
     "id": "c1_12",
@@ -115,7 +115,7 @@
     "category": "friends",
     "text_es": "¿Cuál es tu meme o chiste interno favorito del momento?",
     "text_en": "What is your current favorite meme or inside joke?",
-    "text_pt": "Cuál es tu meme o chiste interno favorito del momento?",
+    "text_pt": "Qual é o seu meme ou piada interna favorita do momento?",
     "text_fr": "Quel est ton current favorite meme or inside joke?",
     "text_it": "Qual è tu meme o chiste interno favorito del momento?"
   },
@@ -125,9 +125,9 @@
     "category": "couples",
     "text_es": "¿Qué es lo más lindo o inesperado que un desconocido hizo por ti en la calle?",
     "text_en": "What is the kindest or most unexpected thing a stranger did for you?",
-    "text_pt": "Qué es lo más lindo o inesperado que un desconocido hizo por ti en la calle?",
+    "text_pt": "Qual foi a coisa mais legal ou inesperada que um estranho fez por você na rua?",
     "text_fr": "Quel est le kindest or most unexpected thing a stranger did for you?",
-    "text_it": "Qué es lo más lindo o inesperado que un desconocido hizo por ti en la calle?"
+    "text_it": "Qual è la cosa più bella o più inaspettata che uno sconosciuto ha fatto per te per strada?"
   },
   {
     "id": "c1_14",
@@ -135,9 +135,9 @@
     "category": "dates",
     "text_es": "¿Café por la mañana o trago al atardecer? Describe tu momento perfecto.",
     "text_en": "Morning coffee or sunset drink? Describe your ideal ritual.",
-    "text_pt": "Café por la mañana o trago al atardecer? Describe tu momento perfecto.",
-    "text_fr": "Café por la mañana o trago al atardecer? Describe tu momento perfecto.",
-    "text_it": "Café por la mañana o trago al atardecer? Describe tu momento perfecto."
+    "text_pt": "Café pela manhã ou bebida ao pôr do sol? Descreva o seu momento perfeito.",
+    "text_fr": "Café le matin ou boisson au coucher du soleil ? Décrivez votre moment parfait.",
+    "text_it": "Caffè al mattino o drink al tramonto? Descrivi il tuo momento perfetto."
   },
   {
     "id": "c1_15",
@@ -145,9 +145,9 @@
     "category": "friends",
     "text_es": "¿Qué talento inútil o habilidad oculta tienes?",
     "text_en": "What useless talent or hidden skill do you possess?",
-    "text_pt": "Qué talento inútil o habilidad oculta tienes?",
-    "text_fr": "Qué talento inútil o habilidad oculta tienes?",
-    "text_it": "Qué talento inútil o habilidad oculta tienes?"
+    "text_pt": "Que talento inútil ou habilidade oculta você possui?",
+    "text_fr": "Quel talent inutile ou capacité cachée possédez-vous ?",
+    "text_it": "Quale talento inutile o abilità nascosta hai?"
   },
   {
     "id": "c1_16",
@@ -155,9 +155,9 @@
     "category": "dates",
     "text_es": "¿Cómo sería tu domingo perfecto de descanso absoluto?",
     "text_en": "What does your perfect Sunday of pure unwinding look like?",
-    "text_pt": "Cómo sería tu domingo perfecto de descanso absoluto?",
-    "text_fr": "Cómo sería tu domingo perfecto de descanso absoluto?",
-    "text_it": "Cómo sería tu domingo perfecto de descanso absoluto?"
+    "text_pt": "Como seria o seu domingo perfeito de descanso absoluto?",
+    "text_fr": "À quoi ressemblerait votre dimanche parfait de repos absolu ?",
+    "text_it": "Come sarebbe la vostra domenica perfetta di assoluto riposo?"
   },
   {
     "id": "c1_17",
@@ -165,9 +165,9 @@
     "category": "dates",
     "text_es": "¿Cuál es el mejor consejo que te dio un amigo y que de verdad aplicaste?",
     "text_en": "What is the best piece of advice a friend gave you that you actually applied?",
-    "text_pt": "Cuál es el mejor consejo que te dio un amigo y que de verdad aplicaste?",
+    "text_pt": "Qual foi o melhor conselho que um amigo lhe deu e que você realmente aplicou?",
     "text_fr": "Quel est le best piece of advice a friend gave you that you actually applied?",
-    "text_it": "Qual è el mejor consejo que te dio un amigo y que de verdad aplicaste?"
+    "text_it": "Qual è il miglior consiglio che ti ha dato un amico e che hai effettivamente applicato?"
   },
   {
     "id": "c1_18",
@@ -177,7 +177,7 @@
     "text_en": "If you could teleport to any bar or cafe in the world right now, where would you be?",
     "text_pt": "Se você pudesse teletransportarte a un bar o café del mundo ahora mismo, ¿dónde estarías?",
     "text_fr": "Si tu pouvais teleport to any bar or cafe in the world right now, where would you be?",
-    "text_it": "Se potessi teletransportarte a un bar o café del mundo ahora mismo, dónde estarías?"
+    "text_it": "Se potessi teleportarti in un bar o in un caffè nel mondo in questo momento, dove saresti?"
   },
   {
     "id": "c1_19",
@@ -185,7 +185,7 @@
     "category": "dates",
     "text_es": "¿Cuál es una regla de convivencia que consideras sagrada e innegociable?",
     "text_en": "What household coexistence rule is sacred and non-negotiable for you?",
-    "text_pt": "Cuál es una regla de convivencia que consideras sagrada e innegociable?",
+    "text_pt": "Qual é a regra de convivência que você considera sagrada e inegociável?",
     "text_fr": "Quel est una regla de convivencia que consideras sagrada e innegociable?",
     "text_it": "Qual è una regla de convivencia que consideras sagrada e innegociable?"
   },
@@ -195,9 +195,9 @@
     "category": "couples",
     "text_es": "¿Qué apodo de la infancia odiabas pero todos te decían?",
     "text_en": "What childhood nickname did you despise yet everyone used?",
-    "text_pt": "Qué apodo de la infancia odiabas pero todos te decían?",
-    "text_fr": "Qué apodo de la infancia odiabas pero todos te decían?",
-    "text_it": "Qué apodo de la infancia odiabas pero todos te decían?"
+    "text_pt": "Que apelido de infância você odiava, mas todos te chamavam?",
+    "text_fr": "Quel surnom d'enfance détestiez-vous mais tout le monde vous appelait ?",
+    "text_it": "Quale soprannome da bambino odiavi ma tutti ti chiamavano?"
   },
   {
     "id": "c1_21",
@@ -205,9 +205,9 @@
     "category": "dates",
     "text_es": "¿Qué olor o aroma te transporta instantáneamente a un recuerdo feliz?",
     "text_en": "What scent or aroma instantly transports you to a happy memory?",
-    "text_pt": "Qué olor o aroma te transporta instantáneamente a un recuerdo feliz?",
-    "text_fr": "Qué olor o aroma te transporta instantáneamente a un recuerdo feliz?",
-    "text_it": "Qué olor o aroma te transporta instantáneamente a un recuerdo feliz?"
+    "text_pt": "Que cheiro ou aroma o transporta instantaneamente para uma lembrança feliz?",
+    "text_fr": "Quelle odeur ou quel arôme vous transporte instantanément vers un souvenir heureux ?",
+    "text_it": "Quale odore o aroma ti trasporta immediatamente in un ricordo felice?"
   },
   {
     "id": "c1_22",
@@ -215,9 +215,9 @@
     "category": "friends",
     "text_es": "¿Qué moda de vestir o tendencia esperas que jamás vuelva?",
     "text_en": "What fashion trend or fad do you pray never makes a comeback?",
-    "text_pt": "Qué moda de vestir o tendencia esperas que jamás vuelva?",
-    "text_fr": "Qué moda de vestir o tendencia esperas que jamás vuelva?",
-    "text_it": "Qué moda de vestir o tendencia esperas que jamás vuelva?"
+    "text_pt": "Que moda ou tendência de roupas você espera que nunca mais volte?",
+    "text_fr": "Quelle mode ou tendance vestimentaire espérez-vous ne jamais revenir ?",
+    "text_it": "Quale moda o tendenza nell'abbigliamento speri non ritorni mai più?"
   },
   {
     "id": "c1_23",
@@ -225,9 +225,9 @@
     "category": "dates",
     "text_es": "¿Crees que dos personas pueden ser amigos después de salir?",
     "text_en": "Do you believe two people can remain genuine friends after dating?",
-    "text_pt": "Crees que dos personas pueden ser amigos después de salir?",
-    "text_fr": "Crees que dos personas pueden ser amigos después de salir?",
-    "text_it": "Crees que dos personas pueden ser amigos después de salir?"
+    "text_pt": "Você acha que duas pessoas podem ser amigas depois de namorar?",
+    "text_fr": "Pensez-vous que deux personnes peuvent devenir amies après une relation amoureuse ?",
+    "text_it": "Pensi che due persone possano diventare amiche dopo essersi frequentate?"
   },
   {
     "id": "c1_24",
@@ -235,7 +235,7 @@
     "category": "dates",
     "text_es": "¿Cuál es tu teoría conspirativa favorita, aunque sea ridícula?",
     "text_en": "What is your favorite conspiracy theory, even if totally absurd?",
-    "text_pt": "Cuál es tu teoría conspirativa favorita, aunque sea ridícula?",
+    "text_pt": "Qual é a sua teoria da conspiração favorita, mesmo que seja ridícula?",
     "text_fr": "Quel est ton favorite conspiracy theory, even if totally absurd?",
     "text_it": "Qual è tu teoría conspirativa favorita, aunque sea ridícula?"
   },
@@ -245,9 +245,9 @@
     "category": "couples",
     "text_es": "¿Cuál es el regalo más significativo que has recibido?",
     "text_en": "What is the most thoughtful gift you have ever received?",
-    "text_pt": "Cuál es el regalo más significativo que has recibido?",
+    "text_pt": "Qual foi o presente mais significativo que você recebeu?",
     "text_fr": "Quel est le most thoughtful gift you have ever received?",
-    "text_it": "Qual è el regalo más significativo que has recibido?"
+    "text_it": "Qual è il regalo più significativo che hai ricevuto?"
   },
   {
     "id": "c1_26",
@@ -255,9 +255,9 @@
     "category": "friends",
     "text_es": "¿Qué comida típica o plato tradicional no soportas comer?",
     "text_en": "What traditional or popular food can you absolutely not stand eating?",
-    "text_pt": "Qué comida típica o plato tradicional no soportas comer?",
-    "text_fr": "Qué comida típica o plato tradicional no soportas comer?",
-    "text_it": "Qué comida típica o plato tradicional no soportas comer?"
+    "text_pt": "Qual comida típica ou prato tradicional você não aguenta comer?",
+    "text_fr": "Quel plat typique ou plat traditionnel ne supportez-vous pas de manger ?",
+    "text_it": "Quale cibo tipico o piatto tradizionale non sopporti di mangiare?"
   },
   {
     "id": "c1_27",
@@ -265,7 +265,7 @@
     "category": "dates",
     "text_es": "¿Cuál es tu juego de mesa o videojuego nostálgico predilecto?",
     "text_en": "What is your go-to nostalgic board game or video game?",
-    "text_pt": "Cuál es tu juego de mesa o videojuego nostálgico predilecto?",
+    "text_pt": "Qual é o seu jogo de tabuleiro ou videogame nostálgico favorito?",
     "text_fr": "Quel est ton go-to nostalgic board game or video game?",
     "text_it": "Qual è tu juego de mesa o videojuego nostálgico predilecto?"
   },
@@ -275,9 +275,9 @@
     "category": "friends",
     "text_es": "¿Qué es lo más aventurero o espontáneo que hiciste en las últimas 48 horas?",
     "text_en": "What is the most spontaneous thing you did in the last 48 hours?",
-    "text_pt": "Qué es lo más aventurero o espontáneo que hiciste en las últimas 48 horas?",
+    "text_pt": "Qual foi a coisa mais aventureira ou espontânea que você fez nas últimas 48 horas?",
     "text_fr": "Quel est le most spontaneous thing you did in the last 48 hours?",
-    "text_it": "Qué es lo más aventurero o espontáneo que hiciste en las últimas 48 horas?"
+    "text_it": "Qual è la cosa più avventurosa o spontanea che hai fatto nelle ultime 48 ore?"
   },
   {
     "id": "c1_29",
@@ -285,9 +285,9 @@
     "category": "dates",
     "text_es": "¿Qué cumplido recuerdas hasta el día de hoy por cómo te hizo sentir?",
     "text_en": "What compliment do you still remember because of how it made you feel?",
-    "text_pt": "Qué cumplido recuerdas hasta el día de hoy por cómo te hizo sentir?",
-    "text_fr": "Qué cumplido recuerdas hasta el día de hoy por cómo te hizo sentir?",
-    "text_it": "Qué cumplido recuerdas hasta el día de hoy por cómo te hizo sentir?"
+    "text_pt": "De que elogio você se lembra até hoje por como isso fez você se sentir?",
+    "text_fr": "De quel compliment vous souvenez-vous encore aujourd’hui de ce que cela vous a fait ressentir ?",
+    "text_it": "Quale complimento ricordi ancora oggi per come ti ha fatto sentire?"
   },
   {
     "id": "c1_30",
@@ -295,7 +295,7 @@
     "category": "couples",
     "text_es": "¿Cuál es tu postre de confort definitivo cuando tuviste un mal día?",
     "text_en": "What is your ultimate comfort dessert after a brutal day?",
-    "text_pt": "Cuál es tu postre de confort definitivo cuando tuviste un mal día?",
+    "text_pt": "Qual é a sua sobremesa mais reconfortante quando você teve um dia ruim?",
     "text_fr": "Quel est ton ultimate comfort dessert after a brutal day?",
     "text_it": "Qual è tu postre de confort definitivo cuando tuviste un mal día?"
   },
@@ -305,9 +305,9 @@
     "category": "dates",
     "text_es": "¿Alguna vez fingiste que sabías de un tema solo para seguir una conversación?",
     "text_en": "Did you ever fake knowledge on a topic just to keep a conversation going?",
-    "text_pt": "Alguna vez fingiste que sabías de un tema solo para seguir una conversación?",
-    "text_fr": "Alguna vez fingiste que sabías de un tema solo para seguir una conversación?",
-    "text_it": "Alguna vez fingiste que sabías de un tema solo para seguir una conversación?"
+    "text_pt": "Você já fingiu que sabia sobre um assunto apenas para acompanhar uma conversa?",
+    "text_fr": "Avez-vous déjà prétendu connaître un sujet juste pour suivre une conversation ?",
+    "text_it": "Hai mai fatto finta di conoscere un argomento solo per seguire una conversazione?"
   },
   {
     "id": "c1_32",
@@ -315,9 +315,9 @@
     "category": "friends",
     "text_es": "Si tu vida tuviera una banda sonora, ¿qué género musical sonaría de fondo?",
     "text_en": "If your life had a background soundtrack, what genre would play?",
-    "text_pt": "Si tu vida tuviera una banda sonora, ¿qué género musical sonaría de fondo?",
-    "text_fr": "Si tu vida tuviera una banda sonora, qué género musical sonaría de fondo?",
-    "text_it": "Si tu vida tuviera una banda sonora, qué género musical sonaría de fondo?"
+    "text_pt": "Se sua vida tivesse uma trilha sonora, que gênero musical tocaria ao fundo?",
+    "text_fr": "Si votre vie avait une bande sonore, quel genre de musique jouerait en arrière-plan ?",
+    "text_it": "Se la tua vita avesse una colonna sonora, quale genere musicale suonerebbe in sottofondo?"
   },
   {
     "id": "c1_33",
@@ -325,9 +325,9 @@
     "category": "dates",
     "text_es": "¿Qué animal sientes que representa mejor tu personalidad en días libres?",
     "text_en": "What animal best represents your energy on free weekend days?",
-    "text_pt": "Qué animal sientes que representa mejor tu personalidad en días libres?",
-    "text_fr": "Qué animal sientes que representa mejor tu personalidad en días libres?",
-    "text_it": "Qué animal sientes que representa mejor tu personalidad en días libres?"
+    "text_pt": "Qual animal você acha que representa melhor sua personalidade nos dias de folga?",
+    "text_fr": "Selon vous, quel animal représente le mieux votre personnalité pendant vos jours de congé ?",
+    "text_it": "Quale animale ritieni rappresenti meglio la tua personalità nei giorni liberi?"
   },
   {
     "id": "c1_34",
@@ -335,9 +335,9 @@
     "category": "couples",
     "text_es": "¿Qué es lo más gracioso que te pasó intentando impresionar a alguien?",
     "text_en": "What is the funniest fail that happened while trying to impress someone?",
-    "text_pt": "Qué es lo más gracioso que te pasó intentando impresionar a alguien?",
+    "text_pt": "Qual foi a coisa mais engraçada que aconteceu com você tentando impressionar alguém?",
     "text_fr": "Quel est le funniest fail that happened while trying to impress someone?",
-    "text_it": "Qué es lo más gracioso que te pasó intentando impresionar a alguien?"
+    "text_it": "Qual è la cosa più divertente che ti è successa mentre cercavi di impressionare qualcuno?"
   },
   {
     "id": "c1_35",
@@ -345,7 +345,7 @@
     "category": "dates",
     "text_es": "¿Prefieres llamadas telefónicas, notas de voz o mensajes de texto?",
     "text_en": "Do you prefer phone calls, voice notes, or text messages?",
-    "text_pt": "Prefieres llamadas telefónicas, notas de voz o mensajes de texto?",
+    "text_pt": "Você prefere ligações, notas de voz ou mensagens de texto?",
     "text_fr": "Préfères-tu phone calls, voice notes, or text messages?",
     "text_it": "Preferisci llamadas telefónicas, notas de voz o mensajes de texto?"
   },
@@ -355,9 +355,9 @@
     "category": "friends",
     "text_es": "¿Qué lugar de tu ciudad sientes que es tu refugio secreto?",
     "text_en": "What spot in your city feels like your secret sanctuary?",
-    "text_pt": "Qué lugar de tu ciudad sientes que es tu refugio secreto?",
-    "text_fr": "Qué lugar de tu ciudad sientes que es tu refugio secreto?",
-    "text_it": "Qué lugar de tu ciudad sientes que es tu refugio secreto?"
+    "text_pt": "Que lugar da sua cidade você acha que é o seu refúgio secreto?",
+    "text_fr": "Selon vous, quel endroit de votre ville est votre refuge secret ?",
+    "text_it": "Quale posto della tua città ritieni sia il tuo rifugio segreto?"
   },
   {
     "id": "c1_37",
@@ -365,9 +365,9 @@
     "category": "dates",
     "text_es": "¿Qué habilidad manual te gustaría aprender si tuvieras tiempo libre ilimitado?",
     "text_en": "What craft or hands-on skill would you master with infinite free time?",
-    "text_pt": "Qué habilidad manual te gustaría aprender si tuvieras tiempo libre ilimitado?",
-    "text_fr": "Qué habilidad manual te gustaría aprender si tuvieras tiempo libre ilimitado?",
-    "text_it": "Qué habilidad manual te gustaría aprender si tuvieras tiempo libre ilimitado?"
+    "text_pt": "Que habilidade manual você gostaria de aprender se tivesse tempo livre ilimitado?",
+    "text_fr": "Quelle compétence manuelle aimeriez-vous apprendre si vous disposiez de temps libre illimité ?",
+    "text_it": "Quale abilità manuale ti piacerebbe apprendere se avessi tempo libero illimitato?"
   },
   {
     "id": "c1_38",
@@ -375,9 +375,9 @@
     "category": "dates",
     "text_es": "¿Eres de levantarte al primer sonido de alarma o posponerla 5 veces?",
     "text_en": "Do you leap out of bed on alarm one or hit snooze 5 times?",
-    "text_pt": "Eres de levantarte al primer sonido de alarma o posponerla 5 veces?",
-    "text_fr": "Eres de levantarte al primer sonido de alarma o posponerla 5 veces?",
-    "text_it": "Eres de levantarte al primer sonido de alarma o posponerla 5 veces?"
+    "text_pt": "Você acorda ao primeiro som do alarme ou adia 5 vezes?",
+    "text_fr": "Vous levez-vous au premier son de l'alarme ou la répétez-vous 5 fois ?",
+    "text_it": "Ti alzi al primo suono della sveglia o la posticipi 5 volte?"
   },
   {
     "id": "c1_39",
@@ -385,7 +385,7 @@
     "category": "couples",
     "text_es": "¿Cuál es una pequeña manía o detalle que te hace sonreír en otra persona?",
     "text_en": "What small quirk in someone else easily makes you smile?",
-    "text_pt": "Cuál es una pequeña manía o detalle que te hace sonreír en otra persona?",
+    "text_pt": "Qual é uma pequena peculiaridade ou detalhe que faz você sorrir em outra pessoa?",
     "text_fr": "Quel est una pequeña manía o detalle que te hace sonreír en otra persona?",
     "text_it": "Qual è una pequeña manía o detalle que te hace sonreír en otra persona?"
   },
@@ -395,9 +395,9 @@
     "category": "friends",
     "text_es": "¿Cuál ha sido la fiesta o salida nocturna más caótica pero divertida que viviste?",
     "text_en": "What was the most chaotic yet legendary night out you experienced?",
-    "text_pt": "Cuál ha sido la fiesta o salida nocturna más caótica pero divertida que viviste?",
+    "text_pt": "Qual foi a festa ou noite mais caótica, mas divertida, que você já teve?",
     "text_fr": "Quel a été le most chaotic yet legendary night out you experienced?",
-    "text_it": "Cuál ha sido la fiesta o salida nocturna más caótica pero divertida que viviste?"
+    "text_it": "Qual è stata la festa o la serata fuori più caotica ma divertente che tu abbia mai avuto?"
   },
   {
     "id": "c1_41",
@@ -405,9 +405,9 @@
     "category": "dates",
     "text_es": "¿Playa solitaria, cabaña en la montaña o metrópolis llena de luces?",
     "text_en": "Secluded beach, mountain cabin, or glowing metropolis?",
-    "text_pt": "Playa solitaria, cabaña en la montaña o metrópolis llena de luces?",
-    "text_fr": "Playa solitaria, cabaña en la montaña o metrópolis llena de luces?",
-    "text_it": "Playa solitaria, cabaña en la montaña o metrópolis llena de luces?"
+    "text_pt": "Praia solitária, cabana na montanha ou metrópole cheia de luzes?",
+    "text_fr": "Plage solitaire, chalet de montagne ou métropole pleine de lumières ?",
+    "text_it": "Spiaggia solitaria, baita in montagna o metropoli piena di luci?"
   },
   {
     "id": "c1_42",
@@ -415,9 +415,9 @@
     "category": "dates",
     "text_es": "¿Qué compraste recientemente que mejoró tu calidad de vida diaria?",
     "text_en": "What recent small purchase genuinely upgraded your daily life?",
-    "text_pt": "Qué compraste recientemente que mejoró tu calidad de vida diaria?",
-    "text_fr": "Qué compraste recientemente que mejoró tu calidad de vida diaria?",
-    "text_it": "Qué compraste recientemente que mejoró tu calidad de vida diaria?"
+    "text_pt": "O que você comprou recentemente que melhorou sua qualidade de vida diária?",
+    "text_fr": "Qu’avez-vous récemment acheté qui a amélioré votre qualité de vie au quotidien ?",
+    "text_it": "Cosa hai acquistato di recente che ha migliorato la qualità della tua vita quotidiana?"
   },
   {
     "id": "c1_43",
@@ -425,7 +425,7 @@
     "category": "friends",
     "text_es": "¿Cuál es el apunte o recordatorio más raro que tienes guardado en tu teléfono?",
     "text_en": "What is the weirdest note or screenshot saved on your phone right now?",
-    "text_pt": "Cuál es el apunte o recordatorio más raro que tienes guardado en tu teléfono?",
+    "text_pt": "Qual foi a nota ou lembrete mais estranho que você salvou no seu telefone?",
     "text_fr": "Quel est le weirdest note or screenshot saved on your phone right now?",
     "text_it": "Qual è el apunte o recordatorio más raro que tienes guardado en tu teléfono?"
   },
@@ -435,9 +435,9 @@
     "category": "couples",
     "text_es": "¿Qué tema o tema de conversación puedes hablar por horas sin aburrirte?",
     "text_en": "What topic can you talk about for hours without ever tiring?",
-    "text_pt": "Qué tema o tema de conversación puedes hablar por horas sin aburrirte?",
-    "text_fr": "Qué tema o tema de conversación puedes hablar por horas sin aburrirte?",
-    "text_it": "Qué tema o tema de conversación puedes hablar por horas sin aburrirte?"
+    "text_pt": "Sobre qual assunto ou assunto de conversa você pode conversar por horas sem ficar entediado?",
+    "text_fr": "De quel sujet ou sujet de conversation pouvez-vous parler pendant des heures sans vous ennuyer ?",
+    "text_it": "Di quale argomento o argomento di conversazione puoi parlare per ore senza annoiarti?"
   },
   {
     "id": "c1_45",
@@ -445,9 +445,9 @@
     "category": "dates",
     "text_es": "¿Qué opinas del horóscopo o la astrología: diversión, realidad o estafa?",
     "text_en": "Horoscopes & astrology: harmless fun, legitimate truth, or total scam?",
-    "text_pt": "Qué opinas del horóscopo o la astrología: diversión, realidad o estafa?",
-    "text_fr": "Qué opinas del horóscopo o la astrología: diversión, realidad o estafa?",
-    "text_it": "Qué opinas del horóscopo o la astrología: diversión, realidad o estafa?"
+    "text_pt": "O que você acha sobre horóscopo ou astrologia: diversão, realidade ou fraude?",
+    "text_fr": "Que pensez-vous de l'horoscope ou de l'astrologie : amusant, réalité ou arnaque ?",
+    "text_it": "Cosa ne pensi dell'oroscopo o dell'astrologia: divertimento, realtà o truffa?"
   },
   {
     "id": "c1_46",
@@ -455,7 +455,7 @@
     "category": "friends",
     "text_es": "¿Cuál fue el último video o reel que te hizo reír a carcajadas solo?",
     "text_en": "What was the last clip or reel that made you laugh out loud alone?",
-    "text_pt": "Cuál fue el último video o reel que te hizo reír a carcajadas solo?",
+    "text_pt": "Qual foi o último vídeo ou reel que te fez rir alto sozinho?",
     "text_fr": "Quel a été le last clip or reel that made you laugh out loud alone?",
     "text_it": "Qual è stato el último video o reel que te hizo reír a carcajadas solo?"
   },
@@ -465,9 +465,9 @@
     "category": "dates",
     "text_es": "¿Qué es algo que todo el mundo parece amar pero a ti te deja totalmente frío?",
     "text_en": "What is something everybody loves that leaves you completely indifferent?",
-    "text_pt": "Qué es algo que todo el mundo parece amar pero a ti te deja totalmente frío?",
-    "text_fr": "Qué es algo que todo el mundo parece amar pero a ti te deja totalmente frío?",
-    "text_it": "Qué es algo que todo el mundo parece amar pero a ti te deja totalmente frío?"
+    "text_pt": "O que é algo que todo mundo parece amar, mas deixa você completamente indiferente?",
+    "text_fr": "Quelle est quelque chose que tout le monde semble aimer mais qui vous laisse complètement froid ?",
+    "text_it": "Qual è qualcosa che tutti sembrano amare ma che ti lascia completamente freddo?"
   },
   {
     "id": "c1_48",
@@ -475,9 +475,9 @@
     "category": "couples",
     "text_es": "¿Cómo demuestras cariño cuando no quieres usar palabras?",
     "text_en": "How do you show care and affection without using words?",
-    "text_pt": "Cómo demuestras cariño cuando no quieres usar palabras?",
-    "text_fr": "Cómo demuestras cariño cuando no quieres usar palabras?",
-    "text_it": "Cómo demuestras cariño cuando no quieres usar palabras?"
+    "text_pt": "Como você demonstra carinho quando não quer usar palavras?",
+    "text_fr": "Comment montrer de l’affection quand on ne veut pas utiliser de mots ?",
+    "text_it": "Come mostri affetto quando non vuoi usare le parole?"
   },
   {
     "id": "c1_49",
@@ -485,9 +485,9 @@
     "category": "friends",
     "text_es": "Si pudieras borrar una aplicación de tu móvil para siempre sin consecuencias, ¿cuál sería?",
     "text_en": "If you could erase one app from your phone forever with no FOMO, which one?",
-    "text_pt": "Se você pudesse borrar una aplicación de tu móvil para siempre sin consecuencias, ¿cuál sería?",
+    "text_pt": "Se você pudesse excluir um aplicativo do seu telefone para sempre sem consequências, qual seria?",
     "text_fr": "Si tu pouvais erase one app from your phone forever with no FOMO, which one?",
-    "text_it": "Se potessi borrar una aplicación de tu móvil para siempre sin consecuencias, cuál sería?"
+    "text_it": "Se potessi eliminare per sempre un'app dal tuo telefono senza conseguenze, quale sarebbe?"
   },
   {
     "id": "c1_50",
@@ -495,9 +495,9 @@
     "category": "dates",
     "text_es": "¿Qué primera impresión crees que le das a la gente cuando te ven por primera vez?",
     "text_en": "What first impression do you think you project when people first see you?",
-    "text_pt": "Qué primera impresión crees que le das a la gente cuando te ven por primera vez?",
-    "text_fr": "Qué primera impresión crees que le das a la gente cuando te ven por primera vez?",
-    "text_it": "Qué primera impresión crees que le das a la gente cuando te ven por primera vez?"
+    "text_pt": "Que primeira impressão você acha que causa nas pessoas quando elas te veem pela primeira vez?",
+    "text_fr": "Quelle première impression pensez-vous faire aux gens lorsqu’ils vous voient pour la première fois ?",
+    "text_it": "Quale prima impressione pensi di lasciare alle persone quando ti vedono per la prima volta?"
   },
   {
     "id": "c2_1",
@@ -505,9 +505,9 @@
     "category": "dates",
     "text_es": "¿Qué cualidad admiras más en tus amigos más cercanos?",
     "text_en": "What quality do you admire most in your closest friends?",
-    "text_pt": "Qué cualidad admiras más en seus amigos más cercanos?",
-    "text_fr": "Qué cualidad admiras más en tus amigos más cercanos?",
-    "text_it": "Qué cualidad admiras más en i tuoi amici más cercanos?"
+    "text_pt": "Que qualidade você mais admira em seus amigos mais próximos?",
+    "text_fr": "Quelle qualité admirez-vous le plus chez vos amis les plus proches ?",
+    "text_it": "Quale qualità ammiri di più nei tuoi amici più cari?"
   },
   {
     "id": "c2_2",
@@ -515,9 +515,9 @@
     "category": "couples",
     "text_es": "¿Qué significa para ti sentirte seguro emocionalmente con una persona?",
     "text_en": "What does emotional safety with another person genuinely feel like to you?",
-    "text_pt": "Qué significa para ti sentirte seguro emocionalmente con una persona?",
-    "text_fr": "Qué significa para ti sentirte seguro emocionalmente con una persona?",
-    "text_it": "Qué significa para ti sentirte seguro emocionalmente con una persona?"
+    "text_pt": "O que significa para você se sentir emocionalmente seguro com uma pessoa?",
+    "text_fr": "Qu’est-ce que cela signifie pour vous de vous sentir émotionnellement en sécurité avec une personne ?",
+    "text_it": "Cosa significa per te sentirti emotivamente al sicuro con una persona?"
   },
   {
     "id": "c2_3",
@@ -525,9 +525,9 @@
     "category": "friends",
     "text_es": "¿En qué momento de tu vida sentiste que maduraste de golpe?",
     "text_en": "At what turning point in your life did you feel you suddenly grew up?",
-    "text_pt": "En qué momento da sua vida sentiste que maduraste de golpe?",
-    "text_fr": "En qué momento de tu vida sentiste que maduraste de golpe?",
-    "text_it": "En qué momento della tua vita sentiste que maduraste de golpe?"
+    "text_pt": "Em que momento da sua vida você sentiu que amadureceu de repente?",
+    "text_fr": "À quel moment de votre vie avez-vous eu l’impression d’avoir soudainement mûri ?",
+    "text_it": "In quale momento della tua vita ti sei sentito come se fossi improvvisamente maturato?"
   },
   {
     "id": "c2_4",
@@ -535,9 +535,9 @@
     "category": "dates",
     "text_es": "¿Qué es algo que antes tolerabas en vínculos afectivos y hoy es un límite claro?",
     "text_en": "What is something you used to tolerate that is now a firm boundary?",
-    "text_pt": "Qué es algo que antes tolerabas en vínculos afectivos y hoy es un límite claro?",
-    "text_fr": "Qué es algo que antes tolerabas en vínculos afectivos y hoy es un límite claro?",
-    "text_it": "Qué es algo que antes tolerabas en vínculos afectivos y hoy es un límite claro?"
+    "text_pt": "O que você tolerava nos laços afetivos e hoje é um limite claro?",
+    "text_fr": "Qu’est-ce que vous tolériez autrefois dans les liens affectifs et qui constitue aujourd’hui une limite claire ?",
+    "text_it": "Qual è qualcosa che tolleravi nei legami affettivi e che oggi rappresenta un limite evidente?"
   },
   {
     "id": "c2_5",
@@ -545,7 +545,7 @@
     "category": "couples",
     "text_es": "¿Prefieres que te digan una verdad incómoda de inmediato o que cuiden tus formas?",
     "text_en": "Do you prefer blunt uncomfortable truth immediately, or cushioned empathy?",
-    "text_pt": "Prefieres que te digan una verdad incómoda de inmediato o que cuiden tus formas?",
+    "text_pt": "Você prefere ouvir uma verdade incômoda imediatamente ou observar seus caminhos?",
     "text_fr": "Préfères-tu blunt uncomfortable truth immediately, or cushioned empathy?",
     "text_it": "Preferisci que te digan una verdad incómoda de inmediato o que cuiden tus formas?"
   },
@@ -555,9 +555,9 @@
     "category": "dates",
     "text_es": "¿Cuál ha sido la decisión más difícil que tomaste por amor propio?",
     "text_en": "What was the toughest decision you made purely out of self-respect?",
-    "text_pt": "Cuál ha sido la decisión más difícil que tomaste por amor propio?",
+    "text_pt": "Qual foi a decisão mais difícil que você tomou por amor próprio?",
     "text_fr": "Quel a été le toughest decision you made purely out of self-respect?",
-    "text_it": "Cuál ha sido la decisión más difícil que tomaste por amor propio?"
+    "text_it": "Qual è stata la decisione più difficile che hai preso per amor proprio?"
   },
   {
     "id": "c2_7",
@@ -565,9 +565,9 @@
     "category": "friends",
     "text_es": "¿Qué creencia o prejuicio que tenías cambiaste radicalmente con los años?",
     "text_en": "What belief or preconception did you radically change over the years?",
-    "text_pt": "Qué creencia o prejuicio que tenías cambiaste radicalmente con los años?",
-    "text_fr": "Qué creencia o prejuicio que tenías cambiaste radicalmente con los años?",
-    "text_it": "Qué creencia o prejuicio que tenías cambiaste radicalmente con los años?"
+    "text_pt": "Que crença ou preconceito você mudou radicalmente ao longo dos anos?",
+    "text_fr": "Quelle croyance ou quel préjugé avez-vous radicalement changé au fil des années ?",
+    "text_it": "Quale convinzione o pregiudizio hai cambiato radicalmente nel corso degli anni?"
   },
   {
     "id": "c2_8",
@@ -575,9 +575,9 @@
     "category": "couples",
     "text_es": "¿Cómo manejas los silencios compartidos con otra persona: paz o incomodidad?",
     "text_en": "How do you experience shared silence: calming presence or awkward tension?",
-    "text_pt": "Cómo manejas los silencios compartidos con otra persona: paz o incomodidad?",
-    "text_fr": "Cómo manejas los silencios compartidos con otra persona: paz o incomodidad?",
-    "text_it": "Cómo manejas los silencios compartidos con otra persona: paz o incomodidad?"
+    "text_pt": "Como você lida com os silêncios compartilhados com outra pessoa: paz ou desconforto?",
+    "text_fr": "Comment gérer les silences partagés avec une autre personne : paix ou inconfort ?",
+    "text_it": "Come gestisci i silenzi condivisi con un'altra persona: pace o disagio?"
   },
   {
     "id": "c2_9",
@@ -585,9 +585,9 @@
     "category": "dates",
     "text_es": "¿Qué parte de tu rutina diaria es intocable porque protege tu salud mental?",
     "text_en": "What part of your daily routine is sacred because it preserves your mental peace?",
-    "text_pt": "Qué parte de tu rutina diaria es intocable porque protege tu salud mental?",
-    "text_fr": "Qué parte de tu rutina diaria es intocable porque protege tu salud mental?",
-    "text_it": "Qué parte de tu rutina diaria es intocable porque protege tu salud mental?"
+    "text_pt": "Que parte da sua rotina diária é intocável porque protege a sua saúde mental?",
+    "text_fr": "Quelle partie de votre routine quotidienne est intouchable car elle protège votre santé mentale ?",
+    "text_it": "Quale parte della tua routine quotidiana è intoccabile perché protegge la tua salute mentale?"
   },
   {
     "id": "c2_10",
@@ -595,9 +595,9 @@
     "category": "friends",
     "text_es": "¿Alguna vez sentiste envidia sana de alguien a quien quieres? ¿Qué aprendiste de eso?",
     "text_en": "Did you ever feel benign envy towards someone you love? What did you learn?",
-    "text_pt": "Alguna vez sentiste envidia sana de alguien a quien quieres? ¿Qué aprendiste de eso?",
-    "text_fr": "Alguna vez sentiste envidia sana de alguien a quien quieres? Qué aprendiste de eso?",
-    "text_it": "Alguna vez sentiste envidia sana de alguien a quien quieres? Qué aprendiste de eso?"
+    "text_pt": "Você já sentiu uma inveja saudável de alguém que ama? O que você aprendeu com isso?",
+    "text_fr": "Avez-vous déjà ressenti une saine envie envers quelqu’un que vous aimez ? Qu’avez-vous appris de cela ?",
+    "text_it": "Hai mai provato una sana invidia per qualcuno che ami? Cosa hai imparato da questo?"
   },
   {
     "id": "c2_11",
@@ -605,7 +605,7 @@
     "category": "couples",
     "text_es": "¿Qué es lo que más te cuesta pedir cuando necesitas ayuda?",
     "text_en": "What is the hardest thing for you to ask for when you need help?",
-    "text_pt": "Qué es lo que más te cuesta pedir cuando necesitas ayuda?",
+    "text_pt": "Qual é a coisa mais difícil para você pedir quando precisa de ajuda?",
     "text_fr": "Quel est le hardest thing for you to ask for when you need help?",
     "text_it": "Cosa apprezzi di più te cuesta pedir cuando necesitas ayuda?"
   },
@@ -615,9 +615,9 @@
     "category": "dates",
     "text_es": "¿Qué rol juega la ambición profesional en tu escala de prioridades?",
     "text_en": "What role does career ambition play in your life priorities hierarchy?",
-    "text_pt": "Qué rol juega la ambición profesional en tu escala de prioridades?",
-    "text_fr": "Qué rol juega la ambición profesional en tu escala de prioridades?",
-    "text_it": "Qué rol juega la ambición profesional en tu escala de prioridades?"
+    "text_pt": "Qual o papel da ambição profissional na sua escala de prioridades?",
+    "text_fr": "Quelle place joue l’ambition professionnelle dans votre échelle de priorités ?",
+    "text_it": "Che ruolo gioca l’ambizione professionale nella tua scala di priorità?"
   },
   {
     "id": "c2_13",
@@ -625,9 +625,9 @@
     "category": "friends",
     "text_es": "¿Qué conversación pendiente te da vueltas en la cabeza y aún no has tenido?",
     "text_en": "What pending conversation keeps lingering in your mind?",
-    "text_pt": "Qué conversación pendiente te da vueltas en la cabeza y aún no has tenido?",
-    "text_fr": "Qué conversación pendiente te da vueltas en la cabeza y aún no has tenido?",
-    "text_it": "Qué conversación pendiente te da vueltas en la cabeza y aún no has tenido?"
+    "text_pt": "Que conversa pendente está em sua mente e que você ainda não teve?",
+    "text_fr": "Quelle conversation en cours avez-vous en tête et que vous n'avez pas encore eue ?",
+    "text_it": "Quale conversazione in sospeso hai in mente che non hai ancora avuto?"
   },
   {
     "id": "c2_14",
@@ -635,9 +635,9 @@
     "category": "couples",
     "text_es": "¿Qué detalle o gesto hace que sientas que alguien realmente te está escuchando?",
     "text_en": "What subtle gesture makes you feel truly heard and understood?",
-    "text_pt": "Qué detalle o gesto hace que sientas que alguien realmente te está escuchando?",
-    "text_fr": "Qué detalle o gesto hace que sientas que alguien realmente te está escuchando?",
-    "text_it": "Qué detalle o gesto hace que sientas que alguien realmente te está escuchando?"
+    "text_pt": "Que detalhe ou gesto faz você sentir que alguém está realmente ouvindo você?",
+    "text_fr": "Quel détail ou geste vous donne l’impression que quelqu’un vous écoute vraiment ?",
+    "text_it": "Quale dettaglio o gesto ti fa sentire come se qualcuno ti stesse davvero ascoltando?"
   },
   {
     "id": "c2_15",
@@ -645,9 +645,9 @@
     "category": "dates",
     "text_es": "¿En qué te consideras una persona fácil de tratar y en qué eres más exigente?",
     "text_en": "In what ways are you easygoing, and where are you more demanding?",
-    "text_pt": "En qué te consideras una persona fácil de tratar y en qué eres más exigente?",
-    "text_fr": "En qué te consideras una persona fácil de tratar y en qué eres más exigente?",
-    "text_it": "En qué te consideras una persona fácil de tratar y en qué eres más exigente?"
+    "text_pt": "De que forma você se considera uma pessoa fácil de lidar e de que forma você é mais exigente?",
+    "text_fr": "En quoi vous considérez-vous comme une personne facile à gérer et en quoi êtes-vous plus exigeant ?",
+    "text_it": "In che modo ti consideri una persona facile da trattare e in che modo sei più esigente?"
   },
   {
     "id": "c2_16",
@@ -655,9 +655,9 @@
     "category": "friends",
     "text_es": "¿Cuál ha sido el mayor acto de generosidad que han tenido contigo?",
     "text_en": "What was the greatest act of generosity anyone has ever shown you?",
-    "text_pt": "Cuál ha sido el mayor acto de generosidad que han tenido contigo?",
+    "text_pt": "Qual foi o maior ato de generosidade que eles tiveram para com você?",
     "text_fr": "Quel a été le greatest act of generosity anyone has ever shown you?",
-    "text_it": "Cuál ha sido el mayor acto de generosidad que han tenido contigo?"
+    "text_it": "Qual è stato il più grande atto di generosità che hanno avuto nei tuoi confronti?"
   },
   {
     "id": "c2_17",
@@ -665,9 +665,9 @@
     "category": "couples",
     "text_es": "¿Qué herencia emocional o hábito de tu familia buscas no repetir?",
     "text_en": "What emotional pattern from your upbringing do you consciously try not to repeat?",
-    "text_pt": "Qué herencia emocional o hábito de tu familia buscas no repetir?",
-    "text_fr": "Qué herencia emocional o hábito de tu familia buscas no repetir?",
-    "text_it": "Qué herencia emocional o hábito de tu familia buscas no repetir?"
+    "text_pt": "Que herança emocional ou hábito da sua família você busca não repetir?",
+    "text_fr": "Quel héritage émotionnel ou habitude de votre famille cherchez-vous à ne pas répéter ?",
+    "text_it": "Quale eredità emotiva o abitudine della tua famiglia cerchi di non ripetere?"
   },
   {
     "id": "c2_18",
@@ -675,9 +675,9 @@
     "category": "dates",
     "text_es": "¿Cómo reaccionas cuando algo no sale como lo tenías planeado?",
     "text_en": "How do you handle plans falling apart at the last second?",
-    "text_pt": "Cómo reaccionas cuando algo no sale como lo tenías planeado?",
-    "text_fr": "Cómo reaccionas cuando algo no sale como lo tenías planeado?",
-    "text_it": "Cómo reaccionas cuando algo no sale como lo tenías planeado?"
+    "text_pt": "Como você reage quando algo não sai como planejado?",
+    "text_fr": "Comment réagissez-vous lorsque quelque chose ne se passe pas comme prévu ?",
+    "text_it": "Come reagisci quando qualcosa non va come previsto?"
   },
   {
     "id": "c2_19",
@@ -685,9 +685,9 @@
     "category": "friends",
     "text_es": "¿A qué amistad que se enfrió con el tiempo todavía le tienes un cariño intacto?",
     "text_en": "Which faded friendship do you still hold deep unspoken affection for?",
-    "text_pt": "A qué amistad que se enfrió con el tiempo todavía le tienes un cariño intacto?",
-    "text_fr": "A qué amistad que se enfrió con el tiempo todavía le tienes un cariño intacto?",
-    "text_it": "A qué amistad que se enfrió con el tiempo todavía le tienes un cariño intacto?"
+    "text_pt": "Por qual amizade que esfriou com o tempo você ainda tem um carinho intacto?",
+    "text_fr": "Pour quelle amitié qui s’est refroidie avec le temps avez-vous encore une affection intacte ?",
+    "text_it": "Per quale amicizia che si è raffreddata nel tempo provi ancora un affetto intatto?"
   },
   {
     "id": "c2_20",
@@ -695,9 +695,9 @@
     "category": "couples",
     "text_es": "¿Qué te hace sentir más valorado: el tiempo de calidad, las palabras o los actos de servicio?",
     "text_en": "What makes you feel most cherished: quality time, words, or acts of care?",
-    "text_pt": "Qué te hace sentir más valorado: el tiempo de calidad, las palabras o los actos de servicio?",
-    "text_fr": "Qué te hace sentir más valorado: el tiempo de calidad, las palabras o los actos de servicio?",
-    "text_it": "Qué te hace sentir más valorado: el tiempo de calidad, las palabras o los actos de servicio?"
+    "text_pt": "O que faz você se sentir mais valorizado: tempo de qualidade, palavras ou atos de serviço?",
+    "text_fr": "Qu'est-ce qui vous fait vous sentir plus valorisé : du temps de qualité, des paroles ou des actes de service ?",
+    "text_it": "Cosa ti fa sentire più apprezzato: tempo di qualità, parole o atti di servizio?"
   },
   {
     "id": "c2_21",
@@ -705,9 +705,9 @@
     "category": "dates",
     "text_es": "¿Qué aspecto de tu personalidad suele tardar más tiempo en salir a la luz?",
     "text_en": "Which side of your personality takes the longest to reveal itself?",
-    "text_pt": "Qué aspecto de tu personalidad suele tardar más tiempo en salir a la luz?",
-    "text_fr": "Qué aspecto de tu personalidad suele tardar más tiempo en salir a la luz?",
-    "text_it": "Qué aspecto de tu personalidad suele tardar más tiempo en salir a la luz?"
+    "text_pt": "Qual aspecto da sua personalidade geralmente leva mais tempo para vir à tona?",
+    "text_fr": "Quel aspect de votre personnalité met généralement le plus de temps à se révéler ?",
+    "text_it": "Quale aspetto della tua personalità di solito impiega più tempo a venire alla luce?"
   },
   {
     "id": "c2_22",
@@ -715,9 +715,9 @@
     "category": "friends",
     "text_es": "¿Qué significa el éxito para ti en esta etapa exacta de tu vida?",
     "text_en": "What does genuine success mean to you at this exact season of life?",
-    "text_pt": "Qué significa el éxito para ti en esta etapa exacta da sua vida?",
-    "text_fr": "Qué significa el éxito para ti en esta etapa exacta de tu vida?",
-    "text_it": "Qué significa el éxito para ti en esta etapa exacta della tua vita?"
+    "text_pt": "O que o sucesso significa para você nesta fase exata da sua vida?",
+    "text_fr": "Que signifie pour vous le succès à ce stade précis de votre vie ?",
+    "text_it": "Cosa significa per te il successo in questa esatta fase della tua vita?"
   },
   {
     "id": "c2_23",
@@ -725,7 +725,7 @@
     "category": "couples",
     "text_es": "¿Qué es lo que más te apasiona enseñar o compartir con los demás?",
     "text_en": "What are you most passionate about sharing or teaching to others?",
-    "text_pt": "Qué es lo que más te apasiona enseñar o compartir con los demás?",
+    "text_pt": "O que você mais gosta de ensinar ou compartilhar com outras pessoas?",
     "text_fr": "Qu'est-ce qui te te apasiona enseñar o compartir con los demás?",
     "text_it": "Cosa apprezzi di più te apasiona enseñar o compartir con los demás?"
   },
@@ -735,7 +735,7 @@
     "category": "dates",
     "text_es": "¿Cuál es un cumplido sobre tu forma de ser que te llena más que uno físico?",
     "text_en": "What compliment about your character matters far more than an aesthetic one?",
-    "text_pt": "Cuál es un cumplido sobre tu forma de ser que te llena más que uno físico?",
+    "text_pt": "Qual é um elogio sobre sua maneira de ser que o satisfaz mais do que um elogio físico?",
     "text_fr": "Quel est un cumplido sobre tu forma de ser que te llena más que uno físico?",
     "text_it": "Qual è un cumplido sobre tu forma de ser que te llena más que uno físico?"
   },
@@ -745,9 +745,9 @@
     "category": "friends",
     "text_es": "¿Qué error del pasado hoy agradeces haber cometido por la lección que te dejó?",
     "text_en": "What past mistake are you grateful for because of the wisdom it gifted you?",
-    "text_pt": "Qué error del pasado hoy agradeces haber cometido por la lección que te dejó?",
-    "text_fr": "Qué error del pasado hoy agradeces haber cometido por la lección que te dejó?",
-    "text_it": "Qué error del pasado hoy agradeces haber cometido por la lección que te dejó?"
+    "text_pt": "Que erro do passado você está grato por ter cometido hoje pela lição que lhe ensinou?",
+    "text_fr": "Quelle erreur du passé êtes-vous reconnaissant d’avoir commise aujourd’hui pour la leçon qu’elle vous a apprise ?",
+    "text_it": "Quale errore del passato sei grato di aver commesso oggi per la lezione che ti ha insegnato?"
   },
   {
     "id": "c2_26",
@@ -755,9 +755,9 @@
     "category": "couples",
     "text_es": "¿Qué haces cuando sientes que la rutina te está apagando el entusiasmo?",
     "text_en": "What do you do when routine starts dulling your spark?",
-    "text_pt": "Qué haces cuando sientes que la rutina te está apagando el entusiasmo?",
-    "text_fr": "Qué haces cuando sientes que la rutina te está apagando el entusiasmo?",
-    "text_it": "Qué haces cuando sientes que la rutina te está apagando el entusiasmo?"
+    "text_pt": "O que você faz quando sente que a rotina está diminuindo seu entusiasmo?",
+    "text_fr": "Que faites-vous lorsque vous sentez que la routine freine votre enthousiasme ?",
+    "text_it": "Cosa fai quando senti che la routine sta smorzando il tuo entusiasmo?"
   },
   {
     "id": "c2_27",
@@ -765,9 +765,9 @@
     "category": "dates",
     "text_es": "¿Qué tan cómodo te sientes diciendo \"no\" sin dar explicaciones innecesarias?",
     "text_en": "How comfortable are you saying \"no\" without over-explaining?",
-    "text_pt": "Qué tan cómodo te sientes diciendo \"no\" sin dar explicaciones innecesarias?",
-    "text_fr": "Qué tan cómodo te sientes diciendo \"no\" sin dar explicaciones innecesarias?",
-    "text_it": "Qué tan cómodo te sientes diciendo \"no\" sin dar explicaciones innecesarias?"
+    "text_pt": "Quão confortável você se sente em dizer “não” sem dar explicações desnecessárias?",
+    "text_fr": "Dans quelle mesure êtes-vous à l’aise pour dire « non » sans donner d’explications inutiles ?",
+    "text_it": "Quanto ti senti a tuo agio nel dire \"no\" senza dare spiegazioni inutili?"
   },
   {
     "id": "c2_28",
@@ -775,7 +775,7 @@
     "category": "friends",
     "text_es": "¿Cuál es una causa social o causa personal con la que te comprometes de verdad?",
     "text_en": "What cause or value do you stand up for without hesitation?",
-    "text_pt": "Cuál es una causa social o causa personal con la que te comprometes de verdad?",
+    "text_pt": "Qual é uma causa social ou pessoal com a qual você está realmente comprometido?",
     "text_fr": "Quel est una causa social o causa personal con la que te comprometes de verdad?",
     "text_it": "Qual è una causa social o causa personal con la que te comprometes de verdad?"
   },
@@ -785,9 +785,9 @@
     "category": "couples",
     "text_es": "¿Qué necesitas de tu pareja cuando estás pasando por un día frustrante?",
     "text_en": "What do you need most from your partner on an exhausting day?",
-    "text_pt": "Qué necesitas de seu parceiro(a) cuando estás pasando por un día frustrante?",
-    "text_fr": "Qué necesitas de tu pareja cuando estás pasando por un día frustrante?",
-    "text_it": "Qué necesitas de il tuo partner cuando estás pasando por un día frustrante?"
+    "text_pt": "O que você precisa do seu parceiro quando está tendo um dia frustrante?",
+    "text_fr": "De quoi avez-vous besoin de votre partenaire lorsque vous passez une journée frustrante ?",
+    "text_it": "Di cosa hai bisogno dal tuo partner quando stai vivendo una giornata frustrante?"
   },
   {
     "id": "c2_30",
@@ -795,9 +795,9 @@
     "category": "dates",
     "text_es": "¿Crees que las personas cambian en su esencia o solo aprenden a adaptarse?",
     "text_en": "Do people fundamentally change, or do they just learn to adapt?",
-    "text_pt": "Crees que las personas cambian en su esencia o solo aprenden a adaptarse?",
-    "text_fr": "Crees que las personas cambian en su esencia o solo aprenden a adaptarse?",
-    "text_it": "Crees que las personas cambian en su esencia o solo aprenden a adaptarse?"
+    "text_pt": "Você acha que as pessoas mudam em sua essência ou apenas aprendem a se adaptar?",
+    "text_fr": "Pensez-vous que les gens changent dans leur essence ou apprennent simplement à s'adapter ?",
+    "text_it": "Pensi che le persone cambino nella loro essenza o semplicemente imparino ad adattarsi?"
   },
   {
     "id": "c2_31",
@@ -805,9 +805,9 @@
     "category": "friends",
     "text_es": "¿Qué rasgo o actitud en alguien apaga tu interés al instante?",
     "text_en": "What behavior or attitude instantly turns off your interest?",
-    "text_pt": "Qué rasgo o actitud en alguien apaga tu interés al instante?",
-    "text_fr": "Qué rasgo o actitud en alguien apaga tu interés al instante?",
-    "text_it": "Qué rasgo o actitud en alguien apaga tu interés al instante?"
+    "text_pt": "Que característica ou atitude de alguém desativa instantaneamente seu interesse?",
+    "text_fr": "Quel trait ou attitude chez quelqu’un désactive instantanément votre intérêt ?",
+    "text_it": "Quale tratto o atteggiamento di qualcuno spegne immediatamente il tuo interesse?"
   },
   {
     "id": "c2_32",
@@ -815,7 +815,7 @@
     "category": "couples",
     "text_es": "¿Cuál es tu forma de disculparte cuando sabes que te equivocaste?",
     "text_en": "How do you apologize when you realize you were in the wrong?",
-    "text_pt": "Cuál es tu forma de disculparte cuando sabes que te equivocaste?",
+    "text_pt": "Qual é a sua maneira de se desculpar quando sabe que errou?",
     "text_fr": "Quel est tu forma de disculparte cuando sabes que te equivocaste?",
     "text_it": "Qual è tu forma de disculparte cuando sabes que te equivocaste?"
   },
@@ -825,9 +825,9 @@
     "category": "dates",
     "text_es": "¿Qué es lo más valioso que aprendiste de tu última relación importante?",
     "text_en": "What was the most valuable lesson from your previous relationship?",
-    "text_pt": "Qué es lo más valioso que aprendiste de tu última relación importante?",
+    "text_pt": "Qual foi a coisa mais valiosa que você aprendeu em seu último relacionamento importante?",
     "text_fr": "Quel a été le most valuable lesson from your previous relationship?",
-    "text_it": "Qué es lo más valioso que aprendiste de tu última relación importante?"
+    "text_it": "Qual è la cosa più preziosa che hai imparato dalla tua ultima relazione importante?"
   },
   {
     "id": "c2_34",
@@ -835,9 +835,9 @@
     "category": "friends",
     "text_es": "¿En qué situación sientes que estás en tu elemento y con máxima confianza?",
     "text_en": "In what context do you feel completely in your element and confidence?",
-    "text_pt": "En qué situación sientes que estás en tu elemento y con máxima confianza?",
-    "text_fr": "En qué situación sientes que estás en tu elemento y con máxima confianza?",
-    "text_it": "En qué situación sientes que estás en tu elemento y con máxima confianza?"
+    "text_pt": "Em que situação você se sente no seu elemento e com a máxima confiança?",
+    "text_fr": "Dans quelle situation vous sentez-vous dans votre élément et avec un maximum de confiance ?",
+    "text_it": "In quale situazione ti senti nel tuo elemento e con la massima sicurezza?"
   },
   {
     "id": "c2_35",
@@ -845,9 +845,9 @@
     "category": "couples",
     "text_es": "¿Qué peso le das al espacio personal e individual dentro de una pareja?",
     "text_en": "How much weight do you give to personal space inside a relationship?",
-    "text_pt": "Qué peso le das al espacio personal e individual dentro de una pareja?",
-    "text_fr": "Qué peso le das al espacio personal e individual dentro de una pareja?",
-    "text_it": "Qué peso le das al espacio personal e individual dentro de una pareja?"
+    "text_pt": "Que peso você dá ao espaço pessoal e individual dentro de um casal?",
+    "text_fr": "Quelle importance accordez-vous à l’espace personnel et individuel au sein d’un couple ?",
+    "text_it": "Che peso dai allo spazio personale e individuale all'interno di una coppia?"
   },
   {
     "id": "c2_36",
@@ -855,9 +855,9 @@
     "category": "dates",
     "text_es": "¿Qué promesa te hiciste a ti mismo que nunca piensas romper?",
     "text_en": "What promise did you make to yourself that you refuse to break?",
-    "text_pt": "Qué promesa te hiciste a ti mismo que nunca piensas romper?",
-    "text_fr": "Qué promesa te hiciste a ti mismo que nunca piensas romper?",
-    "text_it": "Qué promesa te hiciste a ti mismo que nunca piensas romper?"
+    "text_pt": "Que promessa você fez a si mesmo e que nunca planeja quebrar?",
+    "text_fr": "Quelle promesse vous êtes-vous faite et que vous ne comptez jamais rompre ?",
+    "text_it": "Quale promessa hai fatto a te stesso che non hai mai intenzione di rompere?"
   },
   {
     "id": "c2_37",
@@ -865,9 +865,9 @@
     "category": "friends",
     "text_es": "¿Qué consejo le darías a tu versión de hace 5 años con lo que sabes hoy?",
     "text_en": "What advice would you give your 5-years-ago self with today's perspective?",
-    "text_pt": "Qué consejo le darías a tu versión de hace 5 años con lo que sabes hoy?",
-    "text_fr": "Qué consejo le darías a tu versión de hace 5 años con lo que sabes hoy?",
-    "text_it": "Qué consejo le darías a tu versión de hace 5 años con lo que sabes hoy?"
+    "text_pt": "Que conselho você daria para a sua versão de 5 anos atrás com o que você sabe hoje?",
+    "text_fr": "Quels conseils donneriez-vous à la version de vous-même d’il y a 5 ans avec ce que vous savez aujourd’hui ?",
+    "text_it": "Che consiglio daresti alla versione di te stesso di 5 anni fa con quello che conosci oggi?"
   },
   {
     "id": "c2_38",
@@ -875,9 +875,9 @@
     "category": "couples",
     "text_es": "¿Qué sueño o proyecto tienes que casi nadie conoce por miedo al juicio?",
     "text_en": "What dream or vision do you keep hidden for fear of judgment?",
-    "text_pt": "Qué sueño o proyecto tienes que casi nadie conoce por miedo al juicio?",
-    "text_fr": "Qué sueño o proyecto tienes que casi nadie conoce por miedo al juicio?",
-    "text_it": "Qué sueño o proyecto tienes que casi nadie conoce por miedo al juicio?"
+    "text_pt": "Qual sonho ou projeto você tem que quase ninguém conhece por medo de julgamento?",
+    "text_fr": "Quel rêve ou projet avez-vous et que presque personne ne connaît par peur du jugement ?",
+    "text_it": "Quale sogno o progetto hai di cui quasi nessuno è a conoscenza per paura del giudizio?"
   },
   {
     "id": "c2_39",
@@ -885,9 +885,9 @@
     "category": "dates",
     "text_es": "¿Cómo defines la lealtad en una relación humana?",
     "text_en": "How do you define true loyalty in human connection?",
-    "text_pt": "Cómo defines la lealtad en una relación humana?",
-    "text_fr": "Cómo defines la lealtad en una relación humana?",
-    "text_it": "Cómo defines la lealtad en una relación humana?"
+    "text_pt": "Como você define lealdade em um relacionamento humano?",
+    "text_fr": "Comment définir la fidélité dans une relation humaine ?",
+    "text_it": "Come definisci la lealtà in una relazione umana?"
   },
   {
     "id": "c2_40",
@@ -895,9 +895,9 @@
     "category": "friends",
     "text_es": "¿Qué es lo más difícil de ser tu amigo en los malos momentos?",
     "text_en": "What is the hardest part about being your friend during tough times?",
-    "text_pt": "Qué es lo más difícil de ser tu amigo en los malos momentos?",
+    "text_pt": "Qual é a coisa mais difícil de ser seu amigo nos momentos difíceis?",
     "text_fr": "Quel est le hardest part about being your friend during tough times?",
-    "text_it": "Qué es lo más difícil de ser tu amigo en los malos momentos?"
+    "text_it": "Qual è la cosa più difficile nell'essere tuo amico nei momenti difficili?"
   },
   {
     "id": "c2_41",
@@ -905,9 +905,9 @@
     "category": "couples",
     "text_es": "¿Qué pequeño ritual cotidiano te gustaría tener con tu pareja todos los días?",
     "text_en": "What small daily ritual would you love having with your partner?",
-    "text_pt": "Qué pequeño ritual cotidiano te gustaría tener con seu parceiro(a) todos los días?",
-    "text_fr": "Qué pequeño ritual cotidiano te gustaría tener con tu pareja todos los días?",
-    "text_it": "Qué pequeño ritual cotidiano te gustaría tener con il tuo partner todos los días?"
+    "text_pt": "Que pequeno ritual diário você gostaria de realizar com seu parceiro todos os dias?",
+    "text_fr": "Quel petit rituel quotidien aimeriez-vous avoir avec votre partenaire chaque jour ?",
+    "text_it": "Quale piccolo rituale quotidiano vorresti fare ogni giorno con il tuo partner?"
   },
   {
     "id": "c2_42",
@@ -915,9 +915,9 @@
     "category": "dates",
     "text_es": "¿Qué es lo que más te genera curiosidad de la persona con la que estás jugando ahora?",
     "text_en": "What sparks your curiosity most about the person you are playing with right now?",
-    "text_pt": "Qué es lo que más te genera curiosidad de la persona con la que estás jugando ahora?",
-    "text_fr": "Qu'est-ce qui te te genera curiosidad de la persona con la que estás jugando ahora?",
-    "text_it": "Cosa apprezzi di più te genera curiosidad de la persona con la que estás jugando ahora?"
+    "text_pt": "O que você está mais curioso sobre a pessoa com quem está jogando agora?",
+    "text_fr": "Qu'est-ce qui vous intéresse le plus chez la personne avec qui vous jouez actuellement ?",
+    "text_it": "Cosa ti incuriosisce di più della persona con cui stai giocando adesso?"
   },
   {
     "id": "c2_43",
@@ -925,9 +925,9 @@
     "category": "friends",
     "text_es": "¿Cuál es una habilidad emocional que admiras en otros y te gustaría desarrollar?",
     "text_en": "What emotional strength in others do you wish to cultivate in yourself?",
-    "text_pt": "Cuál es una habilidad emocional que admiras en otros y te gustaría desarrollar?",
-    "text_fr": "Quel est una habilidad emocional que admiras en otros y te gustaría desarrollar?",
-    "text_it": "Qual è una habilidad emocional que admiras en otros y te gustaría desarrollar?"
+    "text_pt": "Qual é uma habilidade emocional que você admira nos outros e gostaria de desenvolver?",
+    "text_fr": "Quelle est la compétence émotionnelle que vous admirez chez les autres et que vous aimeriez développer ?",
+    "text_it": "Qual è un'abilità emotiva che ammiri negli altri e vorresti sviluppare?"
   },
   {
     "id": "c2_44",
@@ -935,9 +935,9 @@
     "category": "couples",
     "text_es": "¿Qué te hace sentir comprendido cuando te cuesta poner tus ideas en palabras?",
     "text_en": "What makes you feel understood when struggling to articulate feelings?",
-    "text_pt": "Qué te hace sentir comprendido cuando te cuesta poner tus ideas en palabras?",
-    "text_fr": "Qué te hace sentir comprendido cuando te cuesta poner tus ideas en palabras?",
-    "text_it": "Qué te hace sentir comprendido cuando te cuesta poner tus ideas en palabras?"
+    "text_pt": "O que faz você se sentir compreendido quando tem dificuldade para colocar suas ideias em palavras?",
+    "text_fr": "Qu’est-ce qui vous fait vous sentir compris lorsque vous avez du mal à mettre des mots sur vos idées ?",
+    "text_it": "Cosa ti fa sentire compreso quando fai fatica a esprimere a parole le tue idee?"
   },
   {
     "id": "c2_45",
@@ -945,9 +945,9 @@
     "category": "dates",
     "text_es": "¿Qué lugar ocupa la espiritualidad, introspección o filosofía en tu vida?",
     "text_en": "What role does spirituality, reflection, or philosophy hold in your life?",
-    "text_pt": "Qué lugar ocupa la espiritualidad, introspección o filosofía en tu vida?",
-    "text_fr": "Qué lugar ocupa la espiritualidad, introspección o filosofía en tu vida?",
-    "text_it": "Qué lugar ocupa la espiritualidad, introspección o filosofía en tu vida?"
+    "text_pt": "Que lugar ocupa a espiritualidade, a introspecção ou a filosofia na sua vida?",
+    "text_fr": "Quelle place la spiritualité, l’introspection ou la philosophie occupent-elles dans votre vie ?",
+    "text_it": "Che posto occupano la spiritualità, l'introspezione o la filosofia nella tua vita?"
   },
   {
     "id": "c2_46",
@@ -955,9 +955,9 @@
     "category": "friends",
     "text_es": "¿Qué persona ha influido más positivamente en la forma en que ves el mundo?",
     "text_en": "Who has influenced your worldview in the most profound positive way?",
-    "text_pt": "Qué persona ha influido más positivamente en la forma en que ves el mundo?",
-    "text_fr": "Qué persona ha influido más positivamente en la forma en que ves el mundo?",
-    "text_it": "Qué persona ha influido más positivamente en la forma en que ves el mundo?"
+    "text_pt": "Qual pessoa influenciou mais positivamente a maneira como você vê o mundo?",
+    "text_fr": "Quelle personne a influencé le plus positivement votre façon de voir le monde ?",
+    "text_it": "Quale persona ha influenzato più positivamente il tuo modo di vedere il mondo?"
   },
   {
     "id": "c2_47",
@@ -965,9 +965,9 @@
     "category": "couples",
     "text_es": "¿Cuál es el cumplido más honesto que le harías a la persona frente a ti?",
     "text_en": "What is the most sincere compliment you could give to the person in front of you?",
-    "text_pt": "Cuál es el cumplido más honesto que le harías a la persona frente a ti?",
+    "text_pt": "Qual é o elogio mais honesto que você faria à pessoa à sua frente?",
     "text_fr": "Quel est le most sincere compliment you could give to the person in front of you?",
-    "text_it": "Qual è el cumplido más honesto que le harías a la persona frente a ti?"
+    "text_it": "Qual è il complimento più sincero che faresti alla persona che hai di fronte?"
   },
   {
     "id": "c2_48",
@@ -975,9 +975,9 @@
     "category": "dates",
     "text_es": "¿Cómo sabes cuando te estás enamorando de verdad?",
     "text_en": "How do you know when you are genuinely falling for someone?",
-    "text_pt": "Cómo sabes cuando te estás enamorando de verdad?",
-    "text_fr": "Cómo sabes cuando te estás enamorando de verdad?",
-    "text_it": "Cómo sabes cuando te estás enamorando de verdad?"
+    "text_pt": "Como saber quando você está realmente se apaixonando?",
+    "text_fr": "Comment savoir quand on tombe vraiment amoureux ?",
+    "text_it": "Come fai a sapere quando ti stai davvero innamorando?"
   },
   {
     "id": "c2_49",
@@ -985,9 +985,9 @@
     "category": "friends",
     "text_es": "¿Qué es algo que la mayoría no nota de ti pero que significa mucho cuando lo hacen?",
     "text_en": "What is something subtle about you that means the world when someone notices?",
-    "text_pt": "Qué es algo que la mayoría no nota de ti pero que significa mucho cuando lo hacen?",
-    "text_fr": "Qué es algo que la mayoría no nota de ti pero que significa mucho cuando lo hacen?",
-    "text_it": "Qué es algo que la mayoría no nota de ti pero que significa mucho cuando lo hacen?"
+    "text_pt": "O que é algo que a maioria das pessoas não percebe em você, mas que significa muito quando o fazem?",
+    "text_fr": "Qu'est-ce que la plupart des gens ne remarquent pas chez vous, mais qui signifie beaucoup lorsqu'ils le font ?",
+    "text_it": "Qual è qualcosa che la maggior parte delle persone non nota di te ma che significa molto quando lo fa?"
   },
   {
     "id": "c2_50",
@@ -995,9 +995,9 @@
     "category": "couples",
     "text_es": "¿Qué conversación sobre el futuro te genera más ilusión que ansiedad?",
     "text_en": "What conversation about the future brings you excitement rather than anxiety?",
-    "text_pt": "Qué conversación sobre el futuro te genera más ilusión que ansiedad?",
-    "text_fr": "Qué conversación sobre el futuro te genera más ilusión que ansiedad?",
-    "text_it": "Qué conversación sobre el futuro te genera más ilusión que ansiedad?"
+    "text_pt": "Que conversa sobre o futuro deixa você mais animado do que ansioso?",
+    "text_fr": "Quelle conversation sur l’avenir vous rend plus excité qu’anxieux ?",
+    "text_it": "Quale conversazione sul futuro ti rende più eccitato che ansioso?"
   },
   {
     "id": "c3_1",
@@ -1005,7 +1005,7 @@
     "category": "dates",
     "text_es": "¿Cuál es un miedo íntimo sobre el futuro que rara vez compartes en voz alta?",
     "text_en": "What is an intimate fear about the future you rarely share out loud?",
-    "text_pt": "Cuál es un miedo íntimo sobre el futuro que rara vez compartes en voz alta?",
+    "text_pt": "Qual é o medo íntimo em relação ao futuro que você raramente compartilha em voz alta?",
     "text_fr": "Quelle est une intimate fear about the future you rarely share out loud?",
     "text_it": "Qual è un miedo íntimo sobre el futuro que rara vez compartes en voz alta?"
   },
@@ -1015,9 +1015,9 @@
     "category": "couples",
     "text_es": "¿Qué parte de tu historia personal sientes que pocas personas comprenden de verdad?",
     "text_en": "What chapter of your personal story feels truly understood by few?",
-    "text_pt": "Qué parte de tu historia personal sientes que pocas personas comprenden de verdad?",
-    "text_fr": "Qué parte de tu historia personal sientes que pocas personas comprenden de verdad?",
-    "text_it": "Qué parte de tu historia personal sientes que pocas personas comprenden de verdad?"
+    "text_pt": "Que parte da sua história pessoal você acha que poucas pessoas realmente entendem?",
+    "text_fr": "Quelle partie de votre histoire personnelle pensez-vous que peu de gens comprennent vraiment ?",
+    "text_it": "Quale parte della tua storia personale ritieni che poche persone capiscano veramente?"
   },
   {
     "id": "c3_3",
@@ -1025,9 +1025,9 @@
     "category": "friends",
     "text_es": "¿Cuándo fue la última vez que lloraste y qué emoción lo provocó?",
     "text_en": "When was the last time you cried, and what emotion sparked it?",
-    "text_pt": "Cuándo fue la última vez que lloraste y qué emoción lo provocó?",
-    "text_fr": "Cuándo fue la última vez que lloraste y qué emoción lo provocó?",
-    "text_it": "Cuándo fue la última vez que lloraste y qué emoción lo provocó?"
+    "text_pt": "Quando foi a última vez que você chorou e que emoção causou isso?",
+    "text_fr": "Quand avez-vous pleuré pour la dernière fois et quelle émotion l’a provoqué ?",
+    "text_it": "Quando è stata l'ultima volta che hai pianto e quale emozione l'ha causato?"
   },
   {
     "id": "c3_4",
@@ -1035,9 +1035,9 @@
     "category": "couples",
     "text_es": "¿Qué herida emocional del pasado sientes que aún estás aprendiendo a sanar?",
     "text_en": "What emotional wound from the past are you still learning to heal?",
-    "text_pt": "Qué herida emocional del pasado sientes que aún estás aprendiendo a sanar?",
-    "text_fr": "Qué herida emocional del pasado sientes que aún estás aprendiendo a sanar?",
-    "text_it": "Qué herida emocional del pasado sientes que aún estás aprendiendo a sanar?"
+    "text_pt": "Que ferida emocional do passado você sente que ainda está aprendendo a curar?",
+    "text_fr": "Quelle blessure émotionnelle du passé pensez-vous que vous êtes encore en train d’apprendre à guérir ?",
+    "text_it": "Quale ferita emotiva del passato ritieni di stare ancora imparando a guarire?"
   },
   {
     "id": "c3_5",
@@ -1045,9 +1045,9 @@
     "category": "dates",
     "text_es": "¿Qué te hace sentir más vulnerable frente a alguien que te gusta mucho?",
     "text_en": "What makes you feel most exposed and vulnerable around someone you adore?",
-    "text_pt": "Qué te hace sentir más vulnerable frente a alguien que te gusta mucho?",
-    "text_fr": "Qué te hace sentir más vulnerable frente a alguien que te gusta mucho?",
-    "text_it": "Qué te hace sentir más vulnerable frente a alguien que te gusta mucho?"
+    "text_pt": "O que faz você se sentir mais vulnerável na frente de alguém de quem você realmente gosta?",
+    "text_fr": "Qu’est-ce qui vous fait vous sentir le plus vulnérable devant quelqu’un que vous aimez vraiment ?",
+    "text_it": "Cosa ti fa sentire più vulnerabile di fronte a qualcuno che ti piace davvero?"
   },
   {
     "id": "c3_6",
@@ -1055,9 +1055,9 @@
     "category": "couples",
     "text_es": "¿Qué verdad sobre ti te da miedo que ahuyente a las personas si la conocen a fondo?",
     "text_en": "What truth about yourself do you fear might push people away?",
-    "text_pt": "Qué verdad sobre ti te da miedo que ahuyente a las personas si la conocen a fondo?",
-    "text_fr": "Qué verdad sobre ti te da miedo que ahuyente a las personas si la conocen a fondo?",
-    "text_it": "Qué verdad sobre ti te da miedo que ahuyente a las personas si la conocen a fondo?"
+    "text_pt": "Que verdade sobre você você teme que assuste as pessoas se elas a conhecerem profundamente?",
+    "text_fr": "Quelle vérité sur vous-même craignez-vous qu’elle effraye les gens s’ils la connaissent profondément ?",
+    "text_it": "Quale verità su te stesso temi possa spaventare le persone se la conoscono profondamente?"
   },
   {
     "id": "c3_7",
@@ -1065,9 +1065,9 @@
     "category": "friends",
     "text_es": "¿Te sientes en paz con la persona que eres hoy cuando te miras al espejo a solas?",
     "text_en": "Do you feel at peace with the person you are when looking in the mirror alone?",
-    "text_pt": "Te sientes en paz con la persona que eres hoy cuando te miras al espejo a solas?",
-    "text_fr": "Te sientes en paz con la persona que eres hoy cuando te miras al espejo a solas?",
-    "text_it": "Te sientes en paz con la persona que eres hoy cuando te miras al espejo a solas?"
+    "text_pt": "Você se sente em paz com a pessoa que você é hoje quando se olha sozinho no espelho?",
+    "text_fr": "Vous sentez-vous en paix avec la personne que vous êtes aujourd’hui lorsque vous vous regardez seul dans le miroir ?",
+    "text_it": "Ti senti in pace con la persona che sei oggi quando ti guardi allo specchio da solo?"
   },
   {
     "id": "c3_8",
@@ -1075,9 +1075,9 @@
     "category": "couples",
     "text_es": "¿Qué es lo que más necesitas escuchar de alguien cuando sientes que no puedes más?",
     "text_en": "What words do you most need to hear when you feel overwhelmed?",
-    "text_pt": "Qué es lo que más necesitas escuchar de alguien cuando sientes que no puedes más?",
-    "text_fr": "Qu'est-ce qui te necesitas escuchar de alguien cuando sientes que no puedes más?",
-    "text_it": "Cosa apprezzi di più necesitas escuchar de alguien cuando sientes que no puedes más?"
+    "text_pt": "O que você mais precisa ouvir de alguém quando sente que não aguenta mais?",
+    "text_fr": "De quoi avez-vous le plus besoin d’entendre quelqu’un lorsque vous sentez que vous n’en pouvez plus ?",
+    "text_it": "Cosa hai più bisogno di sentire da qualcuno quando senti di non farcela più?"
   },
   {
     "id": "c3_9",
@@ -1085,9 +1085,9 @@
     "category": "dates",
     "text_es": "¿En qué área de tu vida sientes que te estás autoexigiendo demasiado?",
     "text_en": "In which aspect of life are you being unreasonably hard on yourself?",
-    "text_pt": "En qué área da sua vida sientes que te estás autoexigiendo demasiado?",
-    "text_fr": "En qué área de tu vida sientes que te estás autoexigiendo demasiado?",
-    "text_it": "En qué área della tua vita sientes que te estás autoexigiendo demasiado?"
+    "text_pt": "Em que área da sua vida você sente que está se esforçando demais?",
+    "text_fr": "Dans quel domaine de votre vie avez-vous l’impression de vous dépasser trop ?",
+    "text_it": "In quale area della tua vita ritieni che ti stai spingendo troppo oltre?"
   },
   {
     "id": "c3_10",
@@ -1095,9 +1095,9 @@
     "category": "couples",
     "text_es": "¿Qué significaría para ti sentirte amado incondicionalmente?",
     "text_en": "What would feeling unconditionally loved genuinely look like for you?",
-    "text_pt": "Qué significaría para ti sentirte amado incondicionalmente?",
-    "text_fr": "Qué significaría para ti sentirte amado incondicionalmente?",
-    "text_it": "Qué significaría para ti sentirte amado incondicionalmente?"
+    "text_pt": "O que significaria para você se sentir amado incondicionalmente?",
+    "text_fr": "Qu’est-ce que cela signifierait pour vous de vous sentir aimé inconditionnellement ?",
+    "text_it": "Cosa significherebbe per te sentirti amato incondizionatamente?"
   },
   {
     "id": "c3_11",
@@ -1105,9 +1105,9 @@
     "category": "friends",
     "text_es": "¿Cuál es un perdón que nunca recibiste pero decidiste otorgar en silencio?",
     "text_en": "What apology did you never receive that you chose to forgive in silence?",
-    "text_pt": "Cuál es un perdón que nunca recibiste pero decidiste otorgar en silencio?",
-    "text_fr": "Quel est un perdón que nunca recibiste pero decidiste otorgar en silencio?",
-    "text_it": "Qual è un perdón que nunca recibiste pero decidiste otorgar en silencio?"
+    "text_pt": "Qual é o perdão que você nunca recebeu, mas decidiu conceder silenciosamente?",
+    "text_fr": "Qu’est-ce qu’un pardon que vous n’avez jamais reçu mais que vous avez décidé d’accorder en silence ?",
+    "text_it": "Qual è il perdono che non hai mai ricevuto ma che hai deciso di concedere in silenzio?"
   },
   {
     "id": "c3_12",
@@ -1115,9 +1115,9 @@
     "category": "couples",
     "text_es": "¿Qué detalle o recuerdo nuestro te hace sentir en casa?",
     "text_en": "What shared memory or detail makes you feel deeply at home?",
-    "text_pt": "Qué detalle o recuerdo nuestro te hace sentir en casa?",
-    "text_fr": "Qué detalle o recuerdo nuestro te hace sentir en casa?",
-    "text_it": "Qué detalle o recuerdo nuestro te hace sentir en casa?"
+    "text_pt": "Que detalhe ou lembrança nossa faz você se sentir em casa?",
+    "text_fr": "Quel détail ou quel souvenir vous fait vous sentir chez vous ?",
+    "text_it": "Quale nostro dettaglio o ricordo ti fa sentire a casa?"
   },
   {
     "id": "c3_13",
@@ -1125,9 +1125,9 @@
     "category": "dates",
     "text_es": "¿Qué es lo más valiente que has hecho en tu vida, aunque nadie te haya aplaudido?",
     "text_en": "What is the bravest thing you have done, even if nobody applauded?",
-    "text_pt": "Qué es lo más valiente que has hecho en tu vida, aunque nadie te haya aplaudido?",
+    "text_pt": "Qual foi a coisa mais corajosa que você fez na vida, mesmo que ninguém tenha aplaudido você?",
     "text_fr": "Quel est le bravest thing you have done, even if nobody applauded?",
-    "text_it": "Qué es lo más valiente que has hecho en tu vida, aunque nadie te haya aplaudido?"
+    "text_it": "Qual è la cosa più coraggiosa che hai fatto nella tua vita, anche se nessuno ti ha applaudito?"
   },
   {
     "id": "c3_14",
@@ -1135,9 +1135,9 @@
     "category": "couples",
     "text_es": "¿Qué parte de tu cuerpo o mente te costó años aprender a abrazar?",
     "text_en": "What part of your body or mind took years of practice to love and embrace?",
-    "text_pt": "Qué parte de tu cuerpo o mente te costó años aprender a abrazar?",
-    "text_fr": "Qué parte de tu cuerpo o mente te costó años aprender a abrazar?",
-    "text_it": "Qué parte de tu cuerpo o mente te costó años aprender a abrazar?"
+    "text_pt": "Que parte do seu corpo ou mente você levou anos para aprender a abraçar?",
+    "text_fr": "Quelle partie de votre corps ou de votre esprit vous a mis des années à apprendre à l’embrasser ?",
+    "text_it": "Quale parte del tuo corpo o della tua mente ti ha richiesto anni per imparare ad abbracciare?"
   },
   {
     "id": "c3_15",
@@ -1145,9 +1145,9 @@
     "category": "friends",
     "text_es": "¿Qué pérdida (persona, etapa o sueño) te cambió la perspectiva para siempre?",
     "text_en": "What loss (person, era, or dream) permanently transformed your outlook?",
-    "text_pt": "Qué pérdida (persona, etapa o sueño) te cambió la perspectiva para siempre?",
-    "text_fr": "Qué pérdida (persona, etapa o sueño) te cambió la perspectiva para siempre?",
-    "text_it": "Qué pérdida (persona, etapa o sueño) te cambió la perspectiva para siempre?"
+    "text_pt": "Que perda (de pessoa, palco ou sonho) mudou sua perspectiva para sempre?",
+    "text_fr": "Quelle perte (personne, scène ou rêve) a changé votre point de vue pour toujours ?",
+    "text_it": "Quale perdita (persona, palcoscenico o sogno) ha cambiato per sempre la tua prospettiva?"
   },
   {
     "id": "c3_16",
@@ -1155,9 +1155,9 @@
     "category": "couples",
     "text_es": "¿Qué es algo que desearías que la otra persona supiera de ti sin tener que explicarlo?",
     "text_en": "What do you wish the other person understood about you without explaining?",
-    "text_pt": "Qué es algo que desearías que la otra persona supiera de ti sin tener que explicarlo?",
-    "text_fr": "Qué es algo que desearías que la otra persona supiera de ti sin tener que explicarlo?",
-    "text_it": "Qué es algo que desearías que la otra persona supiera de ti sin tener que explicarlo?"
+    "text_pt": "O que você gostaria que a outra pessoa soubesse sobre você sem ter que explicar?",
+    "text_fr": "Qu’est-ce que vous souhaiteriez que l’autre personne sache sur vous sans avoir à l’expliquer ?",
+    "text_it": "Cos'è qualcosa che vorresti che l'altra persona sapesse di te senza doverlo spiegare?"
   },
   {
     "id": "c3_17",
@@ -1165,9 +1165,9 @@
     "category": "dates",
     "text_es": "¿Cuándo fue la última vez que sentiste que no encajabas en ningún lugar?",
     "text_en": "When was the last time you felt like you didn't belong anywhere?",
-    "text_pt": "Cuándo fue la última vez que sentiste que no encajabas en ningún lugar?",
-    "text_fr": "Cuándo fue la última vez que sentiste que no encajabas en ningún lugar?",
-    "text_it": "Cuándo fue la última vez que sentiste que no encajabas en ningún lugar?"
+    "text_pt": "Quando foi a última vez que você sentiu que não se encaixava em lugar nenhum?",
+    "text_fr": "À quand remonte la dernière fois où vous avez eu l’impression de ne vous intégrer nulle part ?",
+    "text_it": "Quando è stata l'ultima volta che ti sei sentito come se non fossi adatto a nessun posto?"
   },
   {
     "id": "c3_18",
@@ -1175,9 +1175,9 @@
     "category": "couples",
     "text_es": "¿Qué te da más miedo: perder a alguien querido o perderte a ti mismo en el camino?",
     "text_en": "What terrifies you more: losing someone you cherish or losing yourself?",
-    "text_pt": "Qué te da más miedo: perder a alguien querido o perderte a ti mismo en el camino?",
-    "text_fr": "Qué te da más miedo: perder a alguien querido o perderte a ti mismo en el camino?",
-    "text_it": "Qué te da más miedo: perder a alguien querido o perderte a ti mismo en el camino?"
+    "text_pt": "O que te assusta mais: perder alguém que você ama ou se perder no caminho?",
+    "text_fr": "Qu'est-ce qui vous fait le plus peur : perdre quelqu'un que vous aimez ou vous perdre en cours de route ?",
+    "text_it": "Cosa ti spaventa di più: perdere qualcuno che ami o perdere te stesso lungo la strada?"
   },
   {
     "id": "c3_19",
@@ -1185,9 +1185,9 @@
     "category": "friends",
     "text_es": "¿Qué peso o secreto has cargado solo por miedo a decepcionar a otros?",
     "text_en": "What weight have you carried alone for fear of disappointing others?",
-    "text_pt": "Qué peso o secreto has cargado solo por miedo a decepcionar a otros?",
-    "text_fr": "Qué peso o secreto has cargado solo por miedo a decepcionar a otros?",
-    "text_it": "Qué peso o secreto has cargado solo por miedo a decepcionar a otros?"
+    "text_pt": "Que peso ou segredo você tem carregado só por medo de decepcionar os outros?",
+    "text_fr": "Quel poids ou quel secret avez-vous porté simplement par peur de décevoir les autres ?",
+    "text_it": "Quale peso o segreto ti sei portato dietro solo per paura di deludere gli altri?"
   },
   {
     "id": "c3_20",
@@ -1195,9 +1195,9 @@
     "category": "couples",
     "text_es": "Si esta fuera nuestra última conversación, ¿qué es lo más importante que me dirías?",
     "text_en": "If this were our final conversation, what essential truth would you tell me?",
-    "text_pt": "Si esta fuera nuestra última conversación, ¿qué es lo más importante que me dirías?",
-    "text_fr": "Si esta fuera nuestra última conversación, qué es lo más importante que me dirías?",
-    "text_it": "Si esta fuera nuestra última conversación, qué es lo más importante que me dirías?"
+    "text_pt": "Se esta fosse nossa última conversa, qual a coisa mais importante que você me diria?",
+    "text_fr": "Si c’était notre dernière conversation, quelle est la chose la plus importante que vous me diriez ?",
+    "text_it": "Se questa fosse la nostra ultima conversazione, qual è la cosa più importante che mi diresti?"
   },
   {
     "id": "c3_21",
@@ -1205,9 +1205,9 @@
     "category": "dates",
     "text_es": "¿Qué vacío en tu vida has intentado llenar con trabajo, compras o distracciones?",
     "text_en": "What void in your life have you attempted to numb with work or distractions?",
-    "text_pt": "Qué vacío en tu vida has intentado llenar con trabajo, compras o distracciones?",
-    "text_fr": "Qué vacío en tu vida has intentado llenar con trabajo, compras o distracciones?",
-    "text_it": "Qué vacío en tu vida has intentado llenar con trabajo, compras o distracciones?"
+    "text_pt": "Que vazio em sua vida você tentou preencher com trabalho, compras ou distrações?",
+    "text_fr": "Quel vide dans votre vie avez-vous essayé de combler avec du travail, du shopping ou des distractions ?",
+    "text_it": "Quale vuoto nella tua vita hai cercato di riempire con lavoro, shopping o distrazioni?"
   },
   {
     "id": "c3_22",
@@ -1215,9 +1215,9 @@
     "category": "couples",
     "text_es": "¿Cómo luce tu versión más plena y feliz dentro de diez años?",
     "text_en": "What does your most fulfilled, peaceful self look like in ten years?",
-    "text_pt": "Cómo luce tu versión más plena y feliz dentro de diez años?",
-    "text_fr": "Cómo luce tu versión más plena y feliz dentro de diez años?",
-    "text_it": "Cómo luce tu versión más plena y feliz dentro de diez años?"
+    "text_pt": "Como será a sua versão mais completa e feliz daqui a dez anos?",
+    "text_fr": "À quoi ressemblera la version la plus complète et la plus heureuse de vous-même dans dix ans ?",
+    "text_it": "Come sarà la tua versione più completa e felice tra dieci anni?"
   },
   {
     "id": "c3_23",
@@ -1225,9 +1225,9 @@
     "category": "friends",
     "text_es": "¿Qué palabra o etiqueta que te pusieron de niño aún te pesa de adulto?",
     "text_en": "What label placed upon you in childhood still whispers in your ear?",
-    "text_pt": "Qué palabra o etiqueta que te pusieron de niño aún te pesa de adulto?",
-    "text_fr": "Qué palabra o etiqueta que te pusieron de niño aún te pesa de adulto?",
-    "text_it": "Qué palabra o etiqueta que te pusieron de niño aún te pesa de adulto?"
+    "text_pt": "Que palavra ou rótulo que lhe foi dado quando criança ainda pesa em você quando adulto?",
+    "text_fr": "Quel mot ou quelle étiquette qui vous a été donné lorsque vous étiez enfant vous pèse encore en tant qu'adulte ?",
+    "text_it": "Quale parola o etichetta che ti è stata data da bambino ti pesa ancora da adulto?"
   },
   {
     "id": "c3_24",
@@ -1235,7 +1235,7 @@
     "category": "couples",
     "text_es": "¿Qué es lo que más te asusta de entregarte por completo a otra persona?",
     "text_en": "What frightens you most about giving your heart fully to someone?",
-    "text_pt": "Qué es lo que más te asusta de entregarte por completo a otra persona?",
+    "text_pt": "O que mais te assusta em se entregar completamente a outra pessoa?",
     "text_fr": "Qu'est-ce qui te te asusta de entregarte por completo a otra persona?",
     "text_it": "Cosa apprezzi di più te asusta de entregarte por completo a otra persona?"
   },
@@ -1245,9 +1245,9 @@
     "category": "dates",
     "text_es": "¿Qué crees que ve en ti la persona que está jugando contigo en este instante?",
     "text_en": "What do you believe the person playing with you sees in you right now?",
-    "text_pt": "Qué crees que ve en ti la persona que está jugando contigo en este instante?",
-    "text_fr": "Qué crees que ve en ti la persona que está jugando contigo en este instante?",
-    "text_it": "Qué crees que ve en ti la persona que está jugando contigo en este instante?"
+    "text_pt": "O que você acha que a pessoa que está brincando com você agora vê em você?",
+    "text_fr": "À votre avis, que voit en vous la personne qui joue avec vous en ce moment ?",
+    "text_it": "Cosa pensi che veda in te la persona che sta giocando con te in questo momento?"
   },
   {
     "id": "c3_26",
@@ -1255,9 +1255,9 @@
     "category": "couples",
     "text_es": "¿Qué sueño postergaste por complacer o priorizar a los demás?",
     "text_en": "What dream did you postpone to appease or prioritize others?",
-    "text_pt": "Qué sueño postergaste por complacer o priorizar a los demás?",
-    "text_fr": "Qué sueño postergaste por complacer o priorizar a los demás?",
-    "text_it": "Qué sueño postergaste por complacer o priorizar a los demás?"
+    "text_pt": "Qual sonho você adiou para agradar ou priorizar os outros?",
+    "text_fr": "Quel rêve avez-vous reporté pour plaire ou donner la priorité aux autres ?",
+    "text_it": "Quale sogno hai rimandato per compiacere o dare priorità agli altri?"
   },
   {
     "id": "c3_27",
@@ -1265,9 +1265,9 @@
     "category": "friends",
     "text_es": "¿Qué conversación con tus padres o tutores desearías tener antes de que sea tarde?",
     "text_en": "What conversation with your parents do you wish to have before it's late?",
-    "text_pt": "Qué conversación con tus padres o tutores desearías tener antes de que sea tarde?",
-    "text_fr": "Qué conversación con tus padres o tutores desearías tener antes de que sea tarde?",
-    "text_it": "Qué conversación con tus padres o tutores desearías tener antes de que sea tarde?"
+    "text_pt": "Que conversa com seus pais ou responsáveis ​​você gostaria de ter antes que seja tarde demais?",
+    "text_fr": "Quelle conversation avec vos parents ou tuteurs aimeriez-vous avoir avant qu'il ne soit trop tard ?",
+    "text_it": "Quale conversazione con i tuoi genitori o tutori vorresti avere prima che sia troppo tardi?"
   },
   {
     "id": "c3_28",
@@ -1275,8 +1275,8 @@
     "category": "couples",
     "text_es": "¿Qué momento juntos te demostró que podías confiar ciegamente en mí?",
     "text_en": "What moment together proved that you could lean on me without hesitation?",
-    "text_pt": "Qué momento juntos te demostró que podías confiar ciegamente en mí?",
-    "text_fr": "Qué momento juntos te demostró que podías confiar ciegamente en mí?",
+    "text_pt": "Que momento juntos te mostrou que você poderia confiar cegamente em mim?",
+    "text_fr": "Quel moment ensemble vous a montré que vous pouviez me faire aveuglément confiance ?",
     "text_it": "Quale momento juntos te demostró que podías confiar ciegamente en mí?"
   },
   {
@@ -1285,9 +1285,9 @@
     "category": "dates",
     "text_es": "¿En qué sientes que eres incomprendido por tu entorno cercano?",
     "text_en": "In what way do you feel misunderstood by those closest to you?",
-    "text_pt": "En qué sientes que eres incomprendido por tu entorno cercano?",
-    "text_fr": "En qué sientes que eres incomprendido por tu entorno cercano?",
-    "text_it": "En qué sientes que eres incomprendido por tu entorno cercano?"
+    "text_pt": "Como você se sente por ser incompreendido pelas pessoas ao seu redor?",
+    "text_fr": "Comment sentez-vous que vous êtes incompris par votre entourage ?",
+    "text_it": "Come ti senti incompreso da chi ti circonda?"
   },
   {
     "id": "c3_30",
@@ -1295,9 +1295,9 @@
     "category": "couples",
     "text_es": "¿Qué te da paz cuando el mundo exterior parece caótico?",
     "text_en": "What brings you profound inner calm when the outside world feels chaotic?",
-    "text_pt": "Qué te da paz cuando el mundo exterior parece caótico?",
-    "text_fr": "Qué te da paz cuando el mundo exterior parece caótico?",
-    "text_it": "Qué te da paz cuando el mundo exterior parece caótico?"
+    "text_pt": "O que lhe dá paz quando o mundo exterior parece caótico?",
+    "text_fr": "Qu’est-ce qui vous apporte la paix lorsque le monde extérieur semble chaotique ?",
+    "text_it": "Cosa ti dà pace quando il mondo esterno sembra caotico?"
   },
   {
     "id": "c3_31",
@@ -1305,7 +1305,7 @@
     "category": "friends",
     "text_es": "¿Cuál es la lección de vida más dolorosa que tuviste que aprender solo?",
     "text_en": "What was the most painful truth you had to learn all on your own?",
-    "text_pt": "Cuál es la lección de vida más dolorosa que tuviste que aprender solo?",
+    "text_pt": "Qual foi a lição de vida mais dolorosa que você teve que aprender sozinho?",
     "text_fr": "Quel a été le most painful truth you had to learn all on your own?",
     "text_it": "Qual è la lección de vida más dolorosa que tuviste que aprender solo?"
   },
@@ -1315,9 +1315,9 @@
     "category": "couples",
     "text_es": "¿Qué miedo oculto tienes sobre el envejecer o el paso del tiempo?",
     "text_en": "What hidden fear do you harbor about growing older and the passage of time?",
-    "text_pt": "Qué miedo oculto tienes sobre el envejecer o el paso del tiempo?",
-    "text_fr": "Qué miedo oculto tienes sobre el envejecer o el paso del tiempo?",
-    "text_it": "Qué miedo oculto tienes sobre el envejecer o el paso del tiempo?"
+    "text_pt": "Que medo oculto você tem em relação ao envelhecimento ou à passagem do tempo?",
+    "text_fr": "Quelle peur cachée avez-vous du vieillissement ou du passage du temps ?",
+    "text_it": "Quale paura nascosta hai riguardo all'invecchiamento o al passare del tempo?"
   },
   {
     "id": "c3_33",
@@ -1325,9 +1325,9 @@
     "category": "dates",
     "text_es": "¿Qué parte de tu pasado te cuesta perdonarte a ti mismo?",
     "text_en": "What chapter of your past is hardest to fully forgive yourself for?",
-    "text_pt": "Qué parte de tu pasado te cuesta perdonarte a ti mismo?",
-    "text_fr": "Qué parte de tu pasado te cuesta perdonarte a ti mismo?",
-    "text_it": "Qué parte de tu pasado te cuesta perdonarte a ti mismo?"
+    "text_pt": "Que parte do seu passado é difícil para você se perdoar?",
+    "text_fr": "Quelle partie de votre passé vous est-il difficile de vous pardonner ?",
+    "text_it": "Quale parte del tuo passato ti è difficile perdonare?"
   },
   {
     "id": "c3_34",
@@ -1335,9 +1335,9 @@
     "category": "couples",
     "text_es": "¿Qué detalle no verbal de la otra persona te genera una calidez instantánea?",
     "text_en": "What non-verbal gesture from the other person brings instant warmth to you?",
-    "text_pt": "Qué detalle no verbal de la otra persona te genera una calidez instantánea?",
-    "text_fr": "Qué detalle no verbal de la otra persona te genera una calidez instantánea?",
-    "text_it": "Qué detalle no verbal de la otra persona te genera una calidez instantánea?"
+    "text_pt": "Que detalhe não-verbal sobre a outra pessoa lhe proporciona calor instantâneo?",
+    "text_fr": "Quel détail non verbal sur l’autre personne vous procure une chaleur instantanée ?",
+    "text_it": "Quale dettaglio non verbale dell'altra persona ti dà calore immediato?"
   },
   {
     "id": "c3_35",
@@ -1345,9 +1345,9 @@
     "category": "friends",
     "text_es": "¿Qué máscara social sientes que tienes que ponerte con más frecuencia de la que quisieras?",
     "text_en": "What social mask do you find yourself wearing more often than you'd like?",
-    "text_pt": "Qué máscara social sientes que tienes que ponerte con más frecuencia de la que quisieras?",
-    "text_fr": "Qué máscara social sientes que tienes que ponerte con más frecuencia de la que quisieras?",
-    "text_it": "Qué máscara social sientes que tienes que ponerte con más frecuencia de la que quisieras?"
+    "text_pt": "Que máscara social você acha que precisa usar com mais frequência do que gostaria?",
+    "text_fr": "Quel masque social avez-vous l’impression de devoir porter plus souvent que vous ne le souhaiteriez ?",
+    "text_it": "Quale maschera sociale senti di dover indossare più spesso di quanto vorresti?"
   },
   {
     "id": "c3_36",
@@ -1355,9 +1355,9 @@
     "category": "couples",
     "text_es": "¿Qué significa para ti ser un buen compañero de vida?",
     "text_en": "What does being a truly great life partner mean to your core?",
-    "text_pt": "Qué significa para ti ser un buen compañero de vida?",
-    "text_fr": "Qué significa para ti ser un buen compañero de vida?",
-    "text_it": "Qué significa para ti ser un buen compañero de vida?"
+    "text_pt": "O que significa para você ser um bom parceiro de vida?",
+    "text_fr": "Que signifie pour vous être un bon partenaire de vie ?",
+    "text_it": "Cosa significa per te essere un buon compagno di vita?"
   },
   {
     "id": "c3_37",
@@ -1365,7 +1365,7 @@
     "category": "dates",
     "text_es": "¿Qué es lo que más te cuesta expresar cuando te sientes triste?",
     "text_en": "What is most difficult for you to articulate when you are overwhelmed by sadness?",
-    "text_pt": "Qué es lo que más te cuesta expresar cuando te sientes triste?",
+    "text_pt": "Qual é a coisa mais difícil para você expressar quando se sente triste?",
     "text_fr": "Qu'est-ce qui te te cuesta expresar cuando te sientes triste?",
     "text_it": "Cosa apprezzi di più te cuesta expresar cuando te sientes triste?"
   },
@@ -1375,9 +1375,9 @@
     "category": "couples",
     "text_es": "¿Cómo ha cambiado tu forma de amar desde tu primera desilusión amorosa?",
     "text_en": "How has the way you love evolved since your very first heartbreak?",
-    "text_pt": "Cómo ha cambiado tu forma de amar desde tu primera desilusión amorosa?",
-    "text_fr": "Cómo ha cambiado tu forma de amar desde tu primera desilusión amorosa?",
-    "text_it": "Cómo ha cambiado tu forma de amar desde tu primera desilusión amorosa?"
+    "text_pt": "Como sua maneira de amar mudou desde sua primeira decepção amorosa?",
+    "text_fr": "Comment votre façon d’aimer a-t-elle changé depuis votre première déception amoureuse ?",
+    "text_it": "Come è cambiato il tuo modo di amare dalla prima delusione d'amore?"
   },
   {
     "id": "c3_39",
@@ -1385,9 +1385,9 @@
     "category": "friends",
     "text_es": "¿Qué es algo que hiciste por alguien que nadie sabe y nunca pediste reconocimiento?",
     "text_en": "What selfless act did you do for someone that nobody knows about?",
-    "text_pt": "Qué es algo que hiciste por alguien que nadie sabe y nunca pediste reconocimiento?",
-    "text_fr": "Qué es algo que hiciste por alguien que nadie sabe y nunca pediste reconocimiento?",
-    "text_it": "Qué es algo que hiciste por alguien que nadie sabe y nunca pediste reconocimiento?"
+    "text_pt": "O que você fez por alguém que ninguém conhece e nunca pediu reconhecimento?",
+    "text_fr": "Qu’avez-vous fait pour quelqu’un que personne ne connaît et que vous n’avez jamais demandé de reconnaissance ?",
+    "text_it": "Cos'è qualcosa che hai fatto per qualcuno di cui nessuno è a conoscenza e di cui non hai mai chiesto il riconoscimento?"
   },
   {
     "id": "c3_40",
@@ -1395,9 +1395,9 @@
     "category": "couples",
     "text_es": "¿Qué aspecto de nuestra conexión sientes que es más único o especial?",
     "text_en": "What aspect of our connection feels rarest and most special?",
-    "text_pt": "Qué aspecto de nuestra conexión sientes que es más único o especial?",
-    "text_fr": "Qué aspecto de nuestra conexión sientes que es más único o especial?",
-    "text_it": "Qué aspecto de nuestra conexión sientes que es más único o especial?"
+    "text_pt": "Que aspecto da nossa conexão você acha mais único ou especial?",
+    "text_fr": "Selon vous, quel aspect de notre relation est le plus unique ou le plus spécial ?",
+    "text_it": "Quale aspetto della nostra connessione ritieni sia più unico o speciale?"
   },
   {
     "id": "c3_41",
@@ -1405,9 +1405,9 @@
     "category": "dates",
     "text_es": "¿Qué es lo que más te enorgullece de cómo has superado tus peores días?",
     "text_en": "What makes you proudest about how you weathered your darkest days?",
-    "text_pt": "Qué es lo que más te enorgullece de cómo has superado tus peores días?",
-    "text_fr": "Qu'est-ce qui te te enorgullece de cómo has superado tus peores días?",
-    "text_it": "Cosa apprezzi di più te enorgullece de cómo has superado tus peores días?"
+    "text_pt": "Do que você mais se orgulha em como superou seus piores dias?",
+    "text_fr": "De quoi êtes-vous le plus fier dans la façon dont vous avez surmonté vos pires jours ?",
+    "text_it": "Di cosa sei più orgoglioso di come hai superato i tuoi giorni peggiori?"
   },
   {
     "id": "c3_42",
@@ -1415,9 +1415,9 @@
     "category": "couples",
     "text_es": "¿Qué límites emocionales sientes que debemos cuidar para crecer juntos?",
     "text_en": "What emotional boundaries must we protect to continue growing together?",
-    "text_pt": "Qué límites emocionales sientes que debemos cuidar para crecer juntos?",
-    "text_fr": "Qué límites emocionales sientes que debemos cuidar para crecer juntos?",
-    "text_it": "Qué límites emocionales sientes que debemos cuidar para crecer juntos?"
+    "text_pt": "Quais limites emocionais você acha que precisamos cuidar para crescermos juntos?",
+    "text_fr": "Selon vous, de quelles limites émotionnelles devons-nous prendre soin pour grandir ensemble ?",
+    "text_it": "Di quali confini emotivi ritieni che dobbiamo prenderci cura per crescere insieme?"
   },
   {
     "id": "c3_43",
@@ -1425,9 +1425,9 @@
     "category": "friends",
     "text_es": "¿Cuándo fue la última vez que sentiste que un abrazo te devolvió el aliento?",
     "text_en": "When was the last time an embrace genuinely felt like breathing again?",
-    "text_pt": "Cuándo fue la última vez que sentiste que un abrazo te devolvió el aliento?",
-    "text_fr": "Cuándo fue la última vez que sentiste que un abrazo te devolvió el aliento?",
-    "text_it": "Cuándo fue la última vez que sentiste que un abrazo te devolvió el aliento?"
+    "text_pt": "Quando foi a última vez que você sentiu que um abraço restaurou sua respiração?",
+    "text_fr": "À quand remonte la dernière fois où vous avez eu l’impression qu’un câlin vous rendait le souffle ?",
+    "text_it": "Quando è stata l'ultima volta che hai avuto la sensazione che un abbraccio ti ripristinasse il respiro?"
   },
   {
     "id": "c3_44",
@@ -1435,9 +1435,9 @@
     "category": "couples",
     "text_es": "¿Qué sueño para los dos te gustaría empezar a construir desde hoy?",
     "text_en": "What shared dream would you love to begin constructing today?",
-    "text_pt": "Qué sueño para los dos te gustaría empezar a construir desde hoy?",
-    "text_fr": "Qué sueño para los dos te gustaría empezar a construir desde hoy?",
-    "text_it": "Qué sueño para los dos te gustaría empezar a construir desde hoy?"
+    "text_pt": "Que sonho para vocês dois você gostaria de começar a construir hoje?",
+    "text_fr": "Quel rêve pour vous deux aimeriez-vous commencer à construire aujourd’hui ?",
+    "text_it": "Quale sogno per entrambi vorreste iniziare a costruire oggi?"
   },
   {
     "id": "c3_45",
@@ -1445,9 +1445,9 @@
     "category": "dates",
     "text_es": "¿Qué te da la certeza de que una persona vale la pena en tu vida?",
     "text_en": "What gives you the certainty that someone is worth holding close?",
-    "text_pt": "Qué te da la certeza de que una persona vale la pena en tu vida?",
-    "text_fr": "Qué te da la certeza de que una persona vale la pena en tu vida?",
-    "text_it": "Qué te da la certeza de que una persona vale la pena en tu vida?"
+    "text_pt": "O que te dá a certeza de que uma pessoa vale a pena na sua vida?",
+    "text_fr": "Qu’est-ce qui vous donne la certitude qu’une personne vaut la peine dans votre vie ?",
+    "text_it": "Cosa ti dà la certezza che una persona vale la pena nella tua vita?"
   },
   {
     "id": "c3_46",
@@ -1455,9 +1455,9 @@
     "category": "couples",
     "text_es": "¿Qué inseguridad recurrente se activa cuando sientes que hay distancia emocional?",
     "text_en": "What insecurity is triggered when you sense emotional distance?",
-    "text_pt": "Qué inseguridad recurrente se activa cuando sientes que hay distancia emocional?",
-    "text_fr": "Qué inseguridad recurrente se activa cuando sientes que hay distancia emocional?",
-    "text_it": "Qué inseguridad recurrente se activa cuando sientes que hay distancia emocional?"
+    "text_pt": "Que insegurança recorrente é ativada quando você sente que existe um distanciamento emocional?",
+    "text_fr": "Quelle insécurité récurrente s’active lorsque l’on sent qu’il y a une distance émotionnelle ?",
+    "text_it": "Quale insicurezza ricorrente si attiva quando senti che c'è distanza emotiva?"
   },
   {
     "id": "c3_47",
@@ -1465,9 +1465,9 @@
     "category": "friends",
     "text_es": "¿Qué legado o huella te gustaría dejar en las personas que compartieron tu camino?",
     "text_en": "What imprint do you hope to leave on those who crossed your path?",
-    "text_pt": "Qué legado o huella te gustaría dejar en las personas que compartieron tu camino?",
-    "text_fr": "Qué legado o huella te gustaría dejar en las personas que compartieron tu camino?",
-    "text_it": "Qué legado o huella te gustaría dejar en las personas que compartieron tu camino?"
+    "text_pt": "Que legado ou marca você gostaria de deixar nas pessoas que compartilharam sua trajetória?",
+    "text_fr": "Quel héritage ou marque aimeriez-vous laisser aux personnes qui ont partagé votre chemin ?",
+    "text_it": "Quale eredità o segno vorresti lasciare alle persone che hanno condiviso il tuo percorso?"
   },
   {
     "id": "c3_48",
@@ -1475,9 +1475,9 @@
     "category": "couples",
     "text_es": "¿Qué agradeces de la persona frente a ti en este mismo instante?",
     "text_en": "What do you genuinely appreciate about the person in front of you right now?",
-    "text_pt": "Qué agradeces de la persona frente a ti en este mismo instante?",
-    "text_fr": "Qué agradeces de la persona frente a ti en este mismo instante?",
-    "text_it": "Qué agradeces de la persona frente a ti en este mismo instante?"
+    "text_pt": "Pelo que você é grato pela pessoa que está à sua frente neste exato momento?",
+    "text_fr": "De quoi êtes-vous reconnaissant envers la personne en face de vous en ce moment précis ?",
+    "text_it": "Per cosa sei grato alla persona che hai di fronte in questo preciso momento?"
   },
   {
     "id": "c3_49",
@@ -1485,9 +1485,9 @@
     "category": "dates",
     "text_es": "¿Qué es lo más auténtico que puedes decir sobre quién eres cuando nadie te observa?",
     "text_en": "What is the rawest, most authentic truth about who you are when unobserved?",
-    "text_pt": "Qué es lo más auténtico que puedes decir sobre quién eres cuando nadie te observa?",
+    "text_pt": "Qual é a coisa mais autêntica que você pode dizer sobre quem você é quando ninguém está olhando?",
     "text_fr": "Quel est le rawest, most authentic truth about who you are when unobserved?",
-    "text_it": "Qué es lo más auténtico que puedes decir sobre quién eres cuando nadie te observa?"
+    "text_it": "Qual è la cosa più autentica che puoi dire su chi sei quando nessuno ti guarda?"
   },
   {
     "id": "c3_50",
@@ -1495,9 +1495,9 @@
     "category": "couples",
     "text_es": "Si supieras que no serás juzgado de ninguna forma, ¿qué confesarías ahora?",
     "text_en": "If guaranteed total freedom from judgment, what would you confess right now?",
-    "text_pt": "Si supieras que no serás juzgado de ninguna forma, ¿qué confesarías ahora?",
-    "text_fr": "Si supieras que no serás juzgado de ninguna forma, qué confesarías ahora?",
-    "text_it": "Si supieras que no serás juzgado de ninguna forma, qué confesarías ahora?"
+    "text_pt": "Se você soubesse que não seria julgado de forma alguma, o que você confessaria agora?",
+    "text_fr": "Si vous saviez que vous ne seriez jugé d’aucune façon, que confesseriez-vous maintenant ?",
+    "text_it": "Se sapessi che non verrai giudicato in alcun modo, cosa confesseresti adesso?"
   },
   {
     "id": "r_1",
@@ -1505,9 +1505,9 @@
     "category": "challenges",
     "text_es": "Mírense fijamente a los ojos durante 30 segundos sin hablar y sin desviar la mirada.",
     "text_en": "Look deeply into each other's eyes for 30 seconds without speaking or turning away.",
-    "text_pt": "Mírense fijamente a los ojos durante 30 segundos sin hablar y sin desviar la mirada.",
-    "text_fr": "Mírense fijamente a los ojos durante 30 segundos sin hablar y sin desviar la mirada.",
-    "text_it": "Mírense fijamente a los ojos durante 30 segundos sin hablar y sin desviar la mirada."
+    "text_pt": "Olhem nos olhos um do outro por 30 segundos sem falar ou desviar o olhar.",
+    "text_fr": "Regardez-vous dans les yeux pendant 30 secondes sans parler ni détourner le regard.",
+    "text_it": "Guardatevi negli occhi per 30 secondi senza parlare o distogliere lo sguardo."
   },
   {
     "id": "r_2",
@@ -1515,9 +1515,9 @@
     "category": "challenges",
     "text_es": "Abre la galería de tu teléfono, retrocede exactamente 2 años y muestra la primera foto contando qué pasaba ese día.",
     "text_en": "Open your photos, scroll back exactly 2 years, show the first photo and share the story.",
-    "text_pt": "Abre la galería de tu teléfono, retrocede exactamente 2 años y muestra la primera foto contando qué pasaba ese día.",
-    "text_fr": "Abre la galería de tu teléfono, retrocede exactamente 2 años y muestra la primera foto contando qué pasaba ese día.",
-    "text_it": "Abre la galería de tu teléfono, retrocede exactamente 2 años y muestra la primera foto contando qué pasaba ese día."
+    "text_pt": "Abra a galeria do seu celular, volte exatamente 2 anos e mostre a primeira foto contando o que aconteceu naquele dia.",
+    "text_fr": "Ouvrez la galerie de votre téléphone, remontez exactement 2 ans en arrière et montrez la première photo racontant ce qui s'est passé ce jour-là.",
+    "text_it": "Apri la gallery del tuo cellulare, torna indietro di 2 anni esatti e mostra la prima foto che racconta cosa è successo quel giorno."
   },
   {
     "id": "r_3",
@@ -1525,9 +1525,9 @@
     "category": "challenges",
     "text_es": "Dile a la otra persona 3 cosas que te llamaron la atención de ella en los primeros 5 minutos de conocerla.",
     "text_en": "Tell the other person 3 things that caught your attention in the first 5 minutes of meeting.",
-    "text_pt": "Dile a la otra persona 3 cosas que te llamaron la atención de ella en los primeros 5 minutos de conocerla.",
-    "text_fr": "Dile a la otra persona 3 cosas que te llamaron la atención de ella en los primeros 5 minutos de conocerla.",
-    "text_it": "Dile a la otra persona 3 cosas que te llamaron la atención de ella en los primeros 5 minutos de conocerla."
+    "text_pt": "Conte à outra pessoa 3 coisas que chamaram sua atenção nela nos primeiros 5 minutos após conhecê-la.",
+    "text_fr": "Dites à l’autre personne 3 choses qui ont retenu votre attention à son sujet au cours des 5 premières minutes suivant sa rencontre.",
+    "text_it": "Racconta all'altra persona 3 cose che hanno attirato la tua attenzione nei primi 5 minuti che l'hai incontrata."
   },
   {
     "id": "r_4",
@@ -1535,9 +1535,9 @@
     "category": "challenges",
     "text_es": "Imita la forma en que la otra persona se ríe o pide un café.",
     "text_en": "Imitate how the other person laughs or how they order coffee.",
-    "text_pt": "Imita la forma en que la otra persona se ríe o pide un café.",
-    "text_fr": "Imita la forma en que la otra persona se ríe o pide un café.",
-    "text_it": "Imita la forma en que la otra persona se ríe o pide un café."
+    "text_pt": "Imite a maneira como a outra pessoa ri ou pede um café.",
+    "text_fr": "Imitez la façon dont l'autre personne rit ou commande un café.",
+    "text_it": "Imita il modo in cui l'altra persona ride o ordina un caffè."
   },
   {
     "id": "r_5",
@@ -1545,9 +1545,9 @@
     "category": "challenges",
     "text_es": "Elige una canción en tu teléfono que sientas que describe la energía de este encuentro y pon 30 segundos.",
     "text_en": "Pick a song on your phone that captures the vibe of this moment and play 30 seconds.",
-    "text_pt": "Elige una canción en tu teléfono que sientas que describe la energía de este encuentro y pon 30 segundos.",
-    "text_fr": "Elige una canción en tu teléfono que sientas que describe la energía de este encuentro y pon 30 segundos.",
-    "text_it": "Elige una canción en tu teléfono que sientas que describe la energía de este encuentro y pon 30 segundos."
+    "text_pt": "Escolha uma música em seu celular que você sinta que descreve a energia deste encontro e toque-a por 30 segundos.",
+    "text_fr": "Choisissez une chanson sur votre téléphone qui, selon vous, décrit l'énergie de cette réunion et écoutez-la pendant 30 secondes.",
+    "text_it": "Scegli una canzone sul tuo telefono che ritieni descriva l'energia di questo incontro e ascoltala per 30 secondi."
   },
   {
     "id": "r_6",
@@ -1555,9 +1555,9 @@
     "category": "challenges",
     "text_es": "Confiesa una mentira blanca inofensiva que hayas dicho en los últimos meses.",
     "text_en": "Confess a harmless little white lie you told recently.",
-    "text_pt": "Confiesa una mentira blanca inofensiva que hayas dicho en los últimos meses.",
-    "text_fr": "Confiesa una mentira blanca inofensiva que hayas dicho en los últimos meses.",
-    "text_it": "Confiesa una mentira blanca inofensiva que hayas dicho en los últimos meses."
+    "text_pt": "Confesse uma mentira inofensiva que você contou nos últimos meses.",
+    "text_fr": "Avouez un petit mensonge inoffensif que vous avez raconté au cours des derniers mois.",
+    "text_it": "Confessa un'innocua bugia bianca che hai detto negli ultimi mesi."
   },
   {
     "id": "r_7",
@@ -1565,9 +1565,9 @@
     "category": "challenges",
     "text_es": "Escribe en una servilleta o nota del móvil una pregunta secreta para que la otra persona la responda solo con Sí o No.",
     "text_en": "Write a secret question on a napkin or phone note for the other person to answer only Yes or No.",
-    "text_pt": "Escribe en una servilleta o nota del móvil una pregunta secreta para que la otra persona la responda solo con Sí o No.",
-    "text_fr": "Escribe en una servilleta o nota del móvil una pregunta secreta para que la otra persona la responda solo con Sí o No.",
-    "text_it": "Escribe en una servilleta o nota del móvil una pregunta secreta para que la otra persona la responda solo con Sí o No."
+    "text_pt": "Escreva uma pergunta secreta em um guardanapo ou bilhete de celular para a outra pessoa responder apenas com Sim ou Não.",
+    "text_fr": "Écrivez une question secrète sur une serviette ou une note de téléphone portable pour que l'autre personne puisse répondre uniquement par Oui ou par Non.",
+    "text_it": "Scrivi una domanda segreta su un tovagliolo o un bigliettino sul cellulare affinché l'altra persona possa rispondere solo con Sì o No."
   },
   {
     "id": "r_8",
@@ -1575,9 +1575,9 @@
     "category": "challenges",
     "text_es": "Hazle un cumplido sincero a la otra persona sobre algo que no tenga nada que ver con su físico o ropa.",
     "text_en": "Give a sincere compliment about something that has zero to do with appearance or clothes.",
-    "text_pt": "Hazle un cumplido sincero a la otra persona sobre algo que no tenga nada que ver con su físico o ropa.",
-    "text_fr": "Hazle un cumplido sincero a la otra persona sobre algo que no tenga nada que ver con su físico o ropa.",
-    "text_it": "Hazle un cumplido sincero a la otra persona sobre algo que no tenga nada que ver con su físico o ropa."
+    "text_pt": "Faça um elogio sincero à outra pessoa sobre algo que não tem nada a ver com sua aparência ou roupas.",
+    "text_fr": "Faites à l'autre personne un compliment sincère sur quelque chose qui n'a rien à voir avec son apparence ou ses vêtements.",
+    "text_it": "Fai all'altra persona un complimento sincero per qualcosa che non ha nulla a che fare con il suo aspetto o i suoi vestiti."
   },
   {
     "id": "r_9",
@@ -1585,9 +1585,9 @@
     "category": "challenges",
     "text_es": "Muestren al mismo tiempo la última búsqueda que hicieron en Google o YouTube.",
     "text_en": "Show at the same time the very last search query on your Google or YouTube app.",
-    "text_pt": "Muestren al mismo tiempo la última búsqueda que hicieron en Google o YouTube.",
-    "text_fr": "Muestren al mismo tiempo la última búsqueda que hicieron en Google o YouTube.",
-    "text_it": "Muestren al mismo tiempo la última búsqueda que hicieron en Google o YouTube."
+    "text_pt": "Mostre a última pesquisa que você fez no Google ou no YouTube ao mesmo tempo.",
+    "text_fr": "Affichez en même temps la dernière recherche que vous avez effectuée sur Google ou YouTube.",
+    "text_it": "Mostra contemporaneamente l'ultima ricerca che hai effettuato su Google o YouTube."
   },
   {
     "id": "r_10",
@@ -1595,9 +1595,9 @@
     "category": "challenges",
     "text_es": "Cierra los ojos y adivina el color exacto de ojos de la otra persona y un detalle de lo que lleva puesto.",
     "text_en": "Close your eyes and guess the other person's eye color and one subtle accessory they wear.",
-    "text_pt": "Cierra los ojos y adivina el color exacto de ojos de la otra persona y un detalle de lo que lleva puesto.",
-    "text_fr": "Cierra los ojos y adivina el color exacto de ojos de la otra persona y un detalle de lo que lleva puesto.",
-    "text_it": "Cierra los ojos y adivina el color exacto de ojos de la otra persona y un detalle de lo que lleva puesto."
+    "text_pt": "Feche os olhos e adivinhe a cor exata dos olhos da outra pessoa e um detalhe do que ela está vestindo.",
+    "text_fr": "Fermez les yeux et devinez la couleur exacte des yeux de l'autre personne et un détail de ce qu'elle porte.",
+    "text_it": "Chiudi gli occhi e indovina il colore esatto degli occhi dell'altra persona e un dettaglio di ciò che indossa."
   },
   {
     "id": "r_11",
@@ -1605,9 +1605,9 @@
     "category": "challenges",
     "text_es": "Tómense de las manos durante la siguiente ronda de preguntas.",
     "text_en": "Hold hands through the entirety of the next question round.",
-    "text_pt": "Tómense de las manos durante la siguiente ronda de preguntas.",
-    "text_fr": "Tómense de las manos durante la siguiente ronda de preguntas.",
-    "text_it": "Tómense de las manos durante la siguiente ronda de preguntas."
+    "text_pt": "Dêem as mãos durante a próxima rodada de perguntas.",
+    "text_fr": "Tenez-vous la main lors de la prochaine série de questions.",
+    "text_it": "Tenetevi per mano durante il prossimo giro di domande."
   },
   {
     "id": "r_12",
@@ -1615,9 +1615,9 @@
     "category": "challenges",
     "text_es": "Cuenta tu anécdota más vergonzosa usando solo 10 palabras.",
     "text_en": "Tell your most cringe-worthy story using exactly 10 words.",
-    "text_pt": "Cuenta tu anécdota más vergonzosa usando solo 10 palabras.",
-    "text_fr": "Cuenta tu anécdota más vergonzosa usando solo 10 palabras.",
-    "text_it": "Cuenta tu anécdota más vergonzosa usando solo 10 palabras."
+    "text_pt": "Conte sua anedota mais embaraçosa usando apenas 10 palavras.",
+    "text_fr": "Racontez votre anecdote la plus embarrassante en seulement 10 mots.",
+    "text_it": "Racconta il tuo aneddoto più imbarazzante usando solo 10 parole."
   },
   {
     "id": "r_13",
@@ -1625,9 +1625,9 @@
     "category": "challenges",
     "text_es": "Haz una pregunta directa que hayas querido hacer desde que empezó la velada pero no te animabas.",
     "text_en": "Ask a direct question you've wondered about tonight but hesitated to bring up.",
-    "text_pt": "Haz una pregunta directa que hayas querido hacer desde que empezó la velada pero no te animabas.",
-    "text_fr": "Haz una pregunta directa que hayas querido hacer desde que empezó la velada pero no te animabas.",
-    "text_it": "Haz una pregunta directa que hayas querido hacer desde que empezó la velada pero no te animabas."
+    "text_pt": "Faça uma pergunta direta que você queria fazer desde o início da noite, mas não conseguiu.",
+    "text_fr": "Posez une question directe que vous vouliez poser depuis le début de la soirée mais que vous n'avez pas réussi à poser.",
+    "text_it": "Fai una domanda diretta che avresti voluto fare dall'inizio della serata ma non sei riuscito a fare."
   },
   {
     "id": "r_14",
@@ -1635,9 +1635,9 @@
     "category": "challenges",
     "text_es": "Elige el próximo trago, postre o café para la otra persona sin que pueda oponerse.",
     "text_en": "Order the next drink, dessert, or coffee for the other person with zero objections.",
-    "text_pt": "Elige el próximo trago, postre o café para la otra persona sin que pueda oponerse.",
-    "text_fr": "Elige el próximo trago, postre o café para la otra persona sin que pueda oponerse.",
-    "text_it": "Elige el próximo trago, postre o café para la otra persona sin que pueda oponerse."
+    "text_pt": "Escolha a próxima bebida, sobremesa ou café para a outra pessoa sem que ela possa se opor.",
+    "text_fr": "Choisissez la prochaine boisson, dessert ou café de l'autre personne sans qu'elle puisse s'y opposer.",
+    "text_it": "Scegli la prossima bevanda, dolce o caffè per l'altra persona senza che questa possa opporsi."
   },
   {
     "id": "r_15",
@@ -1645,9 +1645,9 @@
     "category": "challenges",
     "text_es": "Muestra los 3 emojis más usados en tu teclado y explica por qué están ahí.",
     "text_en": "Show your top 3 recently used emojis and explain the context.",
-    "text_pt": "Muestra los 3 emojis más usados en tu teclado y explica por qué están ahí.",
-    "text_fr": "Muestra los 3 emojis más usados en tu teclado y explica por qué están ahí.",
-    "text_it": "Muestra los 3 emojis más usados en tu teclado y explica por qué están ahí."
+    "text_pt": "Mostre os 3 emojis mais usados ​​no seu teclado e explique por que eles estão ali.",
+    "text_fr": "Affichez les 3 emojis les plus utilisés sur votre clavier et expliquez pourquoi ils sont là.",
+    "text_it": "Mostra i 3 emoji più utilizzati sulla tastiera e spiega perché sono lì."
   },
   {
     "id": "r_16",
@@ -1655,9 +1655,9 @@
     "category": "challenges",
     "text_es": "Dile a la otra persona qué aroma o fragancia te recuerda a ella.",
     "text_en": "Tell the other person what scent or aroma reminds you of them.",
-    "text_pt": "Dile a la otra persona qué aroma o fragancia te recuerda a ella.",
-    "text_fr": "Dile a la otra persona qué aroma o fragancia te recuerda a ella.",
-    "text_it": "Dile a la otra persona qué aroma o fragancia te recuerda a ella."
+    "text_pt": "Diga à outra pessoa que aroma ou fragrância faz você lembrar dela.",
+    "text_fr": "Dites à l’autre personne quel arôme ou parfum vous rappelle.",
+    "text_it": "Dì all'altra persona quale aroma o fragranza te lo ricorda."
   },
   {
     "id": "r_17",
@@ -1665,9 +1665,9 @@
     "category": "challenges",
     "text_es": "Ponte en pausa: la otra persona puede hacerte cualquier pregunta y debes responder con total honestidad.",
     "text_en": "Truth pause: the other person gets a free question you must answer with raw honesty.",
-    "text_pt": "Ponte en pausa: la otra persona puede hacerte cualquier pregunta y debes responder con total honestidad.",
-    "text_fr": "Ponte en pausa: la otra persona puede hacerte cualquier pregunta y debes responder con total honestidad.",
-    "text_it": "Ponte en pausa: la otra persona puede hacerte cualquier pregunta y debes responder con total honestidad."
+    "text_pt": "Faça uma pausa: a outra pessoa pode fazer qualquer pergunta e você deve responder com total honestidade.",
+    "text_fr": "Faites une pause : l’autre personne peut vous poser n’importe quelle question et vous devez y répondre en toute honnêteté.",
+    "text_it": "Fai una pausa: l'altra persona può farti qualsiasi domanda e tu devi rispondere con totale onestà."
   },
   {
     "id": "r_18",
@@ -1675,9 +1675,9 @@
     "category": "challenges",
     "text_es": "Haz un brindis improvisado de 20 segundos celebrando algo que hayan descubierto hoy.",
     "text_en": "Make an impromptu 20-second toast celebrating something you learned today.",
-    "text_pt": "Haz un brindis improvisado de 20 segundos celebrando algo que hayan descubierto hoy.",
-    "text_fr": "Haz un brindis improvisado de 20 segundos celebrando algo que hayan descubierto hoy.",
-    "text_it": "Haz un brindis improvisado de 20 segundos celebrando algo que hayan descubierto hoy."
+    "text_pt": "Faça um brinde improvisado de 20 segundos comemorando algo que você descobriu hoje.",
+    "text_fr": "Portez un toast impromptu de 20 secondes pour célébrer quelque chose que vous avez découvert aujourd'hui.",
+    "text_it": "Fai un brindisi improvvisato di 20 secondi per celebrare qualcosa che hai scoperto oggi."
   },
   {
     "id": "r_19",
@@ -1685,9 +1685,9 @@
     "category": "challenges",
     "text_es": "Intercambien teléfonos por 1 minuto solo para ver la pantalla de inicio y apps más usadas.",
     "text_en": "Swap phones for 60 seconds purely to glance at home screen organization.",
-    "text_pt": "Intercambien teléfonos por 1 minuto solo para ver la pantalla de inicio y apps más usadas.",
-    "text_fr": "Intercambien teléfonos por 1 minuto solo para ver la pantalla de inicio y apps más usadas.",
-    "text_it": "Intercambien teléfonos por 1 minuto solo para ver la pantalla de inicio y apps más usadas."
+    "text_pt": "Troque de telefone por 1 minuto apenas para ver a tela inicial e os aplicativos mais usados.",
+    "text_fr": "Échangez votre téléphone pendant 1 minute juste pour voir l'écran d'accueil et les applications les plus utilisées.",
+    "text_it": "Scambia i telefoni per 1 minuto solo per vedere la schermata iniziale e le app più utilizzate."
   },
   {
     "id": "r_20",
@@ -1695,9 +1695,9 @@
     "category": "challenges",
     "text_es": "Describe a la otra persona usando solo 3 adjetivos positivos.",
     "text_en": "Describe the other person using only 3 genuine positive adjectives.",
-    "text_pt": "Describe a la otra persona usando solo 3 adjetivos positivos.",
-    "text_fr": "Describe a la otra persona usando solo 3 adjetivos positivos.",
-    "text_it": "Describe a la otra persona usando solo 3 adjetivos positivos."
+    "text_pt": "Descreva a outra pessoa usando apenas 3 adjetivos positivos.",
+    "text_fr": "Décrivez l’autre personne en utilisant seulement 3 adjectifs positifs.",
+    "text_it": "Descrivi l'altra persona utilizzando solo 3 aggettivi positivi."
   },
   {
     "id": "r_21",
@@ -1705,9 +1705,9 @@
     "category": "challenges",
     "text_es": "Susúrrale al oído a la otra persona una palabra que resuma lo que te transmite esta noche.",
     "text_en": "Whisper one word in the other person's ear that summarizes their energy tonight.",
-    "text_pt": "Susúrrale al oído a la otra persona una palabra que resuma lo que te transmite esta noche.",
-    "text_fr": "Susúrrale al oído a la otra persona una palabra que resuma lo que te transmite esta noche.",
-    "text_it": "Susúrrale al oído a la otra persona una palabra que resuma lo que te transmite esta noche."
+    "text_pt": "Sussurre no ouvido da outra pessoa uma palavra que resuma o que ela está transmitindo para você esta noite.",
+    "text_fr": "Chuchotez à l'oreille de l'autre personne un mot qui résume ce qu'elle vous transmet ce soir.",
+    "text_it": "Sussurra all'orecchio dell'altra persona una parola che riassuma ciò che ti sta comunicando stasera."
   },
   {
     "id": "r_22",
@@ -1715,9 +1715,9 @@
     "category": "challenges",
     "text_es": "Dile qué canción elegirías para cantar juntos en un karaoke en este instante.",
     "text_en": "Tell them which duet song you would sing together at karaoke right now.",
-    "text_pt": "Dile qué canción elegirías para cantar juntos en un karaoke en este instante.",
-    "text_fr": "Dile qué canción elegirías para cantar juntos en un karaoke en este instante.",
-    "text_it": "Dile qué canción elegirías para cantar juntos en un karaoke en este instante."
+    "text_pt": "Diga a ele qual música você escolheria para cantar no karaokê agora.",
+    "text_fr": "Dites-lui quelle chanson vous choisiriez de chanter ensemble au karaoké en ce moment.",
+    "text_it": "Digli quale canzone sceglieresti per cantare insieme al karaoke in questo momento."
   },
   {
     "id": "r_23",
@@ -1725,9 +1725,9 @@
     "category": "challenges",
     "text_es": "Pongan un cronómetro de 1 minuto y ninguno de los dos puede pestañear ni hablar.",
     "text_en": "Set a 1-minute timer: neither of you may blink or speak.",
-    "text_pt": "Pongan un cronómetro de 1 minuto y ninguno de los dos puede pestañear ni hablar.",
-    "text_fr": "Pongan un cronómetro de 1 minuto y ninguno de los dos puede pestañear ni hablar.",
-    "text_it": "Pongan un cronómetro de 1 minuto y ninguno de los dos puede pestañear ni hablar."
+    "text_pt": "Defina um cronômetro para 1 minuto e nenhum de vocês poderá piscar ou falar.",
+    "text_fr": "Réglez une minuterie sur 1 minute et aucun de vous ne pourra cligner des yeux ou parler.",
+    "text_it": "Imposta un timer per 1 minuto e nessuno dei due potrà battere le palpebre o parlare."
   },
   {
     "id": "r_24",
@@ -1735,9 +1735,9 @@
     "category": "challenges",
     "text_es": "Inventen un saludo secreto con las manos que solo ustedes dos conozcan.",
     "text_en": "Create a secret custom handshake that only the two of you know.",
-    "text_pt": "Inventen un saludo secreto con las manos que solo ustedes dos conozcan.",
-    "text_fr": "Inventen un saludo secreto con las manos que solo ustedes dos conozcan.",
-    "text_it": "Inventen un saludo secreto con las manos que solo ustedes dos conozcan."
+    "text_pt": "Faça um aperto de mão secreto que só vocês dois conheçam.",
+    "text_fr": "Inventez une poignée de main secrète que seuls vous deux connaissez.",
+    "text_it": "Inventa una stretta di mano segreta che solo voi due conoscete."
   },
   {
     "id": "r_25",
@@ -1745,9 +1745,9 @@
     "category": "challenges",
     "text_es": "Dile a la otra persona qué personaje de película o libro se parece a su esencia.",
     "text_en": "Tell the other person which fictional character shares their underlying soul.",
-    "text_pt": "Dile a la otra persona qué personaje de película o libro se parece a su esencia.",
-    "text_fr": "Dile a la otra persona qué personaje de película o libro se parece a su esencia.",
-    "text_it": "Dile a la otra persona qué personaje de película o libro se parece a su esencia."
+    "text_pt": "Diga à outra pessoa com qual personagem de filme ou livro sua essência se assemelha.",
+    "text_fr": "Dites à l’autre personne à quel personnage de film ou de livre son essence ressemble.",
+    "text_it": "Spiega all'altra persona a quale personaggio del film o del libro assomiglia la sua essenza."
   },
   {
     "id": "r_26",
@@ -1755,9 +1755,9 @@
     "category": "challenges",
     "text_es": "Tómense una selfie divertida haciendo caras espontáneas para guardar de recuerdo.",
     "text_en": "Snap a fun spontaneous selfie making goofy faces to keep as a souvenir.",
-    "text_pt": "Tómense una selfie divertida haciendo caras espontáneas para guardar de recuerdo.",
-    "text_fr": "Tómense una selfie divertida haciendo caras espontáneas para guardar de recuerdo.",
-    "text_it": "Tómense una selfie divertida haciendo caras espontáneas para guardar de recuerdo."
+    "text_pt": "Tire uma selfie divertida fazendo caretas espontâneas para guardar como lembrança.",
+    "text_fr": "Prenez un selfie amusant en faisant des grimaces spontanées à garder en souvenir.",
+    "text_it": "Scatta un selfie divertente facendo facce spontanee da conservare come souvenir."
   },
   {
     "id": "r_27",
@@ -1765,9 +1765,9 @@
     "category": "challenges",
     "text_es": "Deja que la otra persona elija tu foto de perfil o fondo de pantalla durante 24 horas.",
     "text_en": "Let the other person pick your phone wallpaper for the next 24 hours.",
-    "text_pt": "Deja que la otra persona elija tu foto de perfil o fondo de pantalla durante 24 horas.",
-    "text_fr": "Deja que la otra persona elija tu foto de perfil o fondo de pantalla durante 24 horas.",
-    "text_it": "Deja que la otra persona elija tu foto de perfil o fondo de pantalla durante 24 horas."
+    "text_pt": "Deixe a outra pessoa escolher sua foto de perfil ou papel de parede por 24 horas.",
+    "text_fr": "Laissez l’autre personne choisir votre photo de profil ou votre fond d’écran pendant 24 heures.",
+    "text_it": "Lascia che l'altra persona scelga la foto del tuo profilo o lo sfondo per 24 ore."
   },
   {
     "id": "r_28",
@@ -1775,9 +1775,9 @@
     "category": "challenges",
     "text_es": "Describe cómo sería la cita perfecta que planificarías para ambos sin límite de presupuesto.",
     "text_en": "Describe the dream date you would plan for both of you with zero budget limits.",
-    "text_pt": "Describe cómo sería la cita perfecta que planificarías para ambos sin límite de presupuesto.",
-    "text_fr": "Describe cómo sería la cita perfecta que planificarías para ambos sin límite de presupuesto.",
-    "text_it": "Describe cómo sería la cita perfecta que planificarías para ambos sin límite de presupuesto."
+    "text_pt": "Descreva como seria o encontro perfeito que você planejaria para vocês dois sem limite de orçamento.",
+    "text_fr": "Décrivez à quoi ressemblerait le rendez-vous parfait que vous planifieriez pour vous deux sans limite budgétaire.",
+    "text_it": "Descrivi quale sarebbe l'appuntamento perfetto che pianificheresti per entrambi senza limiti di budget."
   },
   {
     "id": "r_29",
@@ -1785,9 +1785,9 @@
     "category": "challenges",
     "text_es": "Dile a la otra persona qué hábito o detalle suyo te parece irresistiblemente tierno.",
     "text_en": "Share what small habit or gesture of theirs you find irresistibly endearing.",
-    "text_pt": "Dile a la otra persona qué hábito o detalle suyo te parece irresistiblemente tierno.",
-    "text_fr": "Dile a la otra persona qué hábito o detalle suyo te parece irresistiblemente tierno.",
-    "text_it": "Dile a la otra persona qué hábito o detalle suyo te parece irresistiblemente tierno."
+    "text_pt": "Diga à outra pessoa qual hábito ou detalhe dela parece irresistivelmente fofo para você.",
+    "text_fr": "Dites à l’autre personne quelle habitude ou quel détail lui semble irrésistiblement mignon.",
+    "text_it": "Dì all'altra persona quale sua abitudine o dettaglio ti sembra irresistibilmente carino."
   },
   {
     "id": "r_30",
@@ -1795,9 +1795,9 @@
     "category": "challenges",
     "text_es": "Responde la siguiente pregunta imitando el acento de otro país durante toda la respuesta.",
     "text_en": "Answer the next question doing your best funny foreign accent the entire time.",
-    "text_pt": "Responde la siguiente pregunta imitando el acento de otro país durante toda la respuesta.",
-    "text_fr": "Responde la siguiente pregunta imitando el acento de otro país durante toda la respuesta.",
-    "text_it": "Responde la siguiente pregunta imitando el acento de otro país durante toda la respuesta."
+    "text_pt": "Responda à seguinte pergunta imitando o sotaque de outro país ao longo da resposta.",
+    "text_fr": "Répondez à la question suivante en imitant l’accent d’un autre pays tout au long de la réponse.",
+    "text_it": "Rispondi alla seguente domanda imitando l'accento di un altro paese in tutta la risposta."
   },
   {
     "id": "r_31",
@@ -1805,9 +1805,9 @@
     "category": "challenges",
     "text_es": "Hazle un masaje suave de 30 segundos en los hombros o manos para aflojar la tensión.",
     "text_en": "Give a gentle 30-second shoulder or hand massage to release tension.",
-    "text_pt": "Hazle un masaje suave de 30 segundos en los hombros o manos para aflojar la tensión.",
-    "text_fr": "Hazle un masaje suave de 30 segundos en los hombros o manos para aflojar la tensión.",
-    "text_it": "Hazle un masaje suave de 30 segundos en los hombros o manos para aflojar la tensión."
+    "text_pt": "Faça uma massagem suave nos ombros ou nas mãos por 30 segundos para liberar a tensão.",
+    "text_fr": "Massez doucement vos épaules ou vos mains pendant 30 secondes pour relâcher les tensions.",
+    "text_it": "Fai un delicato massaggio di 30 secondi alle spalle o alle mani per allentare la tensione."
   },
   {
     "id": "r_32",
@@ -1815,9 +1815,9 @@
     "category": "challenges",
     "text_es": "Miren al techo y nombren al unísono lo primero que se les venga a la mente en 3, 2, 1...",
     "text_en": "Look at the ceiling and blurt out the very first word in your mind on 3, 2, 1...",
-    "text_pt": "Miren al techo y nombren al unísono lo primero que se les venga a la mente en 3, 2, 1...",
-    "text_fr": "Miren al techo y nombren al unísono lo primero que se les venga a la mente en 3, 2, 1...",
-    "text_it": "Miren al techo y nombren al unísono lo primero que se les venga a la mente en 3, 2, 1..."
+    "text_pt": "Olhe para o teto e em uníssono diga o nome da primeira coisa que lhe vem à cabeça em 3, 2, 1...",
+    "text_fr": "Regardez le plafond et nommez à l'unisson la première chose qui vous vient à l'esprit dans 3, 2, 1...",
+    "text_it": "Guarda il soffitto e all'unisono nome la prima cosa che ti viene in mente in 3, 2, 1..."
   },
   {
     "id": "r_33",
@@ -1825,9 +1825,9 @@
     "category": "challenges",
     "text_es": "Cuéntale a la otra persona qué prejuicio falso tuviste sobre ella antes de conocerla a fondo.",
     "text_en": "Admit what false assumption you initially held before getting to know them.",
-    "text_pt": "Cuéntale a la otra persona qué prejuicio falso tuviste sobre ella antes de conocerla a fondo.",
-    "text_fr": "Cuéntale a la otra persona qué prejuicio falso tuviste sobre ella antes de conocerla a fondo.",
-    "text_it": "Cuéntale a la otra persona qué prejuicio falso tuviste sobre ella antes de conocerla a fondo."
+    "text_pt": "Diga à outra pessoa que falso preconceito você tinha sobre ela antes de conhecê-la bem.",
+    "text_fr": "Dites à l’autre personne les faux préjugés que vous aviez à son sujet avant de bien la connaître.",
+    "text_it": "Racconta all'altra persona quali falsi pregiudizi avevi nei suoi confronti prima di conoscerla bene."
   },
   {
     "id": "r_34",
@@ -1835,9 +1835,9 @@
     "category": "challenges",
     "text_es": "Prometan solemnemente un plan conjunto para realizar en las próximas 2 semanas.",
     "text_en": "Make a pinky-promise on one concrete plan to do together within 2 weeks.",
-    "text_pt": "Prometan solemnemente un plan conjunto para realizar en las próximas 2 semanas.",
-    "text_fr": "Prometan solemnemente un plan conjunto para realizar en las próximas 2 semanas.",
-    "text_it": "Prometan solemnemente un plan conjunto para realizar en las próximas 2 semanas."
+    "text_pt": "Prometa solenemente um plano conjunto a ser executado nas próximas 2 semanas.",
+    "text_fr": "Promettre solennellement un plan commun à réaliser dans les 2 prochaines semaines.",
+    "text_it": "Promettiamo solennemente un piano comune da realizzare nelle prossime due settimane."
   },
   {
     "id": "r_35",
@@ -1845,9 +1845,9 @@
     "category": "challenges",
     "text_es": "Dense un abrazo largo y genuino de al menos 10 segundos para cerrar esta ronda.",
     "text_en": "Share a long, heartfelt embrace lasting at least 10 full seconds to wrap this round.",
-    "text_pt": "Dense un abrazo largo y genuino de al menos 10 segundos para cerrar esta ronda.",
+    "text_pt": "Dêem um ao outro um abraço longo e genuíno de pelo menos 10 segundos para encerrar esta rodada.",
     "text_fr": "Partage un long, heartfelt embrace lasting at least 10 full seconds to wrap this round.",
-    "text_it": "Dense un abrazo largo y genuino de al menos 10 segundos para cerrar esta ronda."
+    "text_it": "Datevi un abbraccio lungo e sincero di almeno 10 secondi per chiudere questo round."
   },
   {
     "id": "spicy_1",
@@ -2226,7 +2226,7 @@
     "text_es": "¿Qué piensas cuando me ves recién salido/a de la ducha?",
     "text_en": "What goes through your mind when you see me fresh out of the shower?",
     "text_pt": "O que passa pela sua cabeça quando você me vê saindo do banho?",
-    "text_fr": "À quoi penses-tu quand tu me vois sortir tout juste de la douche ?",
+    "text_fr": "Que penses-tu quand tu me vois fraîchement sorti de la douche ?",
     "text_it": "Cosa ti passa per la testa quando mi vedi appena uscito/a dalla doccia?"
   },
   {
@@ -2336,7 +2336,7 @@
     "text_es": "¿Cuál es el recuerdo más emocionante de la primera vez que estuvimos a solas?",
     "text_en": "What is your most thrilling memory of the very first time we were alone together?",
     "text_pt": "Qual é a lembrança mais emocionante da primeira vez em que ficamos a sós?",
-    "text_fr": "Quel est ton souvenir le plus excitant de la toute première fois où nous étions seuls ?",
+    "text_fr": "Quel est le souvenir le plus excitant de la première fois où nous étions seuls ?",
     "text_it": "Qual è il ricordo più eccitante della prima volta che siamo rimasti soli insieme?"
   },
   {
@@ -2536,7 +2536,7 @@
     "text_es": "¿Te has sentido atraído/a por alguien de la familia de tu pareja o expareja?",
     "text_en": "Have you ever been secretly attracted to a member of your partner's or ex's family?",
     "text_pt": "Você já sentiu atração por alguém da família do seu parceiro ou ex?",
-    "text_fr": "As-tu déjà été attiré(e) par un membre de la famille de ton partenaire ou de ton ex ?",
+    "text_fr": "Vous êtes-vous senti attiré par un membre de la famille de votre partenaire ou ex-partenaire ?",
     "text_it": "Sei mai stato/a attratto/a da un membro della famiglia del tuo partner o ex?"
   },
   {
@@ -3036,7 +3036,7 @@
     "text_es": "¿Existe la amistad 100% platónica y desinteresada entre dos personas heterosexuales de distinto género cuando hay atracción física?",
     "text_en": "Can purely platonic friendship truly exist between two heterosexual people of different genders if there is physical attraction?",
     "text_pt": "Existe amizade 100% platônica entre homem e mulher héteros quando existe alguma atração física?",
-    "text_fr": "Une amitié purement platonique peut-elle exister entre un homme et une femme hétéros s'il y a de l'attirance physique ?",
+    "text_fr": "Existe-t-il une amitié 100% platonique et désintéressée entre deux personnes hétérosexuelles de genres différents lorsqu'il y a attirance physique ?",
     "text_it": "Esiste un'amicizia al 100% platonica tra persone etero di sesso opposto quando c'è attrazione fisica?"
   },
   {
@@ -3466,7 +3466,7 @@
     "text_es": "¿Preferirías saber la verdad absoluta sobre cómo se creó el universo o qué hay exactamente después de la muerte?",
     "text_en": "Would you rather know how the universe was created or what exactly happens after death?",
     "text_pt": "Você preferiria saber a verdade absoluta sobre a origem do universo ou sobre o que há após a morte?",
-    "text_fr": "Préférerais-tu percer le mystère de l'origine de l'univers ou savoir avec certitude ce qu'il y a après la mort ?",
+    "text_fr": "Préféreriez-vous connaître la vérité absolue sur la façon dont l’univers a été créé ou sur ce qui existe exactement après la mort ?",
     "text_it": "Preferiresti conoscere la verità assoluta sull'origine dell'universo o su cosa c'è esattamente dopo la morte?"
   },
   {
@@ -3496,7 +3496,7 @@
     "text_es": "¿Preferirías ser la persona más inteligente del mundo en una sociedad mediocre o una persona promedio entre genios?",
     "text_en": "Would you rather be the smartest person on Earth in an average world, or an average person among geniuses?",
     "text_pt": "Você preferiria ser a pessoa mais inteligente do mundo entre pessoas comuns ou uma pessoa comum entre gênios?",
-    "text_fr": "Préférerais-tu être le plus intelligent de la planète dans un monde moyen, ou un individu moyen parmi des génies ?",
+    "text_fr": "Préféreriez-vous être la personne la plus intelligente du monde dans une société médiocre ou une personne moyenne parmi les génies ?",
     "text_it": "Preferiresti essere la persona più intelligente del mondo o una persona nella media in mezzo a dei geni?"
   },
   {
@@ -3756,7 +3756,7 @@
     "text_es": "Susúrrale al oído a la persona que te parezca más atractiva de la ronda la frase más picante que se te ocurra.",
     "text_en": "Whisper the hottest phrase you can think of into the ear of the person you find most attractive here.",
     "text_pt": "Sussurre no ouvido da pessoa que você acha mais atraente a frase mais picante que conseguir.",
-    "text_fr": "Murmure à l'oreille de la personne la plus attirante du tour la phrase la plus coquine qui te vienne.",
+    "text_fr": "Chuchotez à l’oreille de la personne la plus attirante du monde la phrase la plus piquante à laquelle vous puissiez penser.",
     "text_it": "Sussurra all'orecchio della persona più attraente del gruppo la frase più piccante che ti viene in mente."
   },
   {
@@ -3766,7 +3766,7 @@
     "text_es": "Dale un beso en la comisura de los labios o en el cuello a la persona que el grupo elija (o bebe 3 tragos de penitencia).",
     "text_en": "Kiss the corner of the lips or neck of whoever the group picks (or take 3 sips of penalty).",
     "text_pt": "Dê um beijo no canto da boca ou no pescoço de quem o grupo escolher (ou beba 3 goles de castigo).",
-    "text_fr": "Donne un baiser au coin des lèvres ou dans le cou de la personne choisie par le groupe (ou bois 3 gorgées).",
+    "text_fr": "Donnez un baiser sur le coin de la bouche ou dans le cou à la personne choisie par le groupe (ou buvez 3 shots de pénitence).",
     "text_it": "Dai un bacio all'angolo della bocca o sul collo alla persona scelta dal gruppo (o bevi 3 sorsi)."
   },
   {
@@ -3796,7 +3796,7 @@
     "text_es": "Hazle un masaje lento en los hombros o el cuello a la persona frente a ti durante 40 segundos mientras le hablas suave.",
     "text_en": "Give a slow shoulder or neck massage to the person across from you for 40 seconds while speaking softly.",
     "text_pt": "Faça uma massagem lenta nos ombros ou pescoço da pessoa à sua frente por 40 segundos falando suavemente.",
-    "text_fr": "Masse lentement les épaules ou la nuque de la personne en face de toi pendant 40 secondes en chuchotant.",
+    "text_fr": "Offrez à la personne devant vous un massage lent des épaules ou du cou pendant 40 secondes tout en parlant doucement.",
     "text_it": "Fai un massaggio lento alle spalle o al collo alla persona di fronte a te per 40 secondi parlando dolcemente."
   },
   {
@@ -3816,7 +3816,7 @@
     "text_es": "Muerde suavemente el labio inferior o la oreja de la persona de tu izquierda durante 3 segundos.",
     "text_en": "Gently bite the lower lip or earlobe of the person to your left for 3 seconds.",
     "text_pt": "Morda suavemente o lábio inferior ou a orelha da pessoa à sua esquerda por 3 segundos.",
-    "text_fr": "Mordille doucement la lèvre inférieure ou l'oreille de la personne à ta gauche pendant 3 secondes.",
+    "text_fr": "Mordez doucement la lèvre inférieure ou l'oreille de la personne à votre gauche pendant 3 secondes.",
     "text_it": "Mordicchia delicatamente il labbro inferiore o l'orecchio della persona alla tua sinistra per 3 secondi."
   },
   {
@@ -3886,7 +3886,7 @@
     "text_es": "Siéntate en el regazo de la persona que elijas durante las próximas dos preguntas de la partida.",
     "text_en": "Sit on the lap of whoever you pick for the next two questions of the game.",
     "text_pt": "Sente-se no colo da pessoa que escolher durante as próximas duas perguntas do jogo.",
-    "text_fr": "Assieds-toi sur les genoux de la personne de ton choix pour les deux prochaines questions.",
+    "text_fr": "Asseyez-vous sur les genoux de la personne que vous choisissez pour les deux prochaines questions du jeu.",
     "text_it": "Siediti sulle ginocchia di chi vuoi tu per le prossime due domande del gioco."
   },
   {
@@ -3946,7 +3946,7 @@
     "text_es": "Come un alimento o fruta de la mano o de la boca de la persona que tengas a tu lado.",
     "text_en": "Eat a piece of food or fruit from the hand or mouth of the person beside you.",
     "text_pt": "Coma um pedaço de comida ou fruta da mão ou da boca da pessoa ao seu lado.",
-    "text_fr": "Mange un morceau de nourriture ou un fruit de la main ou de la bouche de ton voisin.",
+    "text_fr": "Mangez un aliment ou un fruit provenant de la main ou de la bouche de la personne à côté de vous.",
     "text_it": "Mangia un boccone di cibo o frutta dalla mano o dalla bocca della persona accanto a te."
   },
   {
@@ -3986,7 +3986,7 @@
     "text_es": "Acaricia la cara y labios de la persona frente a ti con los ojos vendados o cerrados e intenta adivinar quién es.",
     "text_en": "Caress the face and lips of the person in front of you while blindfolded and guess who it is.",
     "text_pt": "Acaricie o rosto e lábios da pessoa à frente com os olhos vendados e adivinhe quem é.",
-    "text_fr": "Caresse le visage et les lèvres de la personne en face les yeux bandés et devine qui c'est.",
+    "text_fr": "Caressez le visage et les lèvres de la personne devant vous les yeux bandés ou fermés et essayez de deviner de qui il s'agit.",
     "text_it": "Accarezza il viso e le labbra della persona di fronte con gli occhi chiusi e indovina chi è."
   },
   {
@@ -3996,7 +3996,7 @@
     "text_es": "Besa el dorso de la mano de cada persona en la ronda mirando fijamente a sus ojos como un seductor clásico.",
     "text_en": "Kiss the back of the hand of every person in the circle while looking deeply into their eyes.",
     "text_pt": "Beije as costas da mão de cada pessoa na roda olhando fixamente nos olhos como um sedutor.",
-    "text_fr": "Baise le dos de la main de chaque personne du cercle en la regardant intensément dans les yeux.",
+    "text_fr": "Il embrasse le dos de la main de chaque personne du cercle, les regardant dans les yeux comme un séducteur classique.",
     "text_it": "Bacia il dorso della mano di ogni persona nel cerchio guardandola intensamente negli occhi."
   },
   {
@@ -4096,7 +4096,7 @@
     "text_es": "¿Quién es más probable que termine besando a dos personas diferentes en la misma noche?",
     "text_en": "Who is most likely to end up kissing two different people in the exact same night?",
     "text_pt": "Quem é mais provável de beijar duas pessoas diferentes na mesma noite?",
-    "text_fr": "Qui est le plus susceptible d'embrasser deux personnes différentes au cours de la même nuit ?",
+    "text_fr": "Qui est le plus susceptible de finir par embrasser deux personnes différentes au cours de la même nuit ?",
     "text_it": "Chi è più probabile che finisca per baciare due persone diverse nella stessa notte?"
   },
   {
@@ -4506,7 +4506,7 @@
     "text_es": "Yo nunca me he olvidado del nombre de la persona con la que pasé la noche anterior.",
     "text_en": "Never have I ever completely blanked on the morning-after name of the person beside me.",
     "text_pt": "Eu nunca esqueci o nome da pessoa com quem acordei no dia seguinte.",
-    "text_fr": "Je n'ai jamais oublié le prénom de la personne à côté de laquelle je me suis réveillé.",
+    "text_fr": "Je n'ai jamais oublié le nom de la personne avec qui j'ai passé la nuit précédente.",
     "text_it": "Non ho mai dimenticato il nome della persona con cui mi sono svegliato la mattina dopo."
   },
   {
@@ -4546,7 +4546,7 @@
     "text_es": "Yo nunca he besado a más de una persona durante la misma fiesta o festival.",
     "text_en": "Never have I ever kissed more than one person at the same party or music festival.",
     "text_pt": "Eu nunca beijei mais de uma pessoa na mesma balada ou festival.",
-    "text_fr": "Je n'ai jamais embrassé plus d'une personne au cours de la même soirée ou festival.",
+    "text_fr": "Je n'ai jamais embrassé plus d'une personne lors d'une même fête ou festival.",
     "text_it": "Non ho mai baciato più di una persona durante la stessa festa o festival."
   },
   {
@@ -4806,7 +4806,7 @@
     "text_es": "¿Quién es más probable que sea el alma de la fiesta y termine bailando arriba de una silla?",
     "text_en": "Who is most likely to become the life of the party and end up dancing on top of a chair?",
     "text_pt": "Quem é mais provável de ser a alma da festa e terminar dançando em cima da cadeira?",
-    "text_fr": "Qui est le plus susceptible de devenir l'âme de la fête et finir par danser sur une chaise ?",
+    "text_fr": "Qui est le plus susceptible de diriger la fête et de finir par danser sur une chaise ?",
     "text_it": "Chi è più probabile che sia l'anima della festa e finisca a ballare sopra una sedia?"
   },
   {
@@ -4938,5 +4938,355 @@
     "text_pt": "Eu nunca inventei uma desculpa elaborada para esconder onde passei a noite.",
     "text_fr": "Je n'ai jamais inventé un alibi complexe pour cacher où j'avais passé la nuit.",
     "text_it": "Non ho mai dovuto inventare una scusa elaborata su dove avevo passato la notte."
+  },
+  {
+    "id": "couples_ch_1",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Mírense fijamente a los ojos durante 45 segundos en silencio absoluto sin desviar la mirada ni hablar.",
+    "text_en": "Look deeply into each other's eyes for 45 seconds in complete silence without looking away or speaking.",
+    "text_pt": "Olhem fixamente nos olhos um do outro por 45 segundos em silêncio absoluto sem desviar o olhar nem falar.",
+    "text_fr": "Regardez-vous fixement dans les yeux pendant 45 secondes en silence complet sans détourner le regard ni parler.",
+    "text_it": "Guardatevi intensamente negli occhi per 45 secondi in silenzio assoluto senza distogliere lo sguardo né parlare."
+  },
+  {
+    "id": "couples_ch_2",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Dale a tu pareja un masaje de cuello y hombros durante 1 minuto con los ojos de ambos cerrados.",
+    "text_en": "Give your partner a 1-minute neck and shoulder massage with both of your eyes closed.",
+    "text_pt": "Faça uma massagem de 1 minuto no pescoço e ombros do seu parceiro com os olhos de ambos fechados.",
+    "text_fr": "Fais à ton partenaire un massage du cou et des épaules pendant 1 minute, les yeux fermés pour vous deux.",
+    "text_it": "Fai al tuo partner un massaggio di 1 minuto al collo e alle spalle con gli occhi chiusi per entrambi."
+  },
+  {
+    "id": "couples_ch_3",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Susúrrale al oído tres cosas que te vuelven loco/a de su personalidad o de su cuerpo.",
+    "text_en": "Whisper three things into their ear that drive you crazy about their personality or body.",
+    "text_pt": "Sussurre no ouvido dele(a) três coisas que te deixam louco(a) na personalidade ou no corpo dele(a).",
+    "text_fr": "Chuchote-lui à l'oreille trois choses qui te rendent fou/folle dans sa personnalité ou son corps.",
+    "text_it": "Sussurragli/le all'orecchio tre cose che ti fanno impazzire della sua personalità o del suo corpo."
+  },
+  {
+    "id": "couples_ch_4",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Recreen durante 30 segundos el momento exacto en que se conocieron o su primer beso.",
+    "text_en": "Reenact for 30 seconds the exact moment you first met or your very first kiss.",
+    "text_pt": "Recriem durante 30 segundos o momento exato em que se conheceram ou o primeiro beijo.",
+    "text_fr": "Rejouez pendant 30 secondes le moment exact de votre première rencontre ou de votre premier baiser.",
+    "text_it": "Ricreate per 30 secondi il momento esatto in cui vi siete conosciuti o il vostro primo bacio."
+  },
+  {
+    "id": "couples_ch_5",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Tómense de las manos, cierren los ojos y digan al mismo tiempo una palabra que defina lo que sienten hoy.",
+    "text_en": "Hold hands, close your eyes, and say at the exact same time one word that describes what you feel today.",
+    "text_pt": "Deem as mãos, fechem os olhos e digam ao mesmo tempo uma palavra que defina o que sentem hoje.",
+    "text_fr": "Tenez-vous la main, fermez les yeux et dites en même temps un mot qui définit ce que vous ressentez aujourd'hui.",
+    "text_it": "Tenetevi per mano, chiudete gli occhi e dite contemporaneamente una parola che definisce cosa provate oggi."
+  },
+  {
+    "id": "couples_ch_6",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Dale 5 besos lentos en 5 lugares diferentes de su rostro.",
+    "text_en": "Give your partner 5 slow, gentle kisses in 5 different spots on their face.",
+    "text_pt": "Dê 5 beijos lentos e carinhosos em 5 lugares diferentes do rosto do seu amor.",
+    "text_fr": "Donne 5 baisers lents et doux sur 5 endroits différents de son visage.",
+    "text_it": "Dai 5 baci lenti in 5 punti diversi del suo viso."
+  },
+  {
+    "id": "couples_ch_7",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Imita un gesto o tic divertido y característico de tu pareja hasta que adivine cuál es.",
+    "text_en": "Imitate a quirky habit or cute mannerism of your partner until they guess what it is.",
+    "text_pt": "Imite um tique ou mania fofa do seu parceiro até que ele(a) adivinhe o que é.",
+    "text_fr": "Imite une manie ou un geste mignon de ton partenaire jusqu'à ce qu'il devine ce que c'est.",
+    "text_it": "Imita un gesto o tic divertente e tipico del tuo partner finché non indovina qual è."
+  },
+  {
+    "id": "couples_ch_8",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Bailen pegados una canción lenta imaginaria durante 45 segundos, en silencio.",
+    "text_en": "Slow dance closely together to an imaginary slow song for 45 seconds, in silence.",
+    "text_pt": "Dancem coladinhos uma música lenta imaginária por 45 segundos, em silêncio.",
+    "text_fr": "Dansez collés-serrés sur un slow imaginaire pendant 45 secondes, en silence.",
+    "text_it": "Ballate abbracciati su una canzone lenta immaginaria per 45 secondi, in silenzio."
+  },
+  {
+    "id": "couples_ch_9",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Dile a tu pareja un recuerdo de los dos que siempre te saca una sonrisa cuando estás triste.",
+    "text_en": "Share a memory of the two of you that never fails to make you smile whenever you feel down.",
+    "text_pt": "Conte ao seu amor uma lembrança dos dois que sempre coloca um sorriso no seu rosto quando você está triste.",
+    "text_fr": "Raconte à ton partenaire un souvenir de vous deux qui te redonne toujours le sourire quand ça ne va pas.",
+    "text_it": "Condividi un ricordo di voi due che ti fa sempre sorridere ogni volta che sei triste."
+  },
+  {
+    "id": "couples_ch_10",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Dale un abrazo apretado y sostenido de 30 segundos sin decir una sola palabra.",
+    "text_en": "Give each other a tight, continuous 30-second embrace without saying a single word.",
+    "text_pt": "Dê um abraço apertado e aconchegante de 30 segundos sem dizer uma única palavra.",
+    "text_fr": "Serrez-vous fort dans les bras pendant 30 secondes continues sans dire un seul mot.",
+    "text_it": "Datevi un abbraccio stretto e continuo di 30 secondi senza dire una sola parola."
+  },
+  {
+    "id": "couples_ch_11",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Escribe con tu dedo una palabra corta de amor en la espalda de tu pareja hasta que la adivine.",
+    "text_en": "Trace a short love-related word with your finger onto your partner's back until they guess it.",
+    "text_pt": "Escreva com o dedo uma palavra de carinho nas costas do seu parceiro até ele(a) adivinhar.",
+    "text_fr": "Écris avec ton doigt un petit mot doux dans le dos de ton partenaire jusqu'à ce qu'il le devine.",
+    "text_it": "Traccia con un dito una parola d'amore sulla schiena del tuo partner finché non indovina."
+  },
+  {
+    "id": "couples_ch_12",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Dile a tu pareja cuál es tu apodo secreto o cariñoso favorito para ella/él y por qué.",
+    "text_en": "Reveal your absolute favorite pet name or affectionate nickname for them and why.",
+    "text_pt": "Revele seu apelido carinhoso favorito para o seu parceiro e explique o motivo.",
+    "text_fr": "Révèle ton surnom affectueux préféré pour ton partenaire et explique pourquoi.",
+    "text_it": "Rivela il tuo nomignolo affettuoso preferito per il partner e spiega perché."
+  },
+  {
+    "id": "couples_ch_13",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Hagan un duelo de miradas: el primero que sonría o parpadee le debe un desayuno en la cama al otro.",
+    "text_en": "Staring contest: whoever smiles or blinks first owes the other breakfast in bed.",
+    "text_pt": "Duelo de olhares: quem piscar ou rir primeiro deve um café da manhã na cama para o outro.",
+    "text_fr": "Bataille de regards : le premier qui cligne ou sourit doit un petit-déjeuner au lit à l'autre.",
+    "text_it": "Sfida di sguardi: il primo che sbatte le palpebre o sorride deve una colazione a letto all'altro."
+  },
+  {
+    "id": "couples_ch_14",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Alaba sinceramente 3 detalles físicos de tu pareja que tal vez él o ella considere imperfecciones.",
+    "text_en": "Genuinely praise 3 physical traits of your partner that they might consider insecurities or flaws.",
+    "text_pt": "Elogie com carinho 3 traços físicos do seu parceiro que talvez ele(a) considere imperfeições.",
+    "text_fr": "Complimente sincèrement 3 détails physiques de ton partenaire qu'il considère peut-être comme des complexes.",
+    "text_it": "Fai un complimento sincero su 3 dettagli fisici del tuo partner che magari considera difetti."
+  },
+  {
+    "id": "couples_ch_15",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Planifiquen en 60 segundos la cita ideal de fin de semana con presupuesto ilimitado.",
+    "text_en": "In 60 seconds, plan your dream weekend date assuming an unlimited budget.",
+    "text_pt": "Em 60 segundos, planejem o encontro de fim de semana dos sonhos com orçamento ilimitado.",
+    "text_fr": "En 60 secondes, imaginez votre week-end en amoureux idéal sans limite de budget.",
+    "text_it": "In 60 secondi, pianificate l'appuntamento ideale del weekend senza limiti di budget."
+  },
+  {
+    "id": "couples_ch_16",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Dale un beso en la mano a tu pareja mientras le dices algo que admiras profundamente de su forma de ser.",
+    "text_en": "Kiss your partner's hand while naming one thing you deeply admire about who they are.",
+    "text_pt": "Beije a mão do seu amor enquanto diz algo que você admira profundamente na personalidade dele(a).",
+    "text_fr": "Embrasse la main de ton partenaire en lui disant une qualité que tu admires profondément chez lui/elle.",
+    "text_it": "Bacia la mano del tuo partner mentre gli dici una cosa che ammiri profondamente del suo modo di essere."
+  },
+  {
+    "id": "couples_ch_17",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Alimente a su pareja con un bocado o un sorbo de bebida con los ojos de él/ella vendados o cerrados.",
+    "text_en": "Feed your partner a small bite of food or sip of drink while their eyes are closed.",
+    "text_pt": "Dê uma mordidinha de comida ou um gole de bebida para seu amor enquanto ele(a) estiver de olhos fechados.",
+    "text_fr": "Fais goûter une bouchée ou une gorgée à ton partenaire les yeux bandés ou fermés.",
+    "text_it": "Offri un boccone o un sorso al tuo partner mentre tiene gli occhi chiusi."
+  },
+  {
+    "id": "couples_ch_18",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Confiesa cuál fue el primer pensamiento que tuviste sobre tu pareja cuando la viste por primera vez.",
+    "text_en": "Confess the very first unfiltered thought you had when you saw your partner for the first time.",
+    "text_pt": "Confesse qual foi seu primeiríssimo pensamento ao ver seu parceiro pela primeira vez.",
+    "text_fr": "Avoue la toute première pensée qui t'a traversé l'esprit quand tu l'as vu(e) pour la première fois.",
+    "text_it": "Confessa qual è stato il primo pensiero in assoluto quando hai visto il partner per la prima volta."
+  },
+  {
+    "id": "couples_ch_19",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Respiren al unísono: apoyen sus frentes juntas y respiren al mismo ritmo durante 1 minuto.",
+    "text_en": "Synchronize breathing: rest your foreheads together and breathe at the same pace for 1 minute.",
+    "text_pt": "Respirem em sincronia: encostem as testas e respirem no mesmo ritmo durante 1 minuto.",
+    "text_fr": "Respirez à l'unisson : posez vos fronts l'un contre l'autre et respirez au même rythme pendant 1 minute.",
+    "text_it": "Respirate all'unisono: appoggiate le fronti insieme e respirate allo stesso ritmo per 1 minuto."
+  },
+  {
+    "id": "couples_ch_20",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Dile a tu pareja un sueño o meta personal en el que te gustaría que fuera tu compañero/a número uno.",
+    "text_en": "Tell your partner about a personal dream or goal where you want them as your #1 teammate.",
+    "text_pt": "Compartilhe um sonho ou objetivo pessoal onde você quer que ele(a) seja seu(sua) maior companheiro(a).",
+    "text_fr": "Partage un rêve ou projet personnel dans lequel tu veux qu'il/elle soit ton coéquipier numéro un.",
+    "text_it": "Racconta al partner un sogno o obiettivo in cui vorresti averlo/a come alleato numero uno."
+  },
+  {
+    "id": "couples_ch_21",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Dale a tu pareja un masaje suave en las manos usando una crema o simplemente tus pulgares por 1 minuto.",
+    "text_en": "Give your partner a gentle hand massage using lotion or just your thumbs for 1 minute.",
+    "text_pt": "Faça uma massagem suave nas mãos do seu amor usando hidratante ou apenas os polegares por 1 minuto.",
+    "text_fr": "Offrez à votre partenaire un léger massage des mains à l'aide d'une crème ou simplement de vos pouces pendant 1 minute.",
+    "text_it": "Fai un massaggio delicato alle mani del tuo partner per 1 minuto."
+  },
+  {
+    "id": "couples_ch_22",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Dile una promesa romántica y realista que estés dispuesto/a a cumplir a partir de esta semana.",
+    "text_en": "Make a sweet and realistic romantic promise that you commit to keeping starting this week.",
+    "text_pt": "Faça uma promessa romântica e realista que você se comprometa a cumprir a partir desta semana.",
+    "text_fr": "Fais une promesse amoureuse et réaliste que tu t'engages à tenir dès cette semaine.",
+    "text_it": "Fai una promessa romantica e realistica che ti impegni a mantenere da questa settimana."
+  },
+  {
+    "id": "couples_ch_23",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Acércate a menos de 5 cm de sus labios durante 20 segundos sin llegar a besarle.",
+    "text_en": "Stay less than two inches away from their lips for 20 seconds without kissing.",
+    "text_pt": "Fique a menos de 5 cm dos lábios do seu amor por 20 segundos sem beijar.",
+    "text_fr": "Reste à moins de 5 cm de ses lèvres pendant 20 secondes sans l'embrasser.",
+    "text_it": "Avvicinati a meno di 5 cm dalle sue labbra per 20 secondi senza baciarlo/a."
+  },
+  {
+    "id": "couples_ch_24",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Comparte cuál fue la última vez que sentiste mariposas en el estómago estando con tu pareja.",
+    "text_en": "Share the most recent moment you felt butterflies in your stomach being around your partner.",
+    "text_pt": "Conte quando foi a última vez que sentiu frio na barriga ao lado do seu parceiro.",
+    "text_fr": "Partage le dernier moment où tu as ressenti des papillons dans le ventre en présence de ton partenaire.",
+    "text_it": "Condividi l'ultima volta che hai sentito le farfalle nello stomaco insieme al tuo partner."
+  },
+  {
+    "id": "couples_ch_25",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Acaricia el pelo o la mejilla de tu pareja mientras le dices gracias por algo específico de este mes.",
+    "text_en": "Stroke their hair or cheek while thanking them for one specific thing they did this past month.",
+    "text_pt": "Acaricie os cabelos ou o rosto do seu parceiro enquanto agradece por algo especial deste mês.",
+    "text_fr": "Caresse les cheveux ou la joue de ton partenaire en le remerciant pour une chose précise ce mois-ci.",
+    "text_it": "Accarezza i capelli o la guancia del partner ringraziandolo/a per una cosa speciale di questo mese."
+  },
+  {
+    "id": "couples_ch_26",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Elijan juntos una canción que de ahora en adelante será 'su' himno de pareja.",
+    "text_en": "Pick a song together right now that will officially become 'your' couple anthem from now on.",
+    "text_pt": "Escolham juntos uma música agora mesmo para ser o hino oficial do casal a partir de hoje.",
+    "text_fr": "Choisissez ensemble une chanson qui deviendra officiellement votre hymne de couple à partir d'aujourd'hui.",
+    "text_it": "Scegliete insieme una canzone che da oggi sarà il vostro inno ufficiale di coppia."
+  },
+  {
+    "id": "couples_ch_27",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Dile a tu pareja qué outfit o prenda de ropa de las que usa te parece la más irresistible.",
+    "text_en": "Tell your partner which piece of clothing or outfit of theirs you find completely irresistible.",
+    "text_pt": "Conte qual roupa ou look do seu amor você acha o mais irresistível de todos.",
+    "text_fr": "Dis à ton partenaire quelle tenue ou vêtement qu'il/elle porte te semble le plus irrésistible.",
+    "text_it": "Di' al tuo partner quale vestito o capo del suo guardaroba trovi più irresistibile."
+  },
+  {
+    "id": "couples_ch_28",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Recreen su foto favorita juntos tomándose una nueva selfie idéntica en este momento.",
+    "text_en": "Recreate your all-time favorite photo together by taking a fresh, matching selfie right now.",
+    "text_pt": "Recriem a foto favorita de vocês tirando uma selfie divertida e idêntica agora mesmo.",
+    "text_fr": "Recréez votre photo préférée en couple en prenant un selfie identique tout de suite.",
+    "text_it": "Ricreate la vostra foto preferita insieme scattandovi un selfie identico proprio adesso."
+  },
+  {
+    "id": "couples_ch_29",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Acaricien sus narices esquimalmente durante 15 segundos sin reírse.",
+    "text_en": "Rub your noses together (Eskimo kiss) for 15 seconds without laughing.",
+    "text_pt": "Façam um beijinho de esquimó (roçando os narizes) por 15 segundos sem rir.",
+    "text_fr": "Faites un bisou esquimau (frottez vos nez) pendant 15 secondes sans rire.",
+    "text_it": "Datevi un bacio esquimese (strofinando i nasi) per 15 secondi senza ridere."
+  },
+  {
+    "id": "couples_ch_30",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Dile a tu pareja 3 cualidades que lo/la convierten en una persona única en el mundo.",
+    "text_en": "Name 3 unique qualities that make your partner one in eight billion to you.",
+    "text_pt": "Diga ao seu amor 3 qualidades raras que fazem dele(a) alguém único(a) no mundo.",
+    "text_fr": "Dis à ton partenaire 3 qualités uniques qui font de lui/elle quelqu'un d'irremplaçable.",
+    "text_it": "Di' al partner 3 qualità speciali che lo/la rendono unico/a al mondo."
+  },
+  {
+    "id": "couples_ch_31",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Dale un beso suave y prolongado en el cuello, en la nuca o detrás de la oreja.",
+    "text_en": "Give your partner a slow, gentle kiss on the neck, nape, or behind their ear.",
+    "text_pt": "Dê um beijo suave e demorado no pescoço, na nuca ou atrás da orelha do seu amor.",
+    "text_fr": "Donne un baiser doux et prolongé dans le cou, sur la nuque ou derrière l'oreille.",
+    "text_it": "Dai un bacio morbido e prolungato sul collo, sulla nuca o dietro l'orecchio."
+  },
+  {
+    "id": "couples_ch_32",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Confiesa un fetiche inocente o una manía tierna que solo tu pareja te hace sentir.",
+    "text_en": "Confess a sweet quirk or cute innocent obsession that only your partner awakens in you.",
+    "text_pt": "Confesse uma mania fofa ou detalhe irresistível que só seu parceiro desperta em você.",
+    "text_fr": "Avoue une petite manie craquante ou un détail irrésistible que seul ton partenaire éveille en toi.",
+    "text_it": "Confessa una tenera fissazione o mania dolce che solo il tuo partner ti risveglia."
+  },
+  {
+    "id": "couples_ch_33",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Dile a tu pareja qué gesto cotidiano suyo (ej. cocinar, sonreír distraído/a) te enamora cada día.",
+    "text_en": "Share which small everyday habit of theirs (e.g. humming, making coffee) makes you fall in love all over again.",
+    "text_pt": "Conte qual pequeno hábito diário dele(a) (ex: cozinhar, rir distraído) te faz se apaixonar de novo.",
+    "text_fr": "Dis quel petit geste quotidien (ex: cuisiner, sourire distraitement) te fait retomber amoureux/amoureuse.",
+    "text_it": "Di' quale piccolo gesto quotidiano (es. cucinare, sorridere distratto) ti fa innamorare ogni giorno."
+  },
+  {
+    "id": "couples_ch_34",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Acuéstense o siéntense abrazados con los ojos cerrados y escuchen los latidos del corazón del otro por 30 segundos.",
+    "text_en": "Cuddle closely with your eyes closed and listen to each other's heartbeat for 30 seconds.",
+    "text_pt": "Deitem ou abracem-se com os olhos fechados e escutem os batimentos cardíacos um do outro por 30 segundos.",
+    "text_fr": "Allongez-vous ou enlacez-vous les yeux fermés et écoutez battre vos cœurs pendant 30 secondes.",
+    "text_it": "Abbracciatevi con gli occhi chiusi e ascoltate il battito del cuore dell'altro per 30 secondi."
+  },
+  {
+    "id": "couples_ch_35",
+    "level": 4,
+    "category": "couples_challenges",
+    "text_es": "Terminen este reto con el beso más apasionado que se hayan dado en toda la semana.",
+    "text_en": "Conclude this challenge with the most passionate kiss you've shared all week.",
+    "text_pt": "Finalizem este desafio com o beijo mais apaixonado que já deram em toda a semana.",
+    "text_fr": "Terminez ce défi par le baiser le plus passionné que vous ayez partagé de toute la semaine.",
+    "text_it": "Concludete questa sfida con il bacio più appassionato che vi siate dati in tutta la settimana."
   }
 ]

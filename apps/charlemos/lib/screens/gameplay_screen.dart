@@ -176,6 +176,8 @@ class _GamePlayScreenState extends State<GamePlayScreen>
         return l10n.t('deckCouples');
       case 'spicy':
         return l10n.t('deckSpicy');
+      case 'couples_challenges':
+        return l10n.t('deckCouplesChallenges');
       case 'hot_takes':
         return l10n.t('deckHotTakes');
       case 'spicy_challenges':
