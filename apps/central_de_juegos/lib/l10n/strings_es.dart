@@ -5,11 +5,11 @@ const Map<String, String> stringsEs = {
   'appSubtitle': 'El centro definitivo de anotadores y utilidades de mesa.',
 
   // Nav Titles
-  'navDice': 'TIRADOR_DADOS',
-  'navWhoStarts': 'QUIEN_EMPIEZA',
-  'navGames': 'CENTRAL_DE_JUEGOS',
-  'navTimer': 'TEMPORIZADOR',
-  'navCoin': 'LANZADOR_MONEDA',
+  'navDice': 'Tirador de Dados',
+  'navWhoStarts': '¿Quién Empieza?',
+  'navGames': 'Catálogo de Juegos',
+  'navTimer': 'Temporizador de Turno',
+  'navCoin': 'Lanzador de Moneda',
 
   // Bottom Nav Labels
   'bottomDice': 'Dados',
@@ -88,6 +88,8 @@ const Map<String, String> stringsEs = {
   'proDeactivatedToast': 'Modo Mesa Pro Desactivado',
   'testProEnable': '🧪 Activar Pro (Testing)',
   'testProDisable': '🧪 Desactivar Pro (Testing)',
+  'testProToggleTitle': 'Modo PRO (Testing)',
+  'testProToggleSubtitle': 'Activar funciones de Mesa Pro para pruebas internas sin costo',
 
   // Common Dialogs & Actions
   'aboutTitle': 'Acerca de Omniverse Labs',
@@ -95,6 +97,7 @@ const Map<String, String> stringsEs = {
   'versionLabel': 'Versión',
   'close': 'Cerrar',
   'language': 'Idioma',
+  'languageAuto': 'Automático (Sistema)',
   'languageEs': 'Español',
   'languageEn': 'English',
   'selectLanguage': 'Seleccionar Idioma',

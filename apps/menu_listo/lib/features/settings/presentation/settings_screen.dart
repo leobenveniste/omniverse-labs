@@ -7,6 +7,7 @@ import 'package:menu_listo/core/theme/app_colors.dart';
 import 'package:menu_listo/core/theme/app_theme_types.dart';
 import 'package:menu_listo/core/theme/theme_provider.dart';
 import 'package:menu_listo/core/widgets/app_header_title.dart';
+import 'package:menu_listo/core/widgets/contact_us_modal.dart';
 import '../../backup/services/backup_service.dart';
 import '../../premium/presentation/paywall_sheet.dart';
 import '../../premium/providers/premium_provider.dart';
@@ -257,9 +258,41 @@ class SettingsScreen extends ConsumerWidget {
               ],
             ),
           ),
+          // 5. Contact & Feedback
+          Text(
+            strings.isSpanish ? 'Contacto y Sugerencias' : 'Contact & Feedback',
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            child: ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.mail_outline_rounded, color: theme.colorScheme.onPrimaryContainer, size: 20),
+              ),
+              title: Text(
+                strings.isSpanish ? 'Escríbenos / Sugerencias' : 'Write to us / Feedback',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              subtitle: Text(
+                strings.isSpanish ? 'Reportar bugs, ideas o saludar' : 'Report bugs, share ideas, or say hi',
+                style: const TextStyle(fontSize: 12),
+              ),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () {
+                HapticFeedback.lightImpact();
+                ContactUsModal.show(context);
+              },
+            ),
+          ),
           const SizedBox(height: 24),
 
-          // 5. Testing & QA Mode
+          // 6. Testing & QA Mode
           Text(
             strings.testingSectionTitle,
             style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),

@@ -670,16 +670,17 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
             err_json = json.loads(val_err.content.decode("utf-8")) if val_err.content else {}
             err_str = err_json.get("error", {}).get("message", str(val_err))
             if "status draft" in err_str.lower():
-                print("Notice: App is in draft mode on Google Play Console. Converting release to 'draft' status...")
+                print("Notice: App is in draft mode on Google Play Console. Converting non-internal releases to 'draft' status...")
                 for t in tracks_to_deploy:
+                    status_to_use = "completed" if t == "internal" else "draft"
                     edits.tracks().update(
                         packageName=package_name,
                         editId=edit_id,
                         track=t,
-                        body=make_track_body(t, "draft")
+                        body=make_track_body(t, status_to_use)
                     ).execute()
                 edits.validate(packageName=package_name, editId=edit_id).execute()
-                print("Validation succeeded with 'draft' release status.")
+                print("Validation succeeded with adapted release statuses.")
             else:
                 raise val_err
 

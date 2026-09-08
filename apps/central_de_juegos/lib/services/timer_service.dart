@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'sound_haptics_service.dart';
 
 class TimerService extends ChangeNotifier {

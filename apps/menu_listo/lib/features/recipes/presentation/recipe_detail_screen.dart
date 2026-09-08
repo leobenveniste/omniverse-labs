@@ -397,16 +397,16 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                       const SizedBox(height: 16),
                       // Title
                       Text(
-                        recipe.title,
+                        recipe.localizedTitle(strings.isSpanish),
                         style: theme.textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.w800,
                           fontSize: 24,
                         ),
                       ),
-                      if (recipe.description.isNotEmpty) ...[
+                      if (recipe.localizedDescription(strings.isSpanish).isNotEmpty) ...[
                         const SizedBox(height: 8),
                         Text(
-                          recipe.description,
+                          recipe.localizedDescription(strings.isSpanish),
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                             fontSize: 14,
@@ -511,7 +511,9 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                           }
 
                           final scaledIng = ing.scale(scalingFactor);
-                          final emoji = CulinaryCatalog.getEmoji(ing.name);
+                          final ingDisplayName = scaledIng.localizedName(strings.isSpanish);
+                          final ingDisplayUnit = scaledIng.localizedUnit(strings.isSpanish);
+                          final emoji = CulinaryCatalog.getEmoji(scaledIng.name);
 
                           return Container(
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -528,12 +530,26 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                                 Text(emoji, style: const TextStyle(fontSize: 20)),
                                 const SizedBox(width: 12),
                                 Expanded(
-                                  child: Text(
-                                    scaledIng.name,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14,
-                                    ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        ingDisplayName,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      if (scaledIng.localizedNotes(strings.isSpanish).isNotEmpty)
+                                        Text(
+                                          scaledIng.localizedNotes(strings.isSpanish),
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: theme.colorScheme.onSurfaceVariant,
+                                          ),
+                                        ),
+                                    ],
                                   ),
                                 ),
                                 Container(
@@ -543,7 +559,7 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Text(
-                                    PortionCalculator.formatIngredientAmount(scaledIng.amount, scaledIng.unit),
+                                    PortionCalculator.formatIngredientAmount(scaledIng.amount, ingDisplayUnit),
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 12,
@@ -573,6 +589,9 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                         separatorBuilder: (_, _) => const SizedBox(height: 16),
                         itemBuilder: (context, index) {
                           final step = recipe.steps[index];
+                          final stepInstruction = (!strings.isSpanish && step.instructionEn != null && step.instructionEn!.trim().isNotEmpty)
+                              ? step.instructionEn!.trim()
+                              : step.instruction;
 
                           if (step.isSectionHeader) {
                             return Padding(
@@ -582,7 +601,7 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                                   Icon(Icons.bookmark_rounded, size: 18, color: theme.colorScheme.primary),
                                   const SizedBox(width: 8),
                                   Text(
-                                    step.instruction.endsWith(':') ? step.instruction : '${step.instruction}:',
+                                    stepInstruction.endsWith(':') ? stepInstruction : '$stepInstruction:',
                                     style: theme.textTheme.titleSmall?.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: theme.colorScheme.primary,
@@ -617,7 +636,7 @@ class _RecipeDetailScreenState extends ConsumerState<RecipeDetailScreen> {
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Text(
-                                  step.instruction,
+                                  stepInstruction,
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     fontSize: 14,
                                     height: 1.5,

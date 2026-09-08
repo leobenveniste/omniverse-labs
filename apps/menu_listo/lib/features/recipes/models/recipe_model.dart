@@ -48,6 +48,20 @@ class Recipe {
 
   int get totalTimeMinutes => prepTimeMinutes + cookTimeMinutes;
 
+  String localizedTitle(bool isSpanish) {
+    if (!isSpanish && titleEn != null && titleEn!.trim().isNotEmpty) {
+      return titleEn!.trim();
+    }
+    return title;
+  }
+
+  String localizedDescription(bool isSpanish) {
+    if (!isSpanish && descriptionEn != null && descriptionEn!.trim().isNotEmpty) {
+      return descriptionEn!.trim();
+    }
+    return description;
+  }
+
   Recipe copyWith({
     String? id,
     String? title,

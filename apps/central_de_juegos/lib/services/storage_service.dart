@@ -81,9 +81,13 @@ class StorageService {
     return prefs.getString(_keyLanguageCode);
   }
 
-  static Future<void> setLanguageCode(String code) async {
+  static Future<void> setLanguageCode(String? code) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_keyLanguageCode, code);
+    if (code == null) {
+      await prefs.remove(_keyLanguageCode);
+    } else {
+      await prefs.setString(_keyLanguageCode, code);
+    }
   }
 
   static Future<String?> getThemeMode() async {

@@ -171,7 +171,11 @@ class _AddShoppingItemDialogState extends State<AddShoppingItemDialog> {
                   items: CulinaryCatalog.units
                       .map((u) => DropdownMenuItem(
                             value: u,
-                            child: Text(u, style: const TextStyle(fontSize: 13), overflow: TextOverflow.ellipsis),
+                            child: Text(
+                              CulinaryCatalog.getUnitDisplayName(u, strings.isSpanish),
+                              style: const TextStyle(fontSize: 13),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ))
                       .toList(),
                   onChanged: (val) {

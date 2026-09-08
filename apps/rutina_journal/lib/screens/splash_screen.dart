@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
 import 'main_navigation_screen.dart';
+import 'onboarding_tour_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -35,18 +37,21 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    Timer(const Duration(milliseconds: 1800), () {
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder(
-            transitionDuration: const Duration(milliseconds: 500),
-            pageBuilder: (_, animation, __) => FadeTransition(
-              opacity: animation,
-              child: const MainNavigationScreen(),
-            ),
+    Timer(const Duration(milliseconds: 1800), () async {
+      if (!mounted) return;
+      final prefs = await SharedPreferences.getInstance();
+      final hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
+
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 500),
+          pageBuilder: (context, animation, secondaryAnimation) => FadeTransition(
+            opacity: animation,
+            child: hasSeenOnboarding ? const MainNavigationScreen() : const OnboardingTourScreen(),
           ),
-        );
-      }
+        ),
+      );
     });
   }
 
@@ -75,28 +80,16 @@ class _SplashScreenState extends State<SplashScreen>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Official Ritmo App Logo
-                      Container(
-                        width: 124,
-                        height: 124,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: theme.colorScheme.primary.withValues(alpha: 0.16),
-                              blurRadius: 36,
-                              spreadRadius: 2,
-                            ),
-                          ],
-                        ),
-                        child: Image.asset(
-                          'assets/images/app_logo.png',
-                          fit: BoxFit.contain,
-                          errorBuilder: (_, __, ___) => Icon(
-                            Icons.spa_rounded,
-                            size: 64,
-                            color: theme.colorScheme.primary,
-                          ),
+                      // Official Ritmo App Logo standalone without container
+                      Image.asset(
+                        'assets/images/app_logo.png',
+                        width: 120,
+                        height: 120,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) => Icon(
+                          Icons.spa_rounded,
+                          size: 64,
+                          color: theme.colorScheme.primary,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.lg),
@@ -153,7 +146,7 @@ class _SplashScreenState extends State<SplashScreen>
                           : 'assets/images/omniverse_labs_color.png',
                       width: 18,
                       height: 18,
-                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                      errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
                     ),
                     const SizedBox(width: AppSpacing.xs),
                     Text(

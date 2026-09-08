@@ -51,6 +51,26 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
     'Bebidas',
   ];
 
+  String _getCategoryLabel(String c, AppStrings strings) {
+    switch (c.toLowerCase()) {
+      case 'desayuno':
+        return strings.mealBreakfast;
+      case 'almuerzo':
+        return strings.mealLunch;
+      case 'merienda':
+        return strings.mealSnack;
+      case 'cena':
+        return strings.mealDinner;
+      case 'postres':
+        return strings.filterDessert;
+      case 'bebidas':
+        return strings.isSpanish ? 'Bebidas' : 'Beverages';
+      case 'snack':
+      default:
+        return c;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -399,8 +419,9 @@ class _RecipeFormScreenState extends ConsumerState<RecipeFormScreen> {
                     runSpacing: 8,
                     children: _categories.map((c) {
                       final isSelected = _selectedCategories.contains(c);
+                      final label = _getCategoryLabel(c, strings);
                       return FilterChip(
-                        label: Text(c),
+                        label: Text(label),
                         selected: isSelected,
                         showCheckmark: true,
                         onSelected: (selected) {

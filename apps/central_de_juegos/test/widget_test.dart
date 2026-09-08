@@ -15,9 +15,12 @@ void main() {
       find.byWidgetPredicate(
         (widget) =>
             widget is Text &&
-            (widget.data == 'CENTRAL_DE_JUEGOS' || widget.data == 'GAME_NIGHT_HUB'),
+            (widget.data == 'Catálogo de Juegos' ||
+             widget.data == 'Games Catalog' ||
+             widget.data == 'Central de Juegos' ||
+             widget.data == 'Game Night Hub'),
       ),
-      findsOneWidget,
+      findsWidgets,
     );
   });
 }

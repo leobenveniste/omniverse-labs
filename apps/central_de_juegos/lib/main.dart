@@ -52,11 +52,13 @@ class _CentralDeJuegosAppState extends State<CentralDeJuegosApp> {
     });
   }
 
-  void setLocale(Locale newLocale) async {
+  bool get isAutoLanguage => _locale == null;
+
+  void setLocale(Locale? newLocale) async {
     setState(() {
       _locale = newLocale;
     });
-    await StorageService.setLanguageCode(newLocale.languageCode);
+    await StorageService.setLanguageCode(newLocale?.languageCode);
   }
 
   void setThemeMode(ThemeMode mode) async {

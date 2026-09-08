@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n/app_localizations.dart';
 import '../models/routine.dart';
 import '../services/app_services.dart';
@@ -7,14 +8,16 @@ import '../theme/app_spacing.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_typography.dart';
 import '../utils/haptics_helper.dart';
+import '../widgets/app_header_title.dart';
+import '../widgets/first_use_guide_card.dart';
 import '../widgets/focus_zone_screen.dart';
 import '../widgets/routine_edit_dialog.dart';
 import '../widgets/routine_runner_sheet.dart';
+import '../widgets/routine_templates_sheet.dart';
 import '../widgets/paywall_sheet.dart';
 import '../widgets/state_button.dart';
-import 'settings_screen.dart';
 
-class RoutinesScreen extends StatelessWidget {
+class RoutinesScreen extends StatefulWidget {
   final RoutineService routineService;
 
   const RoutinesScreen({
@@ -23,28 +26,71 @@ class RoutinesScreen extends StatelessWidget {
   });
 
   @override
+  State<RoutinesScreen> createState() => _RoutinesScreenState();
+}
+
+class _RoutinesScreenState extends State<RoutinesScreen> {
+  bool _showGuide = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadGuideState();
+  }
+
+  Future<void> _loadGuideState() async {
+    final prefs = await SharedPreferences.getInstance();
+    final seen = prefs.getBool('has_seen_guide_routines') ?? false;
+    if (!seen && mounted) {
+      setState(() => _showGuide = true);
+    }
+  }
+
+  Future<void> _dismissGuide() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('has_seen_guide_routines', true);
+    if (mounted) {
+      setState(() => _showGuide = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     final appServices = AppServices.of(context);
     final prefs = appServices.preferencesService;
-    final storage = appServices.storageService;
-    final habitService = appServices.habitService;
+    final premiumService = appServices.premiumService;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          l10n.t('routinesTitle'),
-          style: AppTypography.display(theme.colorScheme.onSurface),
+        title: AppHeaderTitle(
+          title: l10n.t('navRoutines'),
+          isPro: premiumService.isPro,
         ),
         actions: [
+          if (!premiumService.isPro)
+            IconButton(
+              icon: const Text('👑', style: TextStyle(fontSize: 18)),
+              tooltip: 'Ritmo PRO',
+              onPressed: () {
+                HapticsHelper.light();
+                PaywallSheet.show(context);
+              },
+            ),
+          IconButton(
+            icon: const Icon(Icons.auto_awesome_motion_rounded),
+            tooltip: l10n.t('exploreTemplates'),
+            onPressed: () {
+              HapticsHelper.light();
+              RoutineTemplatesSheet.show(context, widget.routineService);
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.add_rounded),
             tooltip: l10n.t('newRoutine'),
             onPressed: () {
               HapticsHelper.light();
-              final premiumService = appServices.premiumService;
-              if (!premiumService.isPro && routineService.routines.length >= 3) {
+              if (!premiumService.isPro && widget.routineService.routines.length >= 3) {
                 PaywallSheet.show(
                   context,
                   customReason: l10n.t('proLimitRoutinesMsg'),
@@ -53,23 +99,7 @@ class RoutinesScreen extends StatelessWidget {
               }
               RoutineEditDialog.show(
                 context,
-                onSave: (newRoutine) => routineService.addRoutine(newRoutine),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: l10n.t('navSettings'),
-            onPressed: () {
-              HapticsHelper.light();
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => SettingsScreen(
-                    prefs: prefs,
-                    storage: storage,
-                    habitService: habitService,
-                  ),
-                ),
+                onSave: (newRoutine) => widget.routineService.addRoutine(newRoutine),
               );
             },
           ),
@@ -78,15 +108,66 @@ class RoutinesScreen extends StatelessWidget {
       body: Container(
         decoration: AppTheme.getAtmosphericBackground(context, prefs.themePreset),
         child: AnimatedBuilder(
-          animation: routineService,
+          animation: widget.routineService,
           builder: (context, _) {
-            final routines = routineService.routines;
+            final routines = widget.routineService.routines;
 
             return ListView(
               padding: const EdgeInsets.all(AppSpacing.md),
               children: [
+                if (_showGuide)
+                  FirstUseGuideCard(
+                    icon: Icons.repeat_rounded,
+                    title: l10n.locale.languageCode == 'es' ? 'Tus Rutinas y Flujos' : 'Your Routines & Flows',
+                    description: l10n.locale.languageCode == 'es'
+                        ? 'Agrupa pasos y hábitos en rutinas guiadas para tus mañanas, noches o momentos de foco.'
+                        : 'Group steps and habits into guided routines for your mornings, nights, or focus blocks.',
+                    bulletPoints: l10n.locale.languageCode == 'es'
+                        ? [
+                            'Toca una rutina para iniciar el reproductor paso a paso.',
+                            'Crea rutinas con duraciones estimadas y pistas de audio para mantenerte en ritmo.',
+                            'Usa el botón (+) arriba para diseñar tus propias secuencias personalizadas.',
+                          ]
+                        : [
+                            'Tap any routine card to launch the guided step-by-step runner.',
+                            'Set estimated durations and audio cues to keep your momentum.',
+                            'Tap (+) on top to design your own customized routine sequences.',
+                          ],
+                    onDismiss: _dismissGuide,
+                  ),
                 // Hero Focus Zone Banner inspired by mockup
                 _buildFocusZoneHero(context, l10n, routines.isNotEmpty ? routines.first : null),
+                const SizedBox(height: AppSpacing.md),
+
+                // Explore Templates Quick Action
+                OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                    side: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                    ),
+                  ),
+                  icon: const Icon(Icons.auto_awesome_motion_rounded, size: 18),
+                  label: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        l10n.t('exploreTemplates'),
+                        style: AppTypography.body(Theme.of(context).colorScheme.primary, isMedium: true),
+                      ),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        size: 18,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ],
+                  ),
+                  onPressed: () {
+                    HapticsHelper.light();
+                    RoutineTemplatesSheet.show(context, widget.routineService);
+                  },
+                ),
                 const SizedBox(height: AppSpacing.md),
 
                 // Routine List
@@ -288,7 +369,7 @@ class RoutinesScreen extends StatelessWidget {
                     RoutineEditDialog.show(
                       context,
                       routine: routine,
-                      onSave: (updated) => routineService.updateRoutine(updated),
+                      onSave: (updated) => widget.routineService.updateRoutine(updated),
                     );
                   },
                 ),
@@ -361,8 +442,8 @@ class RoutinesScreen extends StatelessWidget {
               icon: Icons.play_arrow_rounded,
               onPressed: () {
                 HapticsHelper.medium();
-                routineService.startRoutine(routine);
-                RoutineRunnerSheet.show(context, routineService);
+                widget.routineService.startRoutine(routine);
+                RoutineRunnerSheet.show(context, widget.routineService);
               },
             ),
           ],
@@ -386,7 +467,7 @@ class RoutinesScreen extends StatelessWidget {
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
             onPressed: () {
-              routineService.deleteRoutine(routine.id);
+              widget.routineService.deleteRoutine(routine.id);
               Navigator.of(ctx).pop();
             },
             child: Text(l10n.t('actionDelete')),

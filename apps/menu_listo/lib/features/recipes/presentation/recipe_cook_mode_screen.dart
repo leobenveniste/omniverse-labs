@@ -507,7 +507,9 @@ class _RecipeCookModeScreenState extends ConsumerState<RecipeCookModeScreen> {
                             child: Column(
                               children: [
                                 Text(
-                                  currentStep.instruction,
+                                  (!strings.isSpanish && currentStep.instructionEn != null && currentStep.instructionEn!.trim().isNotEmpty)
+                                      ? currentStep.instructionEn!.trim()
+                                      : currentStep.instruction,
                                   textAlign: TextAlign.center,
                                   style: theme.textTheme.headlineSmall?.copyWith(
                                     fontSize: 24,
@@ -529,7 +531,7 @@ class _RecipeCookModeScreenState extends ConsumerState<RecipeCookModeScreen> {
                                     });
                                   },
                                   title: Text(
-                                    'Paso completado',
+                                    strings.isSpanish ? 'Paso completado' : 'Step completed',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: _completedSteps.contains(_currentStepIndex)
@@ -719,8 +721,9 @@ class _RecipeCookModeScreenState extends ConsumerState<RecipeCookModeScreen> {
                                             child: Text(
                                               PortionCalculator.formatIngredientDisplay(
                                                 amount: scaledIng.amount,
-                                                unit: scaledIng.unit,
-                                                name: scaledIng.name,
+                                                unit: scaledIng.localizedUnit(strings.isSpanish),
+                                                name: scaledIng.localizedName(strings.isSpanish),
+                                                notes: scaledIng.localizedNotes(strings.isSpanish),
                                               ),
                                               style: TextStyle(
                                                 fontSize: 14,

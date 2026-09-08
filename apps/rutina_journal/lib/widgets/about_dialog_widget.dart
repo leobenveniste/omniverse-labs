@@ -40,7 +40,7 @@ class AboutDialogWidget extends StatelessWidget {
                   : 'assets/images/omniverse_labs_color.png',
               width: 84,
               height: 84,
-              errorBuilder: (_, __, ___) => Icon(
+              errorBuilder: (context, error, stackTrace) => Icon(
                 Icons.all_inclusive_rounded,
                 size: 64,
                 color: theme.colorScheme.primary,

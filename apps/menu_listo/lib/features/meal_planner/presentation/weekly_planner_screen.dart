@@ -2,62 +2,48 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:menu_listo/core/localization/app_localizations.dart';
 import 'package:menu_listo/core/widgets/app_header_title.dart';
-import 'package:menu_listo/core/widgets/feature_guide_dialog.dart';
+import 'package:menu_listo/core/widgets/pro_header_button.dart';
+import 'package:menu_listo/core/widgets/first_use_guide_card.dart';
 import '../models/meal_plan_model.dart';
 import '../providers/meal_planner_provider.dart';
 import 'widgets/meal_slot_card.dart';
+import 'widgets/quick_plan_meal_sheet.dart';
 import 'widgets/recipe_picker_sheet.dart';
 
 class WeeklyPlannerScreen extends ConsumerStatefulWidget {
   const WeeklyPlannerScreen({super.key});
-
-  static Future<void> showGuideIfFirstTime(BuildContext context) async {
-    final strings = AppStrings.of(context);
-    await FeatureGuideDialog.showIfFirstTime(
-      context: context,
-      prefKey: 'has_seen_guide_planner',
-      headerIcon: Icons.calendar_month_rounded,
-      headerColor: Colors.deepOrangeAccent,
-      title: strings.isSpanish ? '¡Bienvenido a tu Agenda Semanal!' : 'Welcome to your Meal Planner!',
-      subtitle: strings.isSpanish
-          ? 'Organiza tus comidas de la semana y ahorra tiempo y dinero.'
-          : 'Plan your meals for the week and save time and money.',
-      features: [
-        FeatureGuideItem(
-          icon: Icons.grid_view_rounded,
-          iconColor: Colors.orange,
-          title: strings.isSpanish ? 'Planificación por Momentos' : 'Slot Planning',
-          description: strings.isSpanish
-              ? 'Toca cualquier momento (Desayuno, Almuerzo, Merienda, Cena) para asignar una receta o comida libre.'
-              : 'Tap any slot (Breakfast, Lunch, Snack, Dinner) to schedule a recipe or custom meal.',
-        ),
-        FeatureGuideItem(
-          icon: Icons.bookmarks_outlined,
-          iconColor: Colors.purpleAccent,
-          title: strings.isSpanish ? 'Plantillas de Menú' : 'Menu Templates',
-          description: strings.isSpanish
-              ? 'Usa el botón de marcadores arriba para guardar semanas exitosas y reutilizarlas con un toque.'
-              : 'Use the bookmarks button on top to save your best weeks and reuse them anytime.',
-        ),
-        FeatureGuideItem(
-          icon: Icons.shopping_cart_outlined,
-          iconColor: Colors.green,
-          title: strings.isSpanish ? 'Lista de Compras Automática' : 'Automatic Grocery List',
-          description: strings.isSpanish
-              ? 'Ve a la pestaña de Lista de Compras para consolidar todos los ingredientes de la semana al instante.'
-              : 'Go to the Shopping List tab to automatically consolidate all weekly ingredients.',
-        ),
-      ],
-    );
-  }
 
   @override
   ConsumerState<WeeklyPlannerScreen> createState() => _WeeklyPlannerScreenState();
 }
 
 class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
+  bool _showGuide = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadGuideState();
+  }
+
+  Future<void> _loadGuideState() async {
+    final prefs = await SharedPreferences.getInstance();
+    final seen = prefs.getBool('has_seen_guide_planner') ?? false;
+    if (!seen && mounted) {
+      setState(() => _showGuide = true);
+    }
+  }
+
+  Future<void> _dismissGuide() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('has_seen_guide_planner', true);
+    if (mounted) {
+      setState(() => _showGuide = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,6 +73,15 @@ class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
       appBar: AppBar(
         title: AppHeaderTitle(title: strings.plannerTitle),
         actions: [
+          const ProHeaderButton(),
+          IconButton(
+            icon: const Icon(Icons.add_rounded),
+            tooltip: strings.isSpanish ? 'Planificar Comida' : 'Plan Meal',
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              QuickPlanMealSheet.show(context);
+            },
+          ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.bookmarks_outlined),
             tooltip: strings.isSpanish ? 'Plantillas de Menú' : 'Meal Templates',
@@ -230,9 +225,30 @@ class _WeeklyPlannerScreenState extends ConsumerState<WeeklyPlannerScreen> {
               data: (plans) {
                 return ListView.builder(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 130),
-                  itemCount: days.length,
+                  itemCount: days.length + (_showGuide ? 1 : 0),
                   itemBuilder: (context, index) {
-                    final day = days[index];
+                    if (_showGuide && index == 0) {
+                      return FirstUseGuideCard(
+                        icon: Icons.calendar_month_rounded,
+                        title: strings.isSpanish ? '¡Bienvenido a tu Agenda!' : 'Welcome to your Meal Planner!',
+                        description: strings.isSpanish
+                            ? 'Organiza tus comidas de la semana para ahorrar tiempo y cocinar sin estrés.'
+                            : 'Plan your meals for the week to save time and cook stress-free.',
+                        bulletPoints: strings.isSpanish
+                            ? [
+                                'Toca cualquier momento (Desayuno, Almuerzo, Merienda, Cena) para asignar recetas.',
+                                'Usa el botón de marcadores para guardar tus semanas exitosas como plantillas.',
+                                'La lista de compras se actualiza automáticamente con los ingredientes que necesitas.',
+                              ]
+                            : [
+                                'Tap any slot (Breakfast, Lunch, Snack, Dinner) to schedule recipes.',
+                                'Use the bookmark icon to save your best weeks as reusable templates.',
+                                'Your grocery list syncs automatically with all planned ingredients.',
+                              ],
+                        onDismiss: _dismissGuide,
+                      );
+                    }
+                    final day = days[_showGuide ? index - 1 : index];
                     final dayDate = weekStart.add(Duration(days: day['offset'] as int));
                     final dateStr = DateFormat('yyyy-MM-dd').format(dayDate);
                     final isToday = dateStr == DateFormat('yyyy-MM-dd').format(DateTime.now());

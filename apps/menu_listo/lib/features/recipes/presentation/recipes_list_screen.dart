@@ -2,8 +2,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:menu_listo/core/localization/app_localizations.dart';
 import 'package:menu_listo/core/widgets/app_header_title.dart';
+import 'package:menu_listo/core/widgets/pro_header_button.dart';
+import 'package:menu_listo/core/widgets/first_use_guide_card.dart';
 import '../models/recipe_model.dart';
 import '../providers/recipe_provider.dart';
 import 'recipe_detail_screen.dart';
@@ -21,6 +24,7 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
   final TextEditingController _searchController = TextEditingController();
   bool _isGridView = true;
   bool _isSearchOpen = false;
+  bool _showGuide = false;
 
   final List<String> _categories = [
     'Desayuno',
@@ -30,15 +34,49 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
     'Postres',
   ];
 
+  String _getCategoryLabel(String cat, AppStrings strings) {
+    switch (cat.toLowerCase()) {
+      case 'desayuno':
+        return strings.filterBreakfast;
+      case 'almuerzo':
+        return strings.filterLunch;
+      case 'merienda':
+        return strings.filterSnack;
+      case 'cena':
+        return strings.filterDinner;
+      case 'postres':
+        return strings.filterDessert;
+      default:
+        return cat;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    _loadGuideState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final recipes = ref.read(recipesListProvider).valueOrNull ?? [];
       if (recipes.isEmpty) {
         await ref.read(recipesListProvider.notifier).loadRecipes();
       }
     });
+  }
+
+  Future<void> _loadGuideState() async {
+    final prefs = await SharedPreferences.getInstance();
+    final seen = prefs.getBool('has_seen_guide_recipes') ?? false;
+    if (!seen && mounted) {
+      setState(() => _showGuide = true);
+    }
+  }
+
+  Future<void> _dismissGuide() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('has_seen_guide_recipes', true);
+    if (mounted) {
+      setState(() => _showGuide = false);
+    }
   }
 
   @override
@@ -68,6 +106,8 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                   Expanded(
                     child: AppHeaderTitle(title: strings.tabRecipes),
                   ),
+                  // Pro Header Crown Button for free users
+                  const ProHeaderButton(),
                   // Search Toggle
                   IconButton(
                     icon: Icon(_isSearchOpen ? Icons.close : Icons.search),
@@ -86,10 +126,19 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                   // View Toggle (Grid / List)
                   IconButton(
                     icon: Icon(_isGridView ? Icons.view_agenda_outlined : Icons.grid_view_rounded),
-                    tooltip: _isGridView ? 'Vista lista' : 'Vista cuadrícula',
+                    tooltip: _isGridView ? strings.viewList : strings.viewGrid,
                     onPressed: () {
                       HapticFeedback.selectionClick();
                       setState(() => _isGridView = !_isGridView);
+                    },
+                  ),
+                  // Add / New Recipe Button in Header
+                  IconButton(
+                    icon: const Icon(Icons.add_rounded),
+                    tooltip: strings.isSpanish ? 'Nueva Receta' : 'New Recipe',
+                    onPressed: () {
+                      HapticFeedback.lightImpact();
+                      showRecipeCreationOptions(context);
                     },
                   ),
                 ],
@@ -176,11 +225,12 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                   // Meal Time Filters (Multi-select enabled, no "Todas")
                   ..._categories.map((cat) {
                     final isSelected = filterState.selectedCategories.contains(cat);
+                    final catLabel = _getCategoryLabel(cat, strings);
                     return Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: FilterChip(
                         label: Text(
-                          cat,
+                          catLabel,
                           style: TextStyle(
                             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                             fontSize: 13,
@@ -252,6 +302,31 @@ class _RecipesListScreenState extends ConsumerState<RecipesListScreen> {
                 ),
               ),
             ),
+
+            // Guide Card if first time
+            if (_showGuide)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                child: FirstUseGuideCard(
+                  icon: Icons.menu_book_rounded,
+                  title: strings.isSpanish ? 'Tus Recetas y Cocina' : 'Your Recipes & Kitchen',
+                  description: strings.isSpanish
+                      ? 'Crea, organiza y cocina tus platos preferidos con control total de porciones e ingredientes.'
+                      : 'Create, organize and cook your favorite meals with full serving and ingredient controls.',
+                  bulletPoints: strings.isSpanish
+                      ? [
+                          'Toca el botón (+) para crear una receta manualmente, con foto o IA.',
+                          'Usa "¿Qué cocino hoy?" para descubrir qué preparar con lo que ya tienes en la heladera.',
+                          'Filtra por momento del día o toca el corazón para ver tus favoritas.',
+                        ]
+                      : [
+                          'Tap (+) to create a new recipe manually, with photo or AI.',
+                          'Use "Fridge Matcher" to see what you can cook with items at home.',
+                          'Filter by meal time or tap the heart to see your favorites.',
+                        ],
+                  onDismiss: _dismissGuide,
+                ),
+              ),
 
             // Scrollable Content
             Expanded(

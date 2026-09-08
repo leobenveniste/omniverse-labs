@@ -1,10 +1,11 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../l10n/app_localizations.dart';
 import '../main.dart';
 import '../services/premium_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/about_dialog_widget.dart';
+import '../widgets/app_header_title.dart';
+import '../widgets/contact_us_modal.dart';
 import '../widgets/paywall_sheet.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -20,6 +21,7 @@ class SettingsScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context);
+    final isSpanish = l10n.locale.languageCode == 'es';
     final appState = CentralDeJuegosApp.of(context);
     final currentThemeMode = appState.themeMode;
     final currentLang = l10n.locale.languageCode;
@@ -27,13 +29,9 @@ class SettingsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(
-          l10n.t('settingsTitle'),
-          style: TextStyle(
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1.0,
-            color: isDark ? AppTheme.cyberGold : const Color(0xFF1A202C),
-          ),
+        title: AppHeaderTitle(
+          title: l10n.t('settingsTitle'),
+          isPro: premiumService?.isPro ?? false,
         ),
       ),
       body: ListView(
@@ -166,9 +164,18 @@ class SettingsScreen extends StatelessWidget {
             child: Column(
               children: [
                 ListTile(
+                  leading: const Text('🌐', style: TextStyle(fontSize: 22)),
+                  title: Text(l10n.t('languageAuto'), style: TextStyle(fontWeight: appState.isAutoLanguage ? FontWeight.bold : FontWeight.w600)),
+                  trailing: appState.isAutoLanguage
+                      ? const Icon(Icons.check_circle_rounded, color: AppTheme.cyberGold)
+                      : null,
+                  onTap: () => appState.setLocale(null),
+                ),
+                const Divider(height: 1),
+                ListTile(
                   leading: const Text('🇪🇸', style: TextStyle(fontSize: 22)),
-                  title: Text(l10n.t('languageEs'), style: const TextStyle(fontWeight: FontWeight.w600)),
-                  trailing: currentLang == 'es'
+                  title: Text(l10n.t('languageEs'), style: TextStyle(fontWeight: (!appState.isAutoLanguage && currentLang == 'es') ? FontWeight.bold : FontWeight.w600)),
+                  trailing: (!appState.isAutoLanguage && currentLang == 'es')
                       ? const Icon(Icons.check_circle_rounded, color: AppTheme.cyberGold)
                       : null,
                   onTap: () => appState.setLocale(const Locale('es')),
@@ -176,8 +183,8 @@ class SettingsScreen extends StatelessWidget {
                 const Divider(height: 1),
                 ListTile(
                   leading: const Text('🇺🇸', style: TextStyle(fontSize: 22)),
-                  title: Text(l10n.t('languageEn'), style: const TextStyle(fontWeight: FontWeight.w600)),
-                  trailing: currentLang == 'en'
+                  title: Text(l10n.t('languageEn'), style: TextStyle(fontWeight: (!appState.isAutoLanguage && currentLang == 'en') ? FontWeight.bold : FontWeight.w600)),
+                  trailing: (!appState.isAutoLanguage && currentLang == 'en')
                       ? const Icon(Icons.check_circle_rounded, color: AppTheme.cyberGold)
                       : null,
                   onTap: () => appState.setLocale(const Locale('en')),
@@ -187,6 +194,31 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 20),
 
+          // Contact & Suggestions
+          _buildSectionHeader(context, isSpanish ? 'SOPORTE Y CONTACTO' : 'SUPPORT & CONTACT'),
+          Card(
+            child: ListTile(
+              leading: const CircleAvatar(
+                backgroundColor: Colors.transparent,
+                child: Icon(Icons.mail_outline_rounded, color: AppTheme.cyberGold),
+              ),
+              title: Text(
+                isSpanish ? 'Contacto y Sugerencias' : 'Contact & Suggestions',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                'leo.benveniste@gmail.com',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                ),
+              ),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => ContactUsModal.show(context),
+            ),
+          ),
+          const SizedBox(height: 16),
+
           // About Section
           _buildSectionHeader(context, l10n.t('aboutSection').toUpperCase()),
           Card(
@@ -195,7 +227,7 @@ class SettingsScreen extends StatelessWidget {
                 isDark ? 'assets/images/omniverse_labs_white.png' : 'assets/images/omniverse_labs_color.png',
                 width: 32,
                 height: 32,
-                errorBuilder: (_, __, ___) => const Icon(Icons.all_inclusive_rounded),
+                errorBuilder: (context, error, stackTrace) => const Icon(Icons.all_inclusive_rounded),
               ),
               title: Text(
                 l10n.t('aboutTitle'),
@@ -215,29 +247,85 @@ class SettingsScreen extends StatelessWidget {
 
           // Developer Testing Toggle (Always accessible in Settings screen)
           if (premiumService != null) ...[
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
+            _buildSectionHeader(context, isSpanish ? 'MODO DE PRUEBAS / TESTING' : 'TESTING & DEVELOPER'),
             AnimatedBuilder(
               animation: premiumService!,
               builder: (context, _) {
                 final isPro = premiumService!.isPro;
-                return Center(
-                  child: TextButton.icon(
-                    style: TextButton.styleFrom(
-                      foregroundColor: isPro ? Colors.orangeAccent : Colors.tealAccent,
+                return Card(
+                  clipBehavior: Clip.antiAlias,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: BorderSide(
+                      color: isPro
+                          ? AppTheme.cyberGold.withValues(alpha: 0.6)
+                          : theme.colorScheme.outline.withValues(alpha: 0.2),
+                      width: 1,
                     ),
-                    icon: Icon(isPro ? Icons.lock_open_rounded : Icons.science_outlined, size: 16),
-                    label: Text(
-                      isPro ? l10n.t('testProDisable') : l10n.t('testProEnable'),
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  ),
+                  child: SwitchListTile.adaptive(
+                    secondary: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: isPro
+                            ? AppTheme.cyberGold.withValues(alpha: 0.2)
+                            : theme.colorScheme.surfaceContainerHighest,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.science_rounded,
+                        color: isPro ? AppTheme.cyberGold : theme.colorScheme.primary,
+                        size: 22,
+                      ),
                     ),
-                    onPressed: () async {
-                      await premiumService!.setProForTesting(!isPro);
+                    title: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            l10n.t('testProToggleTitle'),
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: isPro ? AppTheme.cyberGold : theme.colorScheme.outlineVariant,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            isPro ? 'PRO' : 'FREE',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              color: isPro ? Colors.black : theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        l10n.t('testProToggleSubtitle'),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                    value: isPro,
+                    activeTrackColor: AppTheme.cyberGold,
+                    activeThumbColor: Colors.amber.shade900,
+                    onChanged: (bool value) async {
+                      await premiumService!.setProForTesting(value);
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
-                              !isPro ? l10n.t('proActivatedToast') : l10n.t('proDeactivatedToast'),
+                              value ? l10n.t('proActivatedToast') : l10n.t('proDeactivatedToast'),
                             ),
+                            behavior: SnackBarBehavior.floating,
                           ),
                         );
                       }

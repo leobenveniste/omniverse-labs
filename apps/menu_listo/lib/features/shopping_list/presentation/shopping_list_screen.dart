@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:menu_listo/core/localization/app_localizations.dart';
 import 'package:menu_listo/core/utils/culinary_catalog.dart';
 import 'package:menu_listo/core/widgets/app_header_title.dart';
+import 'package:menu_listo/core/widgets/pro_header_button.dart';
+import 'package:menu_listo/core/widgets/first_use_guide_card.dart';
 import 'package:menu_listo/core/widgets/empty_state_view.dart';
-import 'package:menu_listo/core/widgets/feature_guide_dialog.dart';
 import '../models/shopping_item_model.dart';
 import '../providers/shopping_provider.dart';
 import 'supermarket_mode_screen.dart';
@@ -15,52 +18,35 @@ import 'widgets/shopping_item_tile.dart';
 class ShoppingListScreen extends ConsumerStatefulWidget {
   const ShoppingListScreen({super.key});
 
-  static Future<void> showGuideIfFirstTime(BuildContext context) async {
-    final strings = AppStrings.of(context);
-    await FeatureGuideDialog.showIfFirstTime(
-      context: context,
-      prefKey: 'has_seen_guide_shopping',
-      headerIcon: Icons.shopping_cart_rounded,
-      headerColor: Colors.teal,
-      title: strings.isSpanish ? '¡Tu Lista de Compras Inteligente!' : 'Your Smart Shopping List!',
-      subtitle: strings.isSpanish
-          ? 'Todo lo que necesitas comprar organizado automáticamente.'
-          : 'Everything you need to buy organized automatically.',
-      features: [
-        FeatureGuideItem(
-          icon: Icons.sync_alt_rounded,
-          iconColor: Colors.green,
-          title: strings.isSpanish ? 'Generación desde la Agenda' : 'Generate from Planner',
-          description: strings.isSpanish
-              ? 'Toca el botón "Generar desde el Menú Semanal" para traer todos los ingredientes y sumar cantidades repetidas.'
-              : 'Tap "Generate from Weekly Plan" to import ingredients and consolidate duplicates.',
-        ),
-        FeatureGuideItem(
-          icon: Icons.shopping_cart_checkout,
-          iconColor: Colors.deepOrangeAccent,
-          title: strings.isSpanish ? 'Modo Súper para Comprar' : 'Supermarket Mode',
-          description: strings.isSpanish
-              ? 'Cuando vayas al supermercado, toca el icono del carrito arriba para abrir la vista enfocada con letra grande y pantalla encendida.'
-              : 'When shopping, tap the cart icon on top for a distraction-free, large-text checklist.',
-        ),
-        FeatureGuideItem(
-          icon: Icons.category_outlined,
-          iconColor: Colors.indigoAccent,
-          title: strings.isSpanish ? 'Organizado por Góndolas' : 'Aisle Categorization',
-          description: strings.isSpanish
-              ? 'Los productos se dividen en Verdulería, Carnicería, Lácteos, Almacén y más para ahorrarte vueltas.'
-              : 'Items are sorted into Produce, Meat, Dairy, and Pantry aisles to save you walking back and forth.',
-        ),
-      ],
-    );
-  }
-
   @override
   ConsumerState<ShoppingListScreen> createState() => _ShoppingListScreenState();
 }
 
 class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
   bool _isCategorizedView = true;
+  bool _showGuide = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadGuideState();
+  }
+
+  Future<void> _loadGuideState() async {
+    final prefs = await SharedPreferences.getInstance();
+    final seen = prefs.getBool('has_seen_guide_shopping') ?? false;
+    if (!seen && mounted) {
+      setState(() => _showGuide = true);
+    }
+  }
+
+  Future<void> _dismissGuide() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('has_seen_guide_shopping', true);
+    if (mounted) {
+      setState(() => _showGuide = false);
+    }
+  }
 
   void _showPantryReviewModal(BuildContext context, List<ShoppingItem> items) {
     final theme = Theme.of(context);
@@ -252,6 +238,24 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
       appBar: AppBar(
         title: AppHeaderTitle(title: strings.shoppingTitle),
         actions: [
+          const ProHeaderButton(),
+          IconButton(
+            icon: const Icon(Icons.add_rounded),
+            tooltip: strings.isSpanish ? 'Agregar Artículo' : 'Add Item',
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              AddShoppingItemDialog.show(
+                context,
+                onAdd: (name, amount, unit) {
+                  ref.read(shoppingListProvider.notifier).addItem(
+                        name: name,
+                        amount: amount,
+                        unit: unit,
+                      );
+                },
+              );
+            },
+          ),
           if (hasItems) ...[
             IconButton(
               icon: const Icon(Icons.shopping_cart_checkout),
@@ -322,6 +326,29 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
       ),
       body: Column(
         children: [
+          if (_showGuide)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: FirstUseGuideCard(
+                icon: Icons.shopping_cart_rounded,
+                title: strings.isSpanish ? '¡Tu Lista de Compras Inteligente!' : 'Your Smart Shopping List!',
+                description: strings.isSpanish
+                    ? 'Todo lo que necesitas comprar organizado automáticamente y libre de distracciones.'
+                    : 'Everything you need to buy organized automatically and distraction-free.',
+                bulletPoints: strings.isSpanish
+                    ? [
+                        'Toca "Generar desde el Menú Semanal" para consolidar los ingredientes del planificador.',
+                        'Usa el icono del carrito arriba para activar el Modo Súper en pantalla completa.',
+                        'Los productos se agrupan automáticamente por góndola (Verdulería, Carnicería, Almacén).',
+                      ]
+                    : [
+                        'Tap "Generate from Planner" to consolidate ingredients from your meal schedule.',
+                        'Use the cart icon on top to enter full-screen Supermarket Mode.',
+                        'Items automatically sort by aisle (Produce, Meat, Pantry) to save walking.',
+                      ],
+                onDismiss: _dismissGuide,
+              ),
+            ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: SizedBox(
@@ -333,7 +360,13 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                   if (consolidated.isEmpty) {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('No hay recetas en la semana actual.')),
+                        SnackBar(
+                          content: Text(
+                            strings.isSpanish
+                                ? 'No hay recetas en la semana actual.'
+                                : 'No recipes planned for the current week.',
+                          ),
+                        ),
                       );
                     }
                   } else {
@@ -432,7 +465,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                                 Text(catIcon, style: const TextStyle(fontSize: 16)),
                                 const SizedBox(width: 6),
                                 Text(
-                                  category,
+                                  CulinaryCatalog.getCategoryDisplayName(category, strings.isSpanish),
                                   style: theme.textTheme.labelLarge?.copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: theme.colorScheme.onSurface,

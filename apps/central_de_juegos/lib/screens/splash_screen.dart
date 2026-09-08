@@ -39,12 +39,12 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     _controller.forward();
 
-    Timer(const Duration(milliseconds: 2000), () {
+    Timer(const Duration(milliseconds: 1700), () {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           PageRouteBuilder(
-            transitionDuration: const Duration(milliseconds: 600),
-            pageBuilder: (_, animation, __) => FadeTransition(
+            transitionDuration: const Duration(milliseconds: 500),
+            pageBuilder: (context, animation, secondaryAnimation) => FadeTransition(
               opacity: animation,
               child: HomeScreen(
                 onToggleTheme: widget.onToggleTheme,
@@ -69,37 +69,89 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF121417) : const Color(0xFFF8F9FA),
-      body: Center(
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return FadeTransition(
-              opacity: _fadeAnimation,
-              child: ScaleTransition(
-                scale: _scaleAnimation,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Full Central de Juegos logo
-                      Image.asset(
-                        'assets/images/central_de_juegos_full.png',
-                        width: 280,
-                        fit: BoxFit.contain,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Center(
+              child: AnimatedBuilder(
+                animation: _controller,
+                builder: (context, child) {
+                  return FadeTransition(
+                    opacity: _fadeAnimation,
+                    child: ScaleTransition(
+                      scale: _scaleAnimation,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 36.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Full Central de Juegos logo
+                            Image.asset(
+                              'assets/images/central_de_juegos_full.png',
+                              width: 270,
+                              fit: BoxFit.contain,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'Anotadores y Juegos de Mesa',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 1.0,
+                                color: isDark ? Colors.white60 : Colors.black54,
+                              ),
+                            ),
+                            const SizedBox(height: 32),
+                            const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFC700)),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 32),
-                      const SizedBox(
-                        width: 32,
-                        height: 32,
-                        child: CircularProgressIndicator(strokeWidth: 2.5),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            // Bottom Branding
+            Positioned(
+              bottom: 24,
+              left: 0,
+              right: 0,
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      isDark
+                          ? 'assets/images/omniverse_labs_white.png'
+                          : 'assets/images/omniverse_labs_color.png',
+                      width: 18,
+                      height: 18,
+                      errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'from OMNIVERSE LABS',
+                      style: TextStyle(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.5,
+                        color: isDark ? Colors.white38 : Colors.black38,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            );
-          },
+            ),
+          ],
         ),
       ),
     );

@@ -29,7 +29,7 @@ class AppDatabase {
 
     return await openDatabase(
       path,
-      version: 4,
+      version: 5,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
@@ -70,6 +70,18 @@ class AppDatabase {
         ''');
       } catch (_) {}
     }
+
+    if (oldVersion < 5) {
+      try {
+        await db.execute('ALTER TABLE ingredients ADD COLUMN unitEn TEXT');
+      } catch (_) {}
+      try {
+        await db.execute('ALTER TABLE ingredients ADD COLUMN nameEn TEXT');
+      } catch (_) {}
+      try {
+        await db.execute('ALTER TABLE ingredients ADD COLUMN notesEn TEXT');
+      } catch (_) {}
+    }
   }
 
   Future<void> _createDB(Database db, int version) async {
@@ -98,8 +110,11 @@ class AppDatabase {
         recipeId TEXT NOT NULL,
         amount REAL NOT NULL,
         unit TEXT,
+        unitEn TEXT,
         name TEXT NOT NULL,
+        nameEn TEXT,
         notes TEXT,
+        notesEn TEXT,
         isSectionHeader INTEGER NOT NULL DEFAULT 0,
         FOREIGN KEY (recipeId) REFERENCES recipes (id) ON DELETE CASCADE
       )

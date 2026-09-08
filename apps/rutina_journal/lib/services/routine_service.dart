@@ -33,17 +33,54 @@ class RoutineService extends ChangeNotifier {
   int get secondsRemaining => _secondsRemaining;
   bool get isRunning => _isRunning;
 
+  int _currentStepDuration = 0;
+
   RoutineStep? get currentStep {
     if (_activeRoutine == null || _activeRoutine!.steps.isEmpty) return null;
     if (_activeStepIndex >= _activeRoutine!.steps.length) return null;
     return _activeRoutine!.steps[_activeStepIndex];
   }
 
+  RoutineStep? get nextUpcomingStep {
+    if (_activeRoutine == null) return null;
+    final nextIdx = _activeStepIndex + 1;
+    if (nextIdx < _activeRoutine!.steps.length) {
+      return _activeRoutine!.steps[nextIdx];
+    }
+    return null;
+  }
+
   double get stepProgress {
     final step = currentStep;
-    if (step == null || step.durationSeconds == 0) return 1.0;
-    final elapsed = step.durationSeconds - _secondsRemaining;
-    return (elapsed / step.durationSeconds).clamp(0.0, 1.0);
+    if (step == null) return 1.0;
+    final totalSec = _currentStepDuration > 0 ? _currentStepDuration : step.durationSeconds;
+    if (totalSec == 0) return 1.0;
+    final elapsed = totalSec - _secondsRemaining;
+    return (elapsed / totalSec).clamp(0.0, 1.0);
+  }
+
+  /// Calculates total remaining seconds across the active routine
+  int get totalRoutineSecondsRemaining {
+    if (_activeRoutine == null) return 0;
+    int remaining = _secondsRemaining;
+    for (int i = _activeStepIndex + 1; i < _activeRoutine!.steps.length; i++) {
+      remaining += _activeRoutine!.steps[i].durationSeconds;
+    }
+    return remaining;
+  }
+
+  /// Estimated time when the active routine will complete
+  DateTime? get estimatedCompletionTime {
+    if (_activeRoutine == null) return null;
+    return DateTime.now().add(Duration(seconds: totalRoutineSecondsRemaining));
+  }
+
+  /// Extends the active step's remaining time by [seconds] (e.g. +60 or +120)
+  void extendCurrentStepTime(int seconds) {
+    if (_activeRoutine == null) return;
+    _secondsRemaining += seconds;
+    _currentStepDuration += seconds;
+    notifyListeners();
   }
 
   Future<void> load() async {
@@ -293,6 +330,7 @@ class RoutineService extends ChangeNotifier {
     _activeRoutine = routine;
     _activeStepIndex = 0;
     _secondsRemaining = routine.steps.isNotEmpty ? routine.steps.first.durationSeconds : 0;
+    _currentStepDuration = _secondsRemaining;
     _isRunning = true;
     _startTimer();
     notifyListeners();
@@ -327,6 +365,7 @@ class RoutineService extends ChangeNotifier {
     if (_activeStepIndex + 1 < _activeRoutine!.steps.length) {
       _activeStepIndex++;
       _secondsRemaining = _activeRoutine!.steps[_activeStepIndex].durationSeconds;
+      _currentStepDuration = _secondsRemaining;
       notifyListeners();
     } else {
       // Finished routine!
@@ -338,6 +377,7 @@ class RoutineService extends ChangeNotifier {
     if (_activeRoutine == null || _activeStepIndex == 0) return;
     _activeStepIndex--;
     _secondsRemaining = _activeRoutine!.steps[_activeStepIndex].durationSeconds;
+    _currentStepDuration = _secondsRemaining;
     notifyListeners();
   }
 
@@ -358,6 +398,7 @@ class RoutineService extends ChangeNotifier {
     _activeRoutine = null;
     _activeStepIndex = 0;
     _secondsRemaining = 0;
+    _currentStepDuration = 0;
     notifyListeners();
   }
 
@@ -367,6 +408,7 @@ class RoutineService extends ChangeNotifier {
     _activeRoutine = null;
     _activeStepIndex = 0;
     _secondsRemaining = 0;
+    _currentStepDuration = 0;
     notifyListeners();
   }
 

@@ -12,7 +12,10 @@ import '../theme/app_theme_preset.dart';
 import '../theme/app_typography.dart';
 import '../utils/haptics_helper.dart';
 import '../widgets/about_dialog_widget.dart';
+import '../widgets/app_header_title.dart';
+import '../widgets/contact_us_modal.dart';
 import '../widgets/paywall_sheet.dart';
+import 'onboarding_tour_screen.dart';
 import 'widgets_gallery_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -35,15 +38,16 @@ class SettingsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          l10n.t('settingsTitle'),
-          style: AppTypography.display(theme.colorScheme.onSurface),
+        title: AppHeaderTitle(
+          title: l10n.t('settingsTitle'),
+          isPro: premiumService.isPro,
         ),
       ),
       body: AnimatedBuilder(
         animation: Listenable.merge([prefs, premiumService]),
         builder: (context, _) {
           final isPro = premiumService.isPro;
+          final isSpanish = l10n.locale.languageCode == 'es';
 
           return ListView(
             padding: const EdgeInsets.all(AppSpacing.md),
@@ -309,6 +313,62 @@ class SettingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.md),
 
+              // App Tour & Guided Walkthrough
+              _buildSectionHeader(context, isSpanish ? 'Guía y Aprendizaje' : 'Guide & Walkthrough'),
+              Card(
+                child: ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(Icons.explore_outlined, color: theme.colorScheme.primary),
+                  ),
+                  title: Text(
+                    isSpanish ? 'Ver Tour de la Aplicación' : 'View App Tour',
+                    style: AppTypography.body(theme.colorScheme.onSurface, isMedium: true),
+                  ),
+                  subtitle: Text(
+                    isSpanish ? 'Repasar las características clave de Ritmo' : 'Review key features of Ritmo',
+                    style: AppTypography.caption(theme.colorScheme.onSurfaceVariant),
+                  ),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () {
+                    OnboardingTourScreen.show(context);
+                  },
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+
+              // Contact & Support
+              _buildSectionHeader(context, isSpanish ? 'Soporte y Sugerencias' : 'Support & Feedback'),
+              Card(
+                child: ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(Icons.mail_outline_rounded, color: theme.colorScheme.primary),
+                  ),
+                  title: Text(
+                    isSpanish ? 'Contacto y Sugerencias' : 'Contact & Suggestions',
+                    style: AppTypography.body(theme.colorScheme.onSurface, isMedium: true),
+                  ),
+                  subtitle: Text(
+                    'leo.benveniste@gmail.com',
+                    style: AppTypography.caption(theme.colorScheme.onSurfaceVariant),
+                  ),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () {
+                    ContactUsModal.show(context);
+                  },
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+
               // About Modal Trigger
               _buildSectionHeader(context, l10n.t('aboutSection')),
               Card(
@@ -319,7 +379,7 @@ class SettingsScreen extends StatelessWidget {
                         : 'assets/images/omniverse_labs_color.png',
                     width: 28,
                     height: 28,
-                    errorBuilder: (_, __, ___) => const Icon(Icons.all_inclusive_rounded),
+                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.all_inclusive_rounded),
                   ),
                   title: Text(l10n.t('aboutTitle'), style: AppTypography.body(theme.colorScheme.onSurface, isMedium: true)),
                   subtitle: Text(l10n.t('appVersion'), style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.6))),
@@ -327,6 +387,90 @@ class SettingsScreen extends StatelessWidget {
                   onTap: () {
                     HapticsHelper.selection();
                     AboutDialogWidget.show(context);
+                  },
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+
+              // Developer Testing Toggle
+              _buildSectionHeader(context, isSpanish ? 'MODO DE PRUEBAS / TESTING' : 'TESTING & DEVELOPER'),
+              Card(
+                clipBehavior: Clip.antiAlias,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(
+                    color: isPro
+                        ? Colors.amber.shade600.withValues(alpha: 0.5)
+                        : theme.colorScheme.outline.withValues(alpha: 0.2),
+                    width: 1,
+                  ),
+                ),
+                child: SwitchListTile.adaptive(
+                  secondary: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: isPro
+                          ? Colors.amber.withValues(alpha: 0.2)
+                          : theme.colorScheme.surfaceContainerHighest,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.science_rounded,
+                      color: isPro ? Colors.amber.shade800 : theme.colorScheme.primary,
+                      size: 22,
+                    ),
+                  ),
+                  title: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          l10n.t('testProToggleTitle'),
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: isPro ? Colors.amber.shade700 : theme.colorScheme.outlineVariant,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          isPro ? 'PRO' : 'FREE',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w900,
+                            color: isPro ? Colors.white : theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      l10n.t('testProToggleSubtitle'),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                  value: isPro,
+                  activeTrackColor: Colors.amber.shade600,
+                  activeThumbColor: Colors.amber.shade900,
+                  onChanged: (bool value) async {
+                    HapticsHelper.medium();
+                    await premiumService.setProUser(value);
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            value ? l10n.t('testProActivated') : l10n.t('testProDeactivated'),
+                          ),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    }
                   },
                 ),
               ),

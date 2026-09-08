@@ -236,6 +236,79 @@ class CulinaryCatalog {
     return 'unidades';
   }
 
+  static String getUnitDisplayName(String unit, bool isSpanish) {
+    final norm = normalizeUnit(unit);
+    if (isSpanish) {
+      return norm;
+    }
+    switch (norm) {
+      case 'unidades':
+        return 'units';
+      case 'g':
+        return 'g';
+      case 'kg':
+        return 'kg';
+      case 'ml':
+        return 'ml';
+      case 'l':
+        return 'L';
+      case 'cda':
+        return 'tbsp';
+      case 'cdta':
+        return 'tsp';
+      case 'taza':
+        return 'cup';
+      case 'dientes':
+        return 'cloves';
+      case 'pizca':
+        return 'pinch';
+      case 'rebanadas':
+        return 'slices';
+      case 'fetas':
+        return 'slices';
+      case 'atado':
+        return 'bunch';
+      case 'lata':
+        return 'can';
+      case 'paquete':
+        return 'pack';
+      case 'hojas':
+        return 'leaves';
+      case 'ramita':
+        return 'sprig';
+      default:
+        return norm;
+    }
+  }
+
+  static String getCategoryDisplayName(String category, bool isSpanish) {
+    final norm = normalizeCategory(category);
+    if (isSpanish) {
+      return norm;
+    }
+    switch (norm) {
+      case 'Verdulería':
+        return 'Produce & Veggies';
+      case 'Carnicería':
+        return 'Meat & Seafood';
+      case 'Lácteos y Huevos':
+        return 'Dairy & Eggs';
+      case 'Panadería':
+        return 'Bakery';
+      case 'Condimentos y Especias':
+        return 'Spices & Seasonings';
+      case 'Bebidas':
+        return 'Beverages';
+      case 'Repostería':
+        return 'Baking';
+      case 'Despensa':
+        return 'Pantry';
+      case 'General':
+      default:
+        return 'General';
+    }
+  }
+
   /// Standardizes category names across the app so that variations
   /// like 'Verdulería' and 'Verduras', 'Lácteos' and 'Lácteos & Huevos', etc.
   /// are merged into cohesive, unified grocery aisles.

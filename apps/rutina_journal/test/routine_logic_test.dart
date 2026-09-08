@@ -79,5 +79,31 @@ void main() {
       expect(routineService.routines.length, 6);
       expect(routineService.routines.any((r) => r.id == 'test_routine_1'), isFalse);
     });
+    test('Can extend step time and calculate dynamic completion time', () {
+      final morning = routineService.routines.first;
+      routineService.startRoutine(morning);
+
+      expect(routineService.nextUpcomingStep, isNotNull);
+      expect(routineService.nextUpcomingStep!.id, morning.steps[1].id);
+
+      final initialRemaining = routineService.totalRoutineSecondsRemaining;
+      final initialStepRemaining = routineService.secondsRemaining;
+      final estFinish = routineService.estimatedCompletionTime;
+      expect(estFinish, isNotNull);
+
+      // Extend step by 60 seconds
+      routineService.extendCurrentStepTime(60);
+      expect(routineService.secondsRemaining, initialStepRemaining + 60);
+      expect(routineService.totalRoutineSecondsRemaining, initialRemaining + 60);
+
+      // Extend step by 120 seconds
+      routineService.extendCurrentStepTime(120);
+      expect(routineService.secondsRemaining, initialStepRemaining + 180);
+      expect(routineService.totalRoutineSecondsRemaining, initialRemaining + 180);
+
+      routineService.stopRoutine();
+      expect(routineService.estimatedCompletionTime, isNull);
+      expect(routineService.nextUpcomingStep, isNull);
+    });
   });
 }

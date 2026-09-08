@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n/app_localizations.dart';
 import '../models/habit.dart';
 import '../services/app_services.dart';
@@ -10,11 +11,13 @@ import '../theme/app_theme.dart';
 import '../theme/app_typography.dart';
 import '../utils/date_utils.dart';
 import '../utils/haptics_helper.dart';
+import '../widgets/app_header_title.dart';
+import '../widgets/first_use_guide_card.dart';
 import '../widgets/habit_edit_dialog.dart';
 import '../widgets/routine_runner_sheet.dart';
 import '../widgets/swipe_habit_card.dart';
 import '../widgets/paywall_sheet.dart';
-import 'settings_screen.dart';
+import 'analytics_screen.dart';
 
 class TodayScreen extends StatefulWidget {
   final HabitService habitService;
@@ -33,47 +36,75 @@ class TodayScreen extends StatefulWidget {
 class _TodayScreenState extends State<TodayScreen> {
   DateTime _selectedDate = DateTime.now();
   bool _showWeekStrip = false;
+  bool _showGuide = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadGuideState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkDailyPromo();
+    });
+  }
+
+  Future<void> _loadGuideState() async {
+    final prefs = await SharedPreferences.getInstance();
+    final seen = prefs.getBool('has_seen_guide_today') ?? false;
+    if (!seen && mounted) {
+      setState(() => _showGuide = true);
+    }
+  }
+
+  Future<void> _dismissGuide() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('has_seen_guide_today', true);
+    if (mounted) {
+      setState(() => _showGuide = false);
+    }
+  }
+
+  Future<void> _checkDailyPromo() async {
+    try {
+      final premium = AppServices.of(context).premiumService;
+      if (premium.isPro) return;
+
+      final prefs = await SharedPreferences.getInstance();
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final lastTimestamp = prefs.getInt('last_pro_promo_timestamp');
+      const fourDaysMs = 4 * 24 * 60 * 60 * 1000;
+
+      if (lastTimestamp == null || (now - lastTimestamp) >= fourDaysMs) {
+        await prefs.setInt('last_pro_promo_timestamp', now);
+        if (mounted) {
+          PaywallSheet.show(context);
+        }
+      }
+    } catch (_) {}
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     final prefs = AppServices.of(context).preferencesService;
+    final premiumService = AppServices.of(context).premiumService;
 
     return Scaffold(
       appBar: AppBar(
-        leadingWidth: 48,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: AppSpacing.sm, top: 8, bottom: 8),
-          child: Image.asset(
-            'assets/images/app_logo.png',
-            fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) => Icon(
-              Icons.spa_rounded,
-              color: theme.colorScheme.primary,
-            ),
-          ),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Ritmo',
-              style: AppTypography.display(theme.colorScheme.onSurface).copyWith(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            Text(
-              DateFormat('EEEE, d MMMM', l10n.locale.languageCode).format(_selectedDate),
-              style: AppTypography.caption(
-                theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                isMedium: true,
-              ),
-            ),
-          ],
+        title: AppHeaderTitle(
+          title: DateFormat('EEEE, d MMMM', l10n.locale.languageCode).format(_selectedDate),
+          isPro: premiumService.isPro,
         ),
         actions: [
+          if (!premiumService.isPro)
+            IconButton(
+              icon: const Text('👑', style: TextStyle(fontSize: 18)),
+              tooltip: 'Ritmo PRO',
+              onPressed: () {
+                HapticsHelper.light();
+                PaywallSheet.show(context);
+              },
+            ),
           // Header Streak Pill
           AnimatedBuilder(
             animation: widget.habitService,
@@ -127,29 +158,30 @@ class _TodayScreenState extends State<TodayScreen> {
               setState(() => _showWeekStrip = !_showWeekStrip);
             },
           ),
-          // Single New Habit Button
+          // Analytics Shortcut
           IconButton(
-            icon: const Icon(Icons.add_rounded),
-            tooltip: l10n.t('newHabit'),
-            onPressed: () => _openAddHabitDialog(context),
-          ),
-          // Settings Button
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: l10n.t('navSettings'),
+            icon: const Icon(Icons.show_chart_rounded),
+            tooltip: l10n.t('navAnalytics'),
             onPressed: () {
               HapticsHelper.light();
               final services = AppServices.of(context);
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (_) => SettingsScreen(
+                  builder: (_) => AnalyticsScreen(
+                    habitService: widget.habitService,
+                    journalService: services.journalService,
                     prefs: services.preferencesService,
                     storage: services.storageService,
-                    habitService: widget.habitService,
                   ),
                 ),
               );
             },
+          ),
+          // Single New Habit Button
+          IconButton(
+            icon: const Icon(Icons.add_rounded),
+            tooltip: l10n.t('newHabit'),
+            onPressed: () => _openAddHabitDialog(context),
           ),
         ],
       ),
@@ -174,6 +206,29 @@ class _TodayScreenState extends State<TodayScreen> {
             return ListView(
               padding: const EdgeInsets.only(bottom: 88),
               children: [
+                if (_showGuide)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.sm, AppSpacing.md, 0),
+                    child: FirstUseGuideCard(
+                      icon: Icons.track_changes_rounded,
+                      title: l10n.locale.languageCode == 'es' ? 'Tus Hábitos Diarios' : 'Your Daily Habits',
+                      description: l10n.locale.languageCode == 'es'
+                          ? 'Construye constancia completando tus hábitos y siguiendo tus rachas de progreso.'
+                          : 'Build consistency by completing habits and tracking your daily streaks.',
+                      bulletPoints: l10n.locale.languageCode == 'es'
+                          ? [
+                              'Desliza hacia la derecha para marcar un hábito completado.',
+                              'Toca el botón (+) arriba para crear nuevos hábitos diarios o personalizados.',
+                              'Usa el calendario para revisar días anteriores o planificar los siguientes.',
+                            ]
+                          : [
+                              'Swipe right on any card to mark a habit completed.',
+                              'Tap (+) on top to create new daily or scheduled habits.',
+                              'Use the calendar icon to navigate past days or future goals.',
+                            ],
+                      onDismiss: _dismissGuide,
+                    ),
+                  ),
                 if (_showWeekStrip) ...[
                   const SizedBox(height: AppSpacing.xs),
                   _buildWeekStrip(context),
@@ -450,7 +505,7 @@ class _TodayScreenState extends State<TodayScreen> {
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
             scrollDirection: Axis.horizontal,
             itemCount: routines.length,
-            separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.xs),
+            separatorBuilder: (context, index) => const SizedBox(width: AppSpacing.xs),
             itemBuilder: (context, idx) {
               final routine = routines[idx];
               final title = l10n.t(routine.title);

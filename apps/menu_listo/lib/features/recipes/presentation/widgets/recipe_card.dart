@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:menu_listo/core/localization/app_localizations.dart';
 import '../../models/recipe_model.dart';
 
 class RecipeCard extends StatelessWidget {
@@ -18,6 +19,7 @@ class RecipeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final strings = AppStrings.of(context);
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -108,7 +110,7 @@ class RecipeCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    recipe.title,
+                    recipe.localizedTitle(strings.isSpanish),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.titleSmall?.copyWith(
@@ -117,10 +119,10 @@ class RecipeCard extends StatelessWidget {
                       height: 1.25,
                     ),
                   ),
-                  if (recipe.description.isNotEmpty) ...[
+                  if (recipe.localizedDescription(strings.isSpanish).isNotEmpty) ...[
                     const SizedBox(height: 2),
                     Text(
-                      recipe.description,
+                      recipe.localizedDescription(strings.isSpanish),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.bodySmall?.copyWith(fontSize: 11),

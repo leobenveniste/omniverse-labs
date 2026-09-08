@@ -255,7 +255,7 @@ class _RoutineEditDialogState extends State<RoutineEditDialog> {
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
                       itemCount: _iconOptions.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.xs),
+                      separatorBuilder: (context, index) => const SizedBox(width: AppSpacing.xs),
                       itemBuilder: (context, index) {
                         final opt = _iconOptions[index];
                         final isSelected = _selectedIconName == opt['name'];

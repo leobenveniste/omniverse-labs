@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n/app_localizations.dart';
 import '../models/journal_entry.dart';
 import '../services/app_services.dart';
@@ -9,10 +10,12 @@ import '../theme/app_theme.dart';
 import '../theme/app_typography.dart';
 import '../utils/date_utils.dart';
 import '../utils/haptics_helper.dart';
+import '../widgets/app_header_title.dart';
+import '../widgets/first_use_guide_card.dart';
 import '../widgets/journal_entry_dialog.dart';
-import 'settings_screen.dart';
+import '../widgets/paywall_sheet.dart';
 
-class JournalScreen extends StatelessWidget {
+class JournalScreen extends StatefulWidget {
   final JournalService journalService;
 
   const JournalScreen({
@@ -20,9 +23,38 @@ class JournalScreen extends StatelessWidget {
     required this.journalService,
   });
 
+  @override
+  State<JournalScreen> createState() => _JournalScreenState();
+}
+
+class _JournalScreenState extends State<JournalScreen> {
+  bool _showGuide = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadGuideState();
+  }
+
+  Future<void> _loadGuideState() async {
+    final prefs = await SharedPreferences.getInstance();
+    final seen = prefs.getBool('has_seen_guide_journal') ?? false;
+    if (!seen && mounted) {
+      setState(() => _showGuide = true);
+    }
+  }
+
+  Future<void> _dismissGuide() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('has_seen_guide_journal', true);
+    if (mounted) {
+      setState(() => _showGuide = false);
+    }
+  }
+
   void _openEntryDialog(BuildContext context, DateTime today, String todayKey) {
     HapticsHelper.medium();
-    final todayEntry = journalService.getEntryForDate(today);
+    final todayEntry = widget.journalService.getEntryForDate(today);
     JournalEntryDialog.show(
       context,
       entry: todayEntry,
@@ -36,7 +68,7 @@ class JournalScreen extends StatelessWidget {
         required dailyWin,
         required notes,
       }) {
-        journalService.saveEntry(
+        widget.journalService.saveEntry(
           dateKey: todayKey,
           moodLevel: moodLevel,
           energyLevel: energyLevel,
@@ -57,48 +89,40 @@ class JournalScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final appServices = AppServices.of(context);
     final prefs = appServices.preferencesService;
-    final storage = appServices.storageService;
-    final habitService = appServices.habitService;
+    final premiumService = appServices.premiumService;
     final today = DateTime.now();
     final todayKey = AppDateUtils.toDateKey(today);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          l10n.t('journalTitle'),
-          style: AppTypography.display(theme.colorScheme.onSurface),
+        title: AppHeaderTitle(
+          title: l10n.t('navJournal'),
+          isPro: premiumService.isPro,
         ),
         actions: [
+          if (!premiumService.isPro)
+            IconButton(
+              icon: const Text('👑', style: TextStyle(fontSize: 18)),
+              tooltip: 'Ritmo PRO',
+              onPressed: () {
+                HapticsHelper.light();
+                PaywallSheet.show(context);
+              },
+            ),
           IconButton(
             icon: const Icon(Icons.add_rounded),
             tooltip: l10n.t('newEntry'),
             onPressed: () => _openEntryDialog(context, today, todayKey),
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: l10n.t('navSettings'),
-            onPressed: () {
-              HapticsHelper.light();
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => SettingsScreen(
-                    prefs: prefs,
-                    storage: storage,
-                    habitService: habitService,
-                  ),
-                ),
-              );
-            },
           ),
         ],
       ),
       body: Container(
         decoration: AppTheme.getAtmosphericBackground(context, prefs.themePreset),
         child: AnimatedBuilder(
-          animation: journalService,
+          animation: widget.journalService,
           builder: (context, _) {
-            final todayEntry = journalService.getEntryForDate(today);
-            final entries = journalService.allEntries;
+            final todayEntry = widget.journalService.getEntryForDate(today);
+            final entries = widget.journalService.allEntries;
 
             return ListView(
               padding: const EdgeInsets.only(
@@ -108,6 +132,26 @@ class JournalScreen extends StatelessWidget {
                 bottom: 88,
               ),
               children: [
+                if (_showGuide)
+                  FirstUseGuideCard(
+                    icon: Icons.auto_stories_rounded,
+                    title: l10n.locale.languageCode == 'es' ? 'Tu Diario y Gratitud' : 'Your Journal & Reflection',
+                    description: l10n.locale.languageCode == 'es'
+                        ? 'Registra tu ánimo, niveles de energía y momentos de gratitud para cuidar tu bienestar mental.'
+                        : 'Log your mood, energy levels, and gratitude reflections to nurture mindful growth.',
+                    bulletPoints: l10n.locale.languageCode == 'es'
+                        ? [
+                            'Toca "Registrar Hoy" para completar tu check-in diario en 1 minuto.',
+                            'Revisa tu historial cronológico para ver patrones de ánimo y reflexiones.',
+                            'Toca (+) arriba en cualquier momento para agregar notas o aprendizajes.',
+                          ]
+                        : [
+                            'Tap "Check In" to record your mood & energy in under 1 minute.',
+                            'Review your timeline feed to reflect on insights and victories.',
+                            'Tap (+) on top anytime to log new thoughts and gratitude entries.',
+                          ],
+                    onDismiss: _dismissGuide,
+                  ),
                 // Today's Status / Check-in Hero Card
                 _buildTodayHeroCard(context, l10n, todayEntry),
                 const SizedBox(height: AppSpacing.lg),
@@ -228,7 +272,7 @@ class JournalScreen extends StatelessWidget {
                     required dailyWin,
                     required notes,
                   }) {
-                    journalService.saveEntry(
+                    widget.journalService.saveEntry(
                       dateKey: todayEntry.dateKey,
                       moodLevel: moodLevel,
                       energyLevel: energyLevel,
@@ -297,7 +341,7 @@ class JournalScreen extends StatelessWidget {
                 required dailyWin,
                 required notes,
               }) {
-                journalService.saveEntry(
+                widget.journalService.saveEntry(
                   dateKey: entry.dateKey,
                   moodLevel: moodLevel,
                   energyLevel: energyLevel,

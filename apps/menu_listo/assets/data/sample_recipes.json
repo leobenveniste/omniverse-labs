@@ -18,96 +18,135 @@
     "isFavorite": 0,
     "ingredients": [
       {
-        "amount": 320.0,
+        "amount": 320,
         "unit": "g",
         "name": "Arroz Carnaroli / Arborio",
-        "notes": ""
+        "notes": "",
+        "name_en": "Carnaroli / Arborio rice",
+        "unit_en": "g",
+        "notes_en": ""
       },
       {
-        "amount": 300.0,
+        "amount": 300,
         "unit": "g",
         "name": "Champiñones / Hongos",
-        "notes": "fileteados"
+        "notes": "fileteados",
+        "name_en": "Mushrooms",
+        "unit_en": "g",
+        "notes_en": "sliced"
       },
       {
-        "amount": 1000.0,
+        "amount": 1000,
         "unit": "ml",
         "name": "Caldo de verduras / verdura",
-        "notes": "caliente"
+        "notes": "caliente",
+        "name_en": "Vegetable broth",
+        "unit_en": "ml",
+        "notes_en": "warm"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "unidades",
         "name": "Cebolla",
-        "notes": "picada fina"
+        "notes": "picada fina",
+        "name_en": "Onion",
+        "unit_en": "units",
+        "notes_en": "finely chopped"
       },
       {
-        "amount": 2.0,
+        "amount": 2,
         "unit": "dientes",
         "name": "Ajo",
-        "notes": "picados"
+        "notes": "picados",
+        "name_en": "Garlic",
+        "unit_en": "cloves",
+        "notes_en": "minced"
       },
       {
-        "amount": 100.0,
+        "amount": 100,
         "unit": "ml",
         "name": "Vino blanco",
-        "notes": ""
+        "notes": "",
+        "name_en": "White wine",
+        "unit_en": "ml",
+        "notes_en": ""
       },
       {
-        "amount": 50.0,
+        "amount": 50,
         "unit": "g",
         "name": "Manteca / Mantequilla",
-        "notes": "en cubos fríos"
+        "notes": "en cubos fríos",
+        "name_en": "Butter",
+        "unit_en": "g",
+        "notes_en": "chilled in cubes"
       },
       {
-        "amount": 60.0,
+        "amount": 60,
         "unit": "g",
         "name": "Queso Parmesano / Rallado",
-        "notes": "rallado fresco"
+        "notes": "rallado fresco",
+        "name_en": "Parmesan cheese",
+        "unit_en": "g",
+        "notes_en": "freshly grated"
       },
       {
-        "amount": 2.0,
+        "amount": 2,
         "unit": "cda",
         "name": "Aceite de oliva virgen extra",
-        "notes": ""
+        "notes": "",
+        "name_en": "Extra virgin olive oil",
+        "unit_en": "tbsp",
+        "notes_en": ""
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "pizca",
         "name": "Sal fina / marina",
-        "notes": "a gusto"
+        "notes": "a gusto",
+        "name_en": "Fine salt",
+        "unit_en": "pinch",
+        "notes_en": "to taste"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "pizca",
         "name": "Pimienta negra molida",
-        "notes": "a gusto"
+        "notes": "a gusto",
+        "name_en": "Ground black pepper",
+        "unit_en": "pinch",
+        "notes_en": "to taste"
       }
     ],
     "steps": [
       {
         "stepNumber": 1,
-        "instruction": "En una sartén grande, calentar una cucharada de aceite de oliva y saltear los hongos a fuego alto durante 5 minutos hasta que doren. Salpimentar y reservar."
+        "instruction": "En una sartén grande, calentar una cucharada de aceite de oliva y saltear los hongos a fuego alto durante 5 minutos hasta que doren. Salpimentar y reservar.",
+        "instructionEn": "In a large skillet, heat one tablespoon of olive oil and sauté mushrooms over high heat for 5 minutes until golden. Season with salt and pepper, then set aside."
       },
       {
         "stepNumber": 2,
-        "instruction": "En una cacerola amplia, rehogar la cebolla y el ajo con el resto del aceite durante 4 minutos hasta que estén transparentes."
+        "instruction": "En una cacerola amplia, rehogar la cebolla y el ajo con el resto del aceite durante 4 minutos hasta que estén transparentes.",
+        "instructionEn": "In a wide saucepan, sauté onion and garlic with the remaining olive oil for 4 minutes until translucent."
       },
       {
         "stepNumber": 3,
-        "instruction": "Incorporar el arroz y tostar (nacarar) durante 2 minutos revolviendo constantemente."
+        "instruction": "Incorporar el arroz y tostar (nacarar) durante 2 minutos revolviendo constantemente.",
+        "instructionEn": "Add the rice and toast for 2 minutes, stirring constantly."
       },
       {
         "stepNumber": 4,
-        "instruction": "Verter el vino blanco y dejar evaporar el alcohol por completo durante 2 minutos."
+        "instruction": "Verter el vino blanco y dejar evaporar el alcohol por completo durante 2 minutos.",
+        "instructionEn": "Pour in the white wine and allow the alcohol to evaporate completely for 2 minutes."
       },
       {
         "stepNumber": 5,
-        "instruction": "Agregar el caldo caliente cucharón a cucharón, revolviendo con cuchara de madera, esperando que el arroz absorba el líquido antes de añadir más (unos 18 minutos)."
+        "instruction": "Agregar el caldo caliente cucharón a cucharón, revolviendo con cuchara de madera, esperando que el arroz absorba el líquido antes de añadir más (unos 18 minutos).",
+        "instructionEn": "Add warm broth ladle by ladle, stirring with a wooden spoon and letting the rice absorb the liquid before adding more (about 18 minutes)."
       },
       {
         "stepNumber": 6,
-        "instruction": "Retirar del fuego, incorporar los hongos salteados, la manteca fría y el parmesano. Emulsionar enérgicamente (mantecatura) y servir de inmediato."
+        "instruction": "Retirar del fuego, incorporar los hongos salteados, la manteca fría y el parmesano. Emulsionar enérgicamente (mantecatura) y servir de inmediato.",
+        "instructionEn": "Remove from heat, stir in sautéed mushrooms, cold butter, and parmesan. Vigorously beat (mantecatura) and serve immediately."
       }
     ]
   },
@@ -130,70 +169,98 @@
     "isFavorite": 0,
     "ingredients": [
       {
-        "amount": 160.0,
+        "amount": 160,
         "unit": "g",
         "name": "Quinoa",
-        "notes": "enjuagada"
+        "notes": "enjuagada",
+        "name_en": "Quinoa",
+        "unit_en": "g",
+        "notes_en": "rinsed"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "unidades",
         "name": "Palta / Aguacate",
-        "notes": "en láminas"
+        "notes": "en láminas",
+        "name_en": "Avocado",
+        "unit_en": "units",
+        "notes_en": "sliced"
       },
       {
-        "amount": 150.0,
+        "amount": 150,
         "unit": "g",
         "name": "Tomates cherry",
-        "notes": "cortados al medio"
+        "notes": "cortados al medio",
+        "name_en": "Cherry tomatoes",
+        "unit_en": "g",
+        "notes_en": "halved"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "unidades",
         "name": "Pepino",
-        "notes": "en cubitos"
+        "notes": "en cubitos",
+        "name_en": "Cucumber",
+        "unit_en": "units",
+        "notes_en": "diced"
       },
       {
-        "amount": 3.0,
+        "amount": 3,
         "unit": "cda",
         "name": "Aceite de oliva virgen extra",
-        "notes": ""
+        "notes": "",
+        "name_en": "Extra virgin olive oil",
+        "unit_en": "tbsp",
+        "notes_en": ""
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "unidades",
         "name": "Limón",
-        "notes": "jugo exprimido"
+        "notes": "jugo exprimido",
+        "name_en": "Lemon",
+        "unit_en": "units",
+        "notes_en": "freshly squeezed juice"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "cdta",
         "name": "Orégano seco",
-        "notes": "a gusto"
+        "notes": "a gusto",
+        "name_en": "Dried oregano",
+        "unit_en": "tsp",
+        "notes_en": "to taste"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "pizca",
         "name": "Sal fina / marina",
-        "notes": "a gusto"
+        "notes": "a gusto",
+        "name_en": "Fine salt",
+        "unit_en": "pinch",
+        "notes_en": "to taste"
       }
     ],
     "steps": [
       {
         "stepNumber": 1,
-        "instruction": "Cocinar la quinoa en 350 ml de agua hirviendo con una pizca de sal durante 15 minutos a fuego medio. Escurrir y dejar enfriar."
+        "instruction": "Cocinar la quinoa en 350 ml de agua hirviendo con una pizca de sal durante 15 minutos a fuego medio. Escurrir y dejar enfriar.",
+        "instructionEn": "Cook quinoa in 350 ml of boiling water with a pinch of salt for 15 minutes over medium heat. Drain and allow to cool."
       },
       {
         "stepNumber": 2,
-        "instruction": "En dos bowls amplios, colocar la base de quinoa cocida."
+        "instruction": "En dos bowls amplios, colocar la base de quinoa cocida.",
+        "instructionEn": "Divide the cooked quinoa into two large bowls as a base."
       },
       {
         "stepNumber": 3,
-        "instruction": "Distribuir en secciones los tomates cherry, el pepino y las láminas de palta."
+        "instruction": "Distribuir en secciones los tomates cherry, el pepino y las láminas de palta.",
+        "instructionEn": "Arrange cherry tomatoes, cucumber, and avocado slices in sections over the quinoa."
       },
       {
         "stepNumber": 4,
-        "instruction": "Emulsionar en un frasco el aceite de oliva, el jugo de limón, sal, pimienta y orégano. Rociar sobre el bowl y disfrutar."
+        "instruction": "Emulsionar en un frasco el aceite de oliva, el jugo de limón, sal, pimienta y orégano. Rociar sobre el bowl y disfrutar.",
+        "instructionEn": "Whisk olive oil, lemon juice, salt, pepper, and oregano together in a small jar. Drizzle over the bowl and enjoy."
       }
     ]
   },
@@ -216,74 +283,103 @@
     "isFavorite": 0,
     "ingredients": [
       {
-        "amount": 120.0,
+        "amount": 120,
         "unit": "g",
         "name": "Avena en copos",
-        "notes": ""
+        "notes": "",
+        "name_en": "Rolled oats",
+        "unit_en": "g",
+        "notes_en": ""
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "unidades",
         "name": "Banana / Plátano",
-        "notes": "madura"
+        "notes": "madura",
+        "name_en": "Banana",
+        "unit_en": "units",
+        "notes_en": "ripe"
       },
       {
-        "amount": 2.0,
+        "amount": 2,
         "unit": "unidades",
         "name": "Huevo / Huevos",
-        "notes": ""
+        "notes": "",
+        "name_en": "Eggs",
+        "unit_en": "units",
+        "notes_en": ""
       },
       {
-        "amount": 80.0,
+        "amount": 80,
         "unit": "ml",
         "name": "Leche entera",
-        "notes": "o vegetal"
+        "notes": "o vegetal",
+        "name_en": "Whole milk",
+        "unit_en": "ml",
+        "notes_en": "or plant-based milk"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "cdta",
         "name": "Polvo para hornear / Levadura química",
-        "notes": ""
+        "notes": "",
+        "name_en": "Baking powder",
+        "unit_en": "tsp",
+        "notes_en": ""
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "cdta",
         "name": "Esencia de vainilla",
-        "notes": ""
+        "notes": "",
+        "name_en": "Vanilla extract",
+        "unit_en": "tsp",
+        "notes_en": ""
       },
       {
-        "amount": 80.0,
+        "amount": 80,
         "unit": "g",
         "name": "Arándanos",
-        "notes": "frescos"
+        "notes": "frescos",
+        "name_en": "Blueberries",
+        "unit_en": "g",
+        "notes_en": "fresh"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "cda",
         "name": "Miel",
-        "notes": "para servir"
+        "notes": "para servir",
+        "name_en": "Honey",
+        "unit_en": "tbsp",
+        "notes_en": "for serving"
       }
     ],
     "steps": [
       {
         "stepNumber": 1,
-        "instruction": "Licuar o procesar la avena, la banana, los huevos, la leche, el polvo de hornear y la vainilla durante 1 minuto hasta obtener una masa suave."
+        "instruction": "Licuar o procesar la avena, la banana, los huevos, la leche, el polvo de hornear y la vainilla durante 1 minuto hasta obtener una masa suave.",
+        "instructionEn": "Blend oats, banana, eggs, milk, baking powder, and vanilla for 1 minute until smooth batter forms."
       },
       {
         "stepNumber": 2,
-        "instruction": "Calentar una sartén antiadherente a fuego medio y pincelar con unas gotas de aceite."
+        "instruction": "Calentar una sartén antiadherente a fuego medio y pincelar con unas gotas de aceite.",
+        "instructionEn": "Heat a nonstick skillet over medium heat and lightly brush with oil."
       },
       {
         "stepNumber": 3,
-        "instruction": "Verter porciones de masa formando discos y colocar 4 o 5 arándanos por encima."
+        "instruction": "Verter porciones de masa formando discos y colocar 4 o 5 arándanos por encima.",
+        "instructionEn": "Pour batter portions to form circles and drop 4 to 5 blueberries on top."
       },
       {
         "stepNumber": 4,
-        "instruction": "Cocinar 2 minutos hasta que aparezcan burbujas en la superficie, dar vuelta con espátula y dorar 1 minuto más del otro lado."
+        "instruction": "Cocinar 2 minutos hasta que aparezcan burbujas en la superficie, dar vuelta con espátula y dorar 1 minuto más del otro lado.",
+        "instructionEn": "Cook for 2 minutes until bubbles form on top, flip with a spatula, and cook for 1 more minute until golden."
       },
       {
         "stepNumber": 5,
-        "instruction": "Servir apilados con un hilo de miel y arándanos frescos extras."
+        "instruction": "Servir apilados con un hilo de miel y arándanos frescos extras.",
+        "instructionEn": "Stack pancakes, drizzle with honey, and garnish with extra fresh blueberries."
       }
     ]
   },
@@ -307,74 +403,103 @@
     "isFavorite": 0,
     "ingredients": [
       {
-        "amount": 400.0,
+        "amount": 400,
         "unit": "g",
         "name": "Salmón fresco",
-        "notes": "con piel"
+        "notes": "con piel",
+        "name_en": "Fresh salmon fillet",
+        "unit_en": "g",
+        "notes_en": "skin on"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "atado",
         "name": "Espárragos",
-        "notes": "sin el tallo duro"
+        "notes": "sin el tallo duro",
+        "name_en": "Asparagus",
+        "unit_en": "bunch",
+        "notes_en": "woody ends trimmed"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "unidades",
         "name": "Limón",
-        "notes": "en rodajas finas"
+        "notes": "en rodajas finas",
+        "name_en": "Lemon",
+        "unit_en": "units",
+        "notes_en": "thinly sliced"
       },
       {
-        "amount": 2.0,
+        "amount": 2,
         "unit": "cda",
         "name": "Aceite de oliva virgen extra",
-        "notes": ""
+        "notes": "",
+        "name_en": "Extra virgin olive oil",
+        "unit_en": "tbsp",
+        "notes_en": ""
       },
       {
-        "amount": 2.0,
+        "amount": 2,
         "unit": "dientes",
         "name": "Ajo",
-        "notes": "rallado"
+        "notes": "rallado",
+        "name_en": "Garlic",
+        "unit_en": "cloves",
+        "notes_en": "grated"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "cda",
         "name": "Perejil fresco",
-        "notes": "picado"
+        "notes": "picado",
+        "name_en": "Fresh parsley",
+        "unit_en": "tbsp",
+        "notes_en": "chopped"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "pizca",
         "name": "Sal fina / marina",
-        "notes": "a gusto"
+        "notes": "a gusto",
+        "name_en": "Fine salt",
+        "unit_en": "pinch",
+        "notes_en": "to taste"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "pizca",
         "name": "Pimienta negra molida",
-        "notes": "a gusto"
+        "notes": "a gusto",
+        "name_en": "Ground black pepper",
+        "unit_en": "pinch",
+        "notes_en": "to taste"
       }
     ],
     "steps": [
       {
         "stepNumber": 1,
-        "instruction": "Precalentar el horno a 200°C y forrar una bandeja con papel manteca o aluminio."
+        "instruction": "Precalentar el horno a 200°C y forrar una bandeja con papel manteca o aluminio.",
+        "instructionEn": "Preheat oven to 200°C (400°F) and line a baking sheet with parchment paper or foil."
       },
       {
         "stepNumber": 2,
-        "instruction": "Colocar los espárragos en un lateral y los filetes de salmón en el centro con la piel hacia abajo."
+        "instruction": "Colocar los espárragos en un lateral y los filetes de salmón en el centro con la piel hacia abajo.",
+        "instructionEn": "Arrange asparagus on one side and place salmon fillets in the center skin-side down."
       },
       {
         "stepNumber": 3,
-        "instruction": "Pincelar el salmón y los espárragos con la mezcla de aceite de oliva, ajo rallado, sal y pimienta."
+        "instruction": "Pincelar el salmón y los espárragos con la mezcla de aceite de oliva, ajo rallado, sal y pimienta.",
+        "instructionEn": "Brush salmon and asparagus with olive oil, grated garlic, salt, and black pepper."
       },
       {
         "stepNumber": 4,
-        "instruction": "Disponer las rodajas de limón sobre el salmón."
+        "instruction": "Disponer las rodajas de limón sobre el salmón.",
+        "instructionEn": "Place lemon slices on top of each salmon fillet."
       },
       {
         "stepNumber": 5,
-        "instruction": "Hornear durante 14 minutos hasta que el salmón esté tierno y los espárragos crujientes. Espolvorear perejil fresco y servir."
+        "instruction": "Hornear durante 14 minutos hasta que el salmón esté tierno y los espárragos crujientes. Espolvorear perejil fresco y servir.",
+        "instructionEn": "Bake for 14 minutes until salmon is flaky and asparagus is tender-crisp. Garnish with fresh parsley and serve."
       }
     ]
   },
@@ -398,92 +523,130 @@
     "isFavorite": 0,
     "ingredients": [
       {
-        "amount": 600.0,
+        "amount": 600,
         "unit": "g",
         "name": "Pechuga de pollo",
-        "notes": "en cubos medianos"
+        "notes": "en cubos medianos",
+        "name_en": "Chicken breast",
+        "unit_en": "g",
+        "notes_en": "cut into medium cubes"
       },
       {
-        "amount": 400.0,
+        "amount": 400,
         "unit": "ml",
         "name": "Leche de coco",
-        "notes": "en lata"
+        "notes": "en lata",
+        "name_en": "Coconut milk",
+        "unit_en": "ml",
+        "notes_en": "canned"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "unidades",
         "name": "Cebolla",
-        "notes": "picada"
+        "notes": "picada",
+        "name_en": "Onion",
+        "unit_en": "units",
+        "notes_en": "chopped"
       },
       {
-        "amount": 2.0,
+        "amount": 2,
         "unit": "dientes",
         "name": "Ajo",
-        "notes": "picados"
+        "notes": "picados",
+        "name_en": "Garlic",
+        "unit_en": "cloves",
+        "notes_en": "minced"
       },
       {
-        "amount": 10.0,
+        "amount": 10,
         "unit": "g",
         "name": "Jengibre fresco / en polvo",
-        "notes": "rallado"
+        "notes": "rallado",
+        "name_en": "Fresh ginger",
+        "unit_en": "g",
+        "notes_en": "grated"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "unidades",
         "name": "Morrón rojo / Pimiento rojo",
-        "notes": "en tiras"
+        "notes": "en tiras",
+        "name_en": "Red bell pepper",
+        "unit_en": "units",
+        "notes_en": "sliced"
       },
       {
-        "amount": 2.0,
+        "amount": 2,
         "unit": "cda",
         "name": "Curry en polvo",
-        "notes": ""
+        "notes": "",
+        "name_en": "Curry powder",
+        "unit_en": "tbsp",
+        "notes_en": ""
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "cdta",
         "name": "Cúrcuma",
-        "notes": ""
+        "notes": "",
+        "name_en": "Ground turmeric",
+        "unit_en": "tsp",
+        "notes_en": ""
       },
       {
-        "amount": 2.0,
+        "amount": 2,
         "unit": "cda",
         "name": "Aceite de oliva virgen extra",
-        "notes": ""
+        "notes": "",
+        "name_en": "Extra virgin olive oil",
+        "unit_en": "tbsp",
+        "notes_en": ""
       },
       {
-        "amount": 200.0,
+        "amount": 200,
         "unit": "g",
         "name": "Arroz blanco",
-        "notes": "para acompañar"
+        "notes": "para acompañar",
+        "name_en": "White rice",
+        "unit_en": "g",
+        "notes_en": "for serving"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "pizca",
         "name": "Sal fina / marina",
-        "notes": "a gusto"
+        "notes": "a gusto",
+        "name_en": "Fine salt",
+        "unit_en": "pinch",
+        "notes_en": "to taste"
       }
     ],
     "steps": [
       {
         "stepNumber": 1,
-        "instruction": "En una sartén o wok grande, calentar el aceite y dorar el pollo a fuego fuerte durante 6 minutos. Retirar y reservar."
+        "instruction": "En una sartén o wok grande, calentar el aceite y dorar el pollo a fuego fuerte durante 6 minutos. Retirar y reservar.",
+        "instructionEn": "In a large skillet or wok, heat olive oil and sear chicken over high heat for 6 minutes until golden. Transfer to a plate."
       },
       {
         "stepNumber": 2,
-        "instruction": "En la misma sartén, rehogar la cebolla, el ajo, el jengibre y el morrón durante 5 minutos hasta tiernizar."
+        "instruction": "En la misma sartén, rehogar la cebolla, el ajo, el jengibre y el morrón durante 5 minutos hasta tiernizar.",
+        "instructionEn": "In the same skillet, sauté onion, garlic, ginger, and bell pepper for 5 minutes until softened."
       },
       {
         "stepNumber": 3,
-        "instruction": "Agregar el curry y la cúrcuma, tostando las especias 1 minuto para liberar los aromas."
+        "instruction": "Agregar el curry y la cúrcuma, tostando las especias 1 minuto para liberar los aromas.",
+        "instructionEn": "Add curry powder and turmeric, toasting for 1 minute until fragrant."
       },
       {
         "stepNumber": 4,
-        "instruction": "Reincorporar el pollo, verter la leche de coco y salpimentar. Cocinar a fuego medio-bajo durante 12 minutos hasta que la salsa espese."
+        "instruction": "Reincorporar el pollo, verter la leche de coco y salpimentar. Cocinar a fuego medio-bajo durante 12 minutos hasta que la salsa espese.",
+        "instructionEn": "Return chicken to the skillet, pour in coconut milk, and season with salt. Simmer over medium-low heat for 12 minutes until sauce thickens."
       },
       {
         "stepNumber": 5,
-        "instruction": "Servir caliente sobre un colchón de arroz blanco recién hecho y espolvorear cilantro o perejil."
+        "instruction": "Servir caliente sobre un colchón de arroz blanco recién hecho y espolvorear cilantro o perejil.",
+        "instructionEn": "Serve hot over steamed white rice and sprinkle with fresh cilantro or parsley."
       }
     ]
   },
@@ -506,70 +669,98 @@
     "isFavorite": 0,
     "ingredients": [
       {
-        "amount": 400.0,
+        "amount": 400,
         "unit": "g",
         "name": "Pasta / Fideos / Spaghetti",
-        "notes": ""
+        "notes": "",
+        "name_en": "Pasta / Spaghetti",
+        "unit_en": "g",
+        "notes_en": ""
       },
       {
-        "amount": 50.0,
+        "amount": 50,
         "unit": "g",
         "name": "Albahaca fresca",
-        "notes": "hojas limpias"
+        "notes": "hojas limpias",
+        "name_en": "Fresh basil",
+        "unit_en": "g",
+        "notes_en": "clean leaves"
       },
       {
-        "amount": 40.0,
+        "amount": 40,
         "unit": "g",
         "name": "Nueces",
-        "notes": "o piñones"
+        "notes": "o piñones",
+        "name_en": "Walnuts / Pine nuts",
+        "unit_en": "g",
+        "notes_en": ""
       },
       {
-        "amount": 60.0,
+        "amount": 60,
         "unit": "g",
         "name": "Queso Parmesano / Rallado",
-        "notes": "rallado"
+        "notes": "rallado",
+        "name_en": "Parmesan cheese",
+        "unit_en": "g",
+        "notes_en": "grated"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "dientes",
         "name": "Ajo",
-        "notes": ""
+        "notes": "",
+        "name_en": "Garlic",
+        "unit_en": "cloves",
+        "notes_en": ""
       },
       {
-        "amount": 80.0,
+        "amount": 80,
         "unit": "ml",
         "name": "Aceite de oliva virgen extra",
-        "notes": ""
+        "notes": "",
+        "name_en": "Extra virgin olive oil",
+        "unit_en": "ml",
+        "notes_en": ""
       },
       {
-        "amount": 200.0,
+        "amount": 200,
         "unit": "g",
         "name": "Tomates cherry",
-        "notes": "cortados al medio"
+        "notes": "cortados al medio",
+        "name_en": "Cherry tomatoes",
+        "unit_en": "g",
+        "notes_en": "halved"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "pizca",
         "name": "Sal fina / marina",
-        "notes": "a gusto"
+        "notes": "a gusto",
+        "name_en": "Fine salt",
+        "unit_en": "pinch",
+        "notes_en": "to taste"
       }
     ],
     "steps": [
       {
         "stepNumber": 1,
-        "instruction": "Poner a hervir abundante agua con sal y cocinar la pasta según el tiempo del paquete (unos 9 minutos al dente)."
+        "instruction": "Poner a hervir abundante agua con sal y cocinar la pasta según el tiempo del paquete (unos 9 minutos al dente).",
+        "instructionEn": "Bring a large pot of salted water to boil and cook pasta according to package directions (about 9 minutes al dente)."
       },
       {
         "stepNumber": 2,
-        "instruction": "Procesar la albahaca con las nueces, el ajo, el queso parmesano, la sal y el aceite de oliva hasta lograr un pesto cremoso."
+        "instruction": "Procesar la albahaca con las nueces, el ajo, el queso parmesano, la sal y el aceite de oliva hasta lograr un pesto cremoso.",
+        "instructionEn": "In a food processor, blend basil, walnuts, garlic, parmesan, salt, and olive oil until smooth pesto forms."
       },
       {
         "stepNumber": 3,
-        "instruction": "En una sartén con unas gotas de aceite, saltear los tomates cherry durante 3 minutos hasta que comiencen a dorarse."
+        "instruction": "En una sartén con unas gotas de aceite, saltear los tomates cherry durante 3 minutos hasta que comiencen a dorarse.",
+        "instructionEn": "In a skillet with a drop of oil, sauté cherry tomatoes for 3 minutes until blistering."
       },
       {
         "stepNumber": 4,
-        "instruction": "Escurrir la pasta reservando 3 cucharadas de agua de cocción. Mezclar la pasta caliente con el pesto, los tomates cherry y el agua reservada. Servir de inmediato."
+        "instruction": "Escurrir la pasta reservando 3 cucharadas de agua de cocción. Mezclar la pasta caliente con el pesto, los tomates cherry y el agua reservada. Servir de inmediato.",
+        "instructionEn": "Drain pasta, reserving 3 tablespoons of pasta cooking water. Toss warm pasta with pesto, cherry tomatoes, and reserved water. Serve immediately."
       }
     ]
   },
@@ -592,74 +783,103 @@
     "isFavorite": 0,
     "ingredients": [
       {
-        "amount": 4.0,
+        "amount": 4,
         "unit": "rebanadas",
         "name": "Pan / Tostadas",
-        "notes": "tipo brioche o lactal grueso"
+        "notes": "tipo brioche o lactal grueso",
+        "name_en": "Brioche / Sandwich bread",
+        "unit_en": "slices",
+        "notes_en": "thick slices"
       },
       {
-        "amount": 2.0,
+        "amount": 2,
         "unit": "unidades",
         "name": "Huevo / Huevos",
-        "notes": ""
+        "notes": "",
+        "name_en": "Eggs",
+        "unit_en": "units",
+        "notes_en": ""
       },
       {
-        "amount": 60.0,
+        "amount": 60,
         "unit": "ml",
         "name": "Leche entera",
-        "notes": ""
+        "notes": "",
+        "name_en": "Whole milk",
+        "unit_en": "ml",
+        "notes_en": ""
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "cdta",
         "name": "Canela en polvo / en rama",
-        "notes": ""
+        "notes": "",
+        "name_en": "Ground cinnamon",
+        "unit_en": "tsp",
+        "notes_en": ""
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "cdta",
         "name": "Esencia de vainilla",
-        "notes": ""
+        "notes": "",
+        "name_en": "Vanilla extract",
+        "unit_en": "tsp",
+        "notes_en": ""
       },
       {
-        "amount": 20.0,
+        "amount": 20,
         "unit": "g",
         "name": "Manteca / Mantequilla",
-        "notes": "para dorar"
+        "notes": "para dorar",
+        "name_en": "Butter",
+        "unit_en": "g",
+        "notes_en": "for pan frying"
       },
       {
-        "amount": 100.0,
+        "amount": 100,
         "unit": "g",
         "name": "Frutillas / Fresas",
-        "notes": "fileteadas"
+        "notes": "fileteadas",
+        "name_en": "Strawberries",
+        "unit_en": "g",
+        "notes_en": "sliced"
       },
       {
-        "amount": 2.0,
+        "amount": 2,
         "unit": "cda",
         "name": "Miel",
-        "notes": "para servir"
+        "notes": "para servir",
+        "name_en": "Honey",
+        "unit_en": "tbsp",
+        "notes_en": "for serving"
       }
     ],
     "steps": [
       {
         "stepNumber": 1,
-        "instruction": "En un plato hondo, batir los huevos con la leche, la canela y la vainilla."
+        "instruction": "En un plato hondo, batir los huevos con la leche, la canela y la vainilla.",
+        "instructionEn": "In a shallow dish, whisk eggs, milk, cinnamon, and vanilla together."
       },
       {
         "stepNumber": 2,
-        "instruction": "Derretir la manteca en una sartén a fuego medio."
+        "instruction": "Derretir la manteca en una sartén a fuego medio.",
+        "instructionEn": "Melt butter in a large skillet over medium heat."
       },
       {
         "stepNumber": 3,
-        "instruction": "Sumergir cada rebanada de pan en la mezcla 10 segundos por lado para que absorba bien el líquido."
+        "instruction": "Sumergir cada rebanada de pan en la mezcla 10 segundos por lado para que absorba bien el líquido.",
+        "instructionEn": "Dip each bread slice into egg mixture for 10 seconds per side so it thoroughly absorbs the liquid."
       },
       {
         "stepNumber": 4,
-        "instruction": "Dorar en la sartén durante 3 minutos por lado hasta que adquieran un color dorado caramelizado."
+        "instruction": "Dorar en la sartén durante 3 minutos por lado hasta que adquieran un color dorado caramelizado.",
+        "instructionEn": "Fry in skillet for 3 minutes per side until beautifully golden brown."
       },
       {
         "stepNumber": 5,
-        "instruction": "Servir calientes con las frutillas frescas y un abundante hilo de miel."
+        "instruction": "Servir calientes con las frutillas frescas y un abundante hilo de miel.",
+        "instructionEn": "Serve warm with sliced fresh strawberries and a generous drizzle of honey."
       }
     ]
   },
@@ -682,82 +902,116 @@
     "isFavorite": 0,
     "ingredients": [
       {
-        "amount": 500.0,
+        "amount": 500,
         "unit": "g",
         "name": "Carne picada / Molida",
-        "notes": ""
+        "notes": "",
+        "name_en": "Ground beef",
+        "unit_en": "g",
+        "notes_en": ""
       },
       {
-        "amount": 6.0,
+        "amount": 6,
         "unit": "unidades",
         "name": "Tortillas de trigo / maíz",
-        "notes": ""
+        "notes": "",
+        "name_en": "Tortillas (flour or corn)",
+        "unit_en": "units",
+        "notes_en": ""
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "unidades",
         "name": "Cebolla",
-        "notes": "picada fina"
+        "notes": "picada fina",
+        "name_en": "Onion",
+        "unit_en": "units",
+        "notes_en": "finely diced"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "unidades",
         "name": "Morrón rojo / Pimiento rojo",
-        "notes": "en cubitos"
+        "notes": "en cubitos",
+        "name_en": "Red bell pepper",
+        "unit_en": "units",
+        "notes_en": "diced"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "cdta",
         "name": "Comino molido",
-        "notes": ""
+        "notes": "",
+        "name_en": "Ground cumin",
+        "unit_en": "tsp",
+        "notes_en": ""
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "cdta",
         "name": "Pimentón dulce / Ahumado",
-        "notes": ""
+        "notes": "",
+        "name_en": "Smoked / Sweet paprika",
+        "unit_en": "tsp",
+        "notes_en": ""
       },
       {
-        "amount": 2.0,
+        "amount": 2,
         "unit": "unidades",
         "name": "Palta / Aguacate",
-        "notes": "maduras"
+        "notes": "maduras",
+        "name_en": "Avocado",
+        "unit_en": "units",
+        "notes_en": "ripe"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "unidades",
         "name": "Limón",
-        "notes": ""
+        "notes": "",
+        "name_en": "Lemon / Lime",
+        "unit_en": "units",
+        "notes_en": ""
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "unidades",
         "name": "Tomate",
-        "notes": "en cubitos"
+        "notes": "en cubitos",
+        "name_en": "Tomato",
+        "unit_en": "units",
+        "notes_en": "diced"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "pizca",
         "name": "Sal fina / marina",
-        "notes": "a gusto"
+        "notes": "a gusto",
+        "name_en": "Fine salt",
+        "unit_en": "pinch",
+        "notes_en": "to taste"
       }
     ],
     "steps": [
       {
         "stepNumber": 1,
-        "instruction": "En una sartén grande con aceite, saltear la cebolla y el morrón durante 4 minutos. Agregar la carne picada, comino, pimentón, sal y cocinar durante 10 minutos."
+        "instruction": "En una sartén grande con aceite, saltear la cebolla y el morrón durante 4 minutos. Agregar la carne picada, comino, pimentón, sal y cocinar durante 10 minutos.",
+        "instructionEn": "In a skillet with oil, sauté onion and bell pepper for 4 minutes. Add ground beef, cumin, paprika, and salt; cook for 10 minutes until browned and juicy."
       },
       {
         "stepNumber": 2,
-        "instruction": "Para el guacamole: pisar la palta con un tenedor, mezclar con el tomate en cubitos, jugo de limón y sal."
+        "instruction": "Para el guacamole: pisar la palta con un tenedor, mezclar con el tomate en cubitos, jugo de limón y sal.",
+        "instructionEn": "For guacamole: mash avocado with a fork, stir in diced tomato, lemon/lime juice, and salt."
       },
       {
         "stepNumber": 3,
-        "instruction": "Calentar las tortillas en una sartén seca 30 segundos por lado."
+        "instruction": "Calentar las tortillas en una sartén seca 30 segundos por lado.",
+        "instructionEn": "Warm tortillas in a dry skillet for 30 seconds per side."
       },
       {
         "stepNumber": 4,
-        "instruction": "Armar los tacos rellenando con la carne jugosa y coronar con una generosa cucharada de guacamole fresco."
+        "instruction": "Armar los tacos rellenando con la carne jugosa y coronar con una generosa cucharada de guacamole fresco.",
+        "instructionEn": "Assemble tacos by filling warm tortillas with seasoned beef and topping with fresh homemade guacamole."
       }
     ]
   },
@@ -780,62 +1034,85 @@
     "isFavorite": 0,
     "ingredients": [
       {
-        "amount": 200.0,
+        "amount": 200,
         "unit": "g",
         "name": "Chocolate amargo / Chips",
-        "notes": "70% cacao"
+        "notes": "70% cacao",
+        "name_en": "Dark chocolate 70%",
+        "unit_en": "g",
+        "notes_en": ""
       },
       {
-        "amount": 4.0,
+        "amount": 4,
         "unit": "unidades",
         "name": "Huevo / Huevos",
-        "notes": "separadas yemas y claras"
+        "notes": "separadas yemas y claras",
+        "name_en": "Eggs",
+        "unit_en": "units",
+        "notes_en": "separated yolks and whites"
       },
       {
-        "amount": 40.0,
+        "amount": 40,
         "unit": "g",
         "name": "Manteca / Mantequilla",
-        "notes": ""
+        "notes": "",
+        "name_en": "Butter",
+        "unit_en": "g",
+        "notes_en": ""
       },
       {
-        "amount": 40.0,
+        "amount": 40,
         "unit": "g",
         "name": "Azúcar blanco",
-        "notes": ""
+        "notes": "",
+        "name_en": "White sugar",
+        "unit_en": "g",
+        "notes_en": ""
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "cdta",
         "name": "Esencia de vainilla",
-        "notes": ""
+        "notes": "",
+        "name_en": "Vanilla extract",
+        "unit_en": "tsp",
+        "notes_en": ""
       },
       {
-        "amount": 60.0,
+        "amount": 60,
         "unit": "g",
         "name": "Frutillas / Fresas",
-        "notes": "para decorar"
+        "notes": "para decorar",
+        "name_en": "Strawberries",
+        "unit_en": "g",
+        "notes_en": "for garnish"
       }
     ],
     "steps": [
       {
         "stepNumber": 1,
-        "instruction": "Derretir el chocolate junto con la manteca a baño maría o en microondas a potencia media en intervalos de 30 segundos. Dejar entibiar."
+        "instruction": "Derretir el chocolate junto con la manteca a baño maría o en microondas a potencia media en intervalos de 30 segundos. Dejar entibiar.",
+        "instructionEn": "Melt dark chocolate with butter in a double boiler or in the microwave on medium in 30-second bursts. Allow to cool slightly."
       },
       {
         "stepNumber": 2,
-        "instruction": "Batir las yemas de huevo con la esencia de vainilla e incorporarlas al chocolate tibio mezclando bien."
+        "instruction": "Batir las yemas de huevo con la esencia de vainilla e incorporarlas al chocolate tibio mezclando bien.",
+        "instructionEn": "Whisk egg yolks with vanilla extract and stir into the warm melted chocolate until smooth."
       },
       {
         "stepNumber": 3,
-        "instruction": "En un bowl limpio, batir las claras a punto nieve, agregando el azúcar en forma de lluvia hasta lograr un merengue firme (unos 4 minutos)."
+        "instruction": "En un bowl limpio, batir las claras a punto nieve, agregando el azúcar en forma de lluvia hasta lograr un merengue firme (unos 4 minutos).",
+        "instructionEn": "In a clean bowl, whip egg whites to soft peaks, gradually adding sugar until firm glossy peaks form (about 4 minutes)."
       },
       {
         "stepNumber": 4,
-        "instruction": "Incorporar las claras al chocolate en 3 tandas con movimientos envolventes suaves para no perder el aire."
+        "instruction": "Incorporar las claras al chocolate en 3 tandas con movimientos envolventes suaves para no perder el aire.",
+        "instructionEn": "Gently fold whipped egg whites into the chocolate mixture in 3 batches to keep the mousse airy."
       },
       {
         "stepNumber": 5,
-        "instruction": "Repartir en copas o vasos individuales y refrigerar al menos 2 horas antes de servir decorado con frutillas."
+        "instruction": "Repartir en copas o vasos individuales y refrigerar al menos 2 horas antes de servir decorado con frutillas.",
+        "instructionEn": "Divide into serving glasses and refrigerate for at least 2 hours. Garnish with strawberries before serving."
       }
     ]
   },
@@ -858,74 +1135,103 @@
     "isFavorite": 0,
     "ingredients": [
       {
-        "amount": 400.0,
+        "amount": 400,
         "unit": "g",
         "name": "Calabaza / Zapallo",
-        "notes": "en cubitos asados"
+        "notes": "en cubitos asados",
+        "name_en": "Pumpkin / Butternut squash",
+        "unit_en": "g",
+        "notes_en": "roasted cubes"
       },
       {
-        "amount": 150.0,
+        "amount": 150,
         "unit": "g",
         "name": "Espinaca",
-        "notes": "salteada y escurrida"
+        "notes": "salteada y escurrida",
+        "name_en": "Spinach",
+        "unit_en": "g",
+        "notes_en": "sautéed and drained"
       },
       {
-        "amount": 100.0,
+        "amount": 100,
         "unit": "g",
         "name": "Queso Feta",
-        "notes": "desgranado"
+        "notes": "desgranado",
+        "name_en": "Feta cheese",
+        "unit_en": "g",
+        "notes_en": "crumbled"
       },
       {
-        "amount": 2.0,
+        "amount": 2,
         "unit": "unidades",
         "name": "Huevo / Huevos",
-        "notes": ""
+        "notes": "",
+        "name_en": "Eggs",
+        "unit_en": "units",
+        "notes_en": ""
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "unidades",
         "name": "Cebolla",
-        "notes": "caramelizada"
+        "notes": "caramelizada",
+        "name_en": "Onion",
+        "unit_en": "units",
+        "notes_en": "caramelized"
       },
       {
-        "amount": 200.0,
+        "amount": 200,
         "unit": "g",
         "name": "Harina 0000 / de trigo",
-        "notes": "para la masa"
+        "notes": "para la masa",
+        "name_en": "All-purpose wheat flour",
+        "unit_en": "g",
+        "notes_en": "for dough"
       },
       {
-        "amount": 80.0,
+        "amount": 80,
         "unit": "g",
         "name": "Manteca / Mantequilla",
-        "notes": "fría"
+        "notes": "fría",
+        "name_en": "Butter",
+        "unit_en": "g",
+        "notes_en": "cold"
       },
       {
-        "amount": 1.0,
+        "amount": 1,
         "unit": "pizca",
         "name": "Nuez moscada",
-        "notes": ""
+        "notes": "",
+        "name_en": "Ground nutmeg",
+        "unit_en": "pinch",
+        "notes_en": ""
       }
     ],
     "steps": [
       {
         "stepNumber": 1,
-        "instruction": "Asar los cubos de calabaza en el horno a 200°C durante 20 minutos con sal y aceite hasta que estén tiernos."
+        "instruction": "Asar los cubos de calabaza en el horno a 200°C durante 20 minutos con sal y aceite hasta que estén tiernos.",
+        "instructionEn": "Roast pumpkin cubes in oven at 200°C (400°F) for 20 minutes with salt and olive oil until tender."
       },
       {
         "stepNumber": 2,
-        "instruction": "Preparar la masa uniendo la harina, la manteca fría en cubos y 4 cucharadas de agua helada. Estirar en forma redonda sobre papel manteca."
+        "instruction": "Preparar la masa uniendo la harina, la manteca fría en cubos y 4 cucharadas de agua helada. Estirar en forma redonda sobre papel manteca.",
+        "instructionEn": "Make dough by cutting cold butter into flour with 4 tbsp iced water until combined. Roll into a circle on parchment paper."
       },
       {
         "stepNumber": 3,
-        "instruction": "En un bowl mezclar la calabaza asada, la espinaca, la cebolla caramelizada, los huevos batidos, sal y nuez moscada."
+        "instruction": "En un bowl mezclar la calabaza asada, la espinaca, la cebolla caramelizada, los huevos batidos, sal y nuez moscada.",
+        "instructionEn": "In a bowl, mix roasted pumpkin, sautéed spinach, caramelized onion, beaten eggs, salt, and nutmeg."
       },
       {
         "stepNumber": 4,
-        "instruction": "Colocar el relleno en el centro de la masa dejando 4 cm de borde libre. Espolvorear el queso feta y doblar los bordes hacia adentro formando un marco rústico."
+        "instruction": "Colocar el relleno en el centro de la masa dejando 4 cm de borde libre. Espolvorear el queso feta y doblar los bordes hacia adentro formando un marco rústico.",
+        "instructionEn": "Spread filling in center of dough leaving a 4 cm border. Sprinkle feta cheese and fold edges inward to create a rustic crust."
       },
       {
         "stepNumber": 5,
-        "instruction": "Hornear a 190°C durante 30 minutos hasta que la masa esté dorada y crocante. Servir tibia."
+        "instruction": "Hornear a 190°C durante 30 minutos hasta que la masa esté dorada y crocante. Servir tibia.",
+        "instructionEn": "Bake at 190°C (375°F) for 30 minutes until golden brown and crispy. Serve warm."
       }
     ]
   }

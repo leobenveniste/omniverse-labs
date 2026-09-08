@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n/app_localizations.dart';
 import '../main.dart';
 import '../models/game_type.dart';
@@ -8,8 +9,10 @@ import '../services/premium_service.dart';
 import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/about_dialog_widget.dart';
+import '../widgets/app_header_title.dart';
 import '../widgets/dice_roller_widget.dart';
 import '../widgets/finger_roulette_widget.dart';
+import '../widgets/first_use_guide_card.dart';
 import '../widgets/turn_timer_widget.dart';
 import '../widgets/coin_flipper_widget.dart';
 import '../widgets/custom_bottom_nav_bar.dart';
@@ -43,11 +46,69 @@ class _HomeScreenState extends State<HomeScreen> {
   PremiumService? _premiumService;
   bool _isLoading = true;
   int _currentNavIndex = 2; // Default to central "Juegos" tab
+  bool _showGamesGuide = false;
+  bool _showDiceGuide = false;
+  bool _showRouletteGuide = false;
+  bool _showTimerGuide = false;
+  bool _showCoinGuide = false;
 
   @override
   void initState() {
     super.initState();
     _loadData();
+    _loadGuidesState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkDailyPromo();
+    });
+  }
+
+  Future<void> _loadGuidesState() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() {
+        _showGamesGuide = !(prefs.getBool('has_seen_guide_games') ?? false);
+        _showDiceGuide = !(prefs.getBool('has_seen_guide_dice') ?? false);
+        _showRouletteGuide = !(prefs.getBool('has_seen_guide_roulette') ?? false);
+        _showTimerGuide = !(prefs.getBool('has_seen_guide_timer') ?? false);
+        _showCoinGuide = !(prefs.getBool('has_seen_guide_coin') ?? false);
+      });
+    }
+  }
+
+  Future<void> _dismissGuide(String key) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(key, true);
+    if (mounted) {
+      setState(() {
+        if (key == 'has_seen_guide_games') _showGamesGuide = false;
+        if (key == 'has_seen_guide_dice') _showDiceGuide = false;
+        if (key == 'has_seen_guide_roulette') _showRouletteGuide = false;
+        if (key == 'has_seen_guide_timer') _showTimerGuide = false;
+        if (key == 'has_seen_guide_coin') _showCoinGuide = false;
+      });
+    }
+  }
+
+  Future<void> _checkDailyPromo() async {
+    try {
+      final premium = await PremiumService.getInstance();
+      if (premium.isPro) return;
+
+      final prefs = await SharedPreferences.getInstance();
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final lastTimestamp = prefs.getInt('last_pro_promo_timestamp');
+      const fourDaysMs = 4 * 24 * 60 * 60 * 1000;
+
+      if (lastTimestamp == null || (now - lastTimestamp) >= fourDaysMs) {
+        await prefs.setInt('last_pro_promo_timestamp', now);
+        if (mounted) {
+          PaywallSheet.show(
+            context,
+            premiumService: premium,
+          );
+        }
+      }
+    } catch (_) {}
   }
 
   Future<void> _loadData() async {
@@ -240,64 +301,27 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: AppTheme.bgDark,
         centerTitle: false,
         titleSpacing: 16,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(
-              'assets/images/logo_dark.png',
-              width: 26,
-              height: 26,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              navTitles[_currentNavIndex],
-              style: const TextStyle(
-                fontWeight: FontWeight.w900,
-                fontSize: 16,
-                letterSpacing: 1.2,
-                color: AppTheme.cyberGold,
-              ),
-            ),
-          ],
+        title: AppHeaderTitle(
+          title: navTitles[_currentNavIndex],
+          isPro: _premiumService?.isPro ?? false,
         ),
         actions: [
-          if (_premiumService != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 2),
-              child: AnimatedBuilder(
-                animation: _premiumService!,
-                builder: (context, _) {
-                  final isPro = _premiumService!.isPro;
-                  return ActionChip(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    backgroundColor: isPro
-                        ? AppTheme.cyberGold.withValues(alpha: 0.2)
-                        : Colors.white.withValues(alpha: 0.08),
-                    side: BorderSide(
-                      color: isPro ? AppTheme.cyberGold : Colors.white24,
-                      width: 1,
-                    ),
-                    avatar: Icon(
-                      isPro ? Icons.workspace_premium_rounded : Icons.star_border_rounded,
-                      color: isPro ? AppTheme.cyberGold : Colors.white70,
-                      size: 16,
-                    ),
-                    label: Text(
-                      isPro ? 'PRO' : 'PRO',
-                      style: TextStyle(
-                        color: isPro ? AppTheme.cyberGold : Colors.white70,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    onPressed: () => PaywallSheet.show(
-                       context,
-                       premiumService: _premiumService!,
-                    ),
-                  );
-                },
-              ),
+          if (!(_premiumService?.isPro ?? false))
+            IconButton(
+              icon: const Text('👑', style: TextStyle(fontSize: 18)),
+              tooltip: 'Central de Juegos PRO',
+              onPressed: () {
+                if (_premiumService != null) {
+                  PaywallSheet.show(context, premiumService: _premiumService!);
+                }
+              },
             ),
+          // Header Add / Quick Custom Match button
+          IconButton(
+            icon: const Icon(Icons.add_rounded, color: AppTheme.cyberGold),
+            tooltip: l10n.t('gameSetupTitle'),
+            onPressed: () => _openGame(GameType.custom),
+          ),
           IconButton(
             icon: const Icon(Icons.history, color: Colors.white70),
             tooltip: l10n.t('historyTitle'),
@@ -322,26 +346,131 @@ class _HomeScreenState extends State<HomeScreen> {
         index: _currentNavIndex,
         children: [
           // 0: Dados
-          const Center(
+          Center(
             child: SingleChildScrollView(
-              padding: EdgeInsets.all(24.0),
-              child: DiceRollerWidget(),
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_showDiceGuide)
+                    FirstUseGuideCard(
+                      icon: Icons.casino_rounded,
+                      title: l10n.locale.languageCode == 'es' ? 'Tirador de Dados' : 'Dice Roller',
+                      description: l10n.locale.languageCode == 'es'
+                          ? 'Tira hasta 6 dados con físicas y sonidos realistas para cualquier juego de mesa.'
+                          : 'Roll up to 6 dice with realistic physics and sound effects for any tabletop game.',
+                      bulletPoints: l10n.locale.languageCode == 'es'
+                          ? [
+                              'Toca o agita la pantalla para lanzar los dados.',
+                              'Ajusta la cantidad de dados (1 a 6) según las reglas de tu juego.',
+                              'La suma total se calcula y anuncia al instante.',
+                            ]
+                          : [
+                              'Tap or shake the screen to roll the dice.',
+                              'Adjust the number of dice (1 to 6) depending on game rules.',
+                              'Total sum is automatically calculated on each roll.',
+                            ],
+                      onDismiss: () => _dismissGuide('has_seen_guide_dice'),
+                    ),
+                  const DiceRollerWidget(),
+                ],
+              ),
             ),
           ),
           // 1: Quién Empieza
-          const FingerRouletteWidget(),
+          Column(
+            children: [
+              if (_showRouletteGuide)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                  child: FirstUseGuideCard(
+                    icon: Icons.touch_app_rounded,
+                    title: l10n.locale.languageCode == 'es' ? 'Ruleta de Dedos' : 'Finger Roulette',
+                    description: l10n.locale.languageCode == 'es'
+                        ? 'Decide quién empieza o quién paga la ronda en 3 segundos.'
+                        : 'Decide who starts first or who pays the round in seconds.',
+                    bulletPoints: l10n.locale.languageCode == 'es'
+                        ? [
+                            'Cada jugador apoya un dedo en la pantalla y lo mantiene.',
+                            'El sensor detecta los contactos y comenzará una cuenta regresiva.',
+                            'Un haz de neón elegirá al afortunado al azar con vibración táctil.',
+                          ]
+                        : [
+                            'Each player holds a finger on the screen simultaneously.',
+                            'Sensors will detect each touch and trigger a countdown.',
+                            'A neon pulse randomly selects the chosen player with haptics.',
+                          ],
+                    onDismiss: () => _dismissGuide('has_seen_guide_roulette'),
+                  ),
+                ),
+              const Expanded(child: FingerRouletteWidget()),
+            ],
+          ),
           // 2: Juegos (Home)
           _buildGamesCatalogTab(theme),
           // 3: Temporizador
-          const Center(
+          Center(
             child: SingleChildScrollView(
-              padding: EdgeInsets.all(24.0),
-              child: TurnTimerWidget(),
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_showTimerGuide)
+                    FirstUseGuideCard(
+                      icon: Icons.timer_rounded,
+                      title: l10n.locale.languageCode == 'es' ? 'Reloj de Turno y Blitz' : 'Turn & Blitz Timer',
+                      description: l10n.locale.languageCode == 'es'
+                          ? 'Controla el tiempo por turno en juegos rápidos para que nadie se duerma.'
+                          : 'Keep everyone moving with an audio-visual countdown for turn-based games.',
+                      bulletPoints: l10n.locale.languageCode == 'es'
+                          ? [
+                              'Elige presets rápidos (30s, 60s, 2m) o configura tu propio límite.',
+                              'Alertas sonoras y visuales cuando resten 5 segundos.',
+                              'Toca para pausar o reiniciar con un solo toque.',
+                            ]
+                          : [
+                              'Choose quick presets (30s, 60s, 2m) or set a custom time.',
+                              'Audio-visual alerts trigger when 5 seconds remain.',
+                              'Tap to pause or restart with a single gesture.',
+                            ],
+                      onDismiss: () => _dismissGuide('has_seen_guide_timer'),
+                    ),
+                  const TurnTimerWidget(),
+                ],
+              ),
             ),
           ),
           // 4: Moneda
-          const Center(
-            child: CoinFlipperWidget(),
+          Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_showCoinGuide)
+                    FirstUseGuideCard(
+                      icon: Icons.monetization_on_rounded,
+                      title: l10n.locale.languageCode == 'es' ? 'Cara o Cruz Consular' : 'Heads or Tails Coin',
+                      description: l10n.locale.languageCode == 'es'
+                          ? 'Resuelve empates y decisiones con un giro equilibrado de moneda.'
+                          : 'Resolve ties and fair choices with a balanced coin flip.',
+                      bulletPoints: l10n.locale.languageCode == 'es'
+                          ? [
+                              'Toca la moneda para lanzarla al aire.',
+                              'Físicas realistas con rotación sobre múltiples ejes.',
+                              'Resultado instantáneo con retroalimentación háptica.',
+                            ]
+                          : [
+                              'Tap the coin to flip it high into the air.',
+                              'Realistic physics with multi-axis rotation.',
+                              'Instant result feedback with tactile haptics.',
+                            ],
+                      onDismiss: () => _dismissGuide('has_seen_guide_coin'),
+                    ),
+                  const CoinFlipperWidget(),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -357,11 +486,32 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildGamesCatalogTab(ThemeData theme) {
+    final l10n = AppLocalizations.of(context);
     return _isLoading
         ? const Center(child: CircularProgressIndicator(color: AppTheme.cyberGold))
         : ListView(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             children: [
+              if (_showGamesGuide)
+                FirstUseGuideCard(
+                  icon: Icons.sports_esports_rounded,
+                  title: l10n.locale.languageCode == 'es' ? 'Anotador de Juegos' : 'Game Scorekeeper',
+                  description: l10n.locale.languageCode == 'es'
+                      ? 'Lleva el puntaje de Truco, Generala, 10.000, Burako, Escoba o cualquier juego personalizado.'
+                      : 'Track scores for Truco, Generala, 10,000, Burako, Escoba or custom games.',
+                  bulletPoints: l10n.locale.languageCode == 'es'
+                      ? [
+                          'Toca (+) arriba o en Contador Libre para iniciar una partida multijugador.',
+                          'Elige un juego del catálogo para usar planillas con reglas y cálculos automáticos.',
+                          'Tus partidas se guardan solas y puedes retomarlas cuando quieras.',
+                        ]
+                      : [
+                          'Tap (+) on top or Custom Match to launch a multiplayer scoreboard.',
+                          'Select any catalog game for tailored rule sheets and automatic calculations.',
+                          'Matches are autosaved so you can resume them at any time.',
+                        ],
+                  onDismiss: () => _dismissGuide('has_seen_guide_games'),
+                ),
               // Active Match Banner (if any) with Resume & Discard buttons
               if (_activeSession != null) ...[
                 _buildActiveMatchCard(theme),

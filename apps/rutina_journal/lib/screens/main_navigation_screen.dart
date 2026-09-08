@@ -9,9 +9,9 @@ import '../services/storage_service.dart';
 import '../utils/haptics_helper.dart';
 import '../widgets/focus_zone_screen.dart';
 import '../widgets/paywall_sheet.dart';
-import 'analytics_screen.dart';
 import 'journal_screen.dart';
 import 'routines_screen.dart';
+import 'settings_screen.dart';
 import 'today_screen.dart';
 
 class MainNavigationScreen extends StatefulWidget {
@@ -118,11 +118,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen>
       TodayScreen(habitService: habitService, routineService: routineService),
       RoutinesScreen(routineService: routineService),
       JournalScreen(journalService: journalService),
-      AnalyticsScreen(
-        habitService: habitService,
-        journalService: journalService,
+      SettingsScreen(
         prefs: prefs,
         storage: storage,
+        habitService: habitService,
       ),
     ];
 
@@ -216,9 +215,9 @@ class _MainNavigationScreenState extends State<MainNavigationScreen>
             ),
             _buildNavItem(
               index: 3,
-              icon: Icons.show_chart_rounded,
-              activeIcon: Icons.show_chart_rounded,
-              label: l10n.t('navAnalytics'),
+              icon: Icons.settings_outlined,
+              activeIcon: Icons.settings_rounded,
+              label: l10n.t('navSettings'),
             ),
           ],
         ),

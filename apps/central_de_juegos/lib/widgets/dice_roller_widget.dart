@@ -18,9 +18,7 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
   bool _isRolling = false;
 
   late List<AnimationController> _controllers;
-  late List<double> _rotationsX;
-  late List<double> _rotationsY;
-  late List<double> _rotationsZ;
+  late List<double> _rotations2D;
   final Random _random = Random();
   Timer? _diceJitterTimer;
 
@@ -35,12 +33,10 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
       6,
       (i) => AnimationController(
         vsync: this,
-        duration: Duration(milliseconds: 700 + i * 80),
+        duration: Duration(milliseconds: 600 + i * 60),
       ),
     );
-    _rotationsX = List.generate(6, (_) => 0.0);
-    _rotationsY = List.generate(6, (_) => 0.0);
-    _rotationsZ = List.generate(6, (_) => 0.0);
+    _rotations2D = List.generate(6, (_) => 0.0);
   }
 
   @override
@@ -58,9 +54,7 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
 
     setState(() {
       _isRolling = true;
-      _rotationsX = List.generate(6, (_) => (_random.nextDouble() + 1.2) * 4 * pi);
-      _rotationsY = List.generate(6, (_) => (_random.nextDouble() + 1.2) * 4 * pi);
-      _rotationsZ = List.generate(6, (_) => (_random.nextDouble() - 0.5) * 2 * pi);
+      _rotations2D = List.generate(6, (_) => (_random.nextDouble() - 0.5) * 0.4);
     });
 
     for (int i = 0; i < _diceCount; i++) {
@@ -216,7 +210,7 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
 
         const SizedBox(height: 28),
 
-        // Center 3D Isometric Animated Dice Area
+        // Center 2D Animated Dice Area
         Center(
           child: Wrap(
             spacing: 22,
@@ -230,43 +224,39 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
                 animation: controller,
                 builder: (context, child) {
                   final progress = controller.value;
-                  final angleX = _isRolling ? (1.0 - progress) * _rotationsX[index] : 0.0;
-                  final angleY = _isRolling ? (1.0 - progress) * _rotationsY[index] : 0.0;
-                  final angleZ = _isRolling ? (1.0 - progress) * _rotationsZ[index] : 0.0;
-
-                  // 3D Jump & Drop physics
-                  final jumpHeight = _isRolling ? -sin(progress * pi) * 60.0 : 0.0;
-                  final shadowScale = _isRolling ? (1.0 - sin(progress * pi) * 0.4) : 1.0;
-                  final shadowOpacity = _isRolling ? (0.6 - sin(progress * pi) * 0.35) : 0.6;
+                  // 2D bounce and wobble
+                  final jumpHeight = _isRolling ? -sin(progress * pi) * 45.0 : 0.0;
+                  final scale = _isRolling ? 1.0 + sin(progress * pi) * 0.12 : 1.0;
+                  final angle2D = _isRolling ? sin(progress * pi * 2) * _rotations2D[index] : 0.0;
+                  final shadowScale = _isRolling ? (1.0 - sin(progress * pi) * 0.3) : 1.0;
+                  final shadowOpacity = _isRolling ? (0.5 - sin(progress * pi) * 0.25) : 0.5;
 
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Dice body with jump and 3D tumble
+                      // Dice body with 2D jump, scale, and wobble
                       Transform.translate(
                         offset: Offset(0, jumpHeight),
-                        child: Transform(
-                          alignment: Alignment.center,
-                          transform: Matrix4.identity()
-                            ..setEntry(3, 2, 0.002)
-                            ..rotateX(angleX)
-                            ..rotateY(angleY)
-                            ..rotateZ(angleZ),
-                          child: _buildDice(value),
+                        child: Transform.rotate(
+                          angle: angle2D,
+                          child: Transform.scale(
+                            scale: scale,
+                            child: _buildDice(value),
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 6),
-                      // Dynamic cast shadow on the ground
+                      const SizedBox(height: 8),
+                      // Ground shadow
                       Container(
-                        width: 70 * shadowScale,
-                        height: 12 * shadowScale,
+                        width: 65 * shadowScale,
+                        height: 10 * shadowScale,
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(shadowOpacity),
+                          color: Colors.black.withValues(alpha: shadowOpacity),
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(shadowOpacity),
-                              blurRadius: 10 * shadowScale,
+                              color: Colors.black.withValues(alpha: shadowOpacity),
+                              blurRadius: 8 * shadowScale,
                             ),
                           ],
                         ),
@@ -379,7 +369,7 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
             const BoxShadow(
               color: Colors.white,
               blurRadius: 2,
-              offset: const Offset(-1, -1),
+              offset: Offset(-1, -1),
             ),
           ],
         ),

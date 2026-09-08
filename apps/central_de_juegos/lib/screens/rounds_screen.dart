@@ -50,12 +50,12 @@ class _RoundsScreenState extends State<RoundsScreen> {
   }
 
   RoundsGame _defaultGame() {
-    final title = widget.gameType == GameType.chinchon ? 'Chinchón' : 'Uno / Rummy';
-    final target = widget.gameType == GameType.chinchon ? 100 : 500;
+    const title = 'Rummy / Cartas';
+    const target = 100;
     return RoundsGame(
       title: title,
       eliminationScore: target,
-      allowRehook: widget.gameType == GameType.chinchon,
+      allowRehook: false,
       players: [
         Player(id: 'p1', name: 'Jugador 1', colorValue: AppTheme.playerColors[0].value),
         Player(id: 'p2', name: 'Jugador 2', colorValue: AppTheme.playerColors[1].value),
@@ -249,12 +249,11 @@ class _RoundsScreenState extends State<RoundsScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  if (widget.gameType == GameType.chinchon)
-                    SwitchListTile(
-                      title: const Text('Permitir Reenganche'),
-                      value: rehook,
-                      onChanged: (v) => setModalState(() => rehook = v),
-                    ),
+                  SwitchListTile(
+                    title: const Text('Permitir Reenganche'),
+                    value: rehook,
+                    onChanged: (v) => setModalState(() => rehook = v),
+                  ),
                   const SizedBox(height: 12),
                   const Text('Jugadores:', style: TextStyle(fontWeight: FontWeight.bold)),
                   ...List.generate(controllers.length, (i) {
@@ -263,10 +262,10 @@ class _RoundsScreenState extends State<RoundsScreen> {
                       child: Row(
                         children: [
                           CircleAvatar(
-                            backgroundColor: AppTheme.playerColors[i % AppTheme.playerColors.length],
                             radius: 12,
+                            backgroundColor: AppTheme.playerColors[i % AppTheme.playerColors.length],
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: TextField(
                               controller: controllers[i],
@@ -276,42 +275,26 @@ class _RoundsScreenState extends State<RoundsScreen> {
                               ),
                             ),
                           ),
-                          if (controllers.length > 2)
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () {
-                                setModalState(() => controllers.removeAt(i));
-                              },
-                            ),
                         ],
                       ),
                     );
                   }),
-                  if (controllers.length < 8)
-                    TextButton.icon(
-                      icon: const Icon(Icons.add),
-                      label: const Text('Agregar Jugador'),
-                      onPressed: () {
-                        setModalState(() {
-                          controllers.add(TextEditingController(text: 'Jugador ${controllers.length + 1}'));
-                        });
-                      },
-                    ),
                 ],
               ),
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.of(ctx).pop(),
+                onPressed: () => Navigator.pop(ctx),
                 child: const Text('Cancelar'),
               ),
               FilledButton(
+                style: FilledButton.styleFrom(backgroundColor: AppTheme.cyberGold),
                 onPressed: () {
                   final newPlayers = <Player>[];
                   for (int i = 0; i < controllers.length; i++) {
                     final name = controllers[i].text.trim().isEmpty ? 'Jugador ${i + 1}' : controllers[i].text.trim();
                     newPlayers.add(Player(
-                      id: 'p${i + 1}',
+                      id: const Uuid().v4(),
                       name: name,
                       colorValue: AppTheme.playerColors[i % AppTheme.playerColors.length].value,
                     ));
@@ -319,7 +302,7 @@ class _RoundsScreenState extends State<RoundsScreen> {
                   final target = int.tryParse(targetController.text) ?? 100;
                   setState(() {
                     _game = RoundsGame(
-                      title: widget.gameType == GameType.chinchon ? 'Chinchón' : 'Uno / Rummy',
+                      title: 'Rummy / Cartas',
                       players: newPlayers,
                       eliminationScore: target,
                       allowRehook: rehook,

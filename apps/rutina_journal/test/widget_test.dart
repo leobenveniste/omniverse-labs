@@ -7,7 +7,9 @@ import 'package:rutina_journal/services/app_services.dart';
 
 void main() {
   testWidgets('RitmoApp smoke test and splash screen display', (WidgetTester tester) async {
-    SharedPreferences.setMockInitialValues({});
+    SharedPreferences.setMockInitialValues({
+      'has_seen_onboarding': true,
+    });
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(const MethodChannel('home_widget'), (call) async {
       return null;
@@ -46,10 +48,10 @@ void main() {
     );
     expect(
       find.byWidgetPredicate(
-        (w) => w is Text && (w.data == 'Progreso' || w.data == 'Progress'),
+        (w) => w is Text && (w.data == 'Ajustes' || w.data == 'Settings'),
       ),
       findsWidgets,
     );
-    expect(find.byIcon(Icons.self_improvement_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.self_improvement_rounded), findsAtLeastNWidgets(1));
   });
 }

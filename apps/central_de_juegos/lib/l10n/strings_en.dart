@@ -5,11 +5,11 @@ const Map<String, String> stringsEn = {
   'appSubtitle': 'The ultimate board game scorekeeper and tabletop utility hub.',
 
   // Nav Titles
-  'navDice': 'DICE_ROLLER',
-  'navWhoStarts': 'WHO_STARTS',
-  'navGames': 'GAME_NIGHT_HUB',
-  'navTimer': 'TURN_TIMER',
-  'navCoin': 'COIN_FLIPPER',
+  'navDice': 'Dice Roller',
+  'navWhoStarts': 'Who Starts?',
+  'navGames': 'Games Catalog',
+  'navTimer': 'Turn Timer',
+  'navCoin': 'Coin Flipper',
 
   // Bottom Nav Labels
   'bottomDice': 'Dice',
@@ -88,6 +88,8 @@ const Map<String, String> stringsEn = {
   'proDeactivatedToast': 'Mesa Pro Mode Deactivated',
   'testProEnable': '🧪 Enable Pro (Testing)',
   'testProDisable': '🧪 Disable Pro (Testing)',
+  'testProToggleTitle': 'PRO Mode (Testing)',
+  'testProToggleSubtitle': 'Enable Pro Table features for internal testing without billing',
 
   // Common Dialogs & Actions
   'aboutTitle': 'About Omniverse Labs',
@@ -95,6 +97,7 @@ const Map<String, String> stringsEn = {
   'versionLabel': 'Version',
   'close': 'Close',
   'language': 'Language',
+  'languageAuto': 'System Default',
   'languageEs': 'Español',
   'languageEn': 'English',
   'selectLanguage': 'Select Language',

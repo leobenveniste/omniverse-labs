@@ -227,7 +227,7 @@ class AnalyticsScreen extends StatelessWidget {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: habits.length,
-                    separatorBuilder: (_, __) => Divider(
+                    separatorBuilder: (context, index) => Divider(
                       height: 1,
                       color: theme.colorScheme.outline.withValues(alpha: 0.5),
                     ),
