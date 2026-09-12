@@ -202,16 +202,16 @@ def deploy_omnitrade(aab_path: str, target_track: str = "beta"):
     # 5. Assign to Track
     print(f"\n5️⃣ Assigning version {version_code} to track [{target_track.upper()}]...")
     notes = [
-        {"language": "es-419", "text": "Lanzamiento oficial de OmniTrade: Bitácora de trading multi-activo (Cripto, Acciones, Forex, Futuros, Opciones), calculadora de riesgo con gestión 1% R, analíticas avanzadas, curva de equidad, seguridad biométrica/PIN y respaldo CSV/JSON."},
-        {"language": "en-US", "text": "Initial launch of OmniTrade: Multi-asset trading journal (Crypto, Stocks, Forex, Futures, Options), position sizing calculator with 1% R risk management, advanced analytics, equity curve, biometric/PIN security, and CSV/JSON export."}
+        {"language": "es-419", "text": "OmniTrade v1.0.1: Corrección de coherencia de ícono de launcher y optimización de rendimiento."},
+        {"language": "en-US", "text": "OmniTrade v1.0.1: In-app launcher icon consistency update and performance optimizations."}
     ]
 
-    def make_track_body(status):
+    def make_track_body(track_name, status):
         return {
-            "track": target_track,
+            "track": track_name,
             "releases": [
                 {
-                    "name": f"v{version_code} (1.0.0)",
+                    "name": f"v{version_code} (1.0.1)",
                     "versionCodes": [str(version_code)],
                     "status": status,
                     "releaseNotes": notes
@@ -225,22 +225,36 @@ def deploy_omnitrade(aab_path: str, target_track: str = "beta"):
             packageName=PACKAGE_NAME,
             editId=edit_id,
             track=target_track,
-            body=make_track_body(status_to_use)
+            body=make_track_body(target_track, status_to_use)
         ).execute()
         print(f"   ✅ Track [{target_track.upper()}] configured with status '{status_to_use}'")
     except HttpError as e:
-        print(f"   ⚠️ Track update error with '{status_to_use}', attempting 'draft' status...")
+        print(f"   ⚠️ Track update error with '{status_to_use}', attempting 'draft' status: {e}")
         status_to_use = "draft"
         edits.tracks().update(
             packageName=PACKAGE_NAME,
             editId=edit_id,
             track=target_track,
-            body=make_track_body(status_to_use)
+            body=make_track_body(target_track, status_to_use)
         ).execute()
         print(f"   ✅ Track [{target_track.upper()}] configured with status 'draft'")
 
+    # Also update internal track if we are deploying beta
+    if target_track != "internal":
+        try:
+            edits.tracks().update(
+                packageName=PACKAGE_NAME,
+                editId=edit_id,
+                track="internal",
+                body=make_track_body("internal", "completed")
+            ).execute()
+            print("   ✅ Track [INTERNAL] also updated with new bundle!")
+        except Exception as e_internal:
+            print(f"   ℹ️ Notice: Track [INTERNAL] update skipped: {e_internal}")
+
     # 6. Validate Edit
     print("\n6️⃣ Validating edit session...")
+    need_changes_not_sent = False
     try:
         edits.validate(packageName=PACKAGE_NAME, editId=edit_id).execute()
         print("   ✅ Edit validation passed!")
@@ -248,21 +262,42 @@ def deploy_omnitrade(aab_path: str, target_track: str = "beta"):
         err_json = json.loads(val_err.content.decode("utf-8")) if val_err.content else {}
         err_msg = err_json.get("error", {}).get("message", str(val_err))
         print(f"   ⚠️ Validation notice: {err_msg}")
-        if "status draft" in err_msg.lower() and status_to_use != "draft":
+        if "changesnotsentforreview" in err_msg.lower():
+            need_changes_not_sent = True
+            print("   ℹ️ Will commit with changesNotSentForReview=True.")
+        elif "status draft" in err_msg.lower() and status_to_use != "draft":
             print("   Retrying validation with 'draft' status...")
             status_to_use = "draft"
             edits.tracks().update(
                 packageName=PACKAGE_NAME,
                 editId=edit_id,
                 track=target_track,
-                body=make_track_body(status_to_use)
+                body=make_track_body(target_track, status_to_use)
             ).execute()
-            edits.validate(packageName=PACKAGE_NAME, editId=edit_id).execute()
-            print("   ✅ Validation passed with draft status!")
+            try:
+                edits.validate(packageName=PACKAGE_NAME, editId=edit_id).execute()
+                print("   ✅ Validation passed with draft status!")
+            except HttpError as v2_err:
+                err_json2 = json.loads(v2_err.content.decode("utf-8")) if v2_err.content else {}
+                err_msg2 = err_json2.get("error", {}).get("message", str(v2_err))
+                if "changesnotsentforreview" in err_msg2.lower():
+                    need_changes_not_sent = True
 
     # 7. Commit Edit
     print("\n7️⃣ Committing and publishing changes to Google Play...")
-    commit_res = edits.commit(packageName=PACKAGE_NAME, editId=edit_id).execute()
+    try:
+        if need_changes_not_sent:
+            commit_res = edits.commit(packageName=PACKAGE_NAME, editId=edit_id, changesNotSentForReview=True).execute()
+        else:
+            commit_res = edits.commit(packageName=PACKAGE_NAME, editId=edit_id).execute()
+    except HttpError as commit_err:
+        err_json = json.loads(commit_err.content.decode("utf-8")) if commit_err.content else {}
+        err_msg = err_json.get("error", {}).get("message", str(commit_err))
+        if "changesnotsentforreview" in err_msg.lower():
+            print("   ℹ️ Retrying commit with changesNotSentForReview=True...")
+            commit_res = edits.commit(packageName=PACKAGE_NAME, editId=edit_id, changesNotSentForReview=True).execute()
+        else:
+            raise commit_err
     print(f"   🎉 SUCCESS! Released to Google Play [{target_track.upper()}]! (Commit ID: {commit_res.get('id', edit_id)})")
     print("=" * 60)
     return True
