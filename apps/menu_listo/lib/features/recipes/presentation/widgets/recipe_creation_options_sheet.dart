@@ -4,6 +4,7 @@ import 'package:menu_listo/core/localization/app_localizations.dart';
 import 'package:menu_listo/features/recipes/services/recipe_photo_scanner.dart';
 import 'package:menu_listo/features/recipes/presentation/recipe_form_screen.dart';
 import 'package:menu_listo/features/recipes/presentation/widgets/recipe_import_url_dialog.dart';
+import 'package:menu_listo/features/recipes/presentation/widgets/recipe_import_social_dialog.dart';
 
 void showRecipeCreationOptions(BuildContext context) {
   final strings = AppStrings.of(context);
@@ -68,7 +69,21 @@ void showRecipeCreationOptions(BuildContext context) {
             ),
             const SizedBox(height: 10),
 
-            // Option 3: Import Web URL
+            // Option 3: Paste Instagram / TikTok Reel
+            _buildOptionTile(
+              context: ctx,
+              icon: Icons.auto_awesome_rounded,
+              iconColor: const Color(0xFFE1306C),
+              title: strings.importSocialPost,
+              subtitle: strings.importSocialSubtitle,
+              onTap: () {
+                Navigator.pop(ctx);
+                RecipeImportSocialDialog.show(context);
+              },
+            ),
+            const SizedBox(height: 10),
+
+            // Option 4: Import Web URL
             _buildOptionTile(
               context: ctx,
               icon: Icons.link_rounded,

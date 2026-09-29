@@ -167,8 +167,30 @@ class AppStrings {
   String get scrapingProgress => isSpanish ? 'Extrayendo ingredientes y pasos limpios...' : 'Extracting ingredients & instructions...';
   String get importingProgress => isSpanish ? 'Extrayendo ingredientes y pasos limpios...' : 'Extracting ingredients & instructions...';
   String get scrapingFailed => isSpanish ? 'No se pudo extraer la receta automáticamente de este sitio.' : 'Could not automatically extract recipe from this site.';
-  String get importSuccess => isSpanish ? '¡Receta extraída con éxito!' : 'Recipe extracted successfully!';
   String get importError => isSpanish ? 'No se pudo extraer la receta automáticamente de este sitio.' : 'Could not automatically extract recipe from this site.';
+
+  // Social / Instagram Reel Importer
+  String get importSocialPost => isSpanish ? 'Pegar post de Instagram o TikTok' : 'Paste Instagram or TikTok Post';
+  String get importSocialSubtitle => isSpanish 
+      ? 'Copia la descripción de cualquier Reel o post y la convertimos en receta' 
+      : 'Paste the caption of any Reel or post to convert it into a recipe';
+  String get socialImportTitle => isSpanish ? 'Importar de Instagram / Redes' : 'Import from Instagram / Social';
+  String get socialImportSubtitle => isSpanish 
+      ? 'Pega la descripción o el texto del Reel para extraer ingredientes y pasos:' 
+      : 'Paste the Reel caption or post text to extract ingredients & steps:';
+  String get pasteFromClipboard => isSpanish ? 'Pegar del Portapapeles' : 'Paste from Clipboard';
+  String get socialInputHint => isSpanish 
+      ? 'Pega aquí el texto o descripción del post de Instagram, TikTok o Facebook...' 
+      : 'Paste Instagram, TikTok or Facebook post caption here...';
+  String get convertRecipe => isSpanish ? 'Crear Receta' : 'Create Recipe';
+  String get socialHowToTitle => isSpanish ? '¿Cómo copiar desde Instagram?' : 'How to copy from Instagram?';
+  String get socialHowToStep1 => isSpanish ? '1. En Instagram, toca los 3 puntos (o Compartir) y elige "Copiar descripción" (o mantén presionado el texto).' : '1. In Instagram, tap the 3 dots (or Share) and choose "Copy caption" (or long-press text).';
+  String get socialHowToStep2 => isSpanish ? '2. Vuelve a Menú Listo y toca "Pegar del Portapapeles".' : '2. Return to Menú Listo and tap "Paste from Clipboard".';
+  String get socialHowToOcrTip => isSpanish ? '💡 Tip: ¡También puedes sacarle captura de pantalla al Reel y usar "Escanear foto / OCR"!' : '💡 Tip: You can also screenshot the Reel and use "Scan photo / OCR"!';
+  String get socialUrlRedirectNotice => isSpanish 
+      ? 'Instagram bloquea la lectura automática directa de enlaces. ¡Pega la descripción del Reel para crear la receta al instante!' 
+      : 'Instagram blocks direct link reading. Paste the Reel caption to create the recipe instantly!';
+  String get switchToSocialPaste => isSpanish ? 'Pegar texto de este Reel' : 'Paste text from this Reel';
 
   // Weekly Planner Screen
   String get plannerTitle => isSpanish ? 'Planificador Semanal' : 'Weekly Meal Planner';

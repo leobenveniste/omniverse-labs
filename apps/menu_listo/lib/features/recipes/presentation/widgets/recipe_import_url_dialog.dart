@@ -4,6 +4,8 @@ import '../../../../core/utils/recipe_scraper.dart';
 import '../../models/recipe_model.dart';
 import '../recipe_form_screen.dart';
 
+import 'recipe_import_social_dialog.dart';
+
 class RecipeImportUrlDialog extends StatefulWidget {
   const RecipeImportUrlDialog({super.key});
 
@@ -23,6 +25,11 @@ class _RecipeImportUrlDialogState extends State<RecipeImportUrlDialog> {
   bool _isLoading = false;
   String? _errorMessage;
 
+  bool get _isSocialUrl {
+    final lower = _urlController.text.toLowerCase();
+    return lower.contains('instagram.com') || lower.contains('tiktok.com');
+  }
+
   @override
   void dispose() {
     _urlController.dispose();
@@ -32,6 +39,12 @@ class _RecipeImportUrlDialogState extends State<RecipeImportUrlDialog> {
   Future<void> _extract() async {
     final url = _urlController.text.trim();
     if (url.isEmpty) return;
+
+    if (_isSocialUrl) {
+      Navigator.of(context).pop();
+      RecipeImportSocialDialog.show(context, initialText: url);
+      return;
+    }
 
     setState(() {
       _isLoading = true;
@@ -113,6 +126,59 @@ class _RecipeImportUrlDialogState extends State<RecipeImportUrlDialog> {
               ),
               onChanged: (_) => setState(() {}),
             ),
+            if (_isSocialUrl) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE1306C).withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFFE1306C).withValues(alpha: 0.25),
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.info_outline_rounded,
+                          color: Color(0xFFE1306C),
+                          size: 18,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            strings.socialUrlRedirectNotice,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              height: 1.35,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: FilledButton.tonalIcon(
+                        onPressed: () {
+                          final currentUrl = _urlController.text.trim();
+                          Navigator.of(context).pop();
+                          RecipeImportSocialDialog.show(context, initialText: currentUrl);
+                        },
+                        icon: const Icon(Icons.post_add_rounded, size: 16),
+                        label: Text(strings.switchToSocialPaste),
+                        style: FilledButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             if (_errorMessage != null) ...[
               const SizedBox(height: 12),
               Text(
