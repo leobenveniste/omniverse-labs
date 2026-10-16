@@ -193,4 +193,23 @@ const Map<String, String> stringsEn = {
   'paywallLimitNotice': 'You have reached the 15-operation free tier limit.',
   'paywallExportNotice': 'Data export requires OmniTrade PRO.',
   'paywallAnalyticsNotice': 'Unlock full analytics to audit your trading performance.',
+
+  // Privacy, Data Deletion & About
+  'privacyPolicyTitle': 'Privacy Policy',
+  'privacyPolicySubtitle': '100% Offline. No trackers or external servers',
+  'privacyDialogTitle': 'Privacy & Data Protection',
+  'privacyDialogContent': 'OmniTrade operates under a 100% Offline-First architecture. All your financial data, trading logs, and settings are stored strictly locally in your device SQLite database.\n\n• We do not collect personal data or usage analytics.\n• No account creation or email registration required.\n• No financial logs are ever transmitted to external servers.\n• You maintain complete ownership to export (CSV/JSON) or purge your data anytime.\n\nFor questions or support inquiries, contact us at omniverselabs@gmail.com.',
+  'clearAllDataTitle': 'Delete All Data',
+  'clearAllDataSubtitle': 'Permanently wipe all logged operations and history',
+  'clearDataConfirmTitle': 'Delete all trade data?',
+  'clearDataConfirmContent': 'This action will irreversibly remove all logged operations from your local journal. This cannot be undone.',
+  'clearDataAction': 'Yes, Delete All',
+  'clearDataSuccessToast': 'All operations successfully cleared',
+  'aboutAppTitle': 'About OmniTrade',
+  'aboutCompany': 'OMNIVERSE LABS',
+  'aboutMission': 'Offline financial tools and analytics engineered with mathematical precision for disciplined traders.',
+  'contactSupportTitle': 'Contact & Support',
+  'contactSupportSubtitle': 'omniverselabs@gmail.com',
+  'packageIdLabel': 'Package ID',
+  'versionLabel': 'Version',
 };

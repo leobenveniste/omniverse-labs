@@ -193,4 +193,23 @@ const Map<String, String> stringsEs = {
   'paywallLimitNotice': 'Has alcanzado el límite de 15 operaciones del plan gratuito.',
   'paywallExportNotice': 'La exportación de datos requiere OmniTrade PRO.',
   'paywallAnalyticsNotice': 'Desbloquea analíticas completas para auditar tus trades.',
+
+  // Privacy, Data Deletion & About
+  'privacyPolicyTitle': 'Política de Privacidad',
+  'privacyPolicySubtitle': '100% Fuera de línea. Sin rastreadores ni servidores externos',
+  'privacyDialogTitle': 'Privacidad y Protección de Datos',
+  'privacyDialogContent': 'OmniTrade opera bajo una arquitectura 100% Offline-First. Toda tu información financiera, bitácoras de operaciones y configuraciones se almacenan exclusivamente de forma local en la base de datos de tu dispositivo (SQLite).\n\n• No recopilamos datos personales ni métricas de uso.\n• No requerimos creación de cuenta ni correo electrónico.\n• Ningún registro financiero se transmite a servidores externos.\n• Tienes control absoluto para exportar (CSV/JSON) o purgar todos tus datos en cualquier momento.\n\nPara consultas o solicitudes de soporte, puedes contactarnos en omniverselabs@gmail.com.',
+  'clearAllDataTitle': 'Eliminar Todos los Datos',
+  'clearAllDataSubtitle': 'Borrar permanentemente todas las operaciones e historial',
+  'clearDataConfirmTitle': '¿Eliminar todos los datos?',
+  'clearDataConfirmContent': 'Esta acción eliminará de forma irreversible todas las operaciones registradas en tu bitácora local. Esta acción no se puede deshacer.',
+  'clearDataAction': 'Sí, Borrar Todo',
+  'clearDataSuccessToast': 'Todas las operaciones fueron eliminadas exitosamente',
+  'aboutAppTitle': 'Acerca de OmniTrade',
+  'aboutCompany': 'OMNIVERSE LABS',
+  'aboutMission': 'Herramientas financieras y analíticas offline diseñadas con precisión matemática para traders disciplinados.',
+  'contactSupportTitle': 'Contacto y Soporte',
+  'contactSupportSubtitle': 'omniverselabs@gmail.com',
+  'packageIdLabel': 'ID de Paquete',
+  'versionLabel': 'Versión',
 };

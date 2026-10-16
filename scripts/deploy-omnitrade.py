@@ -202,8 +202,8 @@ def deploy_omnitrade(aab_path: str, target_track: str = "beta"):
     # 5. Assign to Track
     print(f"\n5️⃣ Assigning version {version_code} to track [{target_track.upper()}]...")
     notes = [
-        {"language": "es-419", "text": "OmniTrade v1.0.1: Corrección de coherencia de ícono de launcher y optimización de rendimiento."},
-        {"language": "en-US", "text": "OmniTrade v1.0.1: In-app launcher icon consistency update and performance optimizations."}
+        {"language": "es-419", "text": "OmniTrade v1.0.2: Nueva política de privacidad integrada, función de purga y eliminación de datos locales, diálogos de soporte y mejoras de seguridad."},
+        {"language": "en-US", "text": "OmniTrade v1.0.2: Built-in privacy policy, local data purge/deletion options, about & support dialogs, and security enhancements."}
     ]
 
     def make_track_body(track_name, status):
@@ -211,7 +211,7 @@ def deploy_omnitrade(aab_path: str, target_track: str = "beta"):
             "track": track_name,
             "releases": [
                 {
-                    "name": f"v{version_code} (1.0.1)",
+                    "name": f"v{version_code} (1.0.2)",
                     "versionCodes": [str(version_code)],
                     "status": status,
                     "releaseNotes": notes

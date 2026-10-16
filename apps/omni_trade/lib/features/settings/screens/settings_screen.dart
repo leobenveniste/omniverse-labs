@@ -13,7 +13,7 @@ import '../../../providers/settings_provider.dart';
 import '../../../providers/trade_provider.dart';
 import '../../premium/screens/paywall_sheet.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   final SettingsProvider settingsProvider;
   final SecurityProvider securityProvider;
   final TradeProvider tradeProvider;
@@ -24,6 +24,52 @@ class SettingsScreen extends StatelessWidget {
     required this.securityProvider,
     required this.tradeProvider,
   });
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  int _devModeTapCount = 0;
+  DateTime? _lastDevTapTime;
+
+  void _handleDevModeTap(BuildContext context) async {
+    final now = DateTime.now();
+    if (_lastDevTapTime == null || now.difference(_lastDevTapTime!) > const Duration(seconds: 2)) {
+      _devModeTapCount = 1;
+    } else {
+      _devModeTapCount++;
+    }
+    _lastDevTapTime = now;
+
+    if (_devModeTapCount >= 7) {
+      _devModeTapCount = 0;
+      HapticsHelper.heavy();
+      await widget.settingsProvider.toggleDevMode();
+      if (!context.mounted) return;
+      final isNowDev = widget.settingsProvider.isDevMode;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isNowDev
+                ? '🧪 Modo Desarrollador Activado'
+                : '🔒 Modo Desarrollador Desactivado',
+          ),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } else if (_devModeTapCount >= 4) {
+      HapticsHelper.light();
+      final remaining = 7 - _devModeTapCount;
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$remaining toques más para alternar Modo Desarrollador...'),
+          duration: const Duration(milliseconds: 600),
+        ),
+      );
+    }
+  }
 
   void _showSetPinDialog(BuildContext context) {
     final colors = context.colors;
@@ -66,7 +112,7 @@ class SettingsScreen extends StatelessWidget {
             onPressed: () async {
               if (formKey.currentState!.validate()) {
                 HapticsHelper.medium();
-                await securityProvider.setupPin(pinController.text.trim());
+                await widget.securityProvider.setupPin(pinController.text.trim());
                 if (ctx.mounted) Navigator.of(ctx).pop();
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -86,7 +132,7 @@ class SettingsScreen extends StatelessWidget {
     final colors = context.colors;
     final l10n = AppLocalizations.of(context);
     final balanceController = TextEditingController(
-      text: settingsProvider.accountBalance.toStringAsFixed(2),
+      text: widget.settingsProvider.accountBalance.toStringAsFixed(2),
     );
 
     showDialog(
@@ -99,7 +145,7 @@ class SettingsScreen extends StatelessWidget {
           autofocus: true,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           decoration: InputDecoration(
-            prefixText: '${settingsProvider.currencySymbol} ',
+            prefixText: '${widget.settingsProvider.currencySymbol} ',
             labelText: l10n.t('accountBalanceLabel'),
           ),
         ),
@@ -114,7 +160,7 @@ class SettingsScreen extends StatelessWidget {
               final val = double.tryParse(balanceController.text.trim());
               if (val != null && val > 0) {
                 HapticsHelper.medium();
-                await settingsProvider.setAccountBalance(val);
+                await widget.settingsProvider.setAccountBalance(val);
                 if (ctx.mounted) Navigator.of(ctx).pop();
               }
             },
@@ -125,18 +171,223 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+  void _showPrivacyPolicyDialog(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: colors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+          side: BorderSide(color: colors.outline, width: 1.0),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.xs),
+              decoration: BoxDecoration(
+                color: colors.secondary.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.privacy_tip_outlined, color: colors.secondary, size: 22),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Text(
+                l10n.t('privacyDialogTitle'),
+                style: AppTypography.title(colors.textPrimary),
+              ),
+            ),
+          ],
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: SingleChildScrollView(
+            child: Text(
+              l10n.t('privacyDialogContent'),
+              style: AppTypography.body(colors.textSecondary).copyWith(height: 1.45),
+            ),
+          ),
+        ),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colors.secondary,
+              foregroundColor: Colors.black,
+            ),
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              'OK',
+              style: AppTypography.body(Colors.black, isBold: true),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showClearDataDialog(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: colors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+          side: BorderSide(color: colors.loss.withValues(alpha: 0.5), width: 1.2),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.xs),
+              decoration: BoxDecoration(
+                color: colors.loss.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.warning_amber_rounded, color: colors.loss, size: 24),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Text(
+                l10n.t('clearDataConfirmTitle'),
+                style: AppTypography.title(colors.textPrimary),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          l10n.t('clearDataConfirmContent'),
+          style: AppTypography.body(colors.textSecondary).copyWith(height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.t('cancelAction'), style: AppTypography.body(colors.textSecondary)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colors.loss,
+              foregroundColor: colors.onLoss,
+            ),
+            onPressed: () async {
+              HapticsHelper.heavy();
+              await widget.tradeProvider.clearAll();
+              if (ctx.mounted) Navigator.of(ctx).pop();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(l10n.t('clearDataSuccessToast')),
+                    backgroundColor: colors.surfaceElevated,
+                  ),
+                );
+              }
+            },
+            child: Text(
+              l10n.t('clearDataAction'),
+              style: AppTypography.body(colors.onLoss, isBold: true),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAboutDialog(BuildContext context) {
+    final colors = context.colors;
+    final l10n = AppLocalizations.of(context);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: colors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+          side: BorderSide(color: colors.outline, width: 1.0),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.xs),
+              decoration: BoxDecoration(
+                color: colors.primary.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.info_outline_rounded, color: colors.primary, size: 22),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Text(
+                l10n.t('aboutAppTitle'),
+                style: AppTypography.title(colors.textPrimary),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${AppConstants.appName} v${AppConstants.appVersion}',
+              style: AppTypography.body(colors.textPrimary, isBold: true),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              l10n.t('aboutCompany'),
+              style: AppTypography.caption(colors.primary, isMedium: true),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              l10n.t('aboutMission'),
+              style: AppTypography.caption(colors.textSecondary).copyWith(height: 1.4),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            const Divider(),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              '${l10n.t('packageIdLabel')}: com.omniverselabs.omnitrade',
+              style: AppTypography.caption(colors.textTertiary),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              '${l10n.t('contactSupportTitle')}: ${l10n.t('contactSupportSubtitle')}',
+              style: AppTypography.caption(colors.textTertiary),
+            ),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colors.primary,
+              foregroundColor: colors.onPrimary,
+            ),
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              'OK',
+              style: AppTypography.body(colors.onPrimary, isBold: true),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _exportCsv(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    if (!settingsProvider.isPro) {
+    if (!widget.settingsProvider.isPro) {
       PaywallSheet.show(
         context,
-        settingsProvider: settingsProvider,
+        settingsProvider: widget.settingsProvider,
         customReason: l10n.t('paywallExportNotice'),
       );
       return;
     }
 
-    final trades = tradeProvider.trades;
+    final trades = widget.tradeProvider.trades;
     final buffer = StringBuffer();
     buffer.writeln('ID,Symbol,AssetClass,Direction,Status,EntryPrice,ExitPrice,Quantity,Multiplier,Fees,StopLoss,TakeProfit,RealizedPnL,EntryDate,ExitDate,Strategy,Emotion,Notes');
 
@@ -155,16 +406,16 @@ class SettingsScreen extends StatelessWidget {
 
   void _backupJson(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    if (!settingsProvider.isPro) {
+    if (!widget.settingsProvider.isPro) {
       PaywallSheet.show(
         context,
-        settingsProvider: settingsProvider,
+        settingsProvider: widget.settingsProvider,
         customReason: l10n.t('paywallExportNotice'),
       );
       return;
     }
 
-    final jsonStr = jsonEncode(tradeProvider.trades.map((t) => t.toMap()).toList());
+    final jsonStr = jsonEncode(widget.tradeProvider.trades.map((t) => t.toMap()).toList());
     Clipboard.setData(ClipboardData(text: jsonStr));
     HapticsHelper.medium();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -176,7 +427,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final l10n = AppLocalizations.of(context);
-    final isPro = settingsProvider.isPro;
+    final isPro = widget.settingsProvider.isPro;
     final numFormat = NumberFormat('#,##0.00', 'en_US');
 
     return Scaffold(
@@ -263,7 +514,7 @@ class SettingsScreen extends StatelessWidget {
                   IconButton(
                     icon: Icon(Icons.arrow_forward_ios_rounded, color: colors.proGold, size: 16),
                     onPressed: () {
-                      PaywallSheet.show(context, settingsProvider: settingsProvider);
+                      PaywallSheet.show(context, settingsProvider: widget.settingsProvider);
                     },
                   ),
               ],
@@ -271,71 +522,73 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.md),
 
-          // --- 🧪 DEVELOPER TESTING / MODO DE PRUEBAS ---
-          _buildSectionHeader(l10n.t('testModeSection'), Icons.science_rounded, colors.proGold),
-          Material(
-            color: colors.surface,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              side: BorderSide(
-                color: isPro ? colors.proGold.withValues(alpha: 0.6) : colors.outline,
-                width: 1.2,
-              ),
-            ),
-            child: SwitchListTile.adaptive(
-              secondary: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: isPro
-                      ? colors.proGold.withValues(alpha: 0.15)
-                      : colors.surfaceElevated,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.science_rounded,
-                  color: isPro ? colors.proGold : colors.textSecondary,
-                  size: 20,
+          // --- 🧪 DEVELOPER TESTING / MODO DE PRUEBAS (Protected by Dev Mode) ---
+          if (widget.settingsProvider.isDevMode) ...[
+            _buildSectionHeader(l10n.t('testModeSection'), Icons.science_rounded, colors.proGold),
+            Material(
+              color: colors.surface,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                side: BorderSide(
+                  color: isPro ? colors.proGold.withValues(alpha: 0.6) : colors.outline,
+                  width: 1.2,
                 ),
               ),
-              title: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      l10n.t('testProToggleTitle'),
-                      style: AppTypography.body(colors.textPrimary, isBold: true),
-                    ),
+              child: SwitchListTile.adaptive(
+                secondary: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: isPro
+                        ? colors.proGold.withValues(alpha: 0.15)
+                        : colors.surfaceElevated,
+                    shape: BoxShape.circle,
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: isPro ? colors.secondary : colors.surfaceElevated,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: isPro ? colors.secondary : colors.outline),
-                    ),
-                    child: Text(
-                      isPro ? 'PRO' : 'FREE',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w900,
-                        color: isPro ? Colors.black : colors.textSecondary,
+                  child: Icon(
+                    Icons.science_rounded,
+                    color: isPro ? colors.proGold : colors.textSecondary,
+                    size: 20,
+                  ),
+                ),
+                title: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        l10n.t('testProToggleTitle'),
+                        style: AppTypography.body(colors.textPrimary, isBold: true),
                       ),
                     ),
-                  ),
-                ],
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: isPro ? colors.secondary : colors.surfaceElevated,
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: isPro ? colors.secondary : colors.outline),
+                      ),
+                      child: Text(
+                        isPro ? 'PRO' : 'FREE',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                          color: isPro ? Colors.black : colors.textSecondary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                subtitle: Text(
+                  l10n.t('testProToggleSubtitle'),
+                  style: AppTypography.caption(colors.textSecondary),
+                ),
+                value: widget.settingsProvider.isTestProOverride,
+                activeTrackColor: colors.proGold,
+                onChanged: (val) async {
+                  HapticsHelper.medium();
+                  await widget.settingsProvider.toggleTestPro(val);
+                },
               ),
-              subtitle: Text(
-                l10n.t('testProToggleSubtitle'),
-                style: AppTypography.caption(colors.textSecondary),
-              ),
-              value: settingsProvider.isTestProOverride,
-              activeTrackColor: colors.proGold,
-              onChanged: (val) async {
-                HapticsHelper.medium();
-                await settingsProvider.toggleTestPro(val);
-              },
             ),
-          ),
-          const SizedBox(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.md),
+          ],
 
           // --- GENERAL PREFERENCES ---
           _buildSectionHeader(l10n.t('financialPrefsSection'), Icons.tune_rounded, colors.primary),
@@ -352,11 +605,11 @@ class SettingsScreen extends StatelessWidget {
                   leading: Icon(Icons.currency_exchange_rounded, color: colors.primary),
                   title: Text(l10n.t('baseCurrencyTitle'), style: AppTypography.body(colors.textPrimary, isMedium: true)),
                   subtitle: Text(
-                    '${settingsProvider.baseCurrency} (${settingsProvider.currencySymbol})',
+                    '${widget.settingsProvider.baseCurrency} (${widget.settingsProvider.currencySymbol})',
                     style: AppTypography.caption(colors.textSecondary),
                   ),
                   trailing: DropdownButton<String>(
-                    value: settingsProvider.baseCurrency,
+                    value: widget.settingsProvider.baseCurrency,
                     dropdownColor: colors.surface,
                     underline: const SizedBox.shrink(),
                     items: AppConstants.supportedCurrencies.map((c) {
@@ -365,7 +618,7 @@ class SettingsScreen extends StatelessWidget {
                     onChanged: (c) {
                       if (c != null) {
                         HapticsHelper.selection();
-                        settingsProvider.setBaseCurrency(c);
+                        widget.settingsProvider.setBaseCurrency(c);
                       }
                     },
                   ),
@@ -376,7 +629,7 @@ class SettingsScreen extends StatelessWidget {
                   leading: Icon(Icons.account_balance_wallet_outlined, color: colors.primary),
                   title: Text(l10n.t('initialCapitalTitle'), style: AppTypography.body(colors.textPrimary, isMedium: true)),
                   subtitle: Text(
-                    '${settingsProvider.currencySymbol}${numFormat.format(settingsProvider.accountBalance)}',
+                    '${widget.settingsProvider.currencySymbol}${numFormat.format(widget.settingsProvider.accountBalance)}',
                     style: AppTypography.caption(colors.textSecondary),
                   ),
                   trailing: const Icon(Icons.chevron_right_rounded),
@@ -402,13 +655,13 @@ class SettingsScreen extends StatelessWidget {
               leading: Icon(Icons.translate_rounded, color: colors.primary),
               title: Text(l10n.t('languageTitle'), style: AppTypography.body(colors.textPrimary, isMedium: true)),
               subtitle: Text(
-                settingsProvider.locale != null
-                    ? AppLocalizations.getLanguageName(settingsProvider.locale!.languageCode)
+                widget.settingsProvider.locale != null
+                    ? AppLocalizations.getLanguageName(widget.settingsProvider.locale!.languageCode)
                     : 'Automático / System',
                 style: AppTypography.caption(colors.textSecondary),
               ),
               trailing: DropdownButton<String?>(
-                value: settingsProvider.locale?.languageCode,
+                value: widget.settingsProvider.locale?.languageCode,
                 dropdownColor: colors.surface,
                 underline: const SizedBox.shrink(),
                 items: [
@@ -425,7 +678,7 @@ class SettingsScreen extends StatelessWidget {
                 ],
                 onChanged: (code) {
                   HapticsHelper.selection();
-                  settingsProvider.setLocale(code);
+                  widget.settingsProvider.setLocale(code);
                 },
               ),
             ),
@@ -446,28 +699,28 @@ class SettingsScreen extends StatelessWidget {
                 SwitchListTile.adaptive(
                   secondary: Icon(
                     Icons.pin_rounded,
-                    color: securityProvider.hasPinCode ? colors.secondary : colors.textSecondary,
+                    color: widget.securityProvider.hasPinCode ? colors.secondary : colors.textSecondary,
                   ),
                   title: Text(
                     l10n.t('pinLockTitle'),
                     style: AppTypography.body(colors.textPrimary, isMedium: true),
                   ),
                   subtitle: Text(
-                    securityProvider.hasPinCode ? l10n.t('pinLockEnabledSubtitle') : l10n.t('pinLockDisabledSubtitle'),
+                    widget.securityProvider.hasPinCode ? l10n.t('pinLockEnabledSubtitle') : l10n.t('pinLockDisabledSubtitle'),
                     style: AppTypography.caption(colors.textSecondary),
                   ),
-                  value: securityProvider.hasPinCode,
+                  value: widget.securityProvider.hasPinCode,
                   activeTrackColor: colors.secondary,
                   onChanged: (val) {
                     HapticsHelper.selection();
                     if (val) {
                       _showSetPinDialog(context);
                     } else {
-                      securityProvider.removePin();
+                      widget.securityProvider.removePin();
                     }
                   },
                 ),
-                if (securityProvider.hasPinCode) ...[
+                if (widget.securityProvider.hasPinCode) ...[
                   const Divider(),
                   // Biometrics Toggle
                   SwitchListTile.adaptive(
@@ -480,11 +733,11 @@ class SettingsScreen extends StatelessWidget {
                       l10n.t('biometricsSubtitle'),
                       style: AppTypography.caption(colors.textSecondary),
                     ),
-                    value: securityProvider.isBiometricsEnabled,
+                    value: widget.securityProvider.isBiometricsEnabled,
                     activeTrackColor: colors.primary,
                     onChanged: (val) async {
                       HapticsHelper.selection();
-                      await securityProvider.toggleBiometrics(val);
+                      await widget.securityProvider.toggleBiometrics(val);
                     },
                   ),
                   const Divider(),
@@ -492,15 +745,15 @@ class SettingsScreen extends StatelessWidget {
                     leading: Icon(Icons.timer_outlined, color: colors.textSecondary),
                     title: Text(l10n.t('autoLockTitle'), style: AppTypography.body(colors.textPrimary, isMedium: true)),
                     subtitle: Text(
-                      securityProvider.autoLockTimeoutSeconds == 0
+                      widget.securityProvider.autoLockTimeoutSeconds == 0
                           ? l10n.t('autoLockImmediate')
-                          : (securityProvider.autoLockTimeoutSeconds == 60
+                          : (widget.securityProvider.autoLockTimeoutSeconds == 60
                               ? l10n.t('autoLock1Min')
                               : l10n.t('autoLock5Min')),
                       style: AppTypography.caption(colors.textSecondary),
                     ),
                     trailing: DropdownButton<int>(
-                      value: securityProvider.autoLockTimeoutSeconds,
+                      value: widget.securityProvider.autoLockTimeoutSeconds,
                       dropdownColor: colors.surface,
                       underline: const SizedBox.shrink(),
                       items: [
@@ -511,12 +764,24 @@ class SettingsScreen extends StatelessWidget {
                       onChanged: (sec) {
                         if (sec != null) {
                           HapticsHelper.selection();
-                          securityProvider.setAutoLockTimeout(sec);
+                          widget.securityProvider.setAutoLockTimeout(sec);
                         }
                       },
                     ),
                   ),
                 ],
+                const Divider(),
+                // Privacy Policy Tile
+                ListTile(
+                  leading: Icon(Icons.privacy_tip_outlined, color: colors.secondary),
+                  title: Text(l10n.t('privacyPolicyTitle'), style: AppTypography.body(colors.textPrimary, isMedium: true)),
+                  subtitle: Text(l10n.t('privacyPolicySubtitle'), style: AppTypography.caption(colors.textSecondary)),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () {
+                    HapticsHelper.light();
+                    _showPrivacyPolicyDialog(context);
+                  },
+                ),
               ],
             ),
           ),
@@ -547,25 +812,56 @@ class SettingsScreen extends StatelessWidget {
                   trailing: const Icon(Icons.chevron_right_rounded),
                   onTap: () => _backupJson(context),
                 ),
+                const Divider(),
+                ListTile(
+                  leading: Icon(Icons.delete_forever_rounded, color: colors.loss),
+                  title: Text(l10n.t('clearAllDataTitle'), style: AppTypography.body(colors.loss, isMedium: true)),
+                  subtitle: Text(l10n.t('clearAllDataSubtitle'), style: AppTypography.caption(colors.textSecondary)),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () {
+                    HapticsHelper.light();
+                    _showClearDataDialog(context);
+                  },
+                ),
               ],
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
 
-          // Omniverse Labs Branding
+          // Omniverse Labs Branding & About
           Center(
-            child: Column(
-              children: [
-                Text(
-                  '${AppConstants.appName} v${AppConstants.appVersion}',
-                  style: AppTypography.caption(colors.textTertiary, isMedium: true),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              onTap: () {
+                _handleDevModeTap(context);
+                _showAboutDialog(context);
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.sm,
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  'Omniverse Labs Ecosystem',
-                  style: AppTypography.caption(colors.textTertiary),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.verified_user_outlined, size: 14, color: colors.textTertiary),
+                        const SizedBox(width: AppSpacing.xs),
+                        Text(
+                          '${AppConstants.appName} v${AppConstants.appVersion}',
+                          style: AppTypography.caption(colors.textTertiary, isMedium: true),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Omniverse Labs Ecosystem',
+                      style: AppTypography.caption(colors.textTertiary),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.xl),

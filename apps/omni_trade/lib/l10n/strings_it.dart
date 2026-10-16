@@ -193,4 +193,23 @@ const Map<String, String> stringsIt = {
   'paywallLimitNotice': 'Hai raggiunto il limite di 15 operazioni del piano gratuito.',
   'paywallExportNotice': 'L’esportazione dei dati richiede OmniTrade PRO.',
   'paywallAnalyticsNotice': 'Sblocca tutte le analisi per verificare le tue prestazioni.',
+
+  // Privacy, Data Deletion & About
+  'privacyPolicyTitle': 'Informativa sulla Privacy',
+  'privacyPolicySubtitle': '100% Offline. Senza tracker o server esterni',
+  'privacyDialogTitle': 'Privacy e Protezione dei Dati',
+  'privacyDialogContent': 'OmniTrade opera con un\'architettura 100% Offline-First. Tutti i tuoi dati finanziari, registri delle operazioni e impostazioni sono memorizzati localmente nel database SQLite del dispositivo.\n\n• Non raccogliamo dati personali né metriche di utilizzo.\n• Nessuna creazione di account o registrazione email richiesta.\n• Nessun dato finanziario viene trasmesso a server esterni.\n• Hai il pieno controllo per esportare (CSV/JSON) o cancellare i tuoi dati in qualsiasi momento.\n\nPer domande o supporto, contattaci all\'indirizzo omniverselabs@gmail.com.',
+  'clearAllDataTitle': 'Elimina Tutti i Dati',
+  'clearAllDataSubtitle': 'Cancella definitivamente tutte le operaciones e la cronologia',
+  'clearDataConfirmTitle': 'Eliminare tutti i dati?',
+  'clearDataConfirmContent': 'Questa azione eliminerà irrevocabilmente tutte le operaciones registrate nel diario locale. L\'azione non può essere annullata.',
+  'clearDataAction': 'Sì, Elimina Tutto',
+  'clearDataSuccessToast': 'Tutte le operazioni sono state eliminate con successo',
+  'aboutAppTitle': 'Informazioni su OmniTrade',
+  'aboutCompany': 'OMNIVERSE LABS',
+  'aboutMission': 'Strumenti finanziari e analitici offline progettati con precisione matematica per trader disciplinati.',
+  'contactSupportTitle': 'Contatto e Supporto',
+  'contactSupportSubtitle': 'omniverselabs@gmail.com',
+  'packageIdLabel': 'ID Pacchetto',
+  'versionLabel': 'Versione',
 };

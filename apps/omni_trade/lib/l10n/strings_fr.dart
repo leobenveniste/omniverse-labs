@@ -193,4 +193,23 @@ const Map<String, String> stringsFr = {
   'paywallLimitNotice': 'Vous avez atteint la limite de 15 opérations du plan gratuit.',
   'paywallExportNotice': 'L’exportation de données requiert OmniTrade PRO.',
   'paywallAnalyticsNotice': 'Débloquez toutes les analyses pour auditer vos trades.',
+
+  // Privacy, Data Deletion & About
+  'privacyPolicyTitle': 'Politique de Confidentialité',
+  'privacyPolicySubtitle': '100% Hors ligne. Sans traceurs ni serveurs externes',
+  'privacyDialogTitle': 'Confidentialité et Protection des Données',
+  'privacyDialogContent': 'OmniTrade fonctionne selon une architecture 100% Offline-First. Toutes vos données financières, journaux de trading et réglages sont stockés exclusivement sur votre appareil (SQLite).\n\n• Nous ne collectons aucune donnée personnelle ni métrique d\'utilisation.\n• Aucune création de compte ou adresse email requise.\n• Aucun enregistrement financier n\'est envoyé à des serveurs tiers.\n• Vous gardez le contrôle total pour exporter (CSV/JSON) ou purger vos données à tout moment.\n\nPour toute question ou support, écrivez-nous à omniverselabs@gmail.com.',
+  'clearAllDataTitle': 'Supprimer Toutes les Données',
+  'clearAllDataSubtitle': 'Effacer définitivement tout l\'historique des opérations',
+  'clearDataConfirmTitle': 'Supprimer toutes les données ?',
+  'clearDataConfirmContent': 'Cette action supprimera de façon irréversible toutes les opérations enregistrées dans votre journal local. Cette action est irréversible.',
+  'clearDataAction': 'Oui, Tout Supprimer',
+  'clearDataSuccessToast': 'Toutes les opérations ont été supprimées avec succès',
+  'aboutAppTitle': 'À Propos d\'OmniTrade',
+  'aboutCompany': 'OMNIVERSE LABS',
+  'aboutMission': 'Outils financiers et analytiques hors ligne conçus avec une précision mathématique pour les traders disciplinés.',
+  'contactSupportTitle': 'Contact et Support',
+  'contactSupportSubtitle': 'omniverselabs@gmail.com',
+  'packageIdLabel': 'ID de Package',
+  'versionLabel': 'Version',
 };
