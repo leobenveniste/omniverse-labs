@@ -50,6 +50,8 @@ class StorageService {
   }
 
   // --- ROUTINES ---
+  bool get hasRoutinesStored => _prefs.containsKey(_keyRoutines);
+
   Future<List<Routine>> loadRoutines() async {
     final raw = _prefs.getString(_keyRoutines);
     if (raw == null || raw.isEmpty) return [];
@@ -133,5 +135,12 @@ class StorageService {
     } catch (_) {
       return false;
     }
+  }
+
+  Future<void> clearAll() async {
+    await _prefs.remove(_keyHabits);
+    await _prefs.remove(_keyLogs);
+    await _prefs.remove(_keyRoutines);
+    await _prefs.remove(_keyJournal);
   }
 }

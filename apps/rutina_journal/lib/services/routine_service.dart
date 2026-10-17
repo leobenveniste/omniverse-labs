@@ -87,19 +87,17 @@ class RoutineService extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    _routines = await _storage.loadRoutines();
-    if (_routines.isEmpty) {
+    if (!_storage.hasRoutinesStored) {
       _routines = _buildDefaultRoutines();
       await _storage.saveRoutines(_routines);
     } else {
-      // Seamlessly merge new default routines if not already added
-      final existingTitles = _routines.map((r) => r.title).toSet();
-      final defaults = _buildDefaultRoutines();
-      bool modified = false;
+      _routines = await _storage.loadRoutines();
       // Ensure existing default routines have their specialized icons updated
+      final defaults = _buildDefaultRoutines();
       final defaultIconMap = {
         for (final d in defaults) d.title: d.iconName,
       };
+      bool modified = false;
       _routines = _routines.map((r) {
         if (defaultIconMap.containsKey(r.title) && r.iconName != defaultIconMap[r.title]) {
           modified = true;
@@ -108,12 +106,6 @@ class RoutineService extends ChangeNotifier {
         return r;
       }).toList();
 
-      for (final def in defaults) {
-        if (!existingTitles.contains(def.title)) {
-          _routines.add(def);
-          modified = true;
-        }
-      }
       if (modified) {
         await _storage.saveRoutines(_routines);
       }
@@ -430,9 +422,19 @@ class RoutineService extends ChangeNotifier {
   }
 
   Future<void> deleteRoutine(String routineId) async {
+    if (_activeRoutine?.id == routineId) {
+      stopRoutine();
+    }
     _routines.removeWhere((r) => r.id == routineId);
     await _storage.saveRoutines(_routines);
     _notificationService?.cancel(routineId.hashCode & 0x7FFFFFFF);
+    notifyListeners();
+  }
+
+  Future<void> clearAll() async {
+    stopRoutine();
+    _routines.clear();
+    await _storage.saveRoutines([]);
     notifyListeners();
   }
 

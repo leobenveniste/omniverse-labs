@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import '../l10n/app_localizations.dart';
 import '../models/player.dart';
 import '../theme/app_theme.dart';
 import '../services/sound_haptics_service.dart';
@@ -65,12 +66,15 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
   }
 
   void _addPlayer() {
+    final l10n = AppLocalizations.of(context);
     final name = _nameController.text.trim();
-    final effectiveName = name.isEmpty ? 'Jugador ${_players.length + 1}' : name;
+    final effectiveName = name.isEmpty
+        ? l10n.t('defaultPlayer').replaceAll('{index}', '${_players.length + 1}')
+        : name;
 
     if (_players.length >= widget.maxPlayers) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Máximo ${widget.maxPlayers} jugadores permitidos')),
+        SnackBar(content: Text(l10n.t('maxPlayersLimit').replaceAll('{count}', '${widget.maxPlayers}'))),
       );
       return;
     }
@@ -92,9 +96,10 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
   }
 
   void _removePlayer(int index) {
+    final l10n = AppLocalizations.of(context);
     if (_players.length <= widget.minPlayers) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Mínimo ${widget.minPlayers} jugadores requeridos')),
+        SnackBar(content: Text(l10n.t('minPlayersRequired').replaceAll('{count}', '${widget.minPlayers}'))),
       );
       return;
     }
@@ -105,10 +110,11 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
   }
 
   void _editPlayerName(Player player) async {
+    final l10n = AppLocalizations.of(context);
     final newName = await PlayerNameDialog.show(
       context,
       currentName: player.name,
-      title: 'Editar Nombre',
+      title: l10n.t('editTeamName'),
     );
     if (newName != null && newName.isNotEmpty) {
       setState(() {
@@ -119,11 +125,12 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
   }
 
   void _pickColor(Player player) async {
+    final l10n = AppLocalizations.of(context);
     final selected = await showDialog<Color>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.surfaceDark,
-        title: const Text('Elegir Color', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text(l10n.t('pickColorTitle'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         content: Wrap(
           spacing: 12,
           runSpacing: 12,
@@ -157,9 +164,10 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
   }
 
   void _submit() {
+    final l10n = AppLocalizations.of(context);
     if (_players.length < widget.minPlayers) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Agrega al menos ${widget.minPlayers} jugadores para comenzar')),
+        SnackBar(content: Text(l10n.t('addAtLeastPlayers').replaceAll('{count}', '${widget.minPlayers}'))),
       );
       return;
     }
@@ -173,6 +181,7 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final headerCode = widget.gameTitle.toUpperCase().replaceAll(' ', '_');
     final isDiezMil = widget.gameTitle.toLowerCase().contains('diez');
 
@@ -206,10 +215,10 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Title & Subtitle in Spanish
-              const Text(
-                'Nuevo Juego',
-                style: TextStyle(
+              // Title & Subtitle
+              Text(
+                l10n.t('gameSetupTitle'),
+                style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w900,
                   color: Colors.white,
@@ -218,10 +227,10 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
               ),
               const SizedBox(height: 4),
               Text(
-                'Agrega jugadores y define el orden de turno.',
+                l10n.t('gameSetupSubtitle'),
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.white.withOpacity(0.6),
+                  color: Colors.white.withValues(alpha: 0.6),
                 ),
               ),
               const SizedBox(height: 18),
@@ -243,10 +252,10 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                           fontWeight: FontWeight.w600,
                           fontSize: 16,
                         ),
-                        decoration: const InputDecoration(
-                          hintText: 'Nombre del jugador...',
-                          hintStyle: TextStyle(color: Colors.black38, fontSize: 15),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        decoration: InputDecoration(
+                          hintText: l10n.t('playerNameHint'),
+                          hintStyle: const TextStyle(color: Colors.black38, fontSize: 15),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                           border: InputBorder.none,
                           enabledBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,
@@ -384,20 +393,20 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Mínimo para Entrar (Apertura):',
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white70),
+                          Text(
+                            l10n.t('diezMilMinEntryLabel'),
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white70),
                           ),
                           DropdownButton<int>(
                             value: _entryScore,
                             dropdownColor: AppTheme.surfaceDark,
                             style: const TextStyle(color: AppTheme.cyberGold, fontWeight: FontWeight.w900, fontSize: 14),
                             underline: const SizedBox(),
-                            items: const [
-                              DropdownMenuItem(value: 0, child: Text('Sin mínimo')),
-                              DropdownMenuItem(value: 500, child: Text('500 pts')),
-                              DropdownMenuItem(value: 750, child: Text('750 pts (Def)')),
-                              DropdownMenuItem(value: 1000, child: Text('1.000 pts')),
+                            items: [
+                              DropdownMenuItem(value: 0, child: Text(l10n.t('noMinimum'))),
+                              const DropdownMenuItem(value: 500, child: Text('500 pts')),
+                              const DropdownMenuItem(value: 750, child: Text('750 pts (Def)')),
+                              const DropdownMenuItem(value: 1000, child: Text('1.000 pts')),
                             ],
                             onChanged: (val) {
                               if (val != null) setState(() => _entryScore = val);
@@ -409,22 +418,22 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
-                            'Mínimo por Ronda (Plantarse):',
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white70),
+                          Text(
+                            l10n.t('diezMilMinStayLabel'),
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white70),
                           ),
                           DropdownButton<int>(
                             value: _minRoundScore,
                             dropdownColor: AppTheme.surfaceDark,
                             style: const TextStyle(color: AppTheme.cyberGold, fontWeight: FontWeight.w900, fontSize: 14),
                             underline: const SizedBox(),
-                            items: const [
-                              DropdownMenuItem(value: 0, child: Text('Sin mínimo')),
-                              DropdownMenuItem(value: 200, child: Text('200 pts')),
-                              DropdownMenuItem(value: 300, child: Text('300 pts')),
-                              DropdownMenuItem(value: 350, child: Text('350 pts (Def)')),
-                              DropdownMenuItem(value: 400, child: Text('400 pts')),
-                              DropdownMenuItem(value: 500, child: Text('500 pts')),
+                            items: [
+                              DropdownMenuItem(value: 0, child: Text(l10n.t('noMinimum'))),
+                              const DropdownMenuItem(value: 200, child: Text('200 pts')),
+                              const DropdownMenuItem(value: 300, child: Text('300 pts')),
+                              const DropdownMenuItem(value: 350, child: Text('350 pts (Def)')),
+                              const DropdownMenuItem(value: 400, child: Text('400 pts')),
+                              const DropdownMenuItem(value: 500, child: Text('500 pts')),
                             ],
                             onChanged: (val) {
                               if (val != null) setState(() => _minRoundScore = val);
@@ -453,20 +462,20 @@ class _GameSetupScreenState extends State<GameSetupScreen> {
                     ),
                     elevation: 0,
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'COMENZAR JUEGO',
-                        style: TextStyle(
+                        l10n.t('startGame').toUpperCase(),
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 1.0,
                           color: Colors.black,
                         ),
                       ),
-                      SizedBox(width: 8),
-                      Icon(Icons.arrow_right, color: Colors.black, size: 26),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.arrow_right, color: Colors.black, size: 26),
                     ],
                   ),
                 ),

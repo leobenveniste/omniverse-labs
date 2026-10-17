@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../l10n/app_localizations.dart';
+import '../../services/app_services.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
+import '../utils/haptics_helper.dart';
 import 'state_button.dart';
 
 class AboutDialogWidget extends StatelessWidget {
@@ -82,7 +84,7 @@ class AboutDialogWidget extends StatelessWidget {
             _buildVersionRow(
               context,
               label: l10n.t('versionLabel'),
-              value: '1.0.2 (Build 3)',
+              value: '1.0.11 (Build 12)',
             ),
             const SizedBox(height: AppSpacing.xs),
             _buildRow(
@@ -161,26 +163,78 @@ class AboutDialogWidget extends StatelessWidget {
     required String value,
   }) {
     final theme = Theme.of(context);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.7), isMedium: true),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.primaryContainer,
-            borderRadius: BorderRadius.circular(4),
+    int tapCount = 0;
+    DateTime? lastTap;
+
+    return StatefulBuilder(
+      builder: (context, setInnerState) {
+        return InkWell(
+          borderRadius: BorderRadius.circular(6),
+          onTap: () async {
+            final now = DateTime.now();
+            if (lastTap == null || now.difference(lastTap!) > const Duration(seconds: 2)) {
+              tapCount = 1;
+            } else {
+              tapCount++;
+            }
+            lastTap = now;
+
+            if (tapCount >= 7) {
+              tapCount = 0;
+              HapticsHelper.heavy();
+              final prefs = AppServices.of(context).preferencesService;
+              await prefs.toggleDevMode();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    backgroundColor: prefs.isDevMode ? const Color(0xFF2D7A4F) : const Color(0xFF475569),
+                    content: Text(
+                      prefs.isDevMode ? '🧪 Modo Desarrollador activado' : '🔒 Modo Desarrollador desactivado',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                );
+              }
+            } else if (tapCount >= 4) {
+              HapticsHelper.light();
+              final remaining = 7 - tapCount;
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('$remaining toques más para alternar Modo Desarrollador...'),
+                    duration: const Duration(milliseconds: 500),
+                  ),
+                );
+              }
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  label,
+                  style: AppTypography.caption(theme.colorScheme.onSurface.withValues(alpha: 0.7), isMedium: true),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    value,
+                    style: AppTypography.caption(theme.colorScheme.onPrimaryContainer, isMedium: true)
+                        .copyWith(fontSize: 10),
+                  ),
+                ),
+              ],
+            ),
           ),
-          child: Text(
-            value,
-            style: AppTypography.caption(theme.colorScheme.onPrimaryContainer, isMedium: true)
-                .copyWith(fontSize: 10),
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 }

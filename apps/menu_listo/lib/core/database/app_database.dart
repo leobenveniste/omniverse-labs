@@ -407,4 +407,17 @@ class AppDatabase {
       debugPrint('Error loading sample recipes: $e\n$st');
     }
   }
+
+  Future<void> clearAllData() async {
+    final db = await database;
+    await db.transaction((txn) async {
+      await txn.delete('ingredients');
+      await txn.delete('recipe_steps');
+      await txn.delete('meal_plans');
+      await txn.delete('meal_plan_templates');
+      await txn.delete('shopping_items');
+      await txn.delete('recipes');
+    });
+  }
 }
+

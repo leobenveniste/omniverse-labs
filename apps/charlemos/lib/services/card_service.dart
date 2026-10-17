@@ -252,4 +252,16 @@ class CardService extends ChangeNotifier {
     drawNextCard();
     notifyListeners();
   }
+
+  Future<void> clearAllData() async {
+    _playedCardIds.clear();
+    _favoriteIds.clear();
+    _customCards.clear();
+    _history.clear();
+    _historyIndex = -1;
+    await _prefs.remove(_keyPlayedHistory);
+    await _prefs.remove(_keyFavorites);
+    await _prefs.remove(_keyCustomCards);
+    await load();
+  }
 }

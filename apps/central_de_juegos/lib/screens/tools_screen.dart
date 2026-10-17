@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../widgets/dice_roller_widget.dart';
 import '../widgets/finger_roulette_widget.dart';
 import '../widgets/coin_flipper_widget.dart';
@@ -22,18 +23,19 @@ class _ToolsScreenState extends State<ToolsScreen> {
     _currentIndex = widget.initialTab;
   }
 
-  final List<String> _titles = [
-    'Tirador de Dados',
-    '¿Quién Empieza?',
-    'Temporizador de Turno',
-    'Lanzador de Moneda',
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final titles = [
+      l10n.t('toolDiceRoller'),
+      l10n.t('toolFingerRoulette'),
+      l10n.t('toolTurnTimer'),
+      l10n.t('toolCoinFlipper'),
+    ];
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(_titles[_currentIndex]),
+        title: Text(titles[_currentIndex]),
       ),
       body: IndexedStack(
         index: _currentIndex,
@@ -63,26 +65,26 @@ class _ToolsScreenState extends State<ToolsScreen> {
             _currentIndex = index;
           });
         },
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.casino_outlined),
-            selectedIcon: Icon(Icons.casino),
-            label: 'Dados',
+            icon: const Icon(Icons.casino_outlined),
+            selectedIcon: const Icon(Icons.casino),
+            label: l10n.t('toolTabDice'),
           ),
           NavigationDestination(
-            icon: Icon(Icons.touch_app_outlined),
-            selectedIcon: Icon(Icons.touch_app),
-            label: 'Quién Empieza',
+            icon: const Icon(Icons.touch_app_outlined),
+            selectedIcon: const Icon(Icons.touch_app),
+            label: l10n.t('toolTabRoulette'),
           ),
           NavigationDestination(
-            icon: Icon(Icons.timer_outlined),
-            selectedIcon: Icon(Icons.timer),
-            label: 'Temporizador',
+            icon: const Icon(Icons.timer_outlined),
+            selectedIcon: const Icon(Icons.timer),
+            label: l10n.t('toolTabTimer'),
           ),
           NavigationDestination(
-            icon: Icon(Icons.monetization_on_outlined),
-            selectedIcon: Icon(Icons.monetization_on),
-            label: 'Moneda',
+            icon: const Icon(Icons.monetization_on_outlined),
+            selectedIcon: const Icon(Icons.monetization_on),
+            label: l10n.t('toolTabCoin'),
           ),
         ],
       ),

@@ -283,4 +283,40 @@ class AppStrings {
   String get testProActivated => isSpanish ? '✨ Menú Listo Pro activado en modo de pruebas' : '✨ Menú Listo Pro activated for testing';
   String get testProDeactivated => isSpanish ? 'Modo gratuito restablecido' : 'Free mode restored';
   String get activateTestPro => isSpanish ? '🧪 Activar versión Pro de prueba' : '🧪 Activate Test Pro Version';
+
+  // Privacy Policy & Data Deletion
+  String get privacyPolicySubtitle => isSpanish
+      ? '100% Fuera de línea. Sin rastreadores ni servidores externos'
+      : '100% Offline. Zero trackers or external servers';
+  String get privacyDialogTitle => isSpanish
+      ? 'Privacidad y Protección de Datos'
+      : 'Privacy & Data Protection';
+  String get privacyDialogContent => isSpanish
+      ? 'Menú Listo opera bajo una arquitectura 100% Offline-First. Todas tus recetas, ingredientes, notas, fotos, planes semanales y listas de compras se almacenan exclusivamente de forma local en tu dispositivo.\n\n• No recopilamos datos personales ni métricas de uso.\n• No requerimos creación de cuenta ni correo electrónico.\n• Ninguna receta o lista se transmite a servidores externos.\n• Tienes control absoluto para exportar, respaldar o purgar todos tus datos en cualquier momento.\n\nPara dudas o sugerencias, escríbenos a omniverselabs@gmail.com.'
+      : 'Menú Listo operates under a strict 100% Offline-First architecture. All your recipes, ingredients, notes, photos, meal plans, and grocery lists are stored exclusively locally on your device.\n\n• We do not collect personal data or analytics.\n• No account creation or email address is needed.\n• No culinary data is transmitted to external servers.\n• You retain full control to export, backup, or purge your data at any time.\n\nFor support or questions, reach out to omniverselabs@gmail.com.';
+  String get clearAllDataTitle => isSpanish
+      ? 'Eliminar Todos los Datos'
+      : 'Delete All Data';
+  String get clearAllDataSubtitle => isSpanish
+      ? 'Borrar permanentemente todas las recetas, planes y lista de compras'
+      : 'Permanently erase all recipes, meal plans, and shopping list';
+  String get clearDataConfirmTitle => isSpanish
+      ? '¿Eliminar todos los datos?'
+      : 'Delete all data?';
+  String get clearDataConfirmContent => isSpanish
+      ? 'Esta acción eliminará de forma irreversible todas tus recetas guardadas, planes semanales y listas de compras. Esta acción no se puede deshacer.'
+      : 'This action will permanently and irreversibly erase all your recipes, meal plans, and grocery items. This action cannot be undone.';
+  String get clearDataAction => isSpanish
+      ? 'Sí, Borrar Todo'
+      : 'Yes, Delete Everything';
+  String get clearDataSuccessToast => isSpanish
+      ? 'Todos los datos fueron eliminados correctamente'
+      : 'All data was successfully deleted';
+  String get devModeUnlockedToast => isSpanish
+      ? '¡Modo de Desarrollador Desbloqueado! 🛠️'
+      : 'Developer Mode Unlocked! 🛠️';
+  String get devModeLockedToast => isSpanish
+      ? 'Modo de Desarrollador Desactivado'
+      : 'Developer Mode Disabled';
 }
+

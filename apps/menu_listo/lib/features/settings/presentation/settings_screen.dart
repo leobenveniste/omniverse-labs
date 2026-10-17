@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:menu_listo/core/database/app_database.dart';
 import 'package:menu_listo/core/localization/app_localizations.dart';
 import 'package:menu_listo/core/localization/locale_provider.dart';
 import 'package:menu_listo/core/theme/app_colors.dart';
@@ -11,6 +13,7 @@ import 'package:menu_listo/core/widgets/contact_us_modal.dart';
 import '../../backup/services/backup_service.dart';
 import '../../premium/presentation/paywall_sheet.dart';
 import '../../premium/providers/premium_provider.dart';
+import '../../recipes/providers/recipe_provider.dart';
 import 'widgets/about_dialog_widget.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -290,111 +293,74 @@ class SettingsScreen extends ConsumerWidget {
               },
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
 
-          // 6. Testing & QA Mode
+          // 6. Privacy Policy
           Text(
-            strings.testingSectionTitle,
+            strings.privacyPolicy,
             style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
           Card(
-            clipBehavior: Clip.antiAlias,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(
-                color: premiumState.isProUser
-                    ? Colors.amber.shade600.withValues(alpha: 0.5)
-                    : theme.colorScheme.outline.withValues(alpha: 0.2),
-                width: 1,
-              ),
-            ),
-            child: SwitchListTile.adaptive(
-              secondary: Container(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            child: ListTile(
+              leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: premiumState.isProUser
-                      ? Colors.amber.withValues(alpha: 0.2)
-                      : theme.colorScheme.surfaceContainerHighest,
+                  color: theme.colorScheme.primaryContainer,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.science_rounded,
-                  color: premiumState.isProUser ? Colors.amber.shade800 : theme.colorScheme.primary,
-                  size: 22,
-                ),
+                child: Icon(Icons.privacy_tip_outlined, color: theme.colorScheme.onPrimaryContainer, size: 20),
               ),
-              title: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      strings.testProToggleTitle,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: premiumState.isProUser ? Colors.amber.shade700 : theme.colorScheme.outlineVariant,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      premiumState.isProUser ? 'PRO' : 'FREE',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w900,
-                        color: premiumState.isProUser ? Colors.white : theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                ],
+              title: Text(
+                strings.privacyPolicy,
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
-              subtitle: Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text(
-                  strings.testProToggleSubtitle,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
+              subtitle: Text(
+                strings.privacyPolicySubtitle,
+                style: const TextStyle(fontSize: 12),
               ),
-              value: premiumState.isProUser,
-              activeTrackColor: Colors.amber.shade600,
-              activeThumbColor: Colors.amber.shade900,
-              onChanged: (bool value) async {
-                HapticFeedback.mediumImpact();
-                await ref.read(premiumProvider.notifier).setProUser(value);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      duration: const Duration(seconds: 2),
-                      backgroundColor: value ? Colors.green.shade700 : Colors.blueGrey.shade800,
-                      content: Row(
-                        children: [
-                          Icon(
-                            value ? Icons.stars_rounded : Icons.info_outline,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              value ? strings.testProActivated : strings.testProDeactivated,
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () {
+                HapticFeedback.lightImpact();
+                _showPrivacyPolicyDialog(context, strings);
               },
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
 
-          // 6. About Screen
+          // 7. Data Management / Delete All Data
+          Text(
+            strings.clearAllDataTitle,
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            child: ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.errorContainer,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.delete_forever_rounded, color: theme.colorScheme.error, size: 20),
+              ),
+              title: Text(
+                strings.clearAllDataTitle,
+                style: TextStyle(fontWeight: FontWeight.w600, color: theme.colorScheme.error),
+              ),
+              subtitle: Text(
+                strings.clearAllDataSubtitle,
+                style: const TextStyle(fontSize: 12),
+              ),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => _handleClearAllData(context, strings, ref),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // 8. About Screen
           Card(
             child: ListTile(
               leading: const Icon(Icons.info_outline_rounded),
@@ -408,6 +374,110 @@ class SettingsScreen extends ConsumerWidget {
               },
             ),
           ),
+
+          // 9. Testing & QA Mode (Protected: visible only in debug or developer mode unlocked via Easter Egg)
+          if (kDebugMode || premiumState.isDevMode) ...[
+            const SizedBox(height: 24),
+            Text(
+              strings.testingSectionTitle,
+              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            Card(
+              clipBehavior: Clip.antiAlias,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(
+                  color: premiumState.isProUser
+                      ? Colors.amber.shade600.withValues(alpha: 0.5)
+                      : theme.colorScheme.outline.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+              ),
+              child: SwitchListTile.adaptive(
+                secondary: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: premiumState.isProUser
+                        ? Colors.amber.withValues(alpha: 0.2)
+                        : theme.colorScheme.surfaceContainerHighest,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.science_rounded,
+                    color: premiumState.isProUser ? Colors.amber.shade800 : theme.colorScheme.primary,
+                    size: 22,
+                  ),
+                ),
+                title: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        strings.testProToggleTitle,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: premiumState.isProUser ? Colors.amber.shade700 : theme.colorScheme.outlineVariant,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        premiumState.isProUser ? 'PRO' : 'FREE',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                          color: premiumState.isProUser ? Colors.white : theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(
+                    strings.testProToggleSubtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ),
+                value: premiumState.isProUser,
+                activeTrackColor: Colors.amber.shade600,
+                activeThumbColor: Colors.amber.shade900,
+                onChanged: (bool value) async {
+                  HapticFeedback.mediumImpact();
+                  await ref.read(premiumProvider.notifier).setProUser(value);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        duration: const Duration(seconds: 2),
+                        backgroundColor: value ? Colors.green.shade700 : Colors.blueGrey.shade800,
+                        content: Row(
+                          children: [
+                            Icon(
+                              value ? Icons.stars_rounded : Icons.info_outline,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                value ? strings.testProActivated : strings.testProDeactivated,
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -471,4 +541,105 @@ class SettingsScreen extends ConsumerWidget {
       ),
     );
   }
+
+  void _showPrivacyPolicyDialog(BuildContext context, AppStrings strings) {
+    HapticFeedback.selectionClick();
+    final theme = Theme.of(context);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.privacy_tip_outlined, color: theme.colorScheme.primary),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                strings.privacyDialogTitle,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Text(
+            strings.privacyDialogContent,
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.4,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(strings.close),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _handleClearAllData(
+    BuildContext context,
+    AppStrings strings,
+    WidgetRef ref,
+  ) async {
+    HapticFeedback.heavyImpact();
+    final theme = Theme.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: theme.colorScheme.error),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                strings.clearDataConfirmTitle,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          strings.clearDataConfirmContent,
+          style: TextStyle(
+            fontSize: 14,
+            height: 1.4,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(strings.cancel),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.colorScheme.error,
+              foregroundColor: theme.colorScheme.onError,
+            ),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(strings.clearDataAction),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      await AppDatabase.instance.clearAllData();
+      ref.invalidate(recipesListProvider);
+      HapticFeedback.mediumImpact();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(strings.clearDataSuccessToast),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
 }
+

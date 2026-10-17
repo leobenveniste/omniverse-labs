@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import '../l10n/app_localizations.dart';
+import '../main.dart';
 import '../models/game_type.dart';
 import '../models/game_session.dart';
 import '../models/player.dart';
@@ -91,7 +93,6 @@ class _GeneralaScreenState extends State<GeneralaScreen> {
     final sheet = _game.sheets[playerId];
     if (sheet == null) return;
     final currentScore = sheet.scores[category];
-    final isServida = sheet.isServida[category] ?? false;
 
     showModalBottomSheet(
       context: context,
@@ -229,6 +230,7 @@ class _GeneralaScreenState extends State<GeneralaScreen> {
   }
 
   void _managePlayersDialog() {
+    final l10n = AppLocalizations.of(context);
     final controllers = _game.players.map((p) => TextEditingController(text: p.name)).toList();
 
     showDialog(
@@ -236,7 +238,7 @@ class _GeneralaScreenState extends State<GeneralaScreen> {
       builder: (ctx) => StatefulBuilder(
         builder: (context, setModalState) {
           return AlertDialog(
-            title: const Text('Jugadores de Generala'),
+            title: Text(l10n.t('gameGenerala')),
             content: SizedBox(
               width: double.maxFinite,
               child: ListView(
@@ -256,7 +258,7 @@ class _GeneralaScreenState extends State<GeneralaScreen> {
                             child: TextField(
                               controller: controllers[i],
                               decoration: InputDecoration(
-                                labelText: 'Jugador ${i + 1}',
+                                labelText: l10n.t('defaultPlayer').replaceAll('{index}', '${i + 1}'),
                                 isDense: true,
                               ),
                             ),
@@ -277,10 +279,10 @@ class _GeneralaScreenState extends State<GeneralaScreen> {
                   if (controllers.length < 6)
                     TextButton.icon(
                       icon: const Icon(Icons.add),
-                      label: const Text('Agregar Jugador'),
+                      label: Text(l10n.t('addPlayer')),
                       onPressed: () {
                         setModalState(() {
-                          controllers.add(TextEditingController(text: 'Jugador ${controllers.length + 1}'));
+                          controllers.add(TextEditingController(text: l10n.t('defaultPlayer').replaceAll('{index}', '${controllers.length + 1}')));
                         });
                       },
                     ),
@@ -290,13 +292,14 @@ class _GeneralaScreenState extends State<GeneralaScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('Cancelar'),
+                child: Text(l10n.t('cancel')),
               ),
               FilledButton(
                 onPressed: () {
                   final newPlayers = <Player>[];
                   for (int i = 0; i < controllers.length; i++) {
-                    final name = controllers[i].text.trim().isEmpty ? 'Jugador ${i + 1}' : controllers[i].text.trim();
+                    final defaultName = l10n.t('defaultPlayer').replaceAll('{index}', '${i + 1}');
+                    final name = controllers[i].text.trim().isEmpty ? defaultName : controllers[i].text.trim();
                     newPlayers.add(Player(
                       id: 'p${i + 1}',
                       name: name,
@@ -311,7 +314,7 @@ class _GeneralaScreenState extends State<GeneralaScreen> {
                   _saveState();
                   Navigator.of(ctx).pop();
                 },
-                child: const Text('Guardar'),
+                child: Text(l10n.t('save')),
               ),
             ],
           );
@@ -323,11 +326,15 @@ class _GeneralaScreenState extends State<GeneralaScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+    final appState = CentralDeJuegosApp.of(context);
+    final tableMat = appState.tableMat;
 
     return Scaffold(
-      backgroundColor: AppTheme.bgDark,
+      backgroundColor: tableMat.surfaceColor,
       appBar: AppBar(
-        backgroundColor: AppTheme.bgDark,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         title: Row(
           children: [
             Image.asset(
@@ -336,9 +343,9 @@ class _GeneralaScreenState extends State<GeneralaScreen> {
               height: 24,
             ),
             const SizedBox(width: 8),
-            const Text(
-              'GENERALA',
-              style: TextStyle(
+            Text(
+              l10n.t('gameGenerala').toUpperCase(),
+              style: const TextStyle(
                 color: AppTheme.cyberGold,
                 fontWeight: FontWeight.w900,
                 fontSize: 16,
@@ -350,17 +357,19 @@ class _GeneralaScreenState extends State<GeneralaScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.group_add),
-            tooltip: 'Configurar Jugadores',
+            tooltip: l10n.t('gameSetupTitle'),
             onPressed: _managePlayersDialog,
           ),
         ],
       ),
-      body: Column(
+      body: Container(
+        decoration: BoxDecoration(gradient: tableMat.backgroundGradient),
+        child: Column(
         children: [
           // Table header: player avatars & live totals
           Container(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
+            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
             child: Row(
               children: [
                 const SizedBox(
@@ -492,6 +501,7 @@ class _GeneralaScreenState extends State<GeneralaScreen> {
           ),
         ],
       ),
+    ),
     );
   }
 }

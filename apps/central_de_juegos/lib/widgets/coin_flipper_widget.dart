@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../services/sound_haptics_service.dart';
 
 class CoinFlipperWidget extends StatefulWidget {
@@ -59,6 +60,7 @@ class _CoinFlipperWidgetState extends State<CoinFlipperWidget> with SingleTicker
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -93,14 +95,14 @@ class _CoinFlipperWidgetState extends State<CoinFlipperWidget> with SingleTicker
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: (showFace ? Colors.amber : Colors.grey).withOpacity(0.5),
+                          color: (showFace ? Colors.amber : Colors.grey).withValues(alpha: 0.5),
                           blurRadius: 24,
                           spreadRadius: 6,
                           offset: const Offset(0, 10),
                         )
                       ],
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.85),
+                        color: Colors.white.withValues(alpha: 0.85),
                         width: 5,
                       ),
                     ),
@@ -115,7 +117,7 @@ class _CoinFlipperWidgetState extends State<CoinFlipperWidget> with SingleTicker
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            showFace ? 'CARA' : 'CRUZ',
+                            showFace ? l10n.t('coinHeads') : l10n.t('coinTails'),
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w900,
@@ -132,7 +134,9 @@ class _CoinFlipperWidgetState extends State<CoinFlipperWidget> with SingleTicker
             ),
             const SizedBox(height: 36),
             Text(
-              _isFlipping ? '¡Girando en el aire...!' : (_isHeads ? '¡Salió CARA!' : '¡Salió CRUZ!'),
+              _isFlipping
+                  ? l10n.t('coinFlipping')
+                  : (_isHeads ? l10n.t('coinResultHeads') : l10n.t('coinResultTails')),
               style: theme.textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: _isHeads ? Colors.amber.shade800 : theme.colorScheme.primary,
@@ -142,17 +146,17 @@ class _CoinFlipperWidgetState extends State<CoinFlipperWidget> with SingleTicker
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.touch_app, size: 18, color: Colors.grey),
-                  SizedBox(width: 6),
+                  const Icon(Icons.touch_app, size: 18, color: Colors.grey),
+                  const SizedBox(width: 6),
                   Text(
-                    'Toca en cualquier parte de la pantalla para lanzar',
-                    style: TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.w500),
+                    l10n.t('coinTapPrompt'),
+                    style: const TextStyle(fontSize: 13, color: Colors.grey, fontWeight: FontWeight.w500),
                   ),
                 ],
               ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/app_localizations.dart';
+import 'models/table_mat.dart';
 import 'services/storage_service.dart';
 import 'theme/app_theme.dart';
 import 'screens/splash_screen.dart';
@@ -25,9 +26,11 @@ class CentralDeJuegosApp extends StatefulWidget {
 class _CentralDeJuegosAppState extends State<CentralDeJuegosApp> {
   ThemeMode _themeMode = ThemeMode.dark;
   Locale? _locale;
+  TableMatStyle _tableMat = TableMatStyle.arcade;
 
   ThemeMode get themeMode => _themeMode;
   Locale? get locale => _locale;
+  TableMatStyle get tableMat => _tableMat;
 
   @override
   void initState() {
@@ -38,6 +41,7 @@ class _CentralDeJuegosAppState extends State<CentralDeJuegosApp> {
   Future<void> _loadPreferences() async {
     final code = await StorageService.getLanguageCode();
     final themeStr = await StorageService.getThemeMode();
+    final matStr = await StorageService.getTableMat();
     setState(() {
       if (code != null) {
         _locale = Locale(code);
@@ -49,6 +53,9 @@ class _CentralDeJuegosAppState extends State<CentralDeJuegosApp> {
       } else if (themeStr == 'system') {
         _themeMode = ThemeMode.system;
       }
+      if (matStr != null) {
+        _tableMat = TableMatStyle.fromId(matStr);
+      }
     });
   }
 
@@ -59,6 +66,13 @@ class _CentralDeJuegosAppState extends State<CentralDeJuegosApp> {
       _locale = newLocale;
     });
     await StorageService.setLanguageCode(newLocale?.languageCode);
+  }
+
+  void setTableMat(TableMatStyle style) async {
+    setState(() {
+      _tableMat = style;
+    });
+    await StorageService.setTableMat(style.id);
   }
 
   void setThemeMode(ThemeMode mode) async {

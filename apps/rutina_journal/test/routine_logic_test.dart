@@ -105,5 +105,45 @@ void main() {
       expect(routineService.estimatedCompletionTime, isNull);
       expect(routineService.nextUpcomingStep, isNull);
     });
+
+    test('Deleted default routine does not re-appear when reloading routines', () async {
+      expect(routineService.routines.length, 6);
+      final morning = routineService.routines.firstWhere((r) => r.title == 'routineMorning');
+      await routineService.deleteRoutine(morning.id);
+
+      expect(routineService.routines.length, 5);
+      expect(routineService.routines.any((r) => r.title == 'routineMorning'), isFalse);
+
+      // Simulate app restart by calling load() or instantiating a new RoutineService
+      await routineService.load();
+
+      expect(routineService.routines.length, 5);
+      expect(routineService.routines.any((r) => r.title == 'routineMorning'), isFalse);
+    });
+
+    test('Deleting all routines preserves empty list after reloading routines', () async {
+      expect(routineService.routines.length, 6);
+      final routineIds = routineService.routines.map((r) => r.id).toList();
+      for (final id in routineIds) {
+        await routineService.deleteRoutine(id);
+      }
+
+      expect(routineService.routines.isEmpty, isTrue);
+
+      // Simulate app restart
+      await routineService.load();
+      expect(routineService.routines.isEmpty, isTrue);
+    });
+
+    test('Deleting currently active routine stops the routine runner', () async {
+      final morning = routineService.routines.first;
+      routineService.startRoutine(morning);
+      expect(routineService.isRunning, isTrue);
+      expect(routineService.activeRoutine, isNotNull);
+
+      await routineService.deleteRoutine(morning.id);
+      expect(routineService.isRunning, isFalse);
+      expect(routineService.activeRoutine, isNull);
+    });
   });
 }

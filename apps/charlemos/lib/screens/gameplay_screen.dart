@@ -321,6 +321,7 @@ class _GamePlayScreenState extends State<GamePlayScreen>
 
         return Scaffold(
           appBar: AppBar(
+            titleSpacing: 0,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_rounded),
               tooltip: l10n.t('backToDecks'),
@@ -459,7 +460,7 @@ class _GamePlayScreenState extends State<GamePlayScreen>
                   ),
                 ),
 
-                // Bottom Action Bar: "Anterior", Hint, & "Cambiar mazos" Button
+                // Bottom Action Bar: Hint text + Buttons row
                 Padding(
                   padding: const EdgeInsets.only(
                     left: AppSpacing.lg,
@@ -467,73 +468,77 @@ class _GamePlayScreenState extends State<GamePlayScreen>
                     bottom: AppSpacing.lg,
                     top: AppSpacing.xs,
                   ),
-                  child: Row(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      // "Anterior" Button (Undo / Previous Question)
-                      Tooltip(
-                        message: l10n.t('previousCard'),
-                        child: OutlinedButton(
-                          onPressed: cardService.canGoPrevious && !_isAnimating
-                              ? () => _onPreviousCard(cardService)
-                              : null,
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: theme.colorScheme.primary,
-                            disabledForegroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.25),
-                            side: BorderSide(
-                              color: cardService.canGoPrevious
-                                  ? theme.colorScheme.primary.withValues(alpha: 0.5)
-                                  : theme.colorScheme.outline.withValues(alpha: 0.2),
-                              width: 1.2,
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.undo_rounded, size: 18),
-                              const SizedBox(width: 6),
-                              Text(
-                                l10n.t('previousCard'),
-                                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                      // Subtitle hint — its own line above buttons
+                      Text(
+                        l10n.t('tapOrSwipeNext'),
+                        textAlign: TextAlign.center,
+                        style: AppTypography.caption(
+                          theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+
+                      // Buttons row
+                      Row(
+                        children: [
+                          // "Anterior" Button (Undo / Previous Question)
+                          Tooltip(
+                            message: l10n.t('previousCard'),
+                            child: OutlinedButton(
+                              onPressed: cardService.canGoPrevious && !_isAnimating
+                                  ? () => _onPreviousCard(cardService)
+                                  : null,
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: theme.colorScheme.primary,
+                                disabledForegroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.25),
+                                side: BorderSide(
+                                  color: cardService.canGoPrevious
+                                      ? theme.colorScheme.primary.withValues(alpha: 0.5)
+                                      : theme.colorScheme.outline.withValues(alpha: 0.2),
+                                  width: 1.2,
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24),
+                                ),
                               ),
-                            ],
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.undo_rounded, size: 18),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    l10n.t('previousCard'),
+                                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
+                          const Spacer(),
 
-                      // Subtitle hint
-                      Expanded(
-                        child: Text(
-                          l10n.t('tapOrSwipeNext'),
-                          textAlign: TextAlign.center,
-                          style: AppTypography.caption(
-                            theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                          // "Cambiar mazos" Button
+                          ElevatedButton.icon(
+                            onPressed: _openCategorySelector,
+                            icon: const Icon(Icons.tune_rounded, size: 20),
+                            label: Text(
+                              l10n.t('changeCategories'),
+                              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: theme.colorScheme.primary,
+                              foregroundColor: theme.colorScheme.onPrimary,
+                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                              elevation: 3,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-
-                      // "Cambiar mazos" Button
-                      ElevatedButton.icon(
-                        onPressed: _openCategorySelector,
-                        icon: const Icon(Icons.tune_rounded, size: 20),
-                        label: Text(
-                          l10n.t('changeCategories'),
-                          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.colorScheme.primary,
-                          foregroundColor: theme.colorScheme.onPrimary,
-                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                          elevation: 3,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
-                          ),
-                        ),
+                        ],
                       ),
                     ],
                   ),

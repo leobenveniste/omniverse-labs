@@ -29,7 +29,7 @@ class PaywallSheet extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final premiumService = AppServices.of(context).premiumService;
 
-    final priceText = premiumService.proProduct?.price ?? '\$2.99 USD';
+    final priceText = premiumService.proProduct?.price ?? '\$3.49 USD';
 
     return AnimatedBuilder(
       animation: premiumService,

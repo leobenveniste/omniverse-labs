@@ -8,6 +8,7 @@ const String kProLifetimeProductId = 'menu_listo_pro_unlock';
 
 class PremiumState {
   final bool isProUser;
+  final bool isDevMode;
   final bool isLoading;
   final bool isStoreAvailable;
   final ProductDetails? proProduct;
@@ -15,6 +16,7 @@ class PremiumState {
 
   const PremiumState({
     this.isProUser = false,
+    this.isDevMode = false,
     this.isLoading = false,
     this.isStoreAvailable = false,
     this.proProduct,
@@ -23,6 +25,7 @@ class PremiumState {
 
   PremiumState copyWith({
     bool? isProUser,
+    bool? isDevMode,
     bool? isLoading,
     bool? isStoreAvailable,
     ProductDetails? proProduct,
@@ -30,6 +33,7 @@ class PremiumState {
   }) {
     return PremiumState(
       isProUser: isProUser ?? this.isProUser,
+      isDevMode: isDevMode ?? this.isDevMode,
       isLoading: isLoading ?? this.isLoading,
       isStoreAvailable: isStoreAvailable ?? this.isStoreAvailable,
       proProduct: proProduct ?? this.proProduct,
@@ -54,7 +58,8 @@ class PremiumNotifier extends StateNotifier<PremiumState> {
     // 1. Load local cached status
     final prefs = await SharedPreferences.getInstance();
     final isPro = prefs.getBool('is_pro_unlocked') ?? false;
-    state = state.copyWith(isProUser: isPro, isLoading: true);
+    final isDev = prefs.getBool('dev_mode_unlocked') ?? false;
+    state = state.copyWith(isProUser: isPro, isDevMode: isDev, isLoading: true);
 
     // 2. Set up purchase stream listener
     _subscription = _iap.purchaseStream.listen(
@@ -112,8 +117,8 @@ class PremiumNotifier extends StateNotifier<PremiumState> {
     }
 
     if (product == null) {
-      // If store is offline or product is still propagating in Google Play Console
-      if (kDebugMode || !state.isStoreAvailable) {
+      // If store is offline or product is still propagating in Google Play Console (debug only)
+      if (kDebugMode && !state.isStoreAvailable) {
         await setProUser(true);
         return;
       }
@@ -139,6 +144,13 @@ class PremiumNotifier extends StateNotifier<PremiumState> {
     } catch (e) {
       state = state.copyWith(errorMessage: e.toString(), isLoading: false);
     }
+  }
+
+  Future<void> toggleDevMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    final newDev = !state.isDevMode;
+    await prefs.setBool('dev_mode_unlocked', newDev);
+    state = state.copyWith(isDevMode: newDev);
   }
 
   Future<void> setProUser(bool isPro) async {

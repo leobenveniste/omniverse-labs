@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../services/sound_haptics_service.dart';
 
 class FingerRouletteWidget extends StatefulWidget {
@@ -141,6 +142,7 @@ class _FingerRouletteWidgetState extends State<FingerRouletteWidget> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Listener(
       behavior: HitTestBehavior.opaque,
@@ -164,19 +166,19 @@ class _FingerRouletteWidgetState extends State<FingerRouletteWidget> {
                   Icon(
                     Icons.touch_app,
                     size: 64,
-                    color: theme.colorScheme.onSurface.withOpacity(0.2),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     _selectedPointerId != null
-                        ? '¡Este jugador empieza!'
+                        ? l10n.t('rouletteWinner')
                         : (_touches.length < 2
-                            ? 'Coloquen 2 o más dedos en la pantalla'
-                            : '¡Mantengan presionando!'),
+                            ? l10n.t('roulettePrompt')
+                            : l10n.t('rouletteHolding')),
                     textAlign: TextAlign.center,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                 ],

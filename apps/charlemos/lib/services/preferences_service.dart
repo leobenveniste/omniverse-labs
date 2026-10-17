@@ -24,6 +24,7 @@ class PreferencesService extends ChangeNotifier {
   String? get languageCode => _languageCode;
   bool get isAutoLanguage => _languageCode == null || _languageCode == 'auto';
   Locale? get locale => isAutoLanguage ? null : Locale(_languageCode!);
+  bool get isDevMode => _devMode;
   static const String _keyHasSeenGuide = 'charlemos_has_seen_guide';
   bool _hasSeenGuide = false;
 

@@ -31,7 +31,7 @@ class AppHeaderTitle extends StatelessWidget {
             color: primaryColor,
           ),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 6),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [

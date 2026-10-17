@@ -99,4 +99,36 @@ class StorageService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_keyThemeMode, mode);
   }
+
+  static const String _keyTableMat = 'app_table_mat';
+
+  static Future<String?> getTableMat() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_keyTableMat);
+  }
+
+  static Future<void> setTableMat(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyTableMat, id);
+  }
+
+  static const String _keyDevMode = 'dev_mode_unlocked';
+
+  static Future<bool> getDevMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_keyDevMode) ?? false;
+  }
+
+  static Future<void> setDevMode(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyDevMode, value);
+  }
+
+  static Future<void> clearAllData() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_keyActiveSession);
+    await prefs.remove(_keyHistory);
+    await prefs.remove(_keyTableMat);
+  }
 }
+

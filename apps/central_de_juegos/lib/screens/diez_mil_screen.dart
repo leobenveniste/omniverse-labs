@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import '../l10n/app_localizations.dart';
+import '../main.dart';
 import '../models/game_type.dart';
 import '../models/game_session.dart';
 import '../models/player.dart';
@@ -106,6 +108,7 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
   }
 
   void _confirmTurn() {
+    final l10n = AppLocalizations.of(context);
     final currentPlayer = _game.players[_currentTurnIndex];
     final hasEntered = _game.hasPlayerEntered(currentPlayer.id);
 
@@ -113,7 +116,9 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
     if (!hasEntered && _turnPoints > 0 && _turnPoints < _game.entryScore) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Para entrar se requiere un mínimo de ${_game.entryScore} puntos en la tirada'),
+          content: Text(l10n.locale.languageCode == 'es'
+              ? 'Para entrar se requiere un mínimo de ${_game.entryScore} puntos en la tirada'
+              : 'Entry requires a minimum of ${_game.entryScore} points on your turn'),
           backgroundColor: Colors.orange.shade800,
         ),
       );
@@ -124,7 +129,9 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
     if (hasEntered && widget.minRoundScore > 0 && _turnPoints > 0 && _turnPoints < widget.minRoundScore) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('El mínimo para plantarse es de ${widget.minRoundScore} puntos (o 0 si perdiste)'),
+          content: Text(l10n.locale.languageCode == 'es'
+              ? 'El mínimo para plantarse es de ${widget.minRoundScore} puntos (o 0 si perdiste)'
+              : 'Minimum to bank is ${widget.minRoundScore} points (or 0 if bust)'),
           backgroundColor: Colors.orange.shade800,
         ),
       );
@@ -193,13 +200,17 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final appState = CentralDeJuegosApp.of(context);
+    final tableMat = appState.tableMat;
     final currentPlayer = _game.players[_currentTurnIndex];
     final hasEntered = _game.hasPlayerEntered(currentPlayer.id);
 
     return Scaffold(
-      backgroundColor: AppTheme.bgDark,
+      backgroundColor: tableMat.surfaceColor,
       appBar: AppBar(
-        backgroundColor: AppTheme.bgDark,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         title: Row(
           children: [
             Image.asset(
@@ -208,9 +219,9 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
               height: 24,
             ),
             const SizedBox(width: 8),
-            const Text(
-              'DIEZ_MIL',
-              style: TextStyle(
+            Text(
+              l10n.t('gameDiezMil').toUpperCase(),
+              style: const TextStyle(
                 color: AppTheme.cyberGold,
                 fontWeight: FontWeight.w900,
                 fontSize: 16,
@@ -222,25 +233,25 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.undo, color: Colors.white70),
-            tooltip: 'Deshacer Último Turno',
+            tooltip: l10n.locale.languageCode == 'es' ? 'Deshacer Último Turno' : 'Undo Last Turn',
             onPressed: _game.rounds.isEmpty ? null : _undoTurn,
           ),
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white70),
-            tooltip: 'Reiniciar Partida',
+            tooltip: l10n.t('confirmResetTitle'),
             onPressed: () async {
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (ctx) => AlertDialog(
                   backgroundColor: AppTheme.surfaceDark,
-                  title: const Text('Reiniciar Partida', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  content: const Text('¿Deseas reiniciar todos los puntajes a 0?', style: TextStyle(color: Colors.white70)),
+                  title: Text(l10n.t('confirmResetTitle'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  content: Text(l10n.t('confirmResetMsg'), style: const TextStyle(color: Colors.white70)),
                   actions: [
-                    TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancelar')),
+                    TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text(l10n.t('cancel'))),
                     FilledButton(
                       style: FilledButton.styleFrom(backgroundColor: Colors.red),
                       onPressed: () => Navigator.of(ctx).pop(true),
-                      child: const Text('Reiniciar'),
+                      child: Text(l10n.t('confirmResetBtn')),
                     ),
                   ],
                 ),
@@ -262,34 +273,36 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
           ),
         ],
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Top Players Score Strip
-            Container(
-              height: 105,
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                itemCount: _game.players.length,
-                itemBuilder: (ctx, idx) {
-                  final p = _game.players[idx];
-                  final isTurn = idx == _currentTurnIndex;
-                  final entered = _game.hasPlayerEntered(p.id);
+      body: Container(
+        decoration: BoxDecoration(gradient: tableMat.backgroundGradient),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Top Players Score Strip
+              Container(
+                height: 105,
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  itemCount: _game.players.length,
+                  itemBuilder: (ctx, idx) {
+                    final p = _game.players[idx];
+                    final isTurn = idx == _currentTurnIndex;
+                    final entered = _game.hasPlayerEntered(p.id);
 
-                  return GestureDetector(
-                    onTap: () async {
-                      final newName = await PlayerNameDialog.show(
-                        context,
-                        currentName: p.name,
-                        title: 'Editar Nombre',
-                      );
-                      if (newName != null && newName.isNotEmpty) {
-                        setState(() => p.name = newName);
-                        _saveState();
-                      }
-                    },
+                    return GestureDetector(
+                      onTap: () async {
+                        final newName = await PlayerNameDialog.show(
+                          context,
+                          currentName: p.name,
+                          title: l10n.t('editTeamName'),
+                        );
+                        if (newName != null && newName.isNotEmpty) {
+                          setState(() => p.name = newName);
+                          _saveState();
+                        }
+                      },
                     child: Container(
                       width: 140,
                       margin: const EdgeInsets.symmetric(horizontal: 5),
@@ -356,11 +369,11 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: entered ? Colors.green.withOpacity(0.2) : Colors.red.withOpacity(0.2),
+                                  color: entered ? Colors.green.withValues(alpha: 0.2) : Colors.red.withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
-                                  entered ? 'ENTRÓ' : '0/${_game.entryScore}',
+                                  entered ? (l10n.locale.languageCode == 'es' ? 'ENTRÓ' : 'ENTERED') : '0/${_game.entryScore}',
                                   style: TextStyle(
                                     fontSize: 9,
                                     fontWeight: FontWeight.w900,
@@ -404,12 +417,12 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'TURNO DE:',
+                                  l10n.locale.languageCode == 'es' ? 'TURNO DE:' : 'TURN OF:',
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w900,
                                     letterSpacing: 1.2,
-                                    color: Colors.white.withOpacity(0.6),
+                                    color: Colors.white.withValues(alpha: 0.6),
                                   ),
                                 ),
                                 Text(
@@ -427,12 +440,14 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: Colors.orange.withOpacity(0.2),
+                                color: Colors.orange.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(6),
                                 border: Border.all(color: Colors.orange, width: 1),
                               ),
                               child: Text(
-                                'Apertura: ${_game.entryScore}+',
+                                l10n.locale.languageCode == 'es'
+                                    ? 'Apertura: ${_game.entryScore}+'
+                                    : 'Entry: ${_game.entryScore}+',
                                 style: const TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
@@ -444,12 +459,14 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: Colors.blue.withOpacity(0.2),
+                                color: Colors.blue.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(6),
                                 border: Border.all(color: Colors.blue, width: 1),
                               ),
                               child: Text(
-                                'Mín: ${widget.minRoundScore}+',
+                                l10n.locale.languageCode == 'es'
+                                    ? 'Mín: ${widget.minRoundScore}+'
+                                    : 'Min: ${widget.minRoundScore}+',
                                 style: const TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
@@ -475,12 +492,12 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
                       child: Column(
                         children: [
                           Text(
-                            'PUNTOS DE ESTA TIRADA',
+                            l10n.locale.languageCode == 'es' ? 'PUNTOS DE ESTA TIRADA' : 'CURRENT ROLL POINTS',
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1.0,
-                              color: Colors.white.withOpacity(0.5),
+                              color: Colors.white.withValues(alpha: 0.5),
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -500,7 +517,7 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
                                 const SizedBox(width: 12),
                                 IconButton(
                                   icon: const Icon(Icons.backspace, color: Colors.white54, size: 22),
-                                  tooltip: 'Limpiar',
+                                  tooltip: l10n.locale.languageCode == 'es' ? 'Limpiar' : 'Clear',
                                   onPressed: () => setState(() => _turnPoints = 0),
                                 ),
                               ],
@@ -548,9 +565,13 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              _turnPoints == 0 ? '0 PUNTOS (PASAR TURNO)' : 'CONFIRMAR (+$_turnPoints PTS) Y SIGUIENTE',
+                              _turnPoints == 0
+                                  ? (l10n.locale.languageCode == 'es' ? '0 PUNTOS (PASAR TURNO)' : '0 POINTS (PASS TURN)')
+                                  : (l10n.locale.languageCode == 'es'
+                                      ? 'CONFIRMAR (+$_turnPoints PTS) Y SIGUIENTE'
+                                      : 'BANK (+$_turnPoints PTS) & NEXT'),
                               style: const TextStyle(
-                                fontSize: 14,
+                                fontSize: 13,
                                 fontWeight: FontWeight.w900,
                                 letterSpacing: 0.8,
                                 color: Colors.black,
@@ -569,6 +590,7 @@ class _DiezMilScreenState extends State<DiezMilScreen> {
           ],
         ),
       ),
+    ),
     );
   }
 

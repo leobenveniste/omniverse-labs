@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import '../../../premium/providers/premium_provider.dart';
 
 class AboutDialogWidget extends StatelessWidget {
   const AboutDialogWidget({super.key});
@@ -73,31 +76,89 @@ class AboutDialogWidget extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 6),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Versión:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-                FutureBuilder<PackageInfo>(
-                  future: PackageInfo.fromPlatform(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      final info = snapshot.data!;
-                      return Text(
-                        '${info.version} (Build ${info.buildNumber})',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: theme.colorScheme.primary,
+            Consumer(
+              builder: (context, ref, _) {
+                int tapCount = 0;
+                DateTime? lastTap;
+
+                return StatefulBuilder(
+                  builder: (context, setInnerState) {
+                    return InkWell(
+                      borderRadius: BorderRadius.circular(6),
+                      onTap: () async {
+                        final now = DateTime.now();
+                        if (lastTap == null || now.difference(lastTap!) > const Duration(seconds: 2)) {
+                          tapCount = 1;
+                        } else {
+                          tapCount++;
+                        }
+                        lastTap = now;
+
+                        if (tapCount >= 7) {
+                          tapCount = 0;
+                          HapticFeedback.heavyImpact();
+                          await ref.read(premiumProvider.notifier).toggleDevMode();
+                          final isDev = ref.read(premiumProvider).isDevMode;
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                backgroundColor: isDev ? const Color(0xFF2D7A4F) : const Color(0xFF475569),
+                                content: Text(
+                                  isDev
+                                      ? '🧪 Modo Desarrollador activado'
+                                      : '🔒 Modo Desarrollador desactivado',
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            );
+                          }
+                        } else if (tapCount >= 4) {
+                          HapticFeedback.lightImpact();
+                          final remaining = 7 - tapCount;
+                          ScaffoldMessenger.of(context).clearSnackBars();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              duration: const Duration(milliseconds: 600),
+                              content: Text(
+                                'Estás a $remaining pasos de desbloquear el modo desarrollador',
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Versión:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                            FutureBuilder<PackageInfo>(
+                              future: PackageInfo.fromPlatform(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  final info = snapshot.data!;
+                                  return Text(
+                                    '${info.version} (Build ${info.buildNumber})',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                  );
+                                }
+                                return const Text(
+                                  '1.2.15 (Build 32)',
+                                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                                );
+                              },
+                            ),
+                          ],
                         ),
-                      );
-                    }
-                    return const Text(
-                      'Cargando...',
-                      style: TextStyle(fontSize: 13, color: Colors.grey),
+                      ),
                     );
                   },
-                ),
-              ],
+                );
+              },
             ),
             const SizedBox(height: 6),
             const Row(

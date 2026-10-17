@@ -40,7 +40,7 @@ class _PaywallSheetState extends State<PaywallSheet> {
     final l10n = AppLocalizations.of(context);
     final service = widget.premiumService;
     final isPro = service.isPro;
-    final priceStr = service.proProduct?.price ?? '\$2.49 USD';
+    final priceStr = service.proProduct?.price ?? '\$1.99 USD';
 
     return AnimatedBuilder(
       animation: service,

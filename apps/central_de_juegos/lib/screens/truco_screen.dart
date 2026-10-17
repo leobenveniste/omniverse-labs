@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import '../l10n/app_localizations.dart';
+import '../main.dart';
 import '../models/game_type.dart';
 import '../models/game_session.dart';
 import '../models/player.dart';
@@ -113,6 +115,7 @@ class _TrucoScreenState extends State<TrucoScreen> {
   }
 
   void _faltaEnvidoDialog() {
+    final l10n = AppLocalizations.of(context);
     final ptsForT1 = _game.calculateFaltaEnvido(0);
     final ptsForT2 = _game.calculateFaltaEnvido(1);
 
@@ -120,58 +123,57 @@ class _TrucoScreenState extends State<TrucoScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.surfaceDark,
-        title: const Text('Falta Envido', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text(l10n.t('faltaEnvidoTitle'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Puntos calculados según reglamento:',
-              style: TextStyle(fontWeight: FontWeight.w500, color: Colors.white70),
+            Text(
+              l10n.t('faltaEnvidoExplanation'),
+              style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.white70, fontSize: 13),
             ),
             const SizedBox(height: 16),
             ListTile(
               leading: CircleAvatar(backgroundColor: AppTheme.playerColors[0], radius: 14),
-              title: Text('Ganó ${_game.team1Name}', style: const TextStyle(color: Colors.white)),
-              subtitle: Text('Suma +$ptsForT1 puntos', style: const TextStyle(color: Colors.white54)),
+              title: Text('${_game.team1Name} (+$ptsForT1)', style: const TextStyle(color: Colors.white)),
               trailing: FilledButton(
                 style: FilledButton.styleFrom(backgroundColor: AppTheme.cyberGold, foregroundColor: Colors.black),
                 onPressed: () {
                   Navigator.of(ctx).pop();
                   _addPoints(0, ptsForT1, 'Falta Envido (+$ptsForT1)');
                 },
-                child: const Text('Asignar'),
+                child: Text(l10n.t('save')),
               ),
             ),
             const Divider(color: AppTheme.borderDark),
             ListTile(
               leading: CircleAvatar(backgroundColor: AppTheme.playerColors[1], radius: 14),
-              title: Text('Ganó ${_game.team2Name}', style: const TextStyle(color: Colors.white)),
-              subtitle: Text('Suma +$ptsForT2 puntos', style: const TextStyle(color: Colors.white54)),
+              title: Text('${_game.team2Name} (+$ptsForT2)', style: const TextStyle(color: Colors.white)),
               trailing: FilledButton(
                 style: FilledButton.styleFrom(backgroundColor: AppTheme.cyberGold, foregroundColor: Colors.black),
                 onPressed: () {
                   Navigator.of(ctx).pop();
                   _addPoints(1, ptsForT2, 'Falta Envido (+$ptsForT2)');
                 },
-                child: const Text('Asignar'),
+                child: Text(l10n.t('save')),
               ),
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancelar', style: TextStyle(color: Colors.white70))),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text(l10n.t('cancel'), style: const TextStyle(color: Colors.white70))),
         ],
       ),
     );
   }
 
   void _renameTeam(int teamIndex) async {
+    final l10n = AppLocalizations.of(context);
     final currentName = teamIndex == 0 ? _game.team1Name : _game.team2Name;
     final newName = await PlayerNameDialog.show(
       context,
       currentName: currentName,
-      title: 'Editar Nombre de Equipo',
+      title: l10n.t('editTeamName'),
     );
     if (newName != null && newName.isNotEmpty) {
       setState(() {
@@ -188,11 +190,15 @@ class _TrucoScreenState extends State<TrucoScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+    final appState = CentralDeJuegosApp.of(context);
+    final tableMat = appState.tableMat;
 
     return Scaffold(
-      backgroundColor: AppTheme.bgDark,
+      backgroundColor: tableMat.surfaceColor,
       appBar: AppBar(
-        backgroundColor: AppTheme.bgDark,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         title: Row(
           children: [
             Image.asset(
@@ -215,25 +221,25 @@ class _TrucoScreenState extends State<TrucoScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.undo, color: Colors.white70),
-            tooltip: 'Deshacer',
+            tooltip: l10n.t('trucoRules'),
             onPressed: _game.history.isEmpty ? null : _undo,
           ),
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white70),
-            tooltip: 'Reiniciar Partida',
+            tooltip: l10n.t('confirmResetTitle'),
             onPressed: () async {
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (ctx) => AlertDialog(
                   backgroundColor: AppTheme.surfaceDark,
-                  title: const Text('Reiniciar Partida', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                  content: const Text('¿Deseas reiniciar los puntajes de esta partida a 0?', style: TextStyle(color: Colors.white70)),
+                  title: Text(l10n.t('confirmResetTitle'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  content: Text(l10n.t('confirmResetMsg'), style: const TextStyle(color: Colors.white70)),
                   actions: [
-                    TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancelar')),
+                    TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text(l10n.t('cancel'))),
                     FilledButton(
                       style: FilledButton.styleFrom(backgroundColor: Colors.red),
                       onPressed: () => Navigator.of(ctx).pop(true),
-                      child: const Text('Reiniciar'),
+                      child: Text(l10n.t('confirmResetBtn')),
                     ),
                   ],
                 ),
@@ -248,7 +254,9 @@ class _TrucoScreenState extends State<TrucoScreen> {
           ),
         ],
       ),
-      body: Column(
+      body: Container(
+        decoration: BoxDecoration(gradient: tableMat.backgroundGradient),
+        child: Column(
         children: [
           // Score Columns
           Expanded(
@@ -286,6 +294,7 @@ class _TrucoScreenState extends State<TrucoScreen> {
           _buildQuickActionButtons(theme),
         ],
       ),
+    ),
     );
   }
 
@@ -296,13 +305,16 @@ class _TrucoScreenState extends State<TrucoScreen> {
     required bool isLeading,
     required Color color,
   }) {
+    final l10n = AppLocalizations.of(context);
     final isBuenas = _game.isBuenas(score);
-    final scoreLabel = _game.getScoreLabel(score);
+    final scoreLabel = isBuenas
+        ? '${score - _game.halfTarget} ${l10n.t('trucoGoodPoints')}'
+        : '$score ${l10n.t('trucoBadPoints')}';
 
     return InkWell(
       onTap: () => _addPoints(teamIndex, 1, '+1'),
-      splashColor: color.withOpacity(0.15),
-      highlightColor: color.withOpacity(0.08),
+      splashColor: color.withValues(alpha: 0.15),
+      highlightColor: color.withValues(alpha: 0.08),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         child: Column(
@@ -313,9 +325,9 @@ class _TrucoScreenState extends State<TrucoScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
+                  color: color.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: color.withOpacity(0.4)),
+                  border: Border.all(color: color.withValues(alpha: 0.4)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -333,7 +345,7 @@ class _TrucoScreenState extends State<TrucoScreen> {
                       ),
                     ),
                     const SizedBox(width: 4),
-                    Icon(Icons.edit, size: 13, color: color.withOpacity(0.8)),
+                    Icon(Icons.edit, size: 13, color: color.withValues(alpha: 0.8)),
                   ],
                 ),
               ),
@@ -362,7 +374,7 @@ class _TrucoScreenState extends State<TrucoScreen> {
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
               decoration: BoxDecoration(
-                color: isBuenas ? Colors.green.shade900.withOpacity(0.4) : Colors.orange.shade900.withOpacity(0.4),
+                color: isBuenas ? Colors.green.shade900.withValues(alpha: 0.4) : Colors.orange.shade900.withValues(alpha: 0.4),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isBuenas ? Colors.green : Colors.orange,
@@ -424,6 +436,7 @@ class _TrucoScreenState extends State<TrucoScreen> {
 }
 
   Widget _buildQuickActionButtons(ThemeData theme) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: const BoxDecoration(
@@ -445,8 +458,8 @@ class _TrucoScreenState extends State<TrucoScreen> {
             _buildTantoChip('Vale 4 (+4)', 4),
             ActionChip(
               avatar: const Icon(Icons.flash_on, size: 16, color: AppTheme.cyberGold),
-              label: const Text('Falta Envido', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-              backgroundColor: AppTheme.cyberGold.withOpacity(0.15),
+              label: Text(l10n.t('faltaEnvidoTitle'), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+              backgroundColor: AppTheme.cyberGold.withValues(alpha: 0.15),
               side: const BorderSide(color: AppTheme.cyberGold),
               onPressed: _faltaEnvidoDialog,
             ),
@@ -457,6 +470,11 @@ class _TrucoScreenState extends State<TrucoScreen> {
   }
 
   Widget _buildTantoChip(String label, int points) {
+    final l10n = AppLocalizations.of(context);
+    final question = l10n.locale.languageCode == 'es'
+        ? '¿Quién ganó el $label?'
+        : 'Who won $label?';
+
     return ActionChip(
       label: Text(label, style: const TextStyle(color: Colors.white)),
       backgroundColor: AppTheme.surfaceElevated,
@@ -474,7 +492,7 @@ class _TrucoScreenState extends State<TrucoScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  '¿Quién ganó el $label?',
+                  question,
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 const SizedBox(height: 16),

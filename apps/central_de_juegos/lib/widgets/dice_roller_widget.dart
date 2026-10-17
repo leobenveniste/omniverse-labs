@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../services/sound_haptics_service.dart';
 import '../theme/app_theme.dart';
 
@@ -91,6 +92,7 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -106,9 +108,9 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
             children: [
               Row(
                 children: [
-                  const Text(
-                    'Dados:',
-                    style: TextStyle(
+                  Text(
+                    l10n.t('diceCount'),
+                    style: const TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 13,
                       letterSpacing: 0.5,
@@ -158,9 +160,9 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
               const SizedBox(height: 10),
               Row(
                 children: [
-                  const Text(
-                    'Tipo:',
-                    style: TextStyle(
+                  Text(
+                    l10n.t('diceType'),
+                    style: const TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 13,
                       letterSpacing: 0.5,
@@ -285,9 +287,9 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
-                    'TOTAL:',
-                    style: TextStyle(
+                  Text(
+                    l10n.t('diceTotal'),
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w900,
                       letterSpacing: 1.0,
@@ -327,7 +329,7 @@ class _DiceRollerWidgetState extends State<DiceRollerWidget> with TickerProvider
                     const Icon(Icons.casino, color: Colors.black, size: 26),
                     const SizedBox(width: 10),
                     Text(
-                      _isRolling ? 'LANZANDO...' : 'LANZAR DADOS',
+                      _isRolling ? l10n.t('diceRolling') : l10n.t('diceRollAction'),
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w900,

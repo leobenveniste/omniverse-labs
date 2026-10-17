@@ -171,12 +171,41 @@ class _RoutinesScreenState extends State<RoutinesScreen> {
                 const SizedBox(height: AppSpacing.md),
 
                 // Routine List
-                ...routines.map((routine) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                    child: _buildRoutineCard(context, routine),
-                  );
-                }),
+                if (routines.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl, horizontal: AppSpacing.md),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.repeat_rounded,
+                            size: 48,
+                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          Text(
+                            l10n.t('noRoutinesTitle'),
+                            style: AppTypography.section(Theme.of(context).colorScheme.onSurface),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            l10n.t('noRoutinesSubtitle'),
+                            textAlign: TextAlign.center,
+                            style: AppTypography.body(Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else
+                  ...routines.map((routine) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                      child: _buildRoutineCard(context, routine),
+                    );
+                  }),
               ],
             );
           },

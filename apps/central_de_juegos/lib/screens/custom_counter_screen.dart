@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import '../l10n/app_localizations.dart';
+import '../main.dart';
 import '../models/game_type.dart';
 import '../models/game_session.dart';
 import '../models/player.dart';
@@ -106,17 +108,18 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
   }
 
   void _addPlayerMidGame() async {
+    final l10n = AppLocalizations.of(context);
     if (_game.players.length >= 12) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Máximo 12 jugadores permitidos')),
+        SnackBar(content: Text(l10n.t('maxPlayersReached'))),
       );
       return;
     }
 
     final newName = await PlayerNameDialog.show(
       context,
-      currentName: 'Jugador ${_game.players.length + 1}',
-      title: 'Nuevo Jugador',
+      currentName: '${l10n.t('defaultPlayer').replaceAll('{index}', '${_game.players.length + 1}')}',
+      title: l10n.t('newPlayer'),
     );
 
     if (newName != null && newName.isNotEmpty) {
@@ -158,6 +161,7 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
   }
 
   void _finishGame() {
+    final l10n = AppLocalizations.of(context);
     final leader = _getLeader() ?? _game.players.first;
     setState(() {
       _game.winnerId = leader.id;
@@ -168,7 +172,7 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
     WinnerDialog.show(
       context,
       winnerName: leader.name,
-      gameTitle: 'Contador Libre',
+      gameTitle: l10n.t('gameCustom'),
       scores: _game.players,
       onRematch: () {
         setState(() {
@@ -183,18 +187,19 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
   }
 
   void _resetAll() async {
+    final l10n = AppLocalizations.of(context);
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.surfaceDark,
-        title: const Text('Reiniciar Puntajes', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        content: const Text('¿Deseas poner todos los contadores a 0?', style: TextStyle(color: Colors.white70)),
+        title: Text(l10n.t('resetScoresTitle'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        content: Text(l10n.t('resetScoresMsg'), style: const TextStyle(color: Colors.white70)),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancelar')),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text(l10n.t('cancel'))),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Reiniciar'),
+            child: Text(l10n.t('reset')),
           ),
         ],
       ),
@@ -210,12 +215,14 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final tableMat = CentralDeJuegosApp.of(context).tableMat;
     final leader = _getLeader();
 
     return Scaffold(
-      backgroundColor: AppTheme.bgDark,
+      backgroundColor: tableMat.surfaceColor,
       appBar: AppBar(
-        backgroundColor: AppTheme.bgDark,
+        backgroundColor: tableMat.surfaceColor,
         title: Row(
           children: [
             Image.asset(
@@ -224,9 +231,9 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
               height: 24,
             ),
             const SizedBox(width: 8),
-            const Text(
-              'CONTADOR_LIBRE',
-              style: TextStyle(
+            Text(
+              l10n.t('gameCustom').toUpperCase(),
+              style: const TextStyle(
                 color: AppTheme.cyberGold,
                 fontWeight: FontWeight.w900,
                 fontSize: 16,
@@ -238,25 +245,27 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.person_add, color: AppTheme.cyberGold),
-            tooltip: 'Agregar Jugador',
+            tooltip: l10n.t('addPlayer'),
             onPressed: _addPlayerMidGame,
           ),
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white70),
-            tooltip: 'Reiniciar Puntajes',
+            tooltip: l10n.t('resetScoresTitle'),
             onPressed: _resetAll,
           ),
         ],
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // List of separate interactive player cards
-            Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                itemCount: _game.players.length,
-                itemBuilder: (ctx, idx) {
+      body: Container(
+        decoration: BoxDecoration(gradient: tableMat.backgroundGradient),
+        child: SafeArea(
+          child: Column(
+            children: [
+              // List of separate interactive player cards
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  itemCount: _game.players.length,
+                  itemBuilder: (ctx, idx) {
                   final player = _game.players[idx];
                   final isLeader = leader?.id == player.id;
                   final subtleBg = Color.alphaBlend(player.color.withOpacity(0.12), AppTheme.surfaceDark);
@@ -312,7 +321,7 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
                                     final newName = await PlayerNameDialog.show(
                                       context,
                                       currentName: player.name,
-                                      title: 'Editar Nombre',
+                                      title: l10n.t('editTeamName'),
                                     );
                                     if (newName != null && newName.isNotEmpty) {
                                       setState(() => player.name = newName);
@@ -324,7 +333,7 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
                                     decoration: BoxDecoration(
                                       color: Colors.black54,
                                       borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(color: player.color.withOpacity(0.6)),
+                                      border: Border.all(color: player.color.withValues(alpha: 0.6)),
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -367,19 +376,19 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
                                       borderRadius: BorderRadius.circular(8),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: AppTheme.cyberGold.withOpacity(0.4),
+                                          color: AppTheme.cyberGold.withValues(alpha: 0.4),
                                           blurRadius: 6,
                                         ),
                                       ],
                                     ),
-                                    child: const Row(
+                                    child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Icon(Icons.emoji_events, size: 14, color: Colors.black),
-                                        SizedBox(width: 4),
+                                        const Icon(Icons.emoji_events, size: 14, color: Colors.black),
+                                        const SizedBox(width: 4),
                                         Text(
-                                          'LÍDER',
-                                          style: TextStyle(
+                                          l10n.t('leaderBadge'),
+                                          style: const TextStyle(
                                             color: Colors.black,
                                             fontWeight: FontWeight.w900,
                                             fontSize: 11,
@@ -458,7 +467,7 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
                 border: const Border(top: BorderSide(color: AppTheme.borderDark, width: 1.5)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.4),
+                    color: Colors.black.withValues(alpha: 0.4),
                     blurRadius: 10,
                     offset: const Offset(0, -3),
                   ),
@@ -474,8 +483,8 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
                         Expanded(
                           child: Text(
                             leader != null
-                                ? 'Ganando: ${leader.name} (${leader.score} pts)'
-                                : 'Empate o sin puntajes',
+                                ? l10n.t('winningPlayer').replaceAll('{name}', leader.name).replaceAll('{score}', '${leader.score}')
+                                : l10n.t('tieOrNoScores'),
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontSize: 13,
@@ -496,9 +505,9 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: const Text(
-                      'FINALIZAR JUEGO',
-                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.8),
+                    child: Text(
+                      l10n.t('finishGame').toUpperCase(),
+                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.8),
                     ),
                   ),
                 ],
@@ -507,6 +516,7 @@ class _CustomCounterScreenState extends State<CustomCounterScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

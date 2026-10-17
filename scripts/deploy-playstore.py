@@ -731,9 +731,9 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
             rel_notes_es = notes_es or "Lanzamiento inicial de EmpacArte: El arte de empacar con pasaporte táctil, sellos consulares, tarjetas de embarque y 6 idiomas."
             rel_notes_en = notes_en or "Initial release of EmpacArte: The art of packing with tactile passport, collectible stamps, boarding passes, and 6 languages."
         elif package_name == "com.omniverselabs.ritmo":
-            rel_name = release_name or f"1.0.1 (Build {version_code})"
-            rel_notes_es = notes_es or "Tour guiado interactivo de bienvenida, insignia PRO visible en cabecera, modal de contacto directo y mejoras generales."
-            rel_notes_en = notes_en or "Interactive guided onboarding tour, visible PRO badge in header, direct contact modal and general performance improvements."
+            rel_name = release_name or f"1.0.7 (Build {version_code})"
+            rel_notes_es = notes_es or "Corrección de persistencia en rutinas eliminadas, optimización de estados vacíos y mejoras de estabilidad."
+            rel_notes_en = notes_en or "Fixed persistence issue for deleted routines, improved empty states, and overall stability."
         elif package_name == "com.omniverselabs.anotadordejuegos":
             rel_name = release_name or f"1.0.5 (Build {version_code})"
             rel_notes_es = notes_es or "Insignia MESA PRO visible en cabecera principal, modal de contacto y sugerencias directo con el desarrollador, optimizaciones de interfaz."

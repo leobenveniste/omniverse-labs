@@ -238,8 +238,8 @@ class PaywallSheet extends ConsumerWidget {
           ),
           const SizedBox(height: 4),
 
-          // Testing Mode Toggle Button (Only visible in debug / internal development builds)
-          if (kDebugMode)
+          // Testing Mode Toggle Button (Only visible in debug / developer mode)
+          if (kDebugMode || premiumState.isDevMode)
             TextButton.icon(
               onPressed: () async {
                 HapticFeedback.mediumImpact();

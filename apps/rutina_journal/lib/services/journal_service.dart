@@ -82,4 +82,10 @@ class JournalService extends ChangeNotifier {
     final sum = _entries.values.fold<int>(0, (acc, e) => acc + e.moodLevel);
     return sum / _entries.length;
   }
+
+  Future<void> clearAll() async {
+    _entries.clear();
+    await _storage.saveJournalEntries([]);
+    notifyListeners();
+  }
 }

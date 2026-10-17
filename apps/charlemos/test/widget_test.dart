@@ -1,5 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:charlemos/models/card_item.dart';
+import 'package:charlemos/l10n/strings_es.dart';
+import 'package:charlemos/l10n/strings_en.dart';
+import 'package:charlemos/l10n/strings_pt.dart';
+import 'package:charlemos/l10n/strings_fr.dart';
+import 'package:charlemos/l10n/strings_it.dart';
 
 void main() {
   group('Charlemos Unit Tests', () {
@@ -82,5 +87,19 @@ void main() {
       expect(history[index].id, 'card_a');
       expect(index > 0, isFalse); // at origin
     });
+
+    test('Localization keys parity across all languages', () {
+      final esKeys = stringsEs.keys.toSet();
+      final enKeys = stringsEn.keys.toSet();
+      final ptKeys = stringsPt.keys.toSet();
+      final frKeys = stringsFr.keys.toSet();
+      final itKeys = stringsIt.keys.toSet();
+
+      expect(esKeys.difference(enKeys), isEmpty, reason: 'Missing keys in English');
+      expect(esKeys.difference(ptKeys), isEmpty, reason: 'Missing keys in Portuguese');
+      expect(esKeys.difference(frKeys), isEmpty, reason: 'Missing keys in French');
+      expect(esKeys.difference(itKeys), isEmpty, reason: 'Missing keys in Italian');
+    });
   });
 }
+

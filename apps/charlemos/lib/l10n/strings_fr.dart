@@ -193,4 +193,15 @@ const Map<String, String> stringsFr = {
   'sectionFamilyAndAllSub': "Discussions ouvertes et souvenirs chaleureux pour tous les âges",
   'sectionCustomDecks': "Personnalisés",
   'sectionCustomDecksSub': "Vos propres questions et défis inventés",
+  'privacyPolicyTitle': "Politique de Confidentialité",
+  'privacyPolicySubtitle': "100% Hors-ligne. Aucun traceur ni serveur externe",
+  'privacyDialogTitle': "Confidentialité & Protection des Données",
+  'privacyDialogContent': "Charlemos fonctionne selon une architecture 100% Offline-First. Toutes les cartes, favoris, historique et questions créées sont stockés exclusivement sur votre appareil.\n\n• Nous ne collectons aucune donnée personnelle ni métrique.\n• Aucune création de compte ou email n'est requis.\n• Aucune conversation ni enregistrement n'est envoyé à des serveurs externes.\n• Vous avez le contrôle total pour réinitialiser ou purger vos données à tout moment.\n\nPour toute question ou suggestion, contactez omniverselabs@gmail.com.",
+  'clearAllDataTitle': "Supprimer Toutes les Données",
+  'clearAllDataSubtitle': "Effacer définitivement les favoris, l'historique et les cartes personnalisées",
+  'clearDataConfirmTitle': "Supprimer toutes les données ?",
+  'clearDataConfirmContent': "Cette action supprimera irréversiblement toutes vos cartes personnalisées, favoris et historique de jeu. Cette action ne peut pas être annulée.",
+  'clearDataAction': "Oui, Tout Supprimer",
+  'clearDataSuccessToast': "Toutes les données ont été supprimées avec succès",
 };
+

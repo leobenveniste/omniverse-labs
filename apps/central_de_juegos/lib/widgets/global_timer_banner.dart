@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../services/timer_service.dart';
 
 class GlobalTimerBanner extends StatelessWidget {
@@ -6,6 +7,7 @@ class GlobalTimerBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return AnimatedBuilder(
       animation: TimerService(),
       builder: (context, _) {
@@ -24,7 +26,7 @@ class GlobalTimerBanner extends StatelessWidget {
             color: isFinished ? Colors.red.shade700 : theme.colorScheme.primaryContainer,
             border: Border(
               bottom: BorderSide(
-                color: isFinished ? Colors.red.shade900 : theme.colorScheme.primary.withOpacity(0.3),
+                color: isFinished ? Colors.red.shade900 : theme.colorScheme.primary.withValues(alpha: 0.3),
                 width: 1.5,
               ),
             ),
@@ -40,9 +42,9 @@ class GlobalTimerBanner extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: isFinished
-                    ? const Text(
-                        '¡TIEMPO TERMINADO!',
-                        style: TextStyle(
+                    ? Text(
+                        l10n.t('timerBannerFinished'),
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
@@ -52,7 +54,7 @@ class GlobalTimerBanner extends StatelessWidget {
                     : Row(
                         children: [
                           Text(
-                            'Turno: ${timer.formattedRemaining}',
+                            '${l10n.t('timerBannerRunning')}: ${timer.formattedRemaining}',
                             style: TextStyle(
                               color: theme.colorScheme.onPrimaryContainer,
                               fontWeight: FontWeight.bold,
@@ -66,7 +68,7 @@ class GlobalTimerBanner extends StatelessWidget {
                               child: LinearProgressIndicator(
                                 value: timer.progress,
                                 minHeight: 6,
-                                backgroundColor: theme.colorScheme.onPrimaryContainer.withOpacity(0.2),
+                                backgroundColor: theme.colorScheme.onPrimaryContainer.withValues(alpha: 0.2),
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                   timer.remainingSeconds <= 10 ? Colors.red : theme.colorScheme.primary,
                                 ),
@@ -86,7 +88,7 @@ class GlobalTimerBanner extends StatelessWidget {
                     color: theme.colorScheme.onPrimaryContainer,
                     size: 22,
                   ),
-                  tooltip: timer.isRunning ? 'Pausar' : 'Reanudar',
+                  tooltip: timer.isRunning ? l10n.t('timerPause') : l10n.t('timerResume'),
                   onPressed: () {
                     if (timer.isRunning) {
                       timer.pause();
@@ -104,7 +106,7 @@ class GlobalTimerBanner extends StatelessWidget {
                   color: isFinished ? Colors.white : theme.colorScheme.onPrimaryContainer,
                   size: 20,
                 ),
-                tooltip: 'Cerrar Temporizador',
+                tooltip: l10n.t('close'),
                 onPressed: () => timer.stop(),
               ),
             ],

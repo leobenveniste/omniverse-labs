@@ -38,6 +38,8 @@ Omniverse Labs/
 | **Menú Listo** | `com.omniverselabs.menu_listo` | `1.2.9+25` | Asistente culinario integral, planificador de comidas, recetario con OCR, timers interactivos y lista de compras inteligente. |
 | **Ritmo: Hábitos & Diario** | `com.omniverselabs.ritmo` | `1.0.0+1` | Aplicación integral de hábitos atómicos, rutinas secuenciales y micro-diario con recordatorios nativos y 5 idiomas. |
 | **EmpacArte** | `com.omniverselabs.empacarte` | `1.0.0+1` | Asistente de empaque y pasaporte de viaje táctil con sellos consulares coleccionables, tarjetas de embarque, 3 compartimentos y 6 idiomas. |
+| **OmniTrade** | `com.omniverselabs.omnitrade` | `1.0.0+1` | Registro y bitácora de operaciones de trading, calculadora de riesgo, analíticas avanzadas, seguridad biométrica y modelo freemium. |
+| **Mi Delta** | `com.omniverselabs.mi_delta` | `1.0.0+1` | Aplicación ciudadana municipal y gestión urbana (turnos, reclamos geolocalizados con cuadrillas, tarjeta Soy Delta con QR, botón SOS/COD y alertas del río). |
 
 ---
 

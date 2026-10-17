@@ -386,4 +386,11 @@ class HabitService extends ChangeNotifier {
     await _persistLogs();
     notifyListeners();
   }
+
+  Future<void> clearAll() async {
+    _habits.clear();
+    _logs.clear();
+    await _storage.clearAll();
+    notifyListeners();
+  }
 }

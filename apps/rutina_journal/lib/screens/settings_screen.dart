@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../l10n/app_localizations.dart';
@@ -308,6 +309,23 @@ class SettingsScreen extends StatelessWidget {
                         }
                       },
                     ),
+                    const Divider(height: 1),
+                    ListTile(
+                      leading: Icon(Icons.delete_forever_rounded, color: theme.colorScheme.error),
+                      title: Text(
+                        l10n.t('clearAllDataTitle'),
+                        style: AppTypography.body(theme.colorScheme.error, isMedium: true),
+                      ),
+                      subtitle: Text(
+                        l10n.t('clearAllDataSubtitle'),
+                        style: AppTypography.caption(theme.colorScheme.onSurfaceVariant),
+                      ),
+                      trailing: const Icon(Icons.chevron_right_rounded),
+                      onTap: () {
+                        HapticsHelper.light();
+                        _handleClearAllData(context, l10n);
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -369,6 +387,34 @@ class SettingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.md),
 
+              // Privacy Policy
+              Card(
+                child: ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(Icons.privacy_tip_outlined, color: theme.colorScheme.primary),
+                  ),
+                  title: Text(
+                    l10n.t('privacyPolicyTitle'),
+                    style: AppTypography.body(theme.colorScheme.onSurface, isMedium: true),
+                  ),
+                  subtitle: Text(
+                    l10n.t('privacyPolicySubtitle'),
+                    style: AppTypography.caption(theme.colorScheme.onSurfaceVariant),
+                  ),
+                  trailing: const Icon(Icons.chevron_right_rounded),
+                  onTap: () {
+                    HapticsHelper.selection();
+                    _showPrivacyPolicyDialog(context, l10n);
+                  },
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+
               // About Modal Trigger
               _buildSectionHeader(context, l10n.t('aboutSection')),
               Card(
@@ -392,88 +438,91 @@ class SettingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.md),
 
-              // Developer Testing Toggle
-              _buildSectionHeader(context, isSpanish ? 'MODO DE PRUEBAS / TESTING' : 'TESTING & DEVELOPER'),
-              Card(
-                clipBehavior: Clip.antiAlias,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(
-                    color: isPro
-                        ? Colors.amber.shade600.withValues(alpha: 0.5)
-                        : theme.colorScheme.outline.withValues(alpha: 0.2),
-                    width: 1,
-                  ),
-                ),
-                child: SwitchListTile.adaptive(
-                  secondary: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
+              // Developer Testing Toggle (Protected by Dev Mode)
+              if (kDebugMode || prefs.isDevMode) ...[
+                _buildSectionHeader(context, isSpanish ? 'MODO DE PRUEBAS / TESTING' : 'TESTING & DEVELOPER'),
+                Card(
+                  clipBehavior: Clip.antiAlias,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: BorderSide(
                       color: isPro
-                          ? Colors.amber.withValues(alpha: 0.2)
-                          : theme.colorScheme.surfaceContainerHighest,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.science_rounded,
-                      color: isPro ? Colors.amber.shade800 : theme.colorScheme.primary,
-                      size: 22,
+                          ? Colors.amber.shade600.withValues(alpha: 0.5)
+                          : theme.colorScheme.outline.withValues(alpha: 0.2),
+                      width: 1,
                     ),
                   ),
-                  title: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          l10n.t('testProToggleTitle'),
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                        ),
+                  child: SwitchListTile.adaptive(
+                    secondary: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: isPro
+                            ? Colors.amber.withValues(alpha: 0.2)
+                            : theme.colorScheme.surfaceContainerHighest,
+                        shape: BoxShape.circle,
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: isPro ? Colors.amber.shade700 : theme.colorScheme.outlineVariant,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          isPro ? 'PRO' : 'FREE',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w900,
-                            color: isPro ? Colors.white : theme.colorScheme.onSurfaceVariant,
+                      child: Icon(
+                        Icons.science_rounded,
+                        color: isPro ? Colors.amber.shade800 : theme.colorScheme.primary,
+                        size: 22,
+                      ),
+                    ),
+                    title: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            l10n.t('testProToggleTitle'),
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  subtitle: Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      l10n.t('testProToggleSubtitle'),
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: theme.colorScheme.onSurfaceVariant,
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: isPro ? Colors.amber.shade700 : theme.colorScheme.outlineVariant,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            isPro ? 'PRO' : 'FREE',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                              color: isPro ? Colors.white : theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    subtitle: Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        l10n.t('testProToggleSubtitle'),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
-                  ),
-                  value: isPro,
-                  activeTrackColor: Colors.amber.shade600,
-                  activeThumbColor: Colors.amber.shade900,
-                  onChanged: (bool value) async {
-                    HapticsHelper.medium();
-                    await premiumService.setProUser(value);
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            value ? l10n.t('testProActivated') : l10n.t('testProDeactivated'),
+                    value: isPro,
+                    activeTrackColor: Colors.amber.shade600,
+                    activeThumbColor: Colors.amber.shade900,
+                    onChanged: (bool value) async {
+                      HapticsHelper.medium();
+                      await premiumService.setProUser(value);
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              value ? l10n.t('testProActivated') : l10n.t('testProDeactivated'),
+                            ),
+                            behavior: SnackBarBehavior.floating,
                           ),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    }
-                  },
+                        );
+                      }
+                    },
+                  ),
                 ),
-              ),
+                const SizedBox(height: AppSpacing.md),
+              ],
               const SizedBox(height: AppSpacing.xxl),
             ],
           );
@@ -889,5 +938,79 @@ class SettingsScreen extends StatelessWidget {
         );
       }
     }
+  }
+
+  void _handleClearAllData(BuildContext context, AppLocalizations l10n) async {
+    final theme = Theme.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.t('clearDataConfirmTitle')),
+        content: Text(l10n.t('clearDataConfirmContent')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.t('actionCancel')),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.colorScheme.error,
+              foregroundColor: theme.colorScheme.onError,
+            ),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(l10n.t('clearDataAction')),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      HapticsHelper.heavy();
+      final services = AppServices.of(context);
+      await services.habitService.clearAll();
+      await services.routineService.clearAll();
+      await services.journalService.clearAll();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.t('clearDataSuccessToast')),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
+  }
+
+  void _showPrivacyPolicyDialog(BuildContext context, AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.privacy_tip_outlined, color: theme.colorScheme.primary),
+            const SizedBox(width: AppSpacing.xs),
+            Expanded(
+              child: Text(
+                l10n.t('privacyDialogTitle'),
+                style: AppTypography.title(theme.colorScheme.onSurface),
+              ),
+            ),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Text(
+            l10n.t('privacyDialogContent'),
+            style: AppTypography.body(theme.colorScheme.onSurface.withValues(alpha: 0.8)),
+          ),
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.t('actionClose')),
+          ),
+        ],
+      ),
+    );
   }
 }

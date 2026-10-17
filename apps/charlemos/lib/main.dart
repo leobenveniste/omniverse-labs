@@ -31,14 +31,22 @@ class CharlemosApp extends StatelessWidget {
             locale: prefs.locale,
             supportedLocales: AppLocalizations.supportedLocales,
             localeResolutionCallback: (locale, supportedLocales) {
+              // If user picked a specific language, use it
               if (prefs.locale != null) return prefs.locale;
-              if (locale != null) {
+
+              // Check ALL preferred locales from the platform
+              final platformLocales =
+                  WidgetsBinding.instance.platformDispatcher.locales;
+              for (final platformLocale in platformLocales) {
                 for (final supported in supportedLocales) {
-                  if (supported.languageCode == locale.languageCode) {
+                  if (supported.languageCode ==
+                      platformLocale.languageCode) {
                     return supported;
                   }
                 }
               }
+
+              // Fallback to Spanish
               return const Locale('es');
             },
             localizationsDelegates: const [

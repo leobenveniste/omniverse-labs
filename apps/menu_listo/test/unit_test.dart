@@ -1,8 +1,11 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:menu_listo/core/localization/app_localizations.dart';
 import 'package:menu_listo/core/utils/culinary_catalog.dart';
 import 'package:menu_listo/core/utils/portion_calculator.dart';
 import 'package:menu_listo/core/utils/ingredient_parser.dart';
 import 'package:menu_listo/core/utils/shopping_consolidator.dart';
+import 'package:menu_listo/features/premium/providers/premium_provider.dart';
 import 'package:menu_listo/features/recipes/models/ingredient_model.dart';
 
 void main() {
@@ -65,4 +68,32 @@ void main() {
       expect(CulinaryCatalog.normalizeCategory('Lácteos'), equals('Lácteos y Huevos'));
     });
   });
+
+  group('Privacy & DevMode Tests', () {
+    test('AppStrings provides non-empty privacy and data deletion texts in ES and EN', () {
+      final es = AppStrings(const Locale('es'));
+      final en = AppStrings(const Locale('en'));
+
+      expect(es.privacyPolicy, isNotEmpty);
+      expect(es.privacyPolicySubtitle, isNotEmpty);
+      expect(es.privacyDialogTitle, isNotEmpty);
+      expect(es.privacyDialogContent, isNotEmpty);
+      expect(es.clearAllDataTitle, isNotEmpty);
+      expect(es.clearAllDataSubtitle, isNotEmpty);
+
+      expect(en.privacyPolicy, isNotEmpty);
+      expect(en.privacyPolicySubtitle, isNotEmpty);
+      expect(en.privacyDialogTitle, isNotEmpty);
+      expect(en.privacyDialogContent, isNotEmpty);
+      expect(en.clearAllDataTitle, isNotEmpty);
+      expect(en.clearAllDataSubtitle, isNotEmpty);
+    });
+
+    test('PremiumState default values guarantee secure production mode', () {
+      const state = PremiumState();
+      expect(state.isProUser, isFalse);
+      expect(state.isDevMode, isFalse);
+    });
+  });
 }
+

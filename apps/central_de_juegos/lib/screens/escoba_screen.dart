@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import '../l10n/app_localizations.dart';
+import '../main.dart';
 import '../models/game_type.dart';
 import '../models/game_session.dart';
 import '../models/player.dart';
@@ -94,6 +96,7 @@ class _EscobaScreenState extends State<EscobaScreen> {
   }
 
   void _openAddHandModal() {
+    final l10n = AppLocalizations.of(context);
     final escobasControllers = {for (var p in _game.players) p.id: TextEditingController(text: '0')};
     String? mostCardsWinner;
     String? mostOrosWinner;
@@ -122,14 +125,14 @@ class _EscobaScreenState extends State<EscobaScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Anotar Mano ${_game.hands.length + 1}',
+                      '${l10n.t('escobaLogHand')} ${_game.hands.length + 1}',
                       style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 16),
 
                     // Escobas input
-                    const Text('Escobas Limpias:', style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text(l10n.t('escobaCleanBrooms'), style: const TextStyle(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     ..._game.players.map((p) {
                       return Padding(
@@ -185,16 +188,16 @@ class _EscobaScreenState extends State<EscobaScreen> {
 
                     const SizedBox(height: 14),
                     // Tantos específicos (1 pt cada uno)
-                    _buildSelectorRow('Mayoría de Cartas (+1)', mostCardsWinner, (val) {
+                    _buildSelectorRow(l10n.t('escobaMostCards'), mostCardsWinner, (val) {
                       setModalState(() => mostCardsWinner = val);
                     }),
-                    _buildSelectorRow('Mayoría de Oros (+1)', mostOrosWinner, (val) {
+                    _buildSelectorRow(l10n.t('escobaMostGolds'), mostOrosWinner, (val) {
                       setModalState(() => mostOrosWinner = val);
                     }),
-                    _buildSelectorRow('7 de Oro (+1)', sieteDeOroWinner, (val) {
+                    _buildSelectorRow(l10n.t('escobaSevenOfGold'), sieteDeOroWinner, (val) {
                       setModalState(() => sieteDeOroWinner = val);
                     }),
-                    _buildSelectorRow('La Setenta (+1)', setentaWinner, (val) {
+                    _buildSelectorRow(l10n.t('escobaSeventy'), setentaWinner, (val) {
                       setModalState(() => setentaWinner = val);
                     }),
 
@@ -214,7 +217,7 @@ class _EscobaScreenState extends State<EscobaScreen> {
                         Navigator.of(ctx).pop();
                         _applyHand(entries);
                       },
-                      child: const Text('Confirmar Mano'),
+                      child: Text(l10n.t('save')),
                     ),
                   ],
                 ),
@@ -284,11 +287,15 @@ class _EscobaScreenState extends State<EscobaScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+    final appState = CentralDeJuegosApp.of(context);
+    final tableMat = appState.tableMat;
 
     return Scaffold(
-      backgroundColor: AppTheme.bgDark,
+      backgroundColor: tableMat.surfaceColor,
       appBar: AppBar(
-        backgroundColor: AppTheme.bgDark,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         title: Row(
           children: [
             Image.asset(
@@ -298,7 +305,7 @@ class _EscobaScreenState extends State<EscobaScreen> {
             ),
             const SizedBox(width: 8),
             Text(
-              'ESCOBA_DEL_15',
+              l10n.t('gameEscoba').toUpperCase(),
               style: const TextStyle(
                 color: AppTheme.cyberGold,
                 fontWeight: FontWeight.w900,
@@ -309,120 +316,128 @@ class _EscobaScreenState extends State<EscobaScreen> {
           ],
         ),
       ),
-      body: Column(
-        children: [
-          // Header
-          Container(
-            padding: const EdgeInsets.all(16),
-            color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.4),
-            child: Row(
-              children: _game.players.map((p) {
-                return Expanded(
-                  child: GestureDetector(
-                    onTap: () async {
-                      final newName = await PlayerNameDialog.show(
-                        context,
-                        currentName: p.name,
-                        title: 'Editar Jugador',
-                      );
-                      if (newName != null && newName.isNotEmpty) {
-                        setState(() {
-                          p.name = newName;
-                        });
-                        _saveState();
-                      }
-                    },
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Flexible(
-                              child: Text(
-                                p.name,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: p.color,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Icon(Icons.edit, size: 14, color: p.color.withOpacity(0.8)),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '${p.score} pts',
-                          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-          const Divider(height: 1),
-
-          // Hands list
-          Expanded(
-            child: _game.hands.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.cleaning_services, size: 64, color: theme.disabledColor),
-                        const SizedBox(height: 12),
-                        const Text('No hay manos anotadas'),
-                      ],
-                    ),
-                  )
-                : ListView.separated(
-                    itemCount: _game.hands.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
-                    itemBuilder: (ctx, idx) {
-                      final hand = _game.hands[idx];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                        child: Row(
-                          children: [
-                            Text('Mano ${hand.handNumber}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                            const Spacer(),
-                            ..._game.players.map((p) {
-                              final entry = hand.playerEntries[p.id];
-                              final total = entry?.calculateTotal() ?? 0;
-                              return SizedBox(
-                                width: 80,
+      body: Container(
+        decoration: BoxDecoration(gradient: tableMat.backgroundGradient),
+        child: Column(
+          children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.all(16),
+              color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+              child: Row(
+                children: _game.players.map((p) {
+                  return Expanded(
+                    child: GestureDetector(
+                      onTap: () async {
+                        final newName = await PlayerNameDialog.show(
+                          context,
+                          currentName: p.name,
+                          title: l10n.t('editTeamName'),
+                        );
+                        if (newName != null && newName.isNotEmpty) {
+                          setState(() {
+                            p.name = newName;
+                          });
+                          _saveState();
+                        }
+                      },
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Flexible(
                                 child: Text(
-                                  '+$total',
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
+                                  p.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 16,
+                                    color: p.color,
                                   ),
                                 ),
-                              );
-                            }),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: FilledButton.icon(
-              onPressed: _game.isFinished ? null : _openAddHandModal,
-              icon: const Icon(Icons.add),
-              label: const Text('Anotar Mano'),
-              style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(50)),
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(Icons.edit, size: 14, color: p.color.withValues(alpha: 0.8)),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            '${p.score} ${l10n.t('points')}',
+                            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
             ),
-          ),
-        ],
+            const Divider(height: 1),
+
+            // Hands list
+            Expanded(
+              child: _game.hands.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.cleaning_services, size: 64, color: theme.disabledColor),
+                          const SizedBox(height: 12),
+                          Text(
+                            l10n.locale.languageCode == 'es'
+                                ? 'No hay manos anotadas'
+                                : 'No hands logged yet',
+                            style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.separated(
+                      itemCount: _game.hands.length,
+                      separatorBuilder: (_, __) => const Divider(height: 1),
+                      itemBuilder: (ctx, idx) {
+                        final hand = _game.hands[idx];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          child: Row(
+                            children: [
+                              Text('${l10n.t('round')} ${hand.handNumber}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                              const Spacer(),
+                              ..._game.players.map((p) {
+                                final entry = hand.playerEntries[p.id];
+                                final total = entry?.calculateTotal() ?? 0;
+                                return SizedBox(
+                                  width: 80,
+                                  child: Text(
+                                    '+$total',
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: FilledButton.icon(
+                onPressed: _game.isFinished ? null : _openAddHandModal,
+                icon: const Icon(Icons.add),
+                label: Text(l10n.t('escobaLogHand')),
+                style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(50)),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

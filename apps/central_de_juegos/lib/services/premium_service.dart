@@ -8,6 +8,7 @@ const String kCentralJuegosProProductId = 'central_juegos_pro_unlock';
 
 class PremiumService extends ChangeNotifier {
   static const String _keyIsPro = 'is_pro_unlocked';
+  static const String _keyDevMode = 'dev_mode_unlocked';
   static PremiumService? _instance;
 
   final SharedPreferences _prefs;
@@ -16,6 +17,7 @@ class PremiumService extends ChangeNotifier {
   StreamSubscription<List<PurchaseDetails>>? _subscription;
 
   bool _isPro = false;
+  bool _devMode = false;
   bool _isLoading = false;
   bool _isStoreAvailable = false;
   ProductDetails? _proProduct;
@@ -35,6 +37,7 @@ class PremiumService extends ChangeNotifier {
   }
 
   bool get isPro => _isPro;
+  bool get isDevMode => _devMode;
   bool get isLoading => _isLoading;
   bool get isStoreAvailable => _isStoreAvailable;
   ProductDetails? get proProduct => _proProduct;
@@ -42,6 +45,13 @@ class PremiumService extends ChangeNotifier {
 
   void _load() {
     _isPro = _prefs.getBool(_keyIsPro) ?? false;
+    _devMode = _prefs.getBool(_keyDevMode) ?? false;
+  }
+
+  Future<void> toggleDevMode() async {
+    _devMode = !_devMode;
+    await _prefs.setBool(_keyDevMode, _devMode);
+    notifyListeners();
   }
 
   Future<void> init() async {

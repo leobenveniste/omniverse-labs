@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import '../l10n/app_localizations.dart';
+import '../main.dart';
 import '../models/game_type.dart';
 import '../models/game_session.dart';
 import '../models/player.dart';
@@ -80,6 +82,7 @@ class _BurakoScreenState extends State<BurakoScreen> {
   }
 
   void _openAddRoundDialog() {
+    final l10n = AppLocalizations.of(context);
     final t1 = _game.teams[0];
     final t2 = _game.teams[1];
 
@@ -112,7 +115,7 @@ class _BurakoScreenState extends State<BurakoScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Anotar Mano #${_game.rounds.length + 1}',
+                      '${l10n.t('round')} #${_game.rounds.length + 1}',
                       style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     IconButton(
@@ -124,7 +127,7 @@ class _BurakoScreenState extends State<BurakoScreen> {
                 const SizedBox(height: 14),
 
                 // Quién comenzó esta mano
-                const Text('¿Quién comenzó / salió esta mano?', style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(l10n.t('burakoWhoStarted'), style: const TextStyle(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -132,7 +135,7 @@ class _BurakoScreenState extends State<BurakoScreen> {
                       child: ChoiceChip(
                         label: Center(child: Text(t1.name, overflow: TextOverflow.ellipsis)),
                         selected: selectedStarter == t1.id,
-                        selectedColor: t1.color.withOpacity(0.2),
+                        selectedColor: t1.color.withValues(alpha: 0.2),
                         onSelected: (sel) {
                           if (sel) setModalState(() => selectedStarter = t1.id);
                         },
@@ -143,7 +146,7 @@ class _BurakoScreenState extends State<BurakoScreen> {
                       child: ChoiceChip(
                         label: Center(child: Text(t2.name, overflow: TextOverflow.ellipsis)),
                         selected: selectedStarter == t2.id,
-                        selectedColor: t2.color.withOpacity(0.2),
+                        selectedColor: t2.color.withValues(alpha: 0.2),
                         onSelected: (sel) {
                           if (sel) setModalState(() => selectedStarter = t2.id);
                         },
@@ -219,7 +222,7 @@ class _BurakoScreenState extends State<BurakoScreen> {
                       }
                     },
                     icon: const Icon(Icons.check),
-                    label: const Text('Guardar Ronda'),
+                    label: Text(l10n.t('save')),
                     style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
                   ),
                 ),
@@ -313,13 +316,17 @@ class _BurakoScreenState extends State<BurakoScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
+    final appState = CentralDeJuegosApp.of(context);
+    final tableMat = appState.tableMat;
     final t1 = _game.teams[0];
     final t2 = _game.teams[1];
 
     return Scaffold(
-      backgroundColor: AppTheme.bgDark,
+      backgroundColor: tableMat.surfaceColor,
       appBar: AppBar(
-        backgroundColor: AppTheme.bgDark,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         title: Row(
           children: [
             Image.asset(
@@ -329,7 +336,7 @@ class _BurakoScreenState extends State<BurakoScreen> {
             ),
             const SizedBox(width: 8),
             Text(
-              'BURAKO',
+              l10n.t('gameBurako').toUpperCase(),
               style: const TextStyle(
                 color: AppTheme.cyberGold,
                 fontWeight: FontWeight.w900,
@@ -342,7 +349,7 @@ class _BurakoScreenState extends State<BurakoScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.undo),
-            tooltip: 'Deshacer Última Ronda',
+            tooltip: l10n.locale.languageCode == 'es' ? 'Deshacer Última Ronda' : 'Undo Last Round',
             onPressed: _game.rounds.isEmpty
                 ? null
                 : () {
@@ -355,16 +362,16 @@ class _BurakoScreenState extends State<BurakoScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: 'Reiniciar Partida',
+            tooltip: l10n.t('confirmResetTitle'),
             onPressed: () async {
               final confirm = await showDialog<bool>(
                 context: context,
                 builder: (ctx) => AlertDialog(
-                  title: const Text('Reiniciar Partida'),
-                  content: const Text('¿Deseas reiniciar la planilla de Burako a 0?'),
+                  title: Text(l10n.t('confirmResetTitle')),
+                  content: Text(l10n.t('confirmResetMsg')),
                   actions: [
-                    TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Cancelar')),
-                    FilledButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Reiniciar')),
+                    TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text(l10n.t('cancel'))),
+                    FilledButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text(l10n.t('confirmResetBtn'))),
                   ],
                 ),
               );
@@ -380,64 +387,67 @@ class _BurakoScreenState extends State<BurakoScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          // Table Header: Team 1 | Quién Empezó | Team 2
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.6),
-              border: Border(bottom: BorderSide(color: theme.dividerColor)),
-            ),
-            child: Row(
-              children: [
-                // Team 1 Name (Editable)
-                Expanded(
-                  flex: 5,
-                  child: GestureDetector(
-                    onTap: () async {
-                      final newName = await PlayerNameDialog.show(
-                        context,
-                        currentName: t1.name,
-                        title: 'Editar Equipo',
-                      );
-                      if (newName != null && newName.isNotEmpty) {
-                        setState(() => t1.name = newName);
-                        _saveState();
-                      }
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          child: Text(
-                            t1.name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: t1.color,
+      body: Container(
+        decoration: BoxDecoration(gradient: tableMat.backgroundGradient),
+        child: Column(
+          children: [
+            // Table Header: Team 1 | Quién Empezó | Team 2
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.6),
+                border: Border(bottom: BorderSide(color: theme.dividerColor)),
+              ),
+              child: Row(
+                children: [
+                  // Team 1 Name (Editable)
+                  Expanded(
+                    flex: 5,
+                    child: GestureDetector(
+                      onTap: () async {
+                        final newName = await PlayerNameDialog.show(
+                          context,
+                          currentName: t1.name,
+                          title: l10n.t('editTeamName'),
+                        );
+                        if (newName != null && newName.isNotEmpty) {
+                          setState(() => t1.name = newName);
+                          _saveState();
+                        }
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              t1.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: t1.color,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 4),
-                        Icon(Icons.edit, size: 12, color: t1.color.withOpacity(0.8)),
-                      ],
+                          const SizedBox(width: 4),
+                          Icon(Icons.edit, size: 12, color: t1.color.withValues(alpha: 0.8)),
+                        ],
+                      ),
                     ),
                   ),
-                ),
 
-                // Center Column: Salió
-                const Expanded(
-                  flex: 3,
-                  child: Center(
-                    child: Text(
-                      'SALIDA',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1),
+                  // Center Column: Salió
+                  Expanded(
+                    flex: 3,
+                    child: Center(
+                      child: Text(
+                        l10n.t('burakoWentOut').toUpperCase(),
+                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
-                ),
 
                 // Team 2 Name (Editable)
                 Expanded(
@@ -717,7 +727,7 @@ class _BurakoScreenState extends State<BurakoScreen> {
                     child: FilledButton.icon(
                       onPressed: _openAddRoundDialog,
                       icon: const Icon(Icons.add),
-                      label: const Text('Anotar Ronda', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      label: Text(l10n.t('escobaLogHand'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       style: FilledButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14)),
                     ),
                   ),
@@ -727,6 +737,7 @@ class _BurakoScreenState extends State<BurakoScreen> {
           ),
         ],
       ),
+    ),
     );
   }
 }

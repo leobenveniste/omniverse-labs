@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../services/timer_service.dart';
 
 class TurnTimerWidget extends StatefulWidget {
@@ -14,6 +15,7 @@ class _TurnTimerWidgetState extends State<TurnTimerWidget> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final timerService = TimerService();
 
     return AnimatedBuilder(
@@ -80,7 +82,7 @@ class _TurnTimerWidgetState extends State<TurnTimerWidget> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      isFinished ? '¡TIEMPO!' : 'segundos',
+                      isFinished ? l10n.t('timerFinished') : l10n.t('timerSeconds'),
                       style: TextStyle(
                         color: isFinished
                             ? Colors.red
@@ -106,7 +108,7 @@ class _TurnTimerWidgetState extends State<TurnTimerWidget> {
                     timerService.pause();
                   },
                   icon: const Icon(Icons.replay),
-                  label: const Text('Reiniciar'),
+                  label: Text(l10n.t('timerReset')),
                 ),
                 const SizedBox(width: 16),
                 FilledButton.icon(
@@ -122,7 +124,7 @@ class _TurnTimerWidgetState extends State<TurnTimerWidget> {
                     }
                   },
                   icon: Icon(isRunning ? Icons.pause : Icons.play_arrow),
-                  label: Text(isRunning ? 'Pausar' : 'Comenzar'),
+                  label: Text(isRunning ? l10n.t('timerPause') : l10n.t('timerStart')),
                   style: FilledButton.styleFrom(
                     backgroundColor: isRunning ? Colors.orange.shade800 : null,
                     padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),

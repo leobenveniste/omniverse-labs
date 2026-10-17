@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n/app_localizations.dart';
-import '../main.dart';
 import '../models/game_type.dart';
 import '../models/game_session.dart';
-import '../models/player.dart';
 import '../services/premium_service.dart';
 import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
-import '../widgets/about_dialog_widget.dart';
 import '../widgets/app_header_title.dart';
 import '../widgets/dice_roller_widget.dart';
 import '../widgets/finger_roulette_widget.dart';
@@ -157,48 +154,6 @@ class _HomeScreenState extends State<HomeScreen> {
       await StorageService.clearActiveSession();
       _loadActiveSession();
     }
-  }
-
-  void _showLanguageDialog(BuildContext context, AppLocalizations l10n) {
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return AlertDialog(
-          backgroundColor: AppTheme.surfaceDark,
-          title: Text(
-            l10n.t('selectLanguage'),
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: Text(l10n.t('languageEs'), style: const TextStyle(color: Colors.white)),
-                leading: const Text('🇪🇸', style: TextStyle(fontSize: 20)),
-                onTap: () {
-                  CentralDeJuegosApp.of(context).setLocale(const Locale('es'));
-                  Navigator.of(ctx).pop();
-                },
-              ),
-              ListTile(
-                title: Text(l10n.t('languageEn'), style: const TextStyle(color: Colors.white)),
-                leading: const Text('🇺🇸', style: TextStyle(fontSize: 20)),
-                onTap: () {
-                  CentralDeJuegosApp.of(context).setLocale(const Locale('en'));
-                  Navigator.of(ctx).pop();
-                },
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(),
-              child: Text(l10n.t('close')),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   void _openGame(GameType type, {GameSession? existingSession}) async {
