@@ -731,24 +731,24 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
             rel_notes_es = notes_es or "Lanzamiento inicial de EmpacArte: El arte de empacar con pasaporte táctil, sellos consulares, tarjetas de embarque y 6 idiomas."
             rel_notes_en = notes_en or "Initial release of EmpacArte: The art of packing with tactile passport, collectible stamps, boarding passes, and 6 languages."
         elif package_name == "com.omniverselabs.ritmo":
-            rel_name = release_name or f"1.0.7 (Build {version_code})"
-            rel_notes_es = notes_es or "Corrección de persistencia en rutinas eliminadas, optimización de estados vacíos y mejoras de estabilidad."
-            rel_notes_en = notes_en or "Fixed persistence issue for deleted routines, improved empty states, and overall stability."
+            rel_name = release_name or f"1.0.8 (Build {version_code})"
+            rel_notes_es = notes_es or "Protección de modo desarrollador, política de privacidad integrada, opción de eliminación completa de datos y mejoras de rendimiento."
+            rel_notes_en = notes_en or "Developer mode protection, in-app privacy policy, complete data deletion rights, and performance improvements."
         elif package_name == "com.omniverselabs.anotadordejuegos":
-            rel_name = release_name or f"1.0.5 (Build {version_code})"
-            rel_notes_es = notes_es or "Insignia MESA PRO visible en cabecera principal, modal de contacto y sugerencias directo con el desarrollador, optimizaciones de interfaz."
-            rel_notes_en = notes_en or "Visible MESA PRO badge in home header, direct developer contact and feedback modal, UI improvements."
-        elif package_name == "com.omniverselabs.charlemos":
             rel_name = release_name or f"1.0.9 (Build {version_code})"
-            rel_notes_es = notes_es or "Soporte completo y nativo para Portugués, Francés e Italiano en las 529 cartas y fichas de la tienda, optimización de mazos temáticos y mejoras de estabilidad."
-            rel_notes_en = notes_en or "Full native support for Portuguese, French, and Italian across all 529 cards and store listings, deck optimizations and stability enhancements."
-            rel_notes_pt = "Suporte nativo completo para Português em todas as 529 cartas, baralhos temáticos e ficha da loja, com melhorias de estabilidade."
-            rel_notes_fr = "Prise en charge native complète du Français sur l'ensemble des 529 cartes, des jeux thématiques et de la fiche du Play Store."
-            rel_notes_it = "Supporto nativo completo per l'Italiano su tutte le 529 carte, i mazzi tematici e la scheda del Play Store."
+            rel_notes_es = notes_es or "Protección de modo desarrollador, política de privacidad integrada, opción de eliminación completa de datos y mejoras de rendimiento."
+            rel_notes_en = notes_en or "Developer mode protection, in-app privacy policy, complete data deletion rights, and performance improvements."
+        elif package_name == "com.omniverselabs.charlemos":
+            rel_name = release_name or f"1.0.12 (Build {version_code})"
+            rel_notes_es = notes_es or "Protección de modo desarrollador, política de privacidad integrada, opción de eliminación completa de datos y mejoras de rendimiento."
+            rel_notes_en = notes_en or "Developer mode protection, in-app privacy policy, complete data deletion rights, and performance improvements."
+            rel_notes_pt = "Proteção do modo desenvolvedor, política de privacidade no aplicativo, exclusão completa de dados e melhorias de desempenho."
+            rel_notes_fr = "Protection du mode développeur, politique de confidentialité intégrée, suppression complète des données et améliorations de performances."
+            rel_notes_it = "Protezione della modalità sviluppatore, informativa sulla privacy in-app, cancellazione completa dei dati e miglioramenti delle prestazioni."
         else:
-            rel_name = release_name or f"1.2.10 (Build {version_code})"
-            rel_notes_es = notes_es or "Nuevo diseño de identidad visual y logotipo de Menú Listo, optimizaciones de rendimiento y estabilidad."
-            rel_notes_en = notes_en or "Fresh new logo and visual identity for Menú Listo, along with continuous performance and stability improvements."
+            rel_name = release_name or f"1.2.16 (Build {version_code})"
+            rel_notes_es = notes_es or "Protección de modo desarrollador, política de privacidad integrada, opción de eliminación completa de datos y mejoras de rendimiento."
+            rel_notes_en = notes_en or "Developer mode protection, in-app privacy policy, complete data deletion rights, and performance improvements."
 
         def make_track_body(t_name, status_val):
             r_notes = [
@@ -787,12 +787,17 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
 
         # Validate edit session before committing
         print("Validating Edit session...")
+        need_changes_not_sent = False
         try:
             edits.validate(packageName=package_name, editId=edit_id).execute()
         except HttpError as val_err:
             err_json = json.loads(val_err.content.decode("utf-8")) if val_err.content else {}
             err_str = err_json.get("error", {}).get("message", str(val_err))
-            if "status draft" in err_str.lower():
+            print(f"Validation notice: {err_str}")
+            if "changesnotsentforreview" in err_str.lower():
+                need_changes_not_sent = True
+                print("Notice: changesNotSentForReview flag required.")
+            elif "status draft" in err_str.lower():
                 print("Notice: App is in draft mode on Google Play Console. Converting non-internal releases to 'draft' status...")
                 for t in tracks_to_deploy:
                     status_to_use = "completed" if t == "internal" else "draft"
@@ -802,13 +807,34 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
                         track=t,
                         body=make_track_body(t, status_to_use)
                     ).execute()
-                edits.validate(packageName=package_name, editId=edit_id).execute()
-                print("Validation succeeded with adapted release statuses.")
+                try:
+                    edits.validate(packageName=package_name, editId=edit_id).execute()
+                    print("Validation succeeded with adapted release statuses.")
+                except HttpError as val_err2:
+                    err_json2 = json.loads(val_err2.content.decode("utf-8")) if val_err2.content else {}
+                    err_str2 = err_json2.get("error", {}).get("message", str(val_err2))
+                    if "changesnotsentforreview" in err_str2.lower():
+                        need_changes_not_sent = True
+                    else:
+                        raise val_err2
             else:
                 raise val_err
 
         print("Committing and Publishing Edit to Google Play...")
-        commit_res = edits.commit(packageName=package_name, editId=edit_id).execute()
+        try:
+            if need_changes_not_sent:
+                commit_res = edits.commit(packageName=package_name, editId=edit_id, changesNotSentForReview=True).execute()
+            else:
+                commit_res = edits.commit(packageName=package_name, editId=edit_id).execute()
+        except HttpError as commit_err:
+            err_json_c = json.loads(commit_err.content.decode("utf-8")) if commit_err.content else {}
+            err_str_c = err_json_c.get("error", {}).get("message", str(commit_err))
+            if "changesnotsentforreview" in err_str_c.lower():
+                print("Retrying commit with changesNotSentForReview=True...")
+                commit_res = edits.commit(packageName=package_name, editId=edit_id, changesNotSentForReview=True).execute()
+            else:
+                raise commit_err
+
         print(f"SUCCESS! Released to Google Play [{', '.join(tracks_to_deploy).upper()}] tracks (Commit ID: {commit_res.get('id', edit_id)})")
         return True
 

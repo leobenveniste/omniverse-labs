@@ -147,7 +147,7 @@ class AboutDialogWidget extends StatelessWidget {
                                   );
                                 }
                                 return const Text(
-                                  '1.2.15 (Build 32)',
+                                  '1.2.16 (Build 33)',
                                   style: TextStyle(fontSize: 13, color: Colors.grey),
                                 );
                               },

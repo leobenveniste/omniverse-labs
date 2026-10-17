@@ -361,7 +361,7 @@ class SettingsScreen extends StatelessWidget {
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               subtitle: Text(
-                'Omniverse Labs • 1.0.8 (Build 22)',
+                'Omniverse Labs • 1.0.9 (Build 23)',
                 style: TextStyle(
                   fontSize: 12,
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
