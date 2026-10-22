@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -223,8 +224,8 @@ class _PaywallSheetState extends State<PaywallSheet> {
               ),
             ),
 
-            // Developer Shortcut in Paywall (Protected by devMode)
-            if (settingsProvider.isDevMode) ...[
+            // Developer Shortcut in Paywall (Strictly debug mode & devMode protected)
+            if (kDebugMode && settingsProvider.isDevMode) ...[
               const Divider(),
               const SizedBox(height: AppSpacing.xs),
               InkWell(

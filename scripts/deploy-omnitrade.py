@@ -169,6 +169,17 @@ def deploy_omnitrade(aab_path: str, target_track: str = "beta"):
             except Exception as e:
                 print(f"   ⚠️ Feature Graphic upload warning for [{lang}]: {e}")
 
+        # Clear previous screenshots first to avoid exceeding max 8 limit
+        try:
+            edits.images().deleteall(
+                packageName=PACKAGE_NAME,
+                editId=edit_id,
+                language=lang,
+                imageType="phoneScreenshots"
+            ).execute()
+        except Exception:
+            pass
+
         # Screenshots
         for s_idx, s_path in enumerate([screenshot1_path, screenshot2_path], start=1):
             if os.path.exists(s_path):

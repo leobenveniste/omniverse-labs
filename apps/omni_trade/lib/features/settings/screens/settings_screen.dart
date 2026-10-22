@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -522,8 +523,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: AppSpacing.md),
 
-          // --- 🧪 DEVELOPER TESTING / MODO DE PRUEBAS (Protected by Dev Mode) ---
-          if (widget.settingsProvider.isDevMode) ...[
+          // --- 🧪 DEVELOPER TESTING / MODO DE PRUEBAS (Strictly debug mode & Dev Mode protected) ---
+          if (kDebugMode && widget.settingsProvider.isDevMode) ...[
             _buildSectionHeader(l10n.t('testModeSection'), Icons.science_rounded, colors.proGold),
             Material(
               color: colors.surface,
