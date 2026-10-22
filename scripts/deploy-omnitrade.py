@@ -200,10 +200,11 @@ def deploy_omnitrade(aab_path: str, target_track: str = "beta"):
     print(f"   ✅ App Bundle uploaded! Version Code: {version_code} (SHA256: {sha256}...)")
 
     # 5. Assign to Track
-    print(f"\n5️⃣ Assigning version {version_code} to track [{target_track.upper()}]...")
+    tracks_to_deploy = [t.strip() for t in target_track.split(",") if t.strip()]
+    print(f"\n5️⃣ Assigning version {version_code} to tracks: {tracks_to_deploy}...")
     notes = [
-        {"language": "es-419", "text": "OmniTrade v1.0.2: Nueva política de privacidad integrada, función de purga y eliminación de datos locales, diálogos de soporte y mejoras de seguridad."},
-        {"language": "en-US", "text": "OmniTrade v1.0.2: Built-in privacy policy, local data purge/deletion options, about & support dialogs, and security enhancements."}
+        {"language": "es-419", "text": "OmniTrade v1.0.3: Activación y configuración del Pase Vitalicio PRO en Google Play, optimización de paywall y analíticas."},
+        {"language": "en-US", "text": "OmniTrade v1.0.3: Official Google Play PRO Lifetime Pass activation, paywall enhancements, and analytics optimizations."}
     ]
 
     def make_track_body(track_name, status):
@@ -211,7 +212,7 @@ def deploy_omnitrade(aab_path: str, target_track: str = "beta"):
             "track": track_name,
             "releases": [
                 {
-                    "name": f"v{version_code} (1.0.2)",
+                    "name": f"v{version_code} (1.0.3)",
                     "versionCodes": [str(version_code)],
                     "status": status,
                     "releaseNotes": notes
@@ -219,38 +220,26 @@ def deploy_omnitrade(aab_path: str, target_track: str = "beta"):
             ]
         }
 
-    status_to_use = "completed"
-    try:
-        edits.tracks().update(
-            packageName=PACKAGE_NAME,
-            editId=edit_id,
-            track=target_track,
-            body=make_track_body(target_track, status_to_use)
-        ).execute()
-        print(f"   ✅ Track [{target_track.upper()}] configured with status '{status_to_use}'")
-    except HttpError as e:
-        print(f"   ⚠️ Track update error with '{status_to_use}', attempting 'draft' status: {e}")
-        status_to_use = "draft"
-        edits.tracks().update(
-            packageName=PACKAGE_NAME,
-            editId=edit_id,
-            track=target_track,
-            body=make_track_body(target_track, status_to_use)
-        ).execute()
-        print(f"   ✅ Track [{target_track.upper()}] configured with status 'draft'")
-
-    # Also update internal track if we are deploying beta
-    if target_track != "internal":
+    for t in tracks_to_deploy:
+        status_to_use = "completed"
         try:
             edits.tracks().update(
                 packageName=PACKAGE_NAME,
                 editId=edit_id,
-                track="internal",
-                body=make_track_body("internal", "completed")
+                track=t,
+                body=make_track_body(t, status_to_use)
             ).execute()
-            print("   ✅ Track [INTERNAL] also updated with new bundle!")
-        except Exception as e_internal:
-            print(f"   ℹ️ Notice: Track [INTERNAL] update skipped: {e_internal}")
+            print(f"   ✅ Track [{t.upper()}] configured with status '{status_to_use}'")
+        except HttpError as e:
+            print(f"   ⚠️ Track update error on [{t}] with '{status_to_use}', attempting 'draft' status: {e}")
+            status_to_use = "draft"
+            edits.tracks().update(
+                packageName=PACKAGE_NAME,
+                editId=edit_id,
+                track=t,
+                body=make_track_body(t, status_to_use)
+            ).execute()
+            print(f"   ✅ Track [{t.upper()}] configured with status 'draft'")
 
     # 6. Validate Edit
     print("\n6️⃣ Validating edit session...")
@@ -305,7 +294,7 @@ def deploy_omnitrade(aab_path: str, target_track: str = "beta"):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--aab", default=r"apps/omni_trade/build/app/outputs/bundle/release/app-release.aab")
-    parser.add_argument("--track", default="beta")
+    parser.add_argument("--track", default="production,beta,internal")
     args = parser.parse_args()
 
     deploy_omnitrade(args.aab, args.track)

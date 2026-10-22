@@ -7,7 +7,7 @@ import '../../../core/utils/haptics_helper.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/settings_provider.dart';
 
-class PaywallSheet extends StatelessWidget {
+class PaywallSheet extends StatefulWidget {
   final SettingsProvider settingsProvider;
   final String? customReason;
 
@@ -35,9 +35,48 @@ class PaywallSheet extends StatelessWidget {
   }
 
   @override
+  State<PaywallSheet> createState() => _PaywallSheetState();
+}
+
+class _PaywallSheetState extends State<PaywallSheet> {
+  bool _isLoading = false;
+
+  Future<void> _handleBuy() async {
+    HapticsHelper.medium();
+    setState(() => _isLoading = true);
+    try {
+      final success = await widget.settingsProvider.buyPro();
+      if (!mounted) return;
+      if (widget.settingsProvider.isPro) {
+        Navigator.of(context).pop();
+      } else if (!success) {
+        // If purchase initiation failed or not completed
+        debugPrint('Buy Pro not completed');
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _handleRestore() async {
+    HapticsHelper.light();
+    setState(() => _isLoading = true);
+    try {
+      await widget.settingsProvider.restorePurchases();
+      if (!mounted) return;
+      if (widget.settingsProvider.isPro) {
+        Navigator.of(context).pop();
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final l10n = AppLocalizations.of(context);
+    final settingsProvider = widget.settingsProvider;
 
     return Container(
       decoration: BoxDecoration(
@@ -111,7 +150,7 @@ class PaywallSheet extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.xxs),
             Text(
-              customReason ?? l10n.t('paywallDefaultSubtitle'),
+              widget.customReason ?? l10n.t('paywallDefaultSubtitle'),
               textAlign: TextAlign.center,
               style: AppTypography.body(colors.textSecondary),
             ),
@@ -158,70 +197,66 @@ class PaywallSheet extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                 ),
               ),
-              onPressed: () {
-                HapticsHelper.medium();
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(l10n.t('activatingTestProToast')),
-                  ),
-                );
-              },
-              child: Text(
-                l10n.t('unlockProPriceButton'),
-                style: AppTypography.body(colors.onPrimary, isBold: true),
-              ),
+              onPressed: _isLoading ? null : _handleBuy,
+              child: _isLoading
+                  ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: colors.onPrimary,
+                      ),
+                    )
+                  : Text(
+                      l10n.t('unlockProPriceButton'),
+                      style: AppTypography.body(colors.onPrimary, isBold: true),
+                    ),
             ),
             const SizedBox(height: AppSpacing.xs),
 
             // Restore Purchases
             TextButton(
-              onPressed: () {
-                HapticsHelper.light();
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('...')),
-                );
-              },
+              onPressed: _isLoading ? null : _handleRestore,
               child: Text(
                 l10n.t('restorePurchasesAction'),
                 style: AppTypography.caption(colors.textSecondary),
               ),
             ),
 
-            const Divider(),
-            const SizedBox(height: AppSpacing.xs),
-
-            // Developer Shortcut in Paywall
-            InkWell(
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-              onTap: () async {
-                HapticsHelper.medium();
-                await settingsProvider.toggleTestPro(true);
-                if (context.mounted) {
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(l10n.t('activatingTestProToast')),
-                    ),
-                  );
-                }
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.xs),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.science_rounded, color: colors.proGold, size: 16),
-                    const SizedBox(width: 6),
-                    Text(
-                      l10n.t('testProShortcut'),
-                      style: AppTypography.caption(colors.proGold, isBold: true),
-                    ),
-                  ],
+            // Developer Shortcut in Paywall (Protected by devMode)
+            if (settingsProvider.isDevMode) ...[
+              const Divider(),
+              const SizedBox(height: AppSpacing.xs),
+              InkWell(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                onTap: () async {
+                  HapticsHelper.medium();
+                  await settingsProvider.toggleTestPro(true);
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(l10n.t('activatingTestProToast')),
+                      ),
+                    );
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.xs),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.science_rounded, color: colors.proGold, size: 16),
+                      const SizedBox(width: 6),
+                      Text(
+                        l10n.t('testProShortcut'),
+                        style: AppTypography.caption(colors.proGold, isBold: true),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
+            ],
           ],
         ),
       ),

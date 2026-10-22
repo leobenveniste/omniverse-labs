@@ -104,6 +104,14 @@ class SettingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<bool> buyPro() async {
+    return await _subscriptionService.buyPro();
+  }
+
+  Future<void> restorePurchases() async {
+    await _subscriptionService.restorePurchases();
+  }
+
   void refreshEntitlement() {
     notifyListeners();
   }

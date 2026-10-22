@@ -3,7 +3,7 @@ class AppConstants {
   AppConstants._();
 
   static const String appName = 'OmniTrade';
-  static const String appVersion = '1.0.2';
+  static const String appVersion = '1.0.3';
 
   // Freemium tier limitations
   static const int maxFreeTrades = 15;
