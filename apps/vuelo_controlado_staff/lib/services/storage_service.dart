@@ -40,13 +40,13 @@ class StorageService {
         createdAt: DateTime.now(),
       );
 
-      // Crear usuario de ejemplo para RRHH
+      // Crear usuario de ejemplo para pruebas / demo
       final rrhhUser = UserModel(
-        id: 'user_rrhh_demo',
-        email: 'rrhh@vuelocontrolado.org',
+        id: 'user_demo_1',
+        email: 'demo@vuelocontrolado.org',
         password: '12345678', // Igual a su DNI
-        firstName: 'Coordinador',
-        lastName: 'RRHH',
+        firstName: 'Staff',
+        lastName: 'Demo',
         documentType: 'DNI',
         documentNumber: '12345678',
         birthDate: DateTime(1995, 5, 12),

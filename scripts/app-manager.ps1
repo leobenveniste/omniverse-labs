@@ -354,6 +354,9 @@ switch ($Command) {
         if ($App -eq "rutina_journal") { 
             $pkgName = "com.omniverselabs.ritmo" 
         }
+        if ($App -eq "vuelo_controlado_staff") { 
+            $pkgName = "com.omniverselabs.vuelocontrolado" 
+        }
 
         if (Test-Path $deployPy) {
             python $deployPy --package $pkgName --aab $aabPath --track $Track

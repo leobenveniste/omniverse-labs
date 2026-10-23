@@ -243,7 +243,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 'leobenveniste@vuelocontrolado.org', 'admin'),
                           ),
                           ActionChip(
-                            label: const Text('RRHH Demo'),
+                            label: const Text('Staff Demo'),
                             backgroundColor: AppTheme.darkCard,
                             side: const BorderSide(color: AppTheme.darkBorder),
                             labelStyle: const TextStyle(
@@ -251,7 +251,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               fontSize: 12,
                             ),
                             onPressed: () => _fillCredentials(
-                                'rrhh@vuelocontrolado.org', '12345678'),
+                                'demo@vuelocontrolado.org', '12345678'),
                           ),
                         ],
                       ),
