@@ -123,3 +123,4 @@ Supported tracks: `internal`, `alpha`, `beta`, `production`.
 ## 🔒 Security Best Practices
 - Keystores (`*.jks`), passwords (`key.properties`), and Google Play credentials (`service_account.json`) are automatically gitignored by `.gitignore`.
 - Keep backups of the `keystores/` folder in a secure password manager or encrypted vault.
+
