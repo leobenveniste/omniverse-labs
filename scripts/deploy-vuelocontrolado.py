@@ -191,16 +191,24 @@ def deploy():
     # 6. Commit Edit
     print("\n6️⃣ Committing and publishing changes to Google Play Console...")
     try:
-        commit_res = edits.commit(
-            packageName=PACKAGE_NAME,
-            editId=edit_id,
-            changesNotSentForReview=need_changes_not_sent
-        ).execute()
+        if need_changes_not_sent:
+            commit_res = edits.commit(
+                packageName=PACKAGE_NAME,
+                editId=edit_id,
+                changesNotSentForReview=True
+            ).execute()
+        else:
+            commit_res = edits.commit(
+                packageName=PACKAGE_NAME,
+                editId=edit_id
+            ).execute()
         print(f"   🎉 SUCCESS! {PACKAGE_NAME} v{version_code} published to {tracks_to_deploy}!")
         print(f"   Commit Result: {commit_res}")
         print("=" * 65)
     except HttpError as c_err:
-        if "changesnotsentforreview" in str(c_err).lower() and not need_changes_not_sent:
+        err_json_c = json.loads(c_err.content.decode("utf-8")) if c_err.content else {}
+        err_str_c = err_json_c.get("error", {}).get("message", str(c_err))
+        if "changesnotsentforreview" in err_str_c.lower() and "must not be set" not in err_str_c.lower():
             print("   Retrying commit with changesNotSentForReview=True...")
             commit_res = edits.commit(
                 packageName=PACKAGE_NAME,
