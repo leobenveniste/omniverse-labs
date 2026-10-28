@@ -247,8 +247,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     BuildContext context,
     EventModel event,
     List<UserModel> staffUsers,
-    UserModel currentUser,
-  ) async {
+    UserModel currentUser, {
+    String? preselectedUserId,
+  }) async {
     // Filtrar miembros anotados que aún no tienen pareja asignada
     final availableUsers =
         staffUsers.where((u) => event.getPairForUser(u.id) == null).toList();
@@ -265,8 +266,18 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       return;
     }
 
-    String? selectedUser1Id = availableUsers[0].id;
-    String? selectedUser2Id = availableUsers[1].id;
+    String? selectedUser1Id;
+    if (preselectedUserId != null &&
+        availableUsers.any((u) => u.id == preselectedUserId)) {
+      selectedUser1Id = preselectedUserId;
+    } else {
+      selectedUser1Id = availableUsers[0].id;
+    }
+
+    final candidateUser2 =
+        availableUsers.where((u) => u.id != selectedUser1Id).toList();
+    String? selectedUser2Id =
+        candidateUser2.isNotEmpty ? candidateUser2[0].id : null;
     final theme = Theme.of(context);
     final textPrimary = AppTheme.textPrimaryColor(context);
 
@@ -841,12 +852,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     }
 
     final isStaff = currentUser != null && event.isUserInStaff(currentUser.id);
-    final canManageProductionReport = currentUser != null &&
-        (currentUser.isSuperAdmin || currentUser.hasRole(AppRoles.produccion));
-    final canManagePairs = currentUser != null &&
+    final canManageEventClose = currentUser != null &&
         (currentUser.isSuperAdmin ||
             currentUser.hasRole(AppRoles.organizacion) ||
             currentUser.hasRole(AppRoles.produccion));
+    final canManagePairs = canManageEventClose;
     final isStarted = event.hasStarted;
     final cases = caseService.getCasesForEvent(event.id);
     final primary = AppTheme.primaryColor(context);
@@ -1299,566 +1309,320 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
                   const SizedBox(height: 16),
 
-                  // SECCIÓN: REGISTRO UNIFICADO POR EVENTO (Exclusivo Rol Producción)
-                  if (canManageProductionReport) ...[
-                    Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        side: BorderSide(
-                          color: event.unifiedReport != null
-                              ? AppTheme.emeraldDark
-                              : primary.withValues(alpha: 0.4),
-                          width: 1.5,
-                        ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.assignment_turned_in_outlined,
-                                      color: primary,
-                                      size: 20,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      'Registro por Evento',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w900,
-                                        color: textPrimary,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 3,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: primary.withValues(alpha: 0.14),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    'PRODUCCIÓN',
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w900,
-                                      color: primary,
-                                      letterSpacing: 0.6,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                  // BOTÓN: CIERRE DE EVENTO (Organización y Producción, sin contenedor)
+                  if (canManageEventClose) ...[
+                    PressableScale(
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => EventUnifiedReportScreen(
+                              event: event,
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              event.unifiedReport != null
-                                  ? 'Completado por ${event.unifiedReport!.completedByUserName} • ${DateFormat('dd/MM/yyyy HH:mm').format(event.unifiedReport!.completedAt)}'
-                                  : 'Pendiente de carga. Información técnica, médica y operativa del evento.',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: textSecondary,
+                          ),
+                        );
+                      },
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: primary,
+                            side: BorderSide(
+                              color: event.unifiedReport != null
+                                  ? AppTheme.emeraldDark
+                                  : primary.withValues(alpha: 0.6),
+                              width: 1.5,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 14,
+                              horizontal: 16,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          icon: Icon(
+                            event.unifiedReport != null
+                                ? Icons.edit_note_rounded
+                                : Icons.assignment_turned_in_rounded,
+                            size: 20,
+                          ),
+                          label: Text(
+                            event.unifiedReport != null
+                                ? 'Editar Cierre de Evento'
+                                : 'Cierre de Evento',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                          onPressed: () {
+                            HapticFeedback.lightImpact();
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => EventUnifiedReportScreen(
+                                  event: event,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 12),
-                            PressableScale(
-                              onTap: () {
-                                HapticFeedback.lightImpact();
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) => EventUnifiedReportScreen(
-                                      event: event,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: FilledButton.icon(
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: event.unifiedReport != null
-                                      ? surfaceContainer
-                                      : primary,
-                                  foregroundColor: event.unifiedReport != null
-                                      ? textPrimary
-                                      : AppTheme.onPrimaryColor(context),
-                                  side: BorderSide(
-                                    color: event.unifiedReport != null
-                                        ? borderColor
-                                        : Colors.transparent,
-                                  ),
-                                  minimumSize: const Size.fromHeight(44),
-                                ),
-                                icon: Icon(
-                                  event.unifiedReport != null
-                                      ? Icons.edit_note_rounded
-                                      : Icons.add_chart_rounded,
-                                  size: 18,
-                                ),
-                                label: Text(
-                                  event.unifiedReport != null
-                                      ? 'Editar Registro de Producción'
-                                      : 'Cargar Registro por Evento',
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                onPressed: () {
-                                  HapticFeedback.lightImpact();
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (_) => EventUnifiedReportScreen(
-                                        event: event,
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
+                            );
+                          },
                         ),
                       ),
                     ),
                     const SizedBox(height: 16),
                   ],
 
-                  // SECCIÓN: PAREJAS DE GUARDIA / RONDA
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Parejas de Ronda (${event.pairs.length})',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          color: textPrimary,
-                          letterSpacing: 0.2,
-                        ),
-                      ),
-                      if (canManagePairs)
-                        PressableScale(
-                          onTap: () => _showAddPairDialog(
-                            context,
-                            event,
-                            staffUsers,
-                            currentUser,
+                  // SECCIÓN: REGISTRO DE RONDAS (Solo si el evento ya empezó o ya tiene rondas registradas)
+                  if (isStarted || event.roundLogs.isNotEmpty) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Registro de Rondas (${event.roundLogs.length})',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w900,
+                            color: textPrimary,
+                            letterSpacing: 0.2,
                           ),
-                          child: TextButton.icon(
-                            style: TextButton.styleFrom(
-                              foregroundColor: primary,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 4),
-                            ),
-                            icon: const Icon(Icons.add_rounded, size: 18),
-                            label: const Text(
-                              'Armar Pareja',
-                              style: TextStyle(fontWeight: FontWeight.w700),
-                            ),
-                            onPressed: () => _showAddPairDialog(
+                        ),
+                        if (currentUser != null &&
+                            (isStaff || currentUser.isSuperAdmin))
+                          PressableScale(
+                            onTap: () => _showAddRoundBottomSheet(
                               context,
                               event,
-                              staffUsers,
                               currentUser,
                             ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-
-                  if (event.pairs.isEmpty)
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          children: [
-                            Icon(Icons.info_outline_rounded,
-                                size: 20, color: textSecondary),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                canManagePairs
-                                    ? 'Aún no se armaron parejas. Los roles de Organización y Producción pueden armarlas aquí.'
-                                    : 'Aún no se asignaron parejas para este evento.',
-                                style: TextStyle(
-                                  color: textSecondary,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
+                            child: FilledButton.icon(
+                              style: FilledButton.styleFrom(
+                                backgroundColor: primary,
+                                foregroundColor:
+                                    AppTheme.onPrimaryColor(context),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                  vertical: 8,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                  else
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: event.pairs.length,
-                      itemBuilder: (context, index) {
-                        final pair = event.pairs[index];
-                        final isMyPair = currentUser != null &&
-                            pair.containsUser(currentUser.id);
-                        return Card(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(
-                              color: isMyPair
-                                  ? AppTheme.neonGreen.withValues(alpha: 0.6)
-                                  : borderColor,
-                              width: isMyPair ? 1.5 : 1.0,
+                              icon:
+                                  const Icon(Icons.add_task_rounded, size: 16),
+                              label: const Text(
+                                'Nueva Ronda',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              onPressed: () => _showAddRoundBottomSheet(
+                                context,
+                                event,
+                                currentUser,
+                              ),
                             ),
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  radius: 18,
-                                  backgroundColor: surfaceContainer,
-                                  child: Text(
-                                    pair.user1Name.isNotEmpty
-                                        ? pair.user1Name[0].toUpperCase()
-                                        : '?',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      color: primary,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Text(
-                                    pair.user1Name,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 14,
-                                      color: textPrimary,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 8),
-                                  child: Icon(
-                                    Icons.swap_horiz_rounded,
-                                    size: 18,
-                                    color: primary,
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    pair.user2Name,
-                                    textAlign: TextAlign.end,
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 14,
-                                      color: textPrimary,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                CircleAvatar(
-                                  radius: 18,
-                                  backgroundColor: surfaceContainer,
-                                  child: Text(
-                                    pair.user2Name.isNotEmpty
-                                        ? pair.user2Name[0].toUpperCase()
-                                        : '?',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      color: primary,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                ),
-                                if (canManagePairs) ...[
-                                  const SizedBox(width: 8),
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.close_rounded,
-                                      size: 18,
-                                      color: AppTheme.errorRed,
-                                    ),
-                                    tooltip: 'Desarmar pareja',
-                                    onPressed: () async {
-                                      HapticFeedback.lightImpact();
-                                      final eventService =
-                                          context.read<EventService>();
-                                      await eventService.removeEventPair(
-                                        eventId: event.id,
-                                        pairId: pair.id,
-                                        currentUser: currentUser,
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        );
-                      },
+                      ],
                     ),
-                  const SizedBox(height: 16),
+                    const SizedBox(height: 8),
 
-                  // SECCIÓN: REGISTRO DE RONDAS
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Registro de Rondas (${event.roundLogs.length})',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          color: textPrimary,
-                          letterSpacing: 0.2,
-                        ),
-                      ),
-                      if (currentUser != null &&
-                          (isStaff || currentUser.isSuperAdmin))
-                        PressableScale(
-                          onTap: () => _showAddRoundBottomSheet(
-                            context,
-                            event,
-                            currentUser,
-                          ),
-                          child: FilledButton.icon(
-                            style: FilledButton.styleFrom(
-                              backgroundColor: primary,
-                              foregroundColor:
-                                  AppTheme.onPrimaryColor(context),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 14,
-                                vertical: 8,
-                              ),
-                            ),
-                            icon: const Icon(Icons.add_task_rounded, size: 16),
-                            label: const Text(
-                              'Nueva Ronda',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            onPressed: () => _showAddRoundBottomSheet(
-                              context,
-                              event,
-                              currentUser,
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-
-                  if (event.roundLogs.isEmpty)
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          children: [
-                            Icon(Icons.directions_walk_rounded,
-                                size: 20, color: textSecondary),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                (isStaff ||
-                                        (currentUser?.isSuperAdmin ?? false))
-                                    ? 'Aún no se registraron rondas. Tocá "Nueva Ronda" para asentar un recorrido de guardia.'
-                                    : 'Aún no se han registrado rondas en este evento.',
-                                style: TextStyle(
-                                  color: textSecondary,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
+                    if (event.roundLogs.isEmpty)
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              Icon(Icons.directions_walk_rounded,
+                                  size: 20, color: textSecondary),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  (isStaff ||
+                                          (currentUser?.isSuperAdmin ?? false))
+                                      ? 'Aún no se registraron rondas. Tocá "Nueva Ronda" para asentar un recorrido de guardia.'
+                                      : 'Aún no se han registrado rondas en este evento.',
+                                  style: TextStyle(
+                                    color: textSecondary,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    )
-                  else
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: event.roundLogs.length,
-                      itemBuilder: (context, index) {
-                        final log = event.roundLogs[index];
-                        final timeStr =
-                            DateFormat('HH:mm').format(log.timestamp);
-                        return Card(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
+                      )
+                    else
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: event.roundLogs.length,
+                        itemBuilder: (context, index) {
+                          final log = event.roundLogs[index];
+                          final timeStr =
+                              DateFormat('HH:mm').format(log.timestamp);
+                          return Card(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding:
+                                                const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  primary.withValues(alpha: 0.14),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              '$timeStr hs',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w900,
+                                                color: primary,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            log.memberName,
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w700,
+                                              color: textPrimary,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      if (log.partnerName != null)
                                         Container(
                                           padding: const EdgeInsets.symmetric(
                                             horizontal: 8,
-                                            vertical: 4,
+                                            vertical: 3,
                                           ),
                                           decoration: BoxDecoration(
-                                            color:
-                                                primary.withValues(alpha: 0.14),
+                                            color: AppTheme.neonGreen
+                                                .withValues(alpha: 0.12),
                                             borderRadius:
-                                                BorderRadius.circular(8),
+                                                BorderRadius.circular(12),
                                           ),
                                           child: Text(
-                                            '$timeStr hs',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w900,
-                                              color: primary,
+                                            'Pareja: ${log.partnerName}',
+                                            style: const TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w700,
+                                              color: AppTheme.neonGreen,
                                             ),
                                           ),
                                         ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          log.memberName,
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w700,
-                                            color: textPrimary,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    if (log.partnerName != null)
+                                    ],
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    children: [
                                       Container(
                                         padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 3,
+                                          horizontal: 10,
+                                          vertical: 5,
                                         ),
                                         decoration: BoxDecoration(
                                           color: AppTheme.neonGreen
                                               .withValues(alpha: 0.12),
                                           borderRadius:
-                                              BorderRadius.circular(12),
-                                        ),
-                                        child: Text(
-                                          'Pareja: ${log.partnerName}',
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w700,
-                                            color: AppTheme.neonGreen,
+                                              BorderRadius.circular(8),
+                                          border: Border.all(
+                                            color: AppTheme.neonGreen
+                                                .withValues(alpha: 0.3),
                                           ),
                                         ),
-                                      ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 5,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: AppTheme.neonGreen
-                                            .withValues(alpha: 0.12),
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                          color: AppTheme.neonGreen
-                                              .withValues(alpha: 0.3),
-                                        ),
-                                      ),
-                                      child: Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.assignment_turned_in_rounded,
-                                            size: 14,
-                                            color: AppTheme.neonGreen,
-                                          ),
-                                          const SizedBox(width: 6),
-                                          Text(
-                                            'Casos: ${log.detectedCasesCount}',
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w800,
+                                        child: Row(
+                                          children: [
+                                            const Icon(
+                                              Icons
+                                                  .assignment_turned_in_rounded,
+                                              size: 14,
                                               color: AppTheme.neonGreen,
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 5,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: AppTheme.skyBlue
-                                            .withValues(alpha: 0.12),
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                          color: AppTheme.skyBlue
-                                              .withValues(alpha: 0.3),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              'Casos: ${log.detectedCasesCount}',
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w800,
+                                                color: AppTheme.neonGreen,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                      child: Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.phone_in_talk_rounded,
-                                            size: 14,
-                                            color: AppTheme.skyBlue,
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 5,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: AppTheme.skyBlue
+                                              .withValues(alpha: 0.12),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          border: Border.all(
+                                            color: AppTheme.skyBlue
+                                                .withValues(alpha: 0.3),
                                           ),
-                                          const SizedBox(width: 6),
-                                          Text(
-                                            'Llamados: ${log.callsCount}',
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w800,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.phone_in_talk_rounded,
+                                              size: 14,
                                               color: AppTheme.skyBlue,
                                             ),
-                                          ),
-                                        ],
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              'Llamados: ${log.callsCount}',
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w800,
+                                                color: AppTheme.skyBlue,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  if (log.observations.isNotEmpty) ...[
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      log.observations,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color:
+                                            textPrimary.withValues(alpha: 0.9),
+                                        height: 1.3,
                                       ),
                                     ),
                                   ],
-                                ),
-                                if (log.observations.isNotEmpty) ...[
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    log.observations,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color:
-                                          textPrimary.withValues(alpha: 0.9),
-                                      height: 1.3,
-                                    ),
-                                  ),
                                 ],
-                              ],
+                              ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
-                  const SizedBox(height: 16),
+                          );
+                        },
+                      ),
+                    const SizedBox(height: 16),
+                  ],
 
                   // SECCIÓN: FICHAS DE CASOS (Solo si el evento ya empezó o ya tiene casos)
                   if (isStarted || cases.isNotEmpty) ...[
@@ -1918,15 +1682,48 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     const SizedBox(height: 16),
                   ],
 
-                  // SECCIÓN: STAFF ANOTADO SIN CONTENEDOR
-                  Text(
-                    'Staff Asignado (${staffUsers.length} / ${event.requiredStaffCount})',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w900,
-                      color: textPrimary,
-                      letterSpacing: 0.2,
-                    ),
+                  // SECCIÓN: STAFF Y PAREJAS (Lista Unificada)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Staff y Parejas (${staffUsers.length} / ${event.requiredStaffCount})',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                          color: textPrimary,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                      if (canManagePairs &&
+                          staffUsers.where((u) => event.getPairForUser(u.id) == null).length >= 2) ...[
+                        TextButton.icon(
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            foregroundColor: primary,
+                          ),
+                          icon: const Icon(Icons.group_add_rounded, size: 16),
+                          label: const Text(
+                            'Armar Pareja',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          onPressed: () => _showAddPairDialog(
+                            context,
+                            event,
+                            staffUsers,
+                            currentUser,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                   const SizedBox(height: 8),
 
@@ -1952,6 +1749,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       itemCount: staffUsers.length,
                       itemBuilder: (context, index) {
                         final member = staffUsers[index];
+                        final pair = event.getPairForUser(member.id);
+                        final hasPair = pair != null;
+                        final partnerName = pair?.getPartnerName(member.id);
+
                         ImageProvider? avatarImage;
                         if (member.photoUrl != null &&
                             member.photoUrl!.trim().isNotEmpty) {
@@ -1971,33 +1772,183 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           }
                         }
 
-                        return ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 4,
-                            vertical: 4,
+                        final unassignedCount = staffUsers
+                            .where((u) => event.getPairForUser(u.id) == null)
+                            .length;
+
+                        return Container(
+                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
                           ),
-                          leading: CircleAvatar(
-                            backgroundColor: surfaceContainer,
-                            backgroundImage: avatarImage,
-                            child: avatarImage == null
-                                ? Text(
-                                    member.firstName.isNotEmpty
-                                        ? member.firstName[0].toUpperCase()
-                                        : '?',
-                                    style: TextStyle(
-                                      color: primary,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  )
-                                : null,
-                          ),
-                          title: Text(
-                            member.fullName,
-                            style: TextStyle(
-                              color: textPrimary,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 14,
+                          decoration: BoxDecoration(
+                            color: surfaceContainer.withValues(alpha: 0.5),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: hasPair
+                                  ? AppTheme.emeraldDark.withValues(alpha: 0.25)
+                                  : borderColor.withValues(alpha: 0.6),
                             ),
+                          ),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 18,
+                                backgroundColor: surfaceContainer,
+                                backgroundImage: avatarImage,
+                                child: avatarImage == null
+                                    ? Text(
+                                        member.firstName.isNotEmpty
+                                            ? member.firstName[0].toUpperCase()
+                                            : '?',
+                                        style: TextStyle(
+                                          color: primary,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      )
+                                    : null,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      member.fullName,
+                                      style: TextStyle(
+                                        color: textPrimary,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    if (hasPair)
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Icon(
+                                            Icons.link_rounded,
+                                            size: 13,
+                                            color: AppTheme.emeraldDark,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Flexible(
+                                            child: Text(
+                                              'En pareja con $partnerName',
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w700,
+                                                color: AppTheme.emeraldDark,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    else
+                                      Text(
+                                        'Sin pareja asignada',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                          color: textSecondary,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                              if (canManagePairs) ...[
+                                if (hasPair)
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.link_off_rounded,
+                                      size: 18,
+                                      color: AppTheme.errorRed,
+                                    ),
+                                    tooltip: 'Desvincular pareja',
+                                    onPressed: () async {
+                                      HapticFeedback.lightImpact();
+                                      final confirm = await showDialog<bool>(
+                                        context: context,
+                                        builder: (ctx) => AlertDialog(
+                                          title: const Text('Desvincular Pareja'),
+                                          content: Text(
+                                            '¿Desvincular la pareja entre ${pair.user1Name} y ${pair.user2Name}?',
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.of(ctx).pop(false),
+                                              child: const Text('Cancelar'),
+                                            ),
+                                            FilledButton(
+                                              style: FilledButton.styleFrom(
+                                                backgroundColor:
+                                                    AppTheme.errorRed,
+                                              ),
+                                              onPressed: () =>
+                                                  Navigator.of(ctx).pop(true),
+                                              child: const Text('Desvincular'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+
+                                      if (confirm == true && context.mounted) {
+                                        final eventService =
+                                            context.read<EventService>();
+                                        final ok =
+                                            await eventService.removeEventPair(
+                                          eventId: event.id,
+                                          pairId: pair.id,
+                                          currentUser: currentUser,
+                                        );
+                                        if (ok && context.mounted) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                  '✓ Pareja desvinculada.'),
+                                              backgroundColor:
+                                                  AppTheme.neonGreen,
+                                            ),
+                                          );
+                                        }
+                                      }
+                                    },
+                                  )
+                                else if (unassignedCount >= 2)
+                                  TextButton.icon(
+                                    style: TextButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
+                                      minimumSize: Size.zero,
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      foregroundColor: primary,
+                                    ),
+                                    icon: const Icon(Icons.add_link_rounded,
+                                        size: 15),
+                                    label: const Text(
+                                      'Asignar',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    onPressed: () => _showAddPairDialog(
+                                      context,
+                                      event,
+                                      staffUsers,
+                                      currentUser,
+                                      preselectedUserId: member.id,
+                                    ),
+                                  ),
+                              ],
+                            ],
                           ),
                         );
                       },

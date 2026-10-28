@@ -127,6 +127,127 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Future<void> _pickPhotoDirectly(BuildContext context, UserModel user) async {
+    HapticFeedback.lightImpact();
+    final theme = Theme.of(context);
+    final source = await showModalBottomSheet<ImageSource?>(
+      context: context,
+      backgroundColor: theme.colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (modalCtx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Foto de Perfil',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ListTile(
+                  leading: const Icon(Icons.camera_alt_rounded,
+                      color: AppTheme.neonGreen),
+                  title: const Text('Tomar foto con la cámara'),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  onTap: () => Navigator.of(modalCtx).pop(ImageSource.camera),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.photo_library_rounded,
+                      color: AppTheme.skyBlue),
+                  title: const Text('Elegir de la galería'),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  onTap: () => Navigator.of(modalCtx).pop(ImageSource.gallery),
+                ),
+                if (user.photoUrl != null && user.photoUrl!.isNotEmpty)
+                  ListTile(
+                    leading: const Icon(Icons.delete_outline_rounded,
+                        color: AppTheme.errorRed),
+                    title: const Text('Eliminar foto actual',
+                        style: TextStyle(color: AppTheme.errorRed)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    onTap: () => Navigator.of(modalCtx).pop(null),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (!context.mounted) return;
+
+    final authService = context.read<AuthService>();
+    if (source == null) {
+      if (user.photoUrl != null && user.photoUrl!.isNotEmpty) {
+        await authService.updateUserPhoto(userId: user.id, photoUrl: '');
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('✓ Foto de perfil eliminada'),
+              backgroundColor: AppTheme.neonGreen,
+            ),
+          );
+        }
+      }
+      return;
+    }
+
+    try {
+      final picker = ImagePicker();
+      final picked = await picker.pickImage(
+        source: source,
+        maxWidth: 600,
+        maxHeight: 600,
+        imageQuality: 80,
+      );
+
+      if (picked != null && context.mounted) {
+        final bytes = await picked.readAsBytes();
+        final base64String = 'data:image/jpeg;base64,${base64Encode(bytes)}';
+        final ok = await authService.updateUserPhoto(
+          userId: user.id,
+          photoUrl: base64String,
+        );
+        if (ok && context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('✓ Foto de perfil actualizada'),
+              backgroundColor: AppTheme.neonGreen,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al actualizar foto: $e'),
+            backgroundColor: AppTheme.errorRed,
+          ),
+        );
+      }
+    }
+  }
+
   void _showConfigureProfileSheet(BuildContext context, UserModel user) {
     final firstNameController = TextEditingController(text: user.firstName);
     final lastNameController = TextEditingController(text: user.lastName);
@@ -533,20 +654,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           return SingleChildScrollView(
             physics: const ClampingScrollPhysics(),
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                _buildUserHeader(context, user, userIg),
-                const SizedBox(height: 16),
-                _buildDualQrRow(
-                  context: context,
-                  userIgUrl: userIgUrl,
-                  instagramVueloUrl: instagramVueloUrl,
-                  userIg: userIg,
-                  qrSize: qrSize,
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 520),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _buildIdCard(context, user, userIg, userIgUrl, instagramVueloUrl),
+                    const SizedBox(height: 24),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.qr_code_2_rounded,
+                          size: 18,
+                          color: AppTheme.primaryColor(context),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'CÓDIGOS QR DE ACCESO',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900,
+                            color: AppTheme.primaryColor(context),
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    _buildDualQrRow(
+                      context: context,
+                      userIgUrl: userIgUrl,
+                      instagramVueloUrl: instagramVueloUrl,
+                      userIg: userIg,
+                      qrSize: qrSize,
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           );
         },
@@ -577,15 +724,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return 'Reducción de Daños';
   }
 
-  Widget _buildUserHeader(
+  Widget _buildIdCard(
     BuildContext context,
     UserModel user,
     String userIg,
+    String userIgUrl,
+    String instagramVueloUrl,
   ) {
     final primary = AppTheme.primaryColor(context);
     final textPrimary = AppTheme.textPrimaryColor(context);
     final textSecondary = AppTheme.textSecondaryColor(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
 
     ImageProvider? avatarImage;
     if (user.photoUrl != null && user.photoUrl!.trim().isNotEmpty) {
@@ -604,112 +754,422 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF131A22) : Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(28),
         border: Border.all(
-          color: primary.withValues(alpha: isDark ? 0.3 : 0.2),
-          width: 1.2,
+          color: primary.withValues(alpha: isDark ? 0.28 : 0.20),
+          width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
+            color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.08),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(
-            padding: const EdgeInsets.all(2.5),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: primary, width: 2.2),
-              boxShadow: [
-                BoxShadow(
-                  color: primary.withValues(alpha: 0.25),
-                  blurRadius: 8,
+          // HERO PORTRAIT SUPERIOR CON BORDES CURVOS
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(26)),
+            child: Stack(
+              children: [
+                if (avatarImage != null)
+                  Image(
+                    image: avatarImage,
+                    width: double.infinity,
+                    height: 270,
+                    fit: BoxFit.cover,
+                  )
+                else
+                  Container(
+                    width: double.infinity,
+                    height: 230,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: isDark
+                            ? [
+                                const Color(0xFF0F172A),
+                                const Color(0xFF1E293B),
+                                primary.withValues(alpha: 0.15),
+                              ]
+                            : [
+                                primary.withValues(alpha: 0.15),
+                                const Color(0xFFE2E8F0),
+                              ],
+                      ),
+                    ),
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: primary, width: 3),
+                          boxShadow: [
+                            BoxShadow(
+                              color: primary.withValues(alpha: 0.3),
+                              blurRadius: 12,
+                            ),
+                          ],
+                        ),
+                        child: CircleAvatar(
+                          radius: 52,
+                          backgroundColor: primary.withValues(alpha: 0.2),
+                          child: Text(
+                            user.firstName.isNotEmpty
+                                ? user.firstName[0].toUpperCase()
+                                : '?',
+                            style: TextStyle(
+                              fontSize: 48,
+                              fontWeight: FontWeight.w900,
+                              color: primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                // Gradiente inferior para legibilidad
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.35),
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.65),
+                        ],
+                        stops: const [0.0, 0.5, 1.0],
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Tag superior izquierdo: Vuelo Controlado Staff
+                Positioned(
+                  top: 14,
+                  left: 14,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.60),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.2),
+                      ),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.flight_takeoff_rounded,
+                          size: 13,
+                          color: AppTheme.neonGreen,
+                        ),
+                        SizedBox(width: 6),
+                        Text(
+                          'STAFF OFICIAL',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Botón superior derecho: Cambiar Foto
+                Positioned(
+                  top: 12,
+                  right: 12,
+                  child: Material(
+                    color: Colors.black.withValues(alpha: 0.55),
+                    shape: const CircleBorder(),
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: () => _pickPhotoDirectly(context, user),
+                      child: Tooltip(
+                        message: 'Cambiar foto de perfil',
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          child: const Icon(
+                            Icons.camera_alt_rounded,
+                            size: 18,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
-            child: CircleAvatar(
-              radius: 30,
-              backgroundColor: primary.withValues(alpha: 0.14),
-              backgroundImage: avatarImage,
-              child: avatarImage == null
-                  ? Text(
-                      user.firstName.isNotEmpty
-                          ? user.firstName[0].toUpperCase()
-                          : '?',
-                      style: TextStyle(
-                        fontSize: 24,
-                        color: primary,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    )
-                  : null,
-            ),
           ),
-          const SizedBox(width: 14),
-          Expanded(
+
+          // CUERPO DE LA TARJETA
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  user.fullName,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.3,
-                    color: textPrimary,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
+                // Nombre en negrita + Badge verificado
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: primary.withValues(alpha: isDark ? 0.16 : 0.10),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                    Flexible(
                       child: Text(
-                        roleLabel,
+                        user.fullName,
                         style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.2,
-                          color: primary,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -0.4,
+                          color: textPrimary,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    const SizedBox(width: 8),
+                    const Icon(
+                      Icons.verified_rounded,
+                      color: AppTheme.neonGreen,
+                      size: 22,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+
+                // Rótulo de rol y mención de Instagram
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: primary.withValues(alpha: isDark ? 0.16 : 0.10),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: primary.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Text(
+                        roleLabel,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.2,
+                          color: primary,
+                        ),
+                      ),
+                    ),
                     if (userIg.isNotEmpty) ...[
                       const SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          '@$userIg',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: textSecondary,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? const Color(0xFF1E293B)
+                              : const Color(0xFFF1F5F9),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.camera_alt_outlined,
+                              size: 12,
+                              color: textSecondary,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              '@$userIg',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: textSecondary,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ],
+                ),
+
+                const SizedBox(height: 16),
+
+                // Datos de Contacto
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isDark
+                        ? const Color(0xFF0F151C)
+                        : const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: theme.colorScheme.outline.withValues(alpha: 0.2),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.email_outlined, size: 16, color: primary),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          user.email,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: textPrimary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Botones píldora para acciones de QR e Instagram
+                Row(
+                  children: [
+                    Expanded(
+                      child: PressableScale(
+                        onTap: () => _showFullscreenQrDialog(
+                          context: context,
+                          title: 'MI INSTAGRAM',
+                          data: userIgUrl,
+                          handle: userIg.isNotEmpty
+                              ? '@$userIg'
+                              : '@configura_tu_ig',
+                          icon: Icons.camera_alt_outlined,
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 11),
+                          decoration: BoxDecoration(
+                            color: primary.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: primary.withValues(alpha: 0.35),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.qr_code_rounded,
+                                  size: 16, color: primary),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Mi QR',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800,
+                                  color: primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: PressableScale(
+                        onTap: () => _showFullscreenQrDialog(
+                          context: context,
+                          title: 'VUELO CONTROLADO',
+                          data: instagramVueloUrl,
+                          handle: '@vuelocontrolado',
+                          icon: Icons.flight_takeoff_rounded,
+                        ),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 11),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? const Color(0xFF1E293B)
+                                : const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: theme.colorScheme.outline
+                                  .withValues(alpha: 0.25),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.flight_takeoff_rounded,
+                                size: 16,
+                                color: textPrimary,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                'QR Vuelo',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800,
+                                  color: textPrimary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 12),
+
+                // Botón Editar Información
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      side: BorderSide(
+                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    icon: const Icon(Icons.edit_note_rounded, size: 18),
+                    label: const Text(
+                      'Editar Datos Personales',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    onPressed: () {
+                      HapticFeedback.lightImpact();
+                      _showConfigureProfileSheet(context, user);
+                    },
+                  ),
                 ),
               ],
             ),
