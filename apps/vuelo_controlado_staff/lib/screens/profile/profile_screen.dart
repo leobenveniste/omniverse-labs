@@ -285,7 +285,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _buildIdCard(context, user, userIg),
+                    _buildIdCard(context, user),
                     const SizedBox(height: 24),
                     Row(
                       children: [
@@ -327,11 +327,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildIdCard(
     BuildContext context,
     UserModel user,
-    String userIg,
   ) {
     final primary = AppTheme.primaryColor(context);
     final textPrimary = AppTheme.textPrimaryColor(context);
-    final textSecondary = AppTheme.textSecondaryColor(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final theme = Theme.of(context);
 
@@ -509,43 +507,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 6),
-
-                if (userIg.isNotEmpty) ...[
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isDark
-                          ? const Color(0xFF1E293B)
-                          : const Color(0xFFF1F5F9),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.camera_alt_outlined,
-                          size: 12,
-                          color: textSecondary,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '@',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
 
                 // Datos de Contacto
                 Container(
