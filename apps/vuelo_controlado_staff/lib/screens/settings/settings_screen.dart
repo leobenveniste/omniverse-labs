@@ -210,7 +210,70 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final firstNameController = TextEditingController(text: user.firstName);
     final lastNameController = TextEditingController(text: user.lastName);
     final emailController = TextEditingController(text: user.email);
-    final phoneController = TextEditingController(text: user.phone);
+
+    // Separar número de teléfono en país (+54), código de área (ej: 11) y número local
+    String initialCountry = '+54';
+    String initialArea = '';
+    String initialNumber = '';
+
+    final rawPhone = user.phone.trim();
+    if (rawPhone.isNotEmpty) {
+      if (rawPhone.startsWith('+')) {
+        if (rawPhone.startsWith('+54')) {
+          initialCountry = '+54';
+          String rest = rawPhone.substring(3).trim();
+          if (rest.startsWith('9')) rest = rest.substring(1).trim();
+          final parts = rest.split(RegExp(r'[\s\-]+')).where((s) => s.isNotEmpty).toList();
+          if (parts.length >= 2) {
+            initialArea = parts[0];
+            initialNumber = parts.sublist(1).join(' ');
+          } else if (rest.length >= 10) {
+            initialArea = rest.substring(0, 2);
+            initialNumber = rest.substring(2);
+          } else {
+            initialNumber = rest;
+          }
+        } else {
+          final match = RegExp(r'^(\+\d{1,3})\s*(.*)$').firstMatch(rawPhone);
+          if (match != null) {
+            initialCountry = match.group(1) ?? '+54';
+            final rest = (match.group(2) ?? '').trim();
+            final parts = rest.split(RegExp(r'[\s\-]+')).where((s) => s.isNotEmpty).toList();
+            if (parts.length >= 2) {
+              initialArea = parts[0];
+              initialNumber = parts.sublist(1).join(' ');
+            } else {
+              initialNumber = rest;
+            }
+          } else {
+            initialNumber = rawPhone;
+          }
+        }
+      } else {
+        final digits = rawPhone.replaceAll(RegExp(r'[^\d]'), '');
+        if (digits.startsWith('54')) {
+          initialCountry = '+54';
+          String rest = digits.substring(2);
+          if (rest.startsWith('9')) rest = rest.substring(1);
+          if (rest.length >= 10) {
+            initialArea = rest.substring(0, 2);
+            initialNumber = rest.substring(2);
+          } else {
+            initialNumber = rest;
+          }
+        } else if (digits.length >= 10) {
+          initialArea = digits.substring(0, 2);
+          initialNumber = digits.substring(2);
+        } else {
+          initialNumber = rawPhone;
+        }
+      }
+    }
+
+    final countryCodeController = TextEditingController(text: initialCountry);
+    final areaCodeController = TextEditingController(text: initialArea);
+    final phoneNumberController = TextEditingController(text: initialNumber);
+
     final instagramController =
         TextEditingController(text: user.instagram ?? '');
     final formKey = GlobalKey<FormState>();
@@ -230,7 +293,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             final theme = Theme.of(ctx);
 
             Future<void> pickPhoto() async {
-              final source = await showModalBottomSheet<ImageSource?>(
+              final action = await showModalBottomSheet<String?>(
                 context: ctx,
                 backgroundColor: theme.colorScheme.surface,
                 shape: const RoundedRectangleBorder(
@@ -268,8 +331,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             title: const Text('Tomar foto con la cámara'),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12)),
-                            onTap: () =>
-                                Navigator.of(modalCtx).pop(ImageSource.camera),
+                            onTap: () => Navigator.of(modalCtx).pop('camera'),
                           ),
                           ListTile(
                             leading: const Icon(Icons.photo_library_rounded,
@@ -277,8 +339,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             title: const Text('Elegir de la galería'),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12)),
-                            onTap: () =>
-                                Navigator.of(modalCtx).pop(ImageSource.gallery),
+                            onTap: () => Navigator.of(modalCtx).pop('gallery'),
                           ),
                           if (currentPhotoUrl != null &&
                               currentPhotoUrl!.isNotEmpty)
@@ -289,10 +350,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   style: TextStyle(color: AppTheme.errorRed)),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12)),
-                              onTap: () {
-                                Navigator.of(modalCtx).pop(null);
-                                setSheetState(() => currentPhotoUrl = '');
-                              },
+                              onTap: () => Navigator.of(modalCtx).pop('delete'),
                             ),
                         ],
                       ),
@@ -301,10 +359,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
               );
 
-              if (source == null) return;
+              // Si se cierra el modal tocando afuera o con atrás, no hacemos nada (no se elimina la foto)
+              if (action == null) return;
+
+              if (action == 'delete') {
+                setSheetState(() => currentPhotoUrl = '');
+                return;
+              }
 
               try {
                 final picker = ImagePicker();
+                final source = action == 'camera' ? ImageSource.camera : ImageSource.gallery;
                 final picked = await picker.pickImage(
                   source: source,
                   maxWidth: 600,
@@ -341,11 +406,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     .replaceAll('@', '')
                     .replaceAll(' ', '');
 
+                final cCode = countryCodeController.text.trim();
+                final aCode = areaCodeController.text.trim().replaceAll(RegExp(r'[^\d]'), '');
+                final lNum = phoneNumberController.text.trim().replaceAll(RegExp(r'[^\d]'), '');
+
+                String assembledPhone = '';
+                if (aCode.isNotEmpty || lNum.isNotEmpty) {
+                  final prefix = cCode.isNotEmpty ? cCode : '+54';
+                  if (aCode.isNotEmpty && lNum.isNotEmpty) {
+                    assembledPhone = '$prefix $aCode $lNum';
+                  } else {
+                    assembledPhone = '$prefix ${aCode.isNotEmpty ? aCode : lNum}'.trim();
+                  }
+                }
+
                 final updatedUser = user.copyWith(
                   firstName: firstNameController.text.trim(),
                   lastName: lastNameController.text.trim(),
                   email: emailController.text.trim(),
-                  phone: phoneController.text.trim(),
+                  phone: assembledPhone,
                   instagram: cleanIg.isNotEmpty ? cleanIg : null,
                   photoUrl: (currentPhotoUrl != null &&
                           currentPhotoUrl!.trim().isNotEmpty)
@@ -562,17 +641,64 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      TextFormField(
-                        controller: phoneController,
-                        enabled: !isSaving,
-                        keyboardType: TextInputType.phone,
-                        decoration: const InputDecoration(
-                          labelText: 'Teléfono de Contacto',
-                          prefixIcon: Icon(Icons.phone_outlined),
-                        ),
-                        validator: (v) => (v == null || v.trim().isEmpty)
-                            ? 'Requerido'
-                            : null,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Teléfono de Contacto (WhatsApp)',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.textSecondaryColor(ctx),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: 78,
+                                child: TextFormField(
+                                  controller: countryCodeController,
+                                  enabled: !isSaving,
+                                  keyboardType: TextInputType.phone,
+                                  decoration: const InputDecoration(
+                                    labelText: 'País',
+                                    hintText: '+54',
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              SizedBox(
+                                width: 88,
+                                child: TextFormField(
+                                  controller: areaCodeController,
+                                  enabled: !isSaving,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Área',
+                                    hintText: '11',
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: TextFormField(
+                                  controller: phoneNumberController,
+                                  enabled: !isSaving,
+                                  keyboardType: TextInputType.phone,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Número',
+                                    hintText: '1234 5678',
+                                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
@@ -591,6 +717,90 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             );
           },
+        );
+      },
+    );
+  }
+
+  void _showThemeSelector(BuildContext context, SettingsService settingsService) {
+    HapticFeedback.lightImpact();
+    final theme = Theme.of(context);
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: theme.colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 36,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Tema de la Aplicación',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ListTile(
+                  leading: const Icon(Icons.brightness_auto_rounded, color: AppTheme.skyBlue),
+                  title: const Text('Automático', style: TextStyle(fontWeight: FontWeight.w700)),
+                  subtitle: const Text('Detecta el modo del dispositivo', style: TextStyle(fontSize: 12)),
+                  trailing: settingsService.isAutoTheme
+                      ? const Icon(Icons.check_rounded, color: AppTheme.neonGreen)
+                      : null,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    settingsService.setThemeMode(ThemeMode.system);
+                    Navigator.of(ctx).pop();
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.dark_mode_rounded, color: Color(0xFF94A3B8)),
+                  title: const Text('Modo Oscuro', style: TextStyle(fontWeight: FontWeight.w700)),
+                  trailing: (!settingsService.isAutoTheme && settingsService.themeMode == ThemeMode.dark)
+                      ? const Icon(Icons.check_rounded, color: AppTheme.neonGreen)
+                      : null,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    settingsService.setThemeMode(ThemeMode.dark);
+                    Navigator.of(ctx).pop();
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.light_mode_rounded, color: Color(0xFFF59E0B)),
+                  title: const Text('Modo Claro', style: TextStyle(fontWeight: FontWeight.w700)),
+                  trailing: (!settingsService.isAutoTheme && settingsService.themeMode == ThemeMode.light)
+                      ? const Icon(Icons.check_rounded, color: AppTheme.neonGreen)
+                      : null,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    settingsService.setThemeMode(ThemeMode.light);
+                    Navigator.of(ctx).pop();
+                  },
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
@@ -633,9 +843,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: 16),
                 ListTile(
+                  leading: const Icon(Icons.language_rounded, color: AppTheme.skyBlue),
+                  title: const Text('Automático', style: TextStyle(fontWeight: FontWeight.w700)),
+                  subtitle: const Text('Detecta el idioma del dispositivo', style: TextStyle(fontSize: 12)),
+                  trailing: settingsService.isAutoLocale
+                      ? const Icon(Icons.check_rounded, color: AppTheme.neonGreen)
+                      : null,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  onTap: () {
+                    HapticFeedback.selectionClick();
+                    settingsService.setAutoLocale();
+                    Navigator.of(ctx).pop();
+                  },
+                ),
+                ListTile(
                   leading: const Text('🇦🇷', style: TextStyle(fontSize: 24)),
                   title: const Text('Español', style: TextStyle(fontWeight: FontWeight.w700)),
-                  trailing: settingsService.locale.languageCode == 'es'
+                  trailing: (!settingsService.isAutoLocale && settingsService.locale.languageCode == 'es')
                       ? const Icon(Icons.check_rounded, color: AppTheme.neonGreen)
                       : null,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -648,7 +872,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ListTile(
                   leading: const Text('🇺🇸', style: TextStyle(fontSize: 24)),
                   title: const Text('English', style: TextStyle(fontWeight: FontWeight.w700)),
-                  trailing: settingsService.locale.languageCode == 'en'
+                  trailing: (!settingsService.isAutoLocale && settingsService.locale.languageCode == 'en')
                       ? const Icon(Icons.check_rounded, color: AppTheme.neonGreen)
                       : null,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -675,8 +899,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final canManageTeam =
         user != null && (user.canManageUsers || user.canCreateUsers);
     final isDark = theme.brightness == Brightness.dark;
-    final isDarkModeActive = settingsService.themeMode == ThemeMode.dark ||
-        (settingsService.themeMode == ThemeMode.system && isDark);
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -708,19 +930,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _SettingsGroup(
                 children: [
                   _SettingRow(
-                    icon: Icons.dark_mode_rounded,
+                    icon: Icons.palette_rounded,
                     iconBgColor: isDark ? const Color(0xFF334155) : const Color(0xFF1E293B),
-                    title: 'Modo Oscuro',
-                    trailing: Switch.adaptive(
-                      value: isDarkModeActive,
-                      activeThumbColor: AppTheme.neonGreen,
-                      onChanged: (val) {
-                        HapticFeedback.selectionClick();
-                        settingsService.setThemeMode(
-                          val ? ThemeMode.dark : ThemeMode.light,
-                        );
-                      },
+                    title: 'Tema',
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          settingsService.isAutoTheme
+                              ? 'Automático'
+                              : (settingsService.themeMode == ThemeMode.dark ? 'Oscuro' : 'Claro'),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppTheme.textSecondaryColor(context),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Icons.chevron_right_rounded,
+                          size: 20,
+                          color: AppTheme.textSecondaryColor(context),
+                        ),
+                      ],
                     ),
+                    onTap: () => _showThemeSelector(context, settingsService),
                   ),
                   _SettingRow(
                     icon: Icons.language_rounded,
@@ -730,9 +964,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          settingsService.locale.languageCode == 'es'
-                              ? '🇦🇷 Español'
-                              : '🇺🇸 English',
+                          settingsService.isAutoLocale
+                              ? 'Automático'
+                              : (settingsService.locale.languageCode == 'es'
+                                  ? '🇦🇷 Español'
+                                  : '🇺🇸 English'),
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -778,7 +1014,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _SettingRow(
                       icon: Icons.people_alt_rounded,
                       iconBgColor: const Color(0xFF8B5CF6),
-                      title: 'Panel de Equipo y Voluntarios',
+                      title: 'Administrar equipo',
                       trailing: Icon(
                         Icons.chevron_right_rounded,
                         size: 20,
@@ -944,7 +1180,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Versión 1.0.26 (Build 29)',
+                      'Versión 1.0.27 (Build 30)',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,

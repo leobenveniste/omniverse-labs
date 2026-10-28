@@ -310,9 +310,15 @@ class _HomeScreenState extends State<HomeScreen> {
         child: InkWell(
           onTap: () {
             HapticFeedback.selectionClick();
-            if (_currentIndex != index) {
-              setState(() => _currentIndex = index);
-            }
+            setState(() {
+              if (index == 0) {
+                _selectedEventId = null;
+              } else if (index == 1) {
+                _caseEventTarget = null;
+                _editingCase = null;
+              }
+              _currentIndex = index;
+            });
           },
           borderRadius: BorderRadius.circular(16),
           child: Padding(

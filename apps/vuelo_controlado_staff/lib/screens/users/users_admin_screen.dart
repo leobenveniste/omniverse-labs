@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
 import '../../theme/app_theme.dart';
@@ -333,10 +334,36 @@ class _UserTile extends StatelessWidget {
             ),
           ],
         ),
-        trailing: Icon(
-          Icons.chevron_right_rounded,
-          color: textSecondary,
-          size: 20,
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (user.phone.trim().isNotEmpty)
+              IconButton(
+                icon: const Icon(
+                  Icons.chat_bubble_outline_rounded,
+                  color: AppTheme.neonGreen,
+                  size: 20,
+                ),
+                tooltip: 'WhatsApp',
+                visualDensity: VisualDensity.compact,
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  final cleanPhone =
+                      user.phone.replaceAll(RegExp(r'[^0-9]'), '');
+                  if (cleanPhone.isNotEmpty) {
+                    launchUrl(
+                      Uri.parse('https://wa.me/$cleanPhone'),
+                      mode: LaunchMode.externalApplication,
+                    );
+                  }
+                },
+              ),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: textSecondary,
+              size: 20,
+            ),
+          ],
         ),
       ),
     );

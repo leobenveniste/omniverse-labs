@@ -390,9 +390,31 @@ class _CurrentEventHeroCard extends StatelessWidget {
                       event.name,
                       style: TextStyle(
                         fontWeight: FontWeight.w900,
-                        fontSize: 20,
+                        fontSize: 24,
                         color: AppTheme.textPrimaryColor(context),
                       ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_today_outlined,
+                          size: 16,
+                          color: primary,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          DateFormat('EEEE d MMMM, y', 'es_AR')
+                              .format(event.date)
+                              .toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: primary,
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 8),
                     Row(
@@ -449,26 +471,6 @@ class _CurrentEventHeroCard extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'Puertas: ',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: textSecondary,
-                              ),
-                            ),
-                            Text(
-                              '${event.doorsOpenTime} hs',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: theme.colorScheme.onSurface,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
                               'Cierre: ',
                               style: TextStyle(
                                 fontSize: 12,
@@ -497,9 +499,11 @@ class _CurrentEventHeroCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Cupo: ${event.quotaText}',
+                          event.requiredStaffCount > 0
+                              ? '${event.currentStaffCount} / ${event.requiredStaffCount}'
+                              : '${event.currentStaffCount}',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 13,
                             fontWeight: FontWeight.w700,
                             color: theme.colorScheme.onSurface,
                           ),
@@ -580,7 +584,7 @@ class _EventCard extends StatelessWidget {
                           child: Text(
                             event.name,
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 20,
                               fontWeight: FontWeight.w900,
                               color: AppTheme.textPrimaryColor(context),
                             ),
@@ -629,15 +633,15 @@ class _EventCard extends StatelessWidget {
                       children: [
                         Icon(
                           Icons.calendar_today_outlined,
-                          size: 14,
+                          size: 16,
                           color: textSecondary,
                         ),
                         const SizedBox(width: 8),
                         Text(
                           dateString,
                           style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
                             color: textSecondary,
                           ),
                         ),
@@ -660,26 +664,6 @@ class _EventCard extends StatelessWidget {
                             ),
                             Text(
                               '${event.startTime} hs',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: theme.colorScheme.onSurface,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Puertas: ',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: textSecondary,
-                              ),
-                            ),
-                            Text(
-                              '${event.doorsOpenTime} hs',
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
@@ -746,9 +730,11 @@ class _EventCard extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Cupo: ${event.quotaText}',
+                          event.requiredStaffCount > 0
+                              ? '${event.currentStaffCount} / ${event.requiredStaffCount}'
+                              : '${event.currentStaffCount}',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 13,
                             fontWeight: FontWeight.w700,
                             color: theme.colorScheme.onSurface,
                           ),

@@ -126,8 +126,7 @@ void main() {
     expect(find.byTooltip('Crear Nuevo Evento'), findsOneWidget);
     expect(find.text('Próximos'), findsOneWidget);
     expect(find.text('Pasados'), findsOneWidget);
-    expect(find.text('Puertas: '), findsWidgets);
-    expect(find.text('21:00 hs'), findsWidgets);
+    expect(find.text('Puertas: '), findsNothing);
     expect(find.text('Inicio: '), findsWidgets);
     expect(find.text('22:00 hs'), findsWidgets);
     expect(find.text('Cierre: '), findsWidgets);

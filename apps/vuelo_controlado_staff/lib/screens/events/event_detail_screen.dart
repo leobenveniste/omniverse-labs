@@ -110,6 +110,17 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     }
   }
 
+  Future<void> _launchWhatsApp(String phone) async {
+    final cleanPhone = phone.replaceAll(RegExp(r'[^0-9]'), '');
+    if (cleanPhone.isEmpty) return;
+    final uri = Uri.parse('https://wa.me/$cleanPhone');
+    try {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      debugPrint('Error launching WhatsApp: $e');
+    }
+  }
+
   Future<void> _toggleStaffMembership(
     EventModel event,
     UserModel currentUser,
@@ -890,15 +901,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           ),
           title: const AppHeaderTitle(title: 'Evento'),
           actions: [
-            if (currentUser != null)
+            if (currentUser != null && !isStaff)
               FilledButton(
                 style: AppTheme.headerActionButtonStyle(
                   context,
-                  isFilled: !isStaff,
+                  isFilled: true,
                 ),
                 onPressed: _isTogglingStaff
                     ? null
-                    : () => _toggleStaffMembership(event, currentUser, isStaff),
+                    : () => _toggleStaffMembership(event, currentUser, false),
                 child: AnimatedSwitcher(
                   duration: const Duration(milliseconds: 200),
                   child: _isTogglingStaff
@@ -909,23 +920,16 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
                             strokeCap: StrokeCap.round,
-                            color: isStaff
-                                ? primary
-                                : AppTheme.onPrimaryColor(context),
+                            color: AppTheme.onPrimaryColor(context),
                           ),
                         )
-                      : Row(
-                          key: ValueKey('staff_state_$isStaff'),
+                      : const Row(
+                          key: ValueKey('staff_state_false'),
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                              isStaff
-                                  ? Icons.check_rounded
-                                  : Icons.person_add_rounded,
-                              size: 16,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(isStaff ? 'Sumado' : 'Sumarme'),
+                            Icon(Icons.person_add_rounded, size: 16),
+                            SizedBox(width: 8),
+                            Text('Sumarme'),
                           ],
                         ),
                 ),
@@ -1010,53 +1014,16 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Banner superior cuando el usuario ya está sumado al evento
+                  // Banner superior de participación en el evento
                   if (isStaff) ...[
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: primary.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                          color: primary.withValues(alpha: 0.4),
-                          width: 1.5,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.check_circle_rounded,
-                            color: primary,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Text(
-                              'Estás sumado como staff en este evento',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: primary,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-
-                  // Banner de Pareja de Ronda del usuario actual
-                  if (currentUser != null &&
-                      (isStaff || currentUser.isSuperAdmin)) ...[
                     Builder(
                       builder: (context) {
                         final myPair = event.getPairForUser(currentUser.id);
-                        final partnerName =
-                            myPair?.getPartnerName(currentUser.id);
+                        final partnerName = myPair?.getPartnerName(currentUser.id);
+                        final participationText = partnerName != null
+                            ? 'Estás participando de este evento en pareja con $partnerName'
+                            : 'Estás participando de este evento';
+
                         return Container(
                           margin: const EdgeInsets.only(bottom: 12),
                           padding: const EdgeInsets.symmetric(
@@ -1064,14 +1031,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             vertical: 12,
                           ),
                           decoration: BoxDecoration(
-                            color: partnerName != null
-                                ? AppTheme.neonGreen.withValues(alpha: 0.12)
-                                : surfaceContainer,
+                            color: primary.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: partnerName != null
-                                  ? AppTheme.neonGreen.withValues(alpha: 0.5)
-                                  : borderColor,
+                              color: primary.withValues(alpha: 0.4),
                               width: 1.5,
                             ),
                           ),
@@ -1080,41 +1043,61 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                               Icon(
                                 partnerName != null
                                     ? Icons.people_alt_rounded
-                                    : Icons.person_outline_rounded,
-                                color: partnerName != null
-                                    ? AppTheme.neonGreen
-                                    : textSecondary,
+                                    : Icons.check_circle_rounded,
+                                color: primary,
                                 size: 22,
                               ),
                               const SizedBox(width: 12),
                               Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      partnerName != null
-                                          ? 'Tu pareja de guardia / ronda:'
-                                          : 'Pareja de guardia / ronda:',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w600,
-                                        color: textSecondary,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      partnerName ??
-                                          'Aún no tenés pareja de ronda asignada.',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w700,
-                                        color: partnerName != null
-                                            ? textPrimary
-                                            : textSecondary,
-                                      ),
-                                    ),
-                                  ],
+                                child: Text(
+                                  participationText,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: primary,
+                                  ),
                                 ),
+                              ),
+                              const SizedBox(width: 8),
+                              OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  visualDensity: VisualDensity.compact,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  side: BorderSide(
+                                    color: primary.withValues(alpha: 0.6),
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                onPressed: _isTogglingStaff
+                                    ? null
+                                    : () => _toggleStaffMembership(
+                                          event,
+                                          currentUser,
+                                          true,
+                                        ),
+                                child: _isTogglingStaff
+                                    ? SizedBox(
+                                        width: 14,
+                                        height: 14,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          strokeCap: StrokeCap.round,
+                                          color: primary,
+                                        ),
+                                      )
+                                    : Text(
+                                        'Bajarse',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          color: primary,
+                                        ),
+                                      ),
                               ),
                             ],
                           ),
@@ -1687,7 +1670,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Staff y Parejas (${staffUsers.length} / ${event.requiredStaffCount})',
+                        'Vuelos disponibles',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w900,
@@ -1858,6 +1841,22 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                   ],
                                 ),
                               ),
+                              if (member.phone.trim().isNotEmpty)
+                                Tooltip(
+                                  message: 'Enviar WhatsApp',
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      Icons.chat_bubble_outline_rounded,
+                                      size: 18,
+                                      color: AppTheme.neonGreen,
+                                    ),
+                                    visualDensity: VisualDensity.compact,
+                                    onPressed: () {
+                                      HapticFeedback.lightImpact();
+                                      _launchWhatsApp(member.phone);
+                                    },
+                                  ),
+                                ),
                               if (canManagePairs) ...[
                                 if (hasPair)
                                   IconButton(

@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../models/user_model.dart';
@@ -127,127 +126,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Future<void> _pickPhotoDirectly(BuildContext context, UserModel user) async {
-    HapticFeedback.lightImpact();
-    final theme = Theme.of(context);
-    final source = await showModalBottomSheet<ImageSource?>(
-      context: context,
-      backgroundColor: theme.colorScheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (modalCtx) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Foto de Perfil',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                ListTile(
-                  leading: const Icon(Icons.camera_alt_rounded,
-                      color: AppTheme.neonGreen),
-                  title: const Text('Tomar foto con la cámara'),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  onTap: () => Navigator.of(modalCtx).pop(ImageSource.camera),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.photo_library_rounded,
-                      color: AppTheme.skyBlue),
-                  title: const Text('Elegir de la galería'),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  onTap: () => Navigator.of(modalCtx).pop(ImageSource.gallery),
-                ),
-                if (user.photoUrl != null && user.photoUrl!.isNotEmpty)
-                  ListTile(
-                    leading: const Icon(Icons.delete_outline_rounded,
-                        color: AppTheme.errorRed),
-                    title: const Text('Eliminar foto actual',
-                        style: TextStyle(color: AppTheme.errorRed)),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    onTap: () => Navigator.of(modalCtx).pop(null),
-                  ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-
-    if (!context.mounted) return;
-
-    final authService = context.read<AuthService>();
-    if (source == null) {
-      if (user.photoUrl != null && user.photoUrl!.isNotEmpty) {
-        await authService.updateUserPhoto(userId: user.id, photoUrl: '');
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('✓ Foto de perfil eliminada'),
-              backgroundColor: AppTheme.neonGreen,
-            ),
-          );
-        }
-      }
-      return;
-    }
-
-    try {
-      final picker = ImagePicker();
-      final picked = await picker.pickImage(
-        source: source,
-        maxWidth: 600,
-        maxHeight: 600,
-        imageQuality: 80,
-      );
-
-      if (picked != null && context.mounted) {
-        final bytes = await picked.readAsBytes();
-        final base64String = 'data:image/jpeg;base64,${base64Encode(bytes)}';
-        final ok = await authService.updateUserPhoto(
-          userId: user.id,
-          photoUrl: base64String,
-        );
-        if (ok && context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('✓ Foto de perfil actualizada'),
-              backgroundColor: AppTheme.neonGreen,
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al actualizar foto: $e'),
-            backgroundColor: AppTheme.errorRed,
-          ),
-        );
-      }
-    }
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -286,27 +164,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _buildIdCard(context, user),
-                    const SizedBox(height: 24),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.qr_code_2_rounded,
-                          size: 18,
-                          color: AppTheme.primaryColor(context),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'CÓDIGOS QR DE ACCESO',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w900,
-                            color: AppTheme.primaryColor(context),
-                            letterSpacing: 0.8,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 16),
                     _buildDualQrRow(
                       context: context,
                       userIgUrl: userIgUrl,
@@ -448,30 +306,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
 
-                // Botón superior derecho: Cambiar Foto
-                Positioned(
-                  top: 12,
-                  right: 12,
-                  child: Material(
-                    color: Colors.black.withValues(alpha: 0.55),
-                    shape: const CircleBorder(),
-                    child: InkWell(
-                      customBorder: const CircleBorder(),
-                      onTap: () => _pickPhotoDirectly(context, user),
-                      child: Tooltip(
-                        message: 'Cambiar foto de perfil',
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          child: const Icon(
-                            Icons.camera_alt_rounded,
-                            size: 18,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+
               ],
             ),
           ),
