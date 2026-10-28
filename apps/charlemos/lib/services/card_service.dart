@@ -40,6 +40,7 @@ class CardService extends ChangeNotifier {
   bool get canGoPrevious => _historyIndex > 0;
   int get historyIndex => _historyIndex;
   int get historyLength => _history.length;
+  List<CardItem> get allCards => List.unmodifiable(_allCards);
 
   List<CardItem> get favoriteCards =>
       _allCards.where((c) => _favoriteIds.contains(c.id)).toList();

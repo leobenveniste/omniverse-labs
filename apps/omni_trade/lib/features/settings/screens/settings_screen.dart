@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -43,6 +42,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
     _lastDevTapTime = now;
 
+    final l10n = AppLocalizations.of(context);
     if (_devModeTapCount >= 7) {
       _devModeTapCount = 0;
       HapticsHelper.heavy();
@@ -53,8 +53,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         SnackBar(
           content: Text(
             isNowDev
-                ? '🧪 Modo Desarrollador Activado'
-                : '🔒 Modo Desarrollador Desactivado',
+                ? l10n.t('devModeActivatedToast')
+                : l10n.t('devModeDeactivatedToast'),
           ),
           duration: const Duration(seconds: 2),
         ),
@@ -65,7 +65,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('$remaining toques más para alternar Modo Desarrollador...'),
+          content: Text(
+            l10n.t('devModeRemainingTapsToast', args: {'remaining': remaining}),
+          ),
           duration: const Duration(milliseconds: 600),
         ),
       );
@@ -523,8 +525,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: AppSpacing.md),
 
-          // --- 🧪 DEVELOPER TESTING / MODO DE PRUEBAS (Strictly debug mode & Dev Mode protected) ---
-          if (kDebugMode && widget.settingsProvider.isDevMode) ...[
+          // --- 🧪 DEVELOPER TESTING / MODO DE PRUEBAS (Dev Mode protected) ---
+          if (widget.settingsProvider.isDevMode) ...[
             _buildSectionHeader(l10n.t('testModeSection'), Icons.science_rounded, colors.proGold),
             Material(
               color: colors.surface,
@@ -658,7 +660,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               subtitle: Text(
                 widget.settingsProvider.locale != null
                     ? AppLocalizations.getLanguageName(widget.settingsProvider.locale!.languageCode)
-                    : 'Automático / System',
+                    : '${l10n.t('systemDefault')} (${AppLocalizations.getLanguageName(Localizations.localeOf(context).languageCode)})',
                 style: AppTypography.caption(colors.textSecondary),
               ),
               trailing: DropdownButton<String?>(
@@ -666,9 +668,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 dropdownColor: colors.surface,
                 underline: const SizedBox.shrink(),
                 items: [
-                  const DropdownMenuItem<String?>(
+                  DropdownMenuItem<String?>(
                     value: null,
-                    child: Text('Automático'),
+                    child: Text(l10n.t('systemDefault')),
                   ),
                   ...AppLocalizations.supportedLocales.map((loc) {
                     return DropdownMenuItem<String?>(

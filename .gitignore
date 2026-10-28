@@ -41,3 +41,7 @@ build/
 # Python
 __pycache__/
 *.py[cod]
+
+# Temp & Scratch
+.scratch/
+temp_*.*

@@ -232,6 +232,83 @@ class PaywallSheet extends StatelessWidget {
                           ],
                         ),
                       ),
+                      const SizedBox(height: AppSpacing.md),
+
+                      // Physical comparison banner
+                      Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF2D7A4F).withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                          border: Border.all(color: const Color(0xFF2D7A4F).withValues(alpha: 0.25)),
+                        ),
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF2D7A4F).withValues(alpha: 0.15),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.savings_outlined, color: Color(0xFF2D7A4F), size: 24),
+                            ),
+                            const SizedBox(width: AppSpacing.sm),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    l10n.t('paywallPhysicalComparisonTitle'),
+                                    style: AppTypography.body(theme.colorScheme.onSurface, isMedium: true),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    l10n.t('paywallPhysicalComparisonDesc'),
+                                    style: AppTypography.caption(theme.colorScheme.onSurfaceVariant),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.md),
+
+                      // Sample Questions Teaser
+                      Container(
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
+                          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                          border: Border.all(color: theme.colorScheme.outline.withValues(alpha: 0.2)),
+                        ),
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.format_quote_rounded, color: Color(0xFFC85A3B), size: 20),
+                                const SizedBox(width: AppSpacing.xs),
+                                Expanded(
+                                  child: Text(
+                                    l10n.t('paywallSampleQuestionsTitle'),
+                                    style: AppTypography.caption(theme.colorScheme.onSurface, isMedium: true).copyWith(
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            _buildSampleQuote(context, l10n.t('paywallPreviewSample1')),
+                            const SizedBox(height: AppSpacing.xs),
+                            _buildSampleQuote(context, l10n.t('paywallPreviewSample2')),
+                            const SizedBox(height: AppSpacing.xs),
+                            _buildSampleQuote(context, l10n.t('paywallPreviewSample3')),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: AppSpacing.lg),
 
                       // Error message banner
@@ -250,6 +327,44 @@ class PaywallSheet extends StatelessWidget {
                         ),
                         const SizedBox(height: AppSpacing.sm),
                       ],
+
+                      // Urgency & Special Offer Ribbon
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFDF00).withValues(alpha: 0.20),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: const Color(0xFFD4AF37),
+                            width: 1.2,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.local_offer_rounded, size: 14, color: Color(0xFFC85A3B)),
+                            const SizedBox(width: 6),
+                            Text(
+                              l10n.t('paywallLaunchOfferBadge'),
+                              style: const TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFFC85A3B),
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        l10n.t('paywallOriginalPrice'),
+                        style: AppTypography.caption(theme.colorScheme.onSurfaceVariant).copyWith(
+                          decoration: TextDecoration.lineThrough,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
 
                       // CTA Button
                       SizedBox(
@@ -371,6 +486,26 @@ class PaywallSheet extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildSampleQuote(BuildContext context, String text) {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+        border: Border.all(color: const Color(0xFFC85A3B).withValues(alpha: 0.15)),
+      ),
+      child: Text(
+        text,
+        style: AppTypography.caption(theme.colorScheme.onSurface).copyWith(
+          fontStyle: FontStyle.italic,
+          height: 1.3,
+        ),
+      ),
     );
   }
 }

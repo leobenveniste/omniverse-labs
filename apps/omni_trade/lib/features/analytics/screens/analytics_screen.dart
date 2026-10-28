@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
@@ -11,6 +12,7 @@ import '../../../providers/trade_provider.dart';
 import '../../dashboard/widgets/kpi_card.dart';
 import '../../dashboard/widgets/mini_equity_chart.dart';
 import '../../premium/screens/paywall_sheet.dart';
+import '../widgets/pnl_calendar_widget.dart';
 
 class AnalyticsScreen extends StatelessWidget {
   final TradeProvider tradeProvider;
@@ -99,44 +101,48 @@ class AnalyticsScreen extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            ElevatedButton.icon(
+            ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: colors.proGold,
                 foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.md),
-              ),
-              icon: const Icon(Icons.stars_rounded, color: Colors.black),
-              label: Text(
-                l10n.t('unlockProButton'),
-                style: AppTypography.body(Colors.black, isBold: true),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusSm)),
               ),
               onPressed: () {
+                HapticsHelper.medium();
                 PaywallSheet.show(
                   context,
                   settingsProvider: settingsProvider,
-                  customReason: l10n.t('paywallAnalyticsNotice'),
+                  customReason: l10n.t('analyticsProSubtitle'),
                 );
               },
+              child: Text(
+                l10n.t('upgradeToProAction'),
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
 
-            // Quick developer test toggle helper button
-            TextButton.icon(
-              onPressed: () async {
-                HapticsHelper.medium();
-                await settingsProvider.toggleTestPro(true);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.t('activatingTestProToast'))),
-                  );
-                }
-              },
-              icon: Icon(Icons.science_rounded, size: 16, color: colors.secondary),
-              label: Text(
-                l10n.t('testProShortcut'),
-                style: AppTypography.caption(colors.secondary, isBold: true),
+            // Quick developer test toggle helper button (Strictly debug mode only)
+            if (kDebugMode) ...[
+              const SizedBox(height: AppSpacing.sm),
+              TextButton.icon(
+                onPressed: () async {
+                  HapticsHelper.medium();
+                  await settingsProvider.toggleTestPro(true);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(l10n.t('activatingTestProToast'))),
+                    );
+                  }
+                },
+                icon: Icon(Icons.science_rounded, size: 16, color: colors.secondary),
+                label: Text(
+                  l10n.t('testProShortcut'),
+                  style: AppTypography.caption(colors.secondary, isBold: true),
+                ),
               ),
-            ),
+            ],
           ],
         ),
       ),
@@ -173,6 +179,13 @@ class AnalyticsScreen extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.md),
 
+        // P&L Calendar Heatmap
+        PnlCalendarWidget(
+          tradeProvider: tradeProvider,
+          currencySymbol: currency,
+        ),
+        const SizedBox(height: AppSpacing.md),
+
         // Key KPI Bento Grid
         Row(
           children: [
@@ -191,7 +204,7 @@ class AnalyticsScreen extends StatelessWidget {
               child: KpiCard(
                 title: l10n.t('profitFactorTitle'),
                 value: profitFactor.toStringAsFixed(2),
-                subtitle: 'Gross W/L Ratio',
+                subtitle: l10n.t('profitFactorSubtitle'),
                 icon: Icons.trending_up_rounded,
                 valueColor: profitFactor >= 1.5 ? colors.profit : (profitFactor >= 1.0 ? colors.warning : colors.loss),
                 accentColor: colors.secondary,

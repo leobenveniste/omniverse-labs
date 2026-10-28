@@ -33,6 +33,7 @@ class UserModel {
   final String documentNumber;
   final DateTime birthDate;
   final String phone;
+  final String? instagram;
   final String? photoUrl;
   final List<String> roles;
   final DateTime createdAt;
@@ -47,6 +48,7 @@ class UserModel {
     required this.documentNumber,
     required this.birthDate,
     required this.phone,
+    this.instagram,
     this.photoUrl,
     required this.roles,
     required this.createdAt,
@@ -83,6 +85,7 @@ class UserModel {
     String? documentNumber,
     DateTime? birthDate,
     String? phone,
+    String? instagram,
     String? photoUrl,
     List<String>? roles,
   }) {
@@ -102,6 +105,7 @@ class UserModel {
       documentNumber: documentNumber ?? this.documentNumber,
       birthDate: birthDate ?? this.birthDate,
       phone: phone ?? this.phone,
+      instagram: instagram ?? this.instagram,
       photoUrl: photoUrl ?? this.photoUrl,
       roles: updatedRoles,
       createdAt: createdAt,
@@ -119,6 +123,7 @@ class UserModel {
       'documentNumber': documentNumber,
       'birthDate': birthDate.toIso8601String(),
       'phone': phone,
+      'instagram': instagram,
       'photoUrl': photoUrl,
       'roles': roles.contains(AppRoles.miembro)
           ? roles
@@ -145,6 +150,7 @@ class UserModel {
           ? DateTime.parse(map['birthDate'])
           : DateTime(2000, 1, 1),
       phone: map['phone'] ?? '',
+      instagram: map['instagram'],
       photoUrl: map['photoUrl'],
       roles: rawRoles,
       createdAt: map['createdAt'] != null

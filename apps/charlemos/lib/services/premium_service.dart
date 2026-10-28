@@ -110,10 +110,6 @@ class PremiumService extends ChangeNotifier {
     }
 
     if (product == null) {
-      if (kDebugMode || !_isStoreAvailable) {
-        await setProUser(true);
-        return;
-      }
       _isLoading = false;
       _errorMessage = 'proSyncing';
       notifyListeners();

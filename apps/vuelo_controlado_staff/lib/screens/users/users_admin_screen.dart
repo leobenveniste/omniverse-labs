@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/app_header.dart';
+import '../../widgets/app_background.dart';
 import 'create_user_screen.dart';
 import 'user_detail_roles_screen.dart';
 
@@ -22,6 +25,10 @@ class _UsersAdminScreenState extends State<UsersAdminScreen> {
     final authService = context.watch<AuthService>();
     final currentUser = authService.currentUser;
     final allUsers = authService.users;
+    final primary = AppTheme.primaryColor(context);
+    final textPrimary = AppTheme.textPrimaryColor(context);
+    final textSecondary = AppTheme.textSecondaryColor(context);
+    final border = AppTheme.borderColor(context);
 
     final isSuperAdmin = currentUser?.isSuperAdmin ?? false;
     final canCreate = currentUser?.canCreateUsers ?? false;
@@ -39,167 +46,173 @@ class _UsersAdminScreenState extends State<UsersAdminScreen> {
     }).toList();
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Equipo y Staff',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.textPrimary,
-                            ),
-                          ),
-                          Text(
-                            'Padrón de miembros y asignación de roles',
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: AppTheme.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (canCreate)
-                        FilledButton.icon(
-                          style: FilledButton.styleFrom(
-                            backgroundColor: AppTheme.neonGreen,
-                            foregroundColor: Colors.black,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 14, vertical: 10),
-                          ),
-                          icon: const Icon(Icons.person_add, size: 18),
-                          label: const Text(
-                            'Crear Usuario',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => const CreateUserScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Buscador
-                  TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Buscar por nombre, email o DNI...',
-                      prefixIcon: const Icon(Icons.search, size: 20),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 12),
-                      suffixIcon: _searchQuery.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear, size: 18),
-                              onPressed: () =>
-                                  setState(() => _searchQuery = ''),
-                            )
-                          : null,
-                    ),
-                    onChanged: (val) => setState(() => _searchQuery = val),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // Filtro por roles
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        'Todos',
-                        ...AppRoles.allRoles,
-                      ].map((role) {
-                        final isSelected = _selectedRoleFilter == role;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: FilterChip(
-                            label: Text(role),
-                            selected: isSelected,
-                            selectedColor:
-                                AppTheme.neonGreen.withValues(alpha: 0.2),
-                            side: BorderSide(
-                              color: isSelected
-                                  ? AppTheme.neonGreen
-                                  : AppTheme.darkBorder,
-                            ),
-                            labelStyle: TextStyle(
-                              color: isSelected
-                                  ? AppTheme.neonGreen
-                                  : AppTheme.textPrimary,
-                              fontSize: 12,
-                              fontWeight: isSelected
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                            ),
-                            onSelected: (val) {
-                              if (val) setState(() => _selectedRoleFilter = role);
-                            },
-                          ),
-                        );
-                      }).toList(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 8),
+          child: IconButton(
+            style: AppTheme.headerIconButtonStyle(context),
+            icon: const Icon(Icons.arrow_back_rounded, size: 20),
+            tooltip: 'Volver',
+            onPressed: () => Navigator.of(context).maybePop(),
           ),
-          if (filteredUsers.isEmpty)
-            const SliverFillRemaining(
-              child: Center(
-                child: Text(
-                  'No se encontraron usuarios.',
-                  style: TextStyle(color: AppTheme.textSecondary),
-                ),
-              ),
-            )
-          else
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final user = filteredUsers[index];
-                    return _UserTile(
-                      user: user,
-                      isSuperAdminViewer: isSuperAdmin,
-                      onTap: () {
-                        if (isSuperAdmin) {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  UserDetailRolesScreen(userId: user.id),
-                            ),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                  'Solo el Superadmin puede modificar los roles de un usuario.'),
-                              backgroundColor: AppTheme.warningOrange,
-                            ),
-                          );
-                        }
-                      },
-                    );
-                  },
-                  childCount: filteredUsers.length,
-                ),
+        ),
+        title: const AppHeaderTitle(title: 'Usuarios'),
+        actions: [
+          if (canCreate)
+            Tooltip(
+              message: 'Crear Usuario',
+              child: FilledButton.icon(
+                style: AppTheme.headerActionButtonStyle(context),
+                icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
+                label: const Text('Nuevo'),
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const CreateUserScreen(),
+                    ),
+                  );
+                },
               ),
             ),
         ],
+      ),
+      body: AppBackground(
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 840),
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${filteredUsers.length} miembros registrados',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Buscador
+                        TextField(
+                          decoration: InputDecoration(
+                            hintText: 'Buscar por nombre, email o DNI...',
+                            prefixIcon:
+                                const Icon(Icons.search_rounded, size: 20),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
+                            suffixIcon: _searchQuery.isNotEmpty
+                                ? IconButton(
+                                    icon: const Icon(Icons.clear_rounded,
+                                        size: 18),
+                                    tooltip: 'Limpiar búsqueda',
+                                    onPressed: () =>
+                                        setState(() => _searchQuery = ''),
+                                  )
+                                : null,
+                          ),
+                          onChanged: (val) =>
+                              setState(() => _searchQuery = val),
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Filtro por roles
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              'Todos',
+                              ...AppRoles.allRoles,
+                            ].map((role) {
+                              final isSelected = _selectedRoleFilter == role;
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: FilterChip(
+                                  showCheckmark: false,
+                                  label: Text(role),
+                                  selected: isSelected,
+                                  selectedColor:
+                                      primary.withValues(alpha: 0.18),
+                                  side: BorderSide(
+                                    color: isSelected ? primary : border,
+                                  ),
+                                  labelStyle: TextStyle(
+                                    color: isSelected ? primary : textPrimary,
+                                    fontSize: 12,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w700
+                                        : FontWeight.w500,
+                                  ),
+                                  onSelected: (val) {
+                                    if (val) {
+                                      HapticFeedback.selectionClick();
+                                      setState(
+                                          () => _selectedRoleFilter = role);
+                                    }
+                                  },
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                if (filteredUsers.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Text(
+                          'No se encontraron usuarios.',
+                          style: TextStyle(
+                            color: textSecondary,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 100),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final user = filteredUsers[index];
+                          return _UserTile(
+                            user: user,
+                            isSuperAdminViewer: isSuperAdmin,
+                            onTap: () {
+                              HapticFeedback.selectionClick();
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      UserDetailRolesScreen(userId: user.id),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                        childCount: filteredUsers.length,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -218,21 +231,28 @@ class _UserTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final primary = AppTheme.primaryColor(context);
+    final textPrimary = AppTheme.textPrimaryColor(context);
+    final textSecondary = AppTheme.textSecondaryColor(context);
+    final surface = AppTheme.surfaceContainer(context);
+    final border = AppTheme.borderColor(context);
+
     return Card(
-      margin: const EdgeInsets.only(bottom: 10),
+      margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         onTap: onTap,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: CircleAvatar(
-          backgroundColor: AppTheme.darkCard,
-          radius: 24,
+          backgroundColor: surface,
+          radius: 22,
           child: Text(
             user.firstName.isNotEmpty ? user.firstName[0].toUpperCase() : '?',
-            style: const TextStyle(
-              color: AppTheme.neonGreen,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+            style: TextStyle(
+              color: primary,
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),
@@ -241,26 +261,28 @@ class _UserTile extends StatelessWidget {
             Expanded(
               child: Text(
                 user.fullName,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                  color: AppTheme.textPrimary,
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  color: textPrimary,
                 ),
               ),
             ),
             if (user.isSuperAdmin)
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppTheme.neonGreen.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(6),
+                  color: primary.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                      color: primary.withValues(alpha: 0.4)),
                 ),
-                child: const Text(
+                child: Text(
                   'SUPERADMIN',
                   style: TextStyle(
-                    fontSize: 10,
-                    color: AppTheme.neonGreen,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    color: primary,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
               ),
@@ -269,42 +291,41 @@ class _UserTile extends StatelessWidget {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 2),
+            const SizedBox(height: 4),
             Text(
               '${user.documentType}: ${user.documentNumber} • ${user.email}',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
-                color: AppTheme.textSecondary,
+                fontWeight: FontWeight.w500,
+                color: textSecondary,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             Wrap(
-              spacing: 6,
+              spacing: 8,
               runSpacing: 4,
               children: user.roles.map((r) {
                 final isDefault = r == AppRoles.miembro;
                 return Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: isDefault
-                        ? AppTheme.darkBorder
-                        : AppTheme.neonGreen.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(6),
+                        ? surface
+                        : primary.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: isDefault
-                          ? AppTheme.darkBorder
-                          : AppTheme.neonGreen.withValues(alpha: 0.6),
+                          ? border
+                          : primary.withValues(alpha: 0.4),
                     ),
                   ),
                   child: Text(
                     r,
                     style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      color: isDefault
-                          ? AppTheme.textSecondary
-                          : AppTheme.neonGreen,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: isDefault ? textSecondary : primary,
                     ),
                   ),
                 );
@@ -312,9 +333,11 @@ class _UserTile extends StatelessWidget {
             ),
           ],
         ),
-        trailing: isSuperAdminViewer
-            ? const Icon(Icons.tune, color: AppTheme.neonGreen, size: 20)
-            : null,
+        trailing: Icon(
+          Icons.chevron_right_rounded,
+          color: textSecondary,
+          size: 20,
+        ),
       ),
     );
   }

@@ -20,7 +20,7 @@ class SettingsProvider extends ChangeNotifier {
   String get baseCurrency => _baseCurrency;
   double get accountBalance => _accountBalance;
   Locale? get locale => _locale;
-  static const String keyDevMode = 'omnitrade_dev_mode_unlocked';
+  static const String keyDevMode = AppConstants.keyDevMode;
   bool _devMode = false;
 
   bool get isDevMode => _devMode;
@@ -67,6 +67,7 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> toggleDevMode() async {
     _devMode = !_devMode;
     await _prefs.setBool(keyDevMode, _devMode);
+    _subscriptionService.onEntitlementChanged?.call();
     notifyListeners();
   }
 

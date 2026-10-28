@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import '../core/theme/app_spacing.dart';
 import '../core/theme/app_theme_preset.dart';
 import '../core/theme/app_typography.dart';
@@ -8,6 +9,7 @@ import '../core/widgets/about_dialog_widget.dart';
 import '../core/widgets/app_header_title.dart';
 import '../core/widgets/contact_us_modal.dart';
 import '../core/widgets/paywall_sheet.dart';
+import '../core/widgets/rating_dialog.dart';
 import '../l10n/app_localizations.dart';
 import '../services/app_services.dart';
 import '../services/card_service.dart';
@@ -265,6 +267,64 @@ class SettingsScreen extends StatelessWidget {
                       onTap: () => _handleClearAllData(context, l10n, cardService),
                     ),
                   ],
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+
+              // Recommend App
+              _buildSectionHeader(context, l10n.t('recommendApp')),
+              Card(
+                child: ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFC85A3B).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.favorite_rounded, color: Color(0xFFC85A3B)),
+                  ),
+                  title: Text(
+                    l10n.t('recommendApp'),
+                    style: AppTypography.body(theme.colorScheme.onSurface, isMedium: true),
+                  ),
+                  subtitle: Text(
+                    l10n.t('recommendAppSubtitle'),
+                    style: AppTypography.caption(theme.colorScheme.onSurfaceVariant),
+                  ),
+                  trailing: const Icon(Icons.share_rounded, size: 20),
+                  onTap: () {
+                    HapticsHelper.selection();
+                    Share.share(l10n.t('recommendShareText'));
+                  },
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+
+              // Rate App
+              _buildSectionHeader(context, l10n.t('rateAppTile')),
+              Card(
+                child: ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFB800).withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.star_rounded, color: Color(0xFFFFB800)),
+                  ),
+                  title: Text(
+                    l10n.t('rateAppTile'),
+                    style: AppTypography.body(theme.colorScheme.onSurface, isMedium: true),
+                  ),
+                  subtitle: Text(
+                    l10n.t('rateAppSubtitle'),
+                    style: AppTypography.caption(theme.colorScheme.onSurfaceVariant),
+                  ),
+                  trailing: const Icon(Icons.open_in_new_rounded, size: 20),
+                  onTap: () {
+                    HapticsHelper.selection();
+                    RatingDialog.openStore();
+                  },
                 ),
               ),
               const SizedBox(height: AppSpacing.md),

@@ -21,14 +21,14 @@ class AppLocalizations {
 
   static AppLocalizations of(BuildContext context) {
     return Localizations.of<AppLocalizations>(context, AppLocalizations) ??
-        AppLocalizations(const Locale('es'));
+        AppLocalizations(const Locale('en'));
   }
 
   static const LocalizationsDelegate<AppLocalizations> delegate =
       _AppLocalizationsDelegate();
 
   Map<String, String> get _currentStrings {
-    switch (locale.languageCode) {
+    switch (locale.languageCode.toLowerCase()) {
       case 'en':
         return stringsEn;
       case 'pt':
@@ -38,8 +38,9 @@ class AppLocalizations {
       case 'it':
         return stringsIt;
       case 'es':
-      default:
         return stringsEs;
+      default:
+        return stringsEn;
     }
   }
 

@@ -137,8 +137,12 @@ def deploy_omnitrade(aab_path: str, target_track: str = "beta"):
     print("\n3️⃣ Uploading Graphic Assets (Icon, Feature Graphic, Screenshots)...")
     icon_path = r"c:\Projects\Omniverse Labs\apps\omni_trade\store_assets\play_store\icon_512x512.png"
     feature_path = r"c:\Projects\Omniverse Labs\apps\omni_trade\store_assets\play_store\feature_graphic_1024x500.jpg"
-    screenshot1_path = r"c:\Projects\Omniverse Labs\apps\omni_trade\store_assets\play_store\screenshot_1_dashboard.png"
-    screenshot2_path = r"c:\Projects\Omniverse Labs\apps\omni_trade\store_assets\play_store\screenshot_2_calculator.png"
+    screenshots = [
+        os.path.join(r"c:\Projects\Omniverse Labs\apps\omni_trade\store_assets\play_store", "screenshot_01_cockpit.png"),
+        os.path.join(r"c:\Projects\Omniverse Labs\apps\omni_trade\store_assets\play_store", "screenshot_02_new_operation.png"),
+        os.path.join(r"c:\Projects\Omniverse Labs\apps\omni_trade\store_assets\play_store", "screenshot_03_analytics.png"),
+        os.path.join(r"c:\Projects\Omniverse Labs\apps\omni_trade\store_assets\play_store", "screenshot_04_feature_vertical.png"),
+    ]
 
     for lang in ["es-419", "en-US"]:
         if os.path.exists(icon_path):
@@ -181,7 +185,7 @@ def deploy_omnitrade(aab_path: str, target_track: str = "beta"):
             pass
 
         # Screenshots
-        for s_idx, s_path in enumerate([screenshot1_path, screenshot2_path], start=1):
+        for s_idx, s_path in enumerate(screenshots, start=1):
             if os.path.exists(s_path):
                 try:
                     media = MediaFileUpload(s_path, mimetype="image/png")
@@ -192,7 +196,7 @@ def deploy_omnitrade(aab_path: str, target_track: str = "beta"):
                         imageType="phoneScreenshots",
                         media_body=media
                     ).execute()
-                    print(f"   ✅ Phone Screenshot #{s_idx} uploaded for [{lang}]")
+                    print(f"   ✅ Phone Screenshot #{s_idx} uploaded for [{lang}]: {os.path.basename(s_path)}")
                 except Exception as e:
                     print(f"   ⚠️ Screenshot #{s_idx} upload warning for [{lang}]: {e}")
 
@@ -200,22 +204,35 @@ def deploy_omnitrade(aab_path: str, target_track: str = "beta"):
     file_size_mb = os.path.getsize(aab_path) / (1024 * 1024)
     print(f"\n4️⃣ Uploading App Bundle ({file_size_mb:.2f} MB)...")
     bundle_media = MediaFileUpload(aab_path, mimetype="application/octet-stream", resumable=True)
-    bundle_res = edits.bundles().upload(
-        packageName=PACKAGE_NAME,
-        editId=edit_id,
-        media_body=bundle_media
-    ).execute()
-
-    version_code = bundle_res.get("versionCode")
-    sha256 = bundle_res.get("sha256", "")[:12]
-    print(f"   ✅ App Bundle uploaded! Version Code: {version_code} (SHA256: {sha256}...)")
+    version_code = None
+    try:
+        bundle_res = edits.bundles().upload(
+            packageName=PACKAGE_NAME,
+            editId=edit_id,
+            media_body=bundle_media
+        ).execute()
+        version_code = bundle_res.get("versionCode")
+        sha256 = bundle_res.get("sha256", "")[:12]
+        print(f"   ✅ App Bundle uploaded! Version Code: {version_code} (SHA256: {sha256}...)")
+    except HttpError as up_err:
+        if "already been used" in str(up_err).lower():
+            print(f"   ℹ️ Bundle version already uploaded in previous release. Querying existing bundles...")
+            bundles_list = edits.bundles().list(packageName=PACKAGE_NAME, editId=edit_id).execute().get("bundles", [])
+            if bundles_list:
+                latest_bundle = max(bundles_list, key=lambda b: b.get("versionCode", 0))
+                version_code = latest_bundle.get("versionCode")
+                print(f"   ✅ Using existing Bundle Version Code: {version_code}")
+            else:
+                raise up_err
+        else:
+            raise up_err
 
     # 5. Assign to Track
     tracks_to_deploy = [t.strip() for t in target_track.split(",") if t.strip()]
     print(f"\n5️⃣ Assigning version {version_code} to tracks: {tracks_to_deploy}...")
     notes = [
-        {"language": "es-419", "text": "OmniTrade v1.0.3: Activación y configuración del Pase Vitalicio PRO en Google Play, optimización de paywall y analíticas."},
-        {"language": "en-US", "text": "OmniTrade v1.0.3: Official Google Play PRO Lifetime Pass activation, paywall enhancements, and analytics optimizations."}
+        {"language": "es-419", "text": "OmniTrade v1.0.6: Nueva pantalla de carga (Splash Screen), soporte nativo Edge-to-Edge Android 15, selector de idioma automático perfeccionado, calendario mensual P&L (Heatmap), capturas de análisis técnico y gestión de riesgo R:R en tiempo real."},
+        {"language": "en-US", "text": "OmniTrade v1.0.6: New animated Splash Screen, native Edge-to-Edge Android 15 support, enhanced auto-locale resolution, Monthly P&L Calendar (Heatmap), chart screenshots, and real-time live R:R risk management."}
     ]
 
     def make_track_body(track_name, status):
@@ -223,7 +240,7 @@ def deploy_omnitrade(aab_path: str, target_track: str = "beta"):
             "track": track_name,
             "releases": [
                 {
-                    "name": f"v{version_code} (1.0.3)",
+                    "name": f"v{version_code} (1.0.6)",
                     "versionCodes": [str(version_code)],
                     "status": status,
                     "releaseNotes": notes

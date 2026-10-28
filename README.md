@@ -40,6 +40,7 @@ Omniverse Labs/
 | **EmpacArte** | `com.omniverselabs.empacarte` | `1.0.0+1` | Asistente de empaque y pasaporte de viaje táctil con sellos consulares coleccionables, tarjetas de embarque, 3 compartimentos y 6 idiomas. |
 | **OmniTrade** | `com.omniverselabs.omnitrade` | `1.0.0+1` | Registro y bitácora de operaciones de trading, calculadora de riesgo, analíticas avanzadas, seguridad biométrica y modelo freemium. |
 | **Mi Delta** | `com.omniverselabs.mi_delta` | `1.0.0+1` | Aplicación ciudadana municipal y gestión urbana (turnos, reclamos geolocalizados con cuadrillas, tarjeta Soy Delta con QR, botón SOS/COD y alertas del río). |
+| **Vuelo Controlado Staff** | `com.omniverselabs.vuelocontrolado` | `1.0.1+4` | Gestión de staff, guardias de eventos y reducción de daños offline-first con diseño Obsidian, dock de navegación flotante y fichas médicas seguras. |
 
 ---
 

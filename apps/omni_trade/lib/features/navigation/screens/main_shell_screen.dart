@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
@@ -11,6 +13,7 @@ import '../../analytics/screens/analytics_screen.dart';
 import '../../calculator/screens/position_calculator_screen.dart';
 import '../../dashboard/screens/dashboard_screen.dart';
 import '../../operations/screens/operations_list_screen.dart';
+import '../../premium/screens/paywall_sheet.dart';
 import '../../settings/screens/settings_screen.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -38,6 +41,37 @@ class _MainShellScreenState extends State<MainShellScreen> {
   // 3: Analytics
   // 4: Settings
   int _currentIndex = 2; // Dashboard center selected by default
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkPeriodicPromo();
+    });
+  }
+
+  Future<void> _checkPeriodicPromo() async {
+    try {
+      if (widget.settingsProvider.isPro) return;
+
+      final prefs = await SharedPreferences.getInstance();
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final lastTimestamp = prefs.getInt(AppConstants.keyLastPromoTimestamp);
+      // Show every 3 days if not PRO
+      const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
+
+      if (lastTimestamp == null || (now - lastTimestamp) >= threeDaysMs) {
+        await prefs.setInt(AppConstants.keyLastPromoTimestamp, now);
+        if (mounted) {
+          PaywallSheet.show(
+            context,
+            settingsProvider: widget.settingsProvider,
+            customReason: AppLocalizations.of(context).t('paywallDefaultSubtitle'),
+          );
+        }
+      }
+    } catch (_) {}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,54 +155,60 @@ class _MainShellScreenState extends State<MainShellScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
-      // Circular notched bottom app bar
+      // Circular notched bottom app bar (Edge-to-Edge Adaptive)
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         notchMargin: 6.0,
         elevation: 12,
         padding: EdgeInsets.zero,
-        height: 64,
         color: colors.surface,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            // Left 1: Operations
-            _buildNavItem(
-              index: 0,
-              icon: Icons.receipt_long_outlined,
-              activeIcon: Icons.receipt_long_rounded,
-              label: l10n.t('navOperations'),
-              colors: colors,
-            ),
-            // Left 2: Calculator
-            _buildNavItem(
-              index: 1,
-              icon: Icons.calculate_outlined,
-              activeIcon: Icons.calculate_rounded,
-              label: l10n.t('navCalculator'),
-              colors: colors,
-            ),
+        child: SafeArea(
+          top: false,
+          maintainBottomViewPadding: true,
+          child: SizedBox(
+            height: 60,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                // Left 1: Operations
+                _buildNavItem(
+                  index: 0,
+                  icon: Icons.receipt_long_outlined,
+                  activeIcon: Icons.receipt_long_rounded,
+                  label: l10n.t('navOperations'),
+                  colors: colors,
+                ),
+                // Left 2: Calculator
+                _buildNavItem(
+                  index: 1,
+                  icon: Icons.calculate_outlined,
+                  activeIcon: Icons.calculate_rounded,
+                  label: l10n.t('navCalculator'),
+                  colors: colors,
+                ),
 
-            // Center Spacing for protruding Dashboard FAB
-            const SizedBox(width: 48),
+                // Center Spacing for protruding Dashboard FAB
+                const SizedBox(width: 48),
 
-            // Right 1: Analytics
-            _buildNavItem(
-              index: 3,
-              icon: Icons.analytics_outlined,
-              activeIcon: Icons.analytics_rounded,
-              label: l10n.t('navAnalytics'),
-              colors: colors,
+                // Right 1: Analytics
+                _buildNavItem(
+                  index: 3,
+                  icon: Icons.analytics_outlined,
+                  activeIcon: Icons.analytics_rounded,
+                  label: l10n.t('navAnalytics'),
+                  colors: colors,
+                ),
+                // Right 2: Settings
+                _buildNavItem(
+                  index: 4,
+                  icon: Icons.settings_outlined,
+                  activeIcon: Icons.settings_rounded,
+                  label: l10n.t('navSettings'),
+                  colors: colors,
+                ),
+              ],
             ),
-            // Right 2: Settings
-            _buildNavItem(
-              index: 4,
-              icon: Icons.settings_outlined,
-              activeIcon: Icons.settings_rounded,
-              label: l10n.t('navSettings'),
-              colors: colors,
-            ),
-          ],
+          ),
         ),
       ),
     );

@@ -233,48 +233,57 @@ class _SwipeHabitCardState extends State<SwipeHabitCard>
                       ],
                     ),
                     clipBehavior: Clip.antiAlias,
-                    child: Stack(
-                      children: [
-                        // Left Accent Strip perfectly clipped to the card's rounded corner
-                        Positioned(
-                          left: 0,
-                          top: 0,
-                          bottom: 0,
-                          width: 4.5,
-                          child: Container(color: categoryColor),
-                        ),
-                        GestureDetector(
-                          onHorizontalDragUpdate: (d) => _onHorizontalDragUpdate(d, maxWidth),
-                          onHorizontalDragEnd: (d) => _onHorizontalDragEnd(d, maxWidth),
-                          child: InkWell(
-                            onTapDown: (_) => setState(() => _isPressed = true),
-                            onTapUp: (_) => setState(() => _isPressed = false),
-                            onTapCancel: () => setState(() => _isPressed = false),
-                            onTap: () {
-                              HapticsHelper.selection();
-                              widget.onToggle();
-                            },
-                            onLongPress: widget.onEdit,
-                            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.md,
-                                vertical: AppSpacing.sm,
-                              ),
-                              child: Row(
-                                children: [
-                                  // Category Icon with satisfying pulse on completion
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 4, right: 8),
-                                    child: ScaleTransition(
-                                      scale: _pulseScale,
-                                      child: Icon(
-                                        widget.habit.category.icon,
-                                        size: 30,
-                                        color: categoryColor,
+                    child: GestureDetector(
+                      onHorizontalDragUpdate: (d) => _onHorizontalDragUpdate(d, maxWidth),
+                      onHorizontalDragEnd: (d) => _onHorizontalDragEnd(d, maxWidth),
+                      child: InkWell(
+                        onTapDown: (_) => setState(() => _isPressed = true),
+                        onTapUp: (_) => setState(() => _isPressed = false),
+                        onTapCancel: () => setState(() => _isPressed = false),
+                        onTap: () {
+                          if (isCompleted) {
+                            HapticsHelper.light();
+                          } else {
+                            HapticsHelper.medium();
+                          }
+                          widget.onToggle();
+                        },
+                        onLongPress: widget.onEdit,
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.md,
+                            vertical: AppSpacing.sm,
+                          ),
+                          child: Row(
+                            children: [
+                              // Category Icon Container with tonal background and satisfying spring pulse on completion
+                              Padding(
+                                padding: const EdgeInsets.only(right: AppSpacing.sm),
+                                child: ScaleTransition(
+                                  scale: _pulseScale,
+                                  child: Container(
+                                    width: 44,
+                                    height: 44,
+                                    decoration: BoxDecoration(
+                                      color: isCompleted
+                                          ? categoryColor.withValues(alpha: 0.25)
+                                          : categoryColor.withValues(alpha: isDark ? 0.16 : 0.10),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: categoryColor.withValues(alpha: isCompleted ? 0.40 : 0.18),
+                                        width: 1.0,
                                       ),
                                     ),
+                                    alignment: Alignment.center,
+                                    child: Icon(
+                                      isCompleted ? Icons.check_rounded : widget.habit.category.icon,
+                                      size: 24,
+                                      color: categoryColor,
+                                    ),
                                   ),
+                                ),
+                              ),
                                   // Title and Info
                                   Expanded(
                                     child: Column(
@@ -375,15 +384,13 @@ class _SwipeHabitCardState extends State<SwipeHabitCard>
                             ),
                           ),
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
-              ),
-        ],
-        ),
+              ],
+            ),
+          );
+        },
       );
-      },
-    );
-  }
+    }
 }

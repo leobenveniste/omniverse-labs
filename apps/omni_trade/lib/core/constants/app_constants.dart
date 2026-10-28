@@ -3,7 +3,7 @@ class AppConstants {
   AppConstants._();
 
   static const String appName = 'OmniTrade';
-  static const String appVersion = '1.0.3';
+  static const String appVersion = '1.0.6';
 
   // Freemium tier limitations
   static const int maxFreeTrades = 15;
@@ -23,6 +23,8 @@ class AppConstants {
   static const String keyLocale = 'omnitrade_locale_code';
   static const String keyProOverride = 'omnitrade_test_pro_override';
   static const String keyProPurchased = 'omnitrade_pro_purchased';
+  static const String keyDevMode = 'omnitrade_dev_mode_unlocked';
+  static const String keyLastPromoTimestamp = 'omnitrade_last_pro_promo_timestamp';
 
   // Default Asset Classes
   static const List<String> assetClasses = [

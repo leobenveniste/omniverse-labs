@@ -1,0 +1,473 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users/{userId}
+    // Document ID: userId (UUID or user identifier)
+    // Fields:
+    //   - id: string (required, immutable, 1-128 chars, matches document ID)
+    //   - email: string (required, valid email format, 1-100 chars)
+    //   - password: string (optional/nullable, 0-100 chars)
+    //   - firstName: string (required, 1-60 chars)
+    //   - lastName: string (required, 1-60 chars)
+    //   - documentType: string (required, 1-30 chars)
+    //   - documentNumber: string (required, 1-40 chars)
+    //   - birthDate: string or timestamp (required, max 40 chars if string)
+    //   - phone: string (required, 1-30 chars)
+    //   - instagram: string (optional/nullable, max 50 chars)
+    //   - photoUrl: string (optional/nullable, max 500 chars)
+    //   - roles: list of strings (required, size 1-10, valid system roles)
+    //   - createdAt: string or timestamp (required, immutable, max 40 chars if string)
+    //
+    // Collection: events/{eventId}
+    // Document ID: eventId (UUID or event identifier)
+    // Fields:
+    //   - id: string (required, immutable, 1-128 chars, matches document ID)
+    //   - name: string (required, 1-120 chars)
+    //   - date: string or timestamp (required, max 40 chars if string)
+    //   - startTime: string (required, 1-15 chars)
+    //   - doorsOpenTime: string (required, 1-15 chars)
+    //   - endTime: string (required, 1-15 chars)
+    //   - location: string (required, 1-150 chars)
+    //   - address: string (optional/nullable, max 200 chars)
+    //   - imageUrl: string (optional/nullable, max 500 chars)
+    //   - requiredStaffCount: int (required, 0 to 500)
+    //   - staffIds: list of strings (required, size <= 500)
+    //   - createdBy: string (required, immutable, 1-128 chars)
+    //   - createdByName: string (required, 1-100 chars)
+    //   - createdAt: string or timestamp (required, immutable, max 40 chars if string)
+    //   - isManuallyStarted: bool (required)
+    //   - isManuallyClosed: bool (required)
+    //   - unifiedReport: map (optional)
+    //       - durationTotal: string (max 50 chars)
+    //       - producer: string (max 120 chars)
+    //       - vueloPresent: bool
+    //       - eventType: string (max 60 chars)
+    //       - otherEventType: string (optional/nullable, max 100 chars)
+    //       - timeSlot: string (max 60 chars)
+    //       - otherTimeSlot: string (optional/nullable, max 100 chars)
+    //       - spaceType: string (max 60 chars)
+    //       - dayNumber: string (max 60 chars)
+    //       - otherDayNumber: string (optional/nullable, max 100 chars)
+    //       - hasFreeWater: bool
+    //       - perceivedDensity: string (max 60 chars)
+    //       - weatherTypes: list of strings (size <= 20)
+    //       - medicalAttendedCount: int (>= 0, <= 100000)
+    //       - medicalTransferredCount: int (>= 0, <= 100000)
+    //       - vcAttendedCount: int (>= 0, <= 100000)
+    //       - medicalComposition: map (size <= 50)
+    //       - medicalOther1Name: string (optional/nullable, max 100 chars)
+    //       - medicalOther1Count: int (optional/nullable, >= 0, <= 100000)
+    //       - medicalOther2Name: string (optional/nullable, max 100 chars)
+    //       - medicalOther2Count: int (optional/nullable, >= 0, <= 100000)
+    //       - vueloVolunteersCount: string (max 60 chars)
+    //       - vueloFruitQuantity: string (max 60 chars)
+    //       - otherRelevantInfo: string (max 3000 chars)
+    //       - completedByUserId: string (1-128 chars)
+    //       - completedByUserName: string (1-100 chars)
+    //       - completedAt: string or timestamp
+    //   - pairs: list of maps (optional, size <= 250)
+    //       - id: string (1-128 chars)
+    //       - user1Id: string (1-128 chars)
+    //       - user1Name: string (1-100 chars)
+    //       - user2Id: string (1-128 chars)
+    //       - user2Name: string (1-100 chars)
+    //       - createdAt: string or timestamp (max 40 chars if string)
+    //   - roundLogs: list of maps (optional, size <= 500)
+    //       - id: string (1-128 chars)
+    //       - timestamp: string or timestamp (max 40 chars if string)
+    //       - memberId: string (1-128 chars)
+    //       - memberName: string (1-100 chars)
+    //       - partnerId: string or null (optional, max 128 chars)
+    //       - partnerName: string or null (optional, max 100 chars)
+    //       - detectedCasesCount: int or float (>= 0, <= 100000)
+    //       - callsCount: int or float (>= 0, <= 100000)
+    //       - observations: string (max 3000 chars)
+    //
+    // Collection: cases/{caseId}
+    // Document ID: caseId (UUID or case identifier)
+    // Fields (Legacy & Structured "Registro Unificado de Atenciones"):
+    //   - id: string (required, immutable, 1-128 chars, matches document ID)
+    //   - eventId: string (required, immutable, 1-128 chars)
+    //   - eventName: string (required, 1-120 chars)
+    //   - registeredByUserId: string (required, immutable, 1-128 chars)
+    //   - registeredByUserName: string (required, 1-100 chars)
+    //   - timestamp: string or timestamp (required, immutable, max 40 chars if string)
+    //   - personName: string (required, 1-100 chars)
+    //   - personAge: string (required, 0-20 chars)
+    //   - personGender: string (required, 1-50 chars)
+    //   - interventionType: string (required, 1-100 chars)
+    //   - substances: list of strings (required, size <= 30)
+    //   - symptoms: string (required, max 2000 chars)
+    //   - actionsTaken: string (required, max 2000 chars)
+    //   - observations: string (required, max 3000 chars)
+    //   - isSyncedToDrive: bool (required)
+    //   - syncedAt: string or timestamp (optional/nullable, max 40 chars if string)
+    //   - gender: string (optional/nullable, max 30 chars)
+    //   - ageRange: string (optional/nullable, max 30 chars)
+    //   - moment: string (optional/nullable, max 30 chars)
+    //   - duration: string (optional/nullable, max 30 chars)
+    //   - arrivalMode: string (optional/nullable, max 50 chars)
+    //   - accompaniedBy: string (optional/nullable, max 100 chars)
+    //   - consumedSubstances: string (optional/nullable, max 30 chars)
+    //   - substanceEntries: map (optional/nullable, size <= 50)
+    //   - mdmaPillName: string (optional/nullable, max 100 chars)
+    //   - otherSubstanceName: string (optional/nullable, max 100 chars)
+    //   - isFirstTimeConsuming: string (optional/nullable, max 30 chars)
+    //   - underlyingCondition: string (optional/nullable, max 200 chars)
+    //   - physicalSymptoms: list of strings (optional/nullable, size <= 30)
+    //   - otherPhysicalSymptoms: string (optional/nullable, max 200 chars)
+    //   - psychologicalSymptoms: list of strings (optional/nullable, size <= 30)
+    //   - healthTeamIntervened: bool (optional/nullable)
+    //   - isComplexCase: bool (optional/nullable)
+    //   - resolution: string (optional/nullable, max 100 chars)
+    //   - otherResolution: string (optional/nullable, max 200 chars)
+    //   - attendingStaff: string (optional/nullable, max 100 chars)
+    //   - relevantInfo: string (optional/nullable, max 3000 chars)
+    //
+    // ===============================================================
+
+    // Root default deny for any collections not explicitly matched
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function areImmutableFieldsUnchanged(fields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+
+    function isValidEmail(email) {
+      return email is string &&
+             email.size() >= 3 &&
+             email.size() <= 100 &&
+             email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
+    }
+
+    function isValidDateTime(val) {
+      return (val is string && val.size() >= 1 && val.size() <= 40) || val is timestamp;
+    }
+
+    function isValidOptionalDateTime(field) {
+      return !(field in request.resource.data) ||
+             request.resource.data[field] == null ||
+             isValidDateTime(request.resource.data[field]);
+    }
+
+    function isValidOptionalString(field, minLen, maxLen) {
+      return !(field in request.resource.data) ||
+             request.resource.data[field] == null ||
+             (request.resource.data[field] is string &&
+              request.resource.data[field].size() >= minLen &&
+              request.resource.data[field].size() <= maxLen);
+    }
+
+    function isValidOptionalBool(field) {
+      return !(field in request.resource.data) ||
+             request.resource.data[field] == null ||
+             request.resource.data[field] is bool;
+    }
+
+    function isValidOptionalList(field, maxSize) {
+      return !(field in request.resource.data) ||
+             request.resource.data[field] == null ||
+             (request.resource.data[field] is list &&
+              request.resource.data[field].size() <= maxSize);
+    }
+
+    function isValidOptionalMap(field, maxSize) {
+      return !(field in request.resource.data) ||
+             request.resource.data[field] == null ||
+             (request.resource.data[field] is map &&
+              request.resource.data[field].size() <= maxSize);
+    }
+
+    // ===============================================================
+    // Domain Validators (Applied to both create and update)
+    // ===============================================================
+
+    function isValidUser(data) {
+      let allowed = [
+        'id', 'email', 'password', 'firstName', 'lastName',
+        'documentType', 'documentNumber', 'birthDate', 'phone',
+        'instagram', 'photoUrl', 'roles', 'createdAt'
+      ];
+      let required = [
+        'id', 'email', 'firstName', 'lastName',
+        'documentType', 'documentNumber', 'birthDate', 'phone',
+        'roles', 'createdAt'
+      ];
+      let validRoles = [
+        'Miembro', 'Organización', 'RRHH', 'Producción', 'Comercial', 'SuperAdmin', 'superadmin'
+      ];
+
+      return hasOnlyAllowedFields(allowed) &&
+             hasRequiredFields(required) &&
+             data.id is string && data.id.size() >= 1 && data.id.size() <= 128 &&
+             isValidEmail(data.email) &&
+             isValidOptionalString('password', 0, 100) &&
+             data.firstName is string && data.firstName.size() >= 1 && data.firstName.size() <= 60 &&
+             data.lastName is string && data.lastName.size() >= 1 && data.lastName.size() <= 60 &&
+             data.documentType is string && data.documentType.size() >= 1 && data.documentType.size() <= 30 &&
+             data.documentNumber is string && data.documentNumber.size() >= 1 && data.documentNumber.size() <= 40 &&
+             isValidDateTime(data.birthDate) &&
+             data.phone is string && data.phone.size() >= 1 && data.phone.size() <= 30 &&
+             isValidOptionalString('instagram', 0, 50) &&
+             isValidOptionalString('photoUrl', 0, 500) &&
+             data.roles is list && data.roles.size() >= 1 && data.roles.size() <= 10 &&
+             data.roles.hasOnly(validRoles) &&
+             isValidDateTime(data.createdAt);
+    }
+
+    function isValidUnifiedReport(report) {
+      let allowed = [
+        'durationTotal', 'producer', 'vueloPresent', 'eventType', 'otherEventType',
+        'timeSlot', 'otherTimeSlot', 'spaceType', 'dayNumber', 'otherDayNumber',
+        'hasFreeWater', 'perceivedDensity', 'weatherTypes',
+        'medicalAttendedCount', 'medicalTransferredCount', 'vcAttendedCount',
+        'medicalComposition', 'medicalOther1Name', 'medicalOther1Count',
+        'medicalOther2Name', 'medicalOther2Count', 'vueloVolunteersCount',
+        'vueloFruitQuantity', 'otherRelevantInfo', 'completedByUserId',
+        'completedByUserName', 'completedAt'
+      ];
+      let required = [
+        'durationTotal', 'producer', 'vueloPresent', 'eventType',
+        'timeSlot', 'spaceType', 'dayNumber',
+        'hasFreeWater', 'perceivedDensity', 'weatherTypes',
+        'medicalAttendedCount', 'medicalTransferredCount', 'vcAttendedCount',
+        'medicalComposition', 'vueloVolunteersCount', 'vueloFruitQuantity',
+        'otherRelevantInfo', 'completedByUserId', 'completedByUserName', 'completedAt'
+      ];
+
+      return report is map &&
+             report.keys().hasOnly(allowed) &&
+             report.keys().hasAll(required) &&
+             report.durationTotal is string && report.durationTotal.size() <= 50 &&
+             report.producer is string && report.producer.size() <= 120 &&
+             report.vueloPresent is bool &&
+             report.eventType is string && report.eventType.size() <= 60 &&
+             (!('otherEventType' in report) || report.otherEventType == null || (report.otherEventType is string && report.otherEventType.size() <= 100)) &&
+             report.timeSlot is string && report.timeSlot.size() <= 60 &&
+             (!('otherTimeSlot' in report) || report.otherTimeSlot == null || (report.otherTimeSlot is string && report.otherTimeSlot.size() <= 100)) &&
+             report.spaceType is string && report.spaceType.size() <= 60 &&
+             report.dayNumber is string && report.dayNumber.size() <= 60 &&
+             (!('otherDayNumber' in report) || report.otherDayNumber == null || (report.otherDayNumber is string && report.otherDayNumber.size() <= 100)) &&
+             report.hasFreeWater is bool &&
+             report.perceivedDensity is string && report.perceivedDensity.size() <= 60 &&
+             report.weatherTypes is list && report.weatherTypes.size() <= 20 &&
+             report.medicalAttendedCount is int && report.medicalAttendedCount >= 0 && report.medicalAttendedCount <= 100000 &&
+             report.medicalTransferredCount is int && report.medicalTransferredCount >= 0 && report.medicalTransferredCount <= 100000 &&
+             report.vcAttendedCount is int && report.vcAttendedCount >= 0 && report.vcAttendedCount <= 100000 &&
+             report.medicalComposition is map && report.medicalComposition.size() <= 50 &&
+             (!('medicalOther1Name' in report) || report.medicalOther1Name == null || (report.medicalOther1Name is string && report.medicalOther1Name.size() <= 100)) &&
+             (!('medicalOther1Count' in report) || report.medicalOther1Count == null || (report.medicalOther1Count is int && report.medicalOther1Count >= 0 && report.medicalOther1Count <= 100000)) &&
+             (!('medicalOther2Name' in report) || report.medicalOther2Name == null || (report.medicalOther2Name is string && report.medicalOther2Name.size() <= 100)) &&
+             (!('medicalOther2Count' in report) || report.medicalOther2Count == null || (report.medicalOther2Count is int && report.medicalOther2Count >= 0 && report.medicalOther2Count <= 100000)) &&
+             report.vueloVolunteersCount is string && report.vueloVolunteersCount.size() <= 60 &&
+             report.vueloFruitQuantity is string && report.vueloFruitQuantity.size() <= 60 &&
+             report.otherRelevantInfo is string && report.otherRelevantInfo.size() <= 3000 &&
+             report.completedByUserId is string && report.completedByUserId.size() >= 1 && report.completedByUserId.size() <= 128 &&
+             report.completedByUserName is string && report.completedByUserName.size() >= 1 && report.completedByUserName.size() <= 100 &&
+             isValidDateTime(report.completedAt);
+    }
+
+    function isValidEventPair(pair) {
+      let allowed = ['id', 'user1Id', 'user1Name', 'user2Id', 'user2Name', 'createdAt'];
+      return pair is map &&
+             pair.keys().hasOnly(allowed) &&
+             pair.keys().hasAll(allowed) &&
+             pair.id is string && pair.id.size() >= 1 && pair.id.size() <= 128 &&
+             pair.user1Id is string && pair.user1Id.size() >= 1 && pair.user1Id.size() <= 128 &&
+             pair.user1Name is string && pair.user1Name.size() >= 1 && pair.user1Name.size() <= 100 &&
+             pair.user2Id is string && pair.user2Id.size() >= 1 && pair.user2Id.size() <= 128 &&
+             pair.user2Name is string && pair.user2Name.size() >= 1 && pair.user2Name.size() <= 100 &&
+             isValidDateTime(pair.createdAt);
+    }
+
+    function isValidEventRoundLog(log) {
+      let allowed = [
+        'id', 'timestamp', 'memberId', 'memberName',
+        'partnerId', 'partnerName', 'detectedCasesCount',
+        'callsCount', 'observations'
+      ];
+      let required = [
+        'id', 'timestamp', 'memberId', 'memberName',
+        'detectedCasesCount', 'callsCount', 'observations'
+      ];
+      return log is map &&
+             log.keys().hasOnly(allowed) &&
+             log.keys().hasAll(required) &&
+             log.id is string && log.id.size() >= 1 && log.id.size() <= 128 &&
+             isValidDateTime(log.timestamp) &&
+             log.memberId is string && log.memberId.size() >= 1 && log.memberId.size() <= 128 &&
+             log.memberName is string && log.memberName.size() >= 1 && log.memberName.size() <= 100 &&
+             (!('partnerId' in log) || log.partnerId == null || (log.partnerId is string && log.partnerId.size() <= 128)) &&
+             (!('partnerName' in log) || log.partnerName == null || (log.partnerName is string && log.partnerName.size() <= 100)) &&
+             (log.detectedCasesCount is int || log.detectedCasesCount is float || log.detectedCasesCount is number) &&
+             log.detectedCasesCount >= 0 && log.detectedCasesCount <= 100000 &&
+             (log.callsCount is int || log.callsCount is float || log.callsCount is number) &&
+             log.callsCount >= 0 && log.callsCount <= 100000 &&
+             log.observations is string && log.observations.size() <= 3000;
+    }
+
+    function isValidEvent(data) {
+      let allowed = [
+        'id', 'name', 'date', 'startTime', 'doorsOpenTime', 'endTime',
+        'location', 'address', 'imageUrl', 'requiredStaffCount',
+        'staffIds', 'createdBy', 'createdByName', 'createdAt',
+        'isManuallyStarted', 'isManuallyClosed', 'unifiedReport',
+        'pairs', 'roundLogs'
+      ];
+      let required = [
+        'id', 'name', 'date', 'startTime', 'doorsOpenTime', 'endTime',
+        'location', 'requiredStaffCount', 'staffIds', 'createdBy',
+        'createdByName', 'createdAt', 'isManuallyStarted', 'isManuallyClosed'
+      ];
+
+      return hasOnlyAllowedFields(allowed) &&
+             hasRequiredFields(required) &&
+             data.id is string && data.id.size() >= 1 && data.id.size() <= 128 &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 120 &&
+             isValidDateTime(data.date) &&
+             data.startTime is string && data.startTime.size() >= 1 && data.startTime.size() <= 15 &&
+             data.doorsOpenTime is string && data.doorsOpenTime.size() >= 1 && data.doorsOpenTime.size() <= 15 &&
+             data.endTime is string && data.endTime.size() >= 1 && data.endTime.size() <= 15 &&
+             data.location is string && data.location.size() >= 1 && data.location.size() <= 150 &&
+             isValidOptionalString('address', 0, 200) &&
+             isValidOptionalString('imageUrl', 0, 500) &&
+             data.requiredStaffCount is int &&
+             data.requiredStaffCount >= 0 && data.requiredStaffCount <= 500 &&
+             data.staffIds is list && data.staffIds.size() <= 500 &&
+             data.createdBy is string && data.createdBy.size() >= 1 && data.createdBy.size() <= 128 &&
+             data.createdByName is string && data.createdByName.size() >= 1 && data.createdByName.size() <= 100 &&
+             isValidDateTime(data.createdAt) &&
+             data.isManuallyStarted is bool &&
+             data.isManuallyClosed is bool &&
+             (!('unifiedReport' in data) || data.unifiedReport == null || (data.unifiedReport is map && isValidUnifiedReport(data.unifiedReport))) &&
+             (!('pairs' in data) || data.pairs == null || (data.pairs is list && data.pairs.size() <= 250 && (data.pairs.size() == 0 || isValidEventPair(data.pairs[0])))) &&
+             (!('roundLogs' in data) || data.roundLogs == null || (data.roundLogs is list && data.roundLogs.size() <= 500 && (data.roundLogs.size() == 0 || isValidEventRoundLog(data.roundLogs[0]))));
+    }
+
+    function isValidCase(data) {
+      let allowed = [
+        'id', 'eventId', 'eventName', 'registeredByUserId', 'registeredByUserName',
+        'timestamp', 'personName', 'personAge', 'personGender',
+        'interventionType', 'substances', 'symptoms', 'actionsTaken',
+        'observations', 'isSyncedToDrive', 'syncedAt',
+        'gender', 'ageRange', 'moment', 'duration', 'arrivalMode',
+        'accompaniedBy', 'consumedSubstances', 'substanceEntries',
+        'mdmaPillName', 'otherSubstanceName', 'isFirstTimeConsuming',
+        'underlyingCondition', 'physicalSymptoms', 'otherPhysicalSymptoms',
+        'psychologicalSymptoms', 'healthTeamIntervened', 'isComplexCase',
+        'resolution', 'otherResolution', 'attendingStaff', 'relevantInfo'
+      ];
+      let required = [
+        'id', 'eventId', 'eventName', 'registeredByUserId', 'registeredByUserName',
+        'timestamp', 'personName', 'personAge', 'personGender',
+        'interventionType', 'substances', 'symptoms', 'actionsTaken',
+        'observations', 'isSyncedToDrive'
+      ];
+
+      return hasOnlyAllowedFields(allowed) &&
+             hasRequiredFields(required) &&
+             data.id is string && data.id.size() >= 1 && data.id.size() <= 128 &&
+             data.eventId is string && data.eventId.size() >= 1 && data.eventId.size() <= 128 &&
+             data.eventName is string && data.eventName.size() >= 1 && data.eventName.size() <= 120 &&
+             data.registeredByUserId is string && data.registeredByUserId.size() >= 1 && data.registeredByUserId.size() <= 128 &&
+             data.registeredByUserName is string && data.registeredByUserName.size() >= 1 && data.registeredByUserName.size() <= 100 &&
+             isValidDateTime(data.timestamp) &&
+             data.personName is string && data.personName.size() >= 1 && data.personName.size() <= 100 &&
+             data.personAge is string && data.personAge.size() <= 20 &&
+             data.personGender is string && data.personGender.size() >= 1 && data.personGender.size() <= 50 &&
+             data.interventionType is string && data.interventionType.size() >= 1 && data.interventionType.size() <= 100 &&
+             data.substances is list && data.substances.size() <= 30 &&
+             data.symptoms is string && data.symptoms.size() <= 2000 &&
+             data.actionsTaken is string && data.actionsTaken.size() <= 2000 &&
+             data.observations is string && data.observations.size() <= 3000 &&
+             data.isSyncedToDrive is bool &&
+             isValidOptionalDateTime('syncedAt') &&
+             isValidOptionalString('gender', 0, 30) &&
+             isValidOptionalString('ageRange', 0, 30) &&
+             isValidOptionalString('moment', 0, 30) &&
+             isValidOptionalString('duration', 0, 30) &&
+             isValidOptionalString('arrivalMode', 0, 50) &&
+             isValidOptionalString('accompaniedBy', 0, 100) &&
+             isValidOptionalString('consumedSubstances', 0, 30) &&
+             isValidOptionalMap('substanceEntries', 50) &&
+             isValidOptionalString('mdmaPillName', 0, 100) &&
+             isValidOptionalString('otherSubstanceName', 0, 100) &&
+             isValidOptionalString('isFirstTimeConsuming', 0, 30) &&
+             isValidOptionalString('underlyingCondition', 0, 200) &&
+             isValidOptionalList('physicalSymptoms', 30) &&
+             isValidOptionalString('otherPhysicalSymptoms', 0, 200) &&
+             isValidOptionalList('psychologicalSymptoms', 30) &&
+             isValidOptionalBool('healthTeamIntervened') &&
+             isValidOptionalBool('isComplexCase') &&
+             isValidOptionalString('resolution', 0, 100) &&
+             isValidOptionalString('otherResolution', 0, 200) &&
+             isValidOptionalString('attendingStaff', 0, 100) &&
+             isValidOptionalString('relevantInfo', 0, 3000);
+    }
+
+    // ===============================================================
+    // Collection Rules
+    // ===============================================================
+
+    // 1. Users collection: Volunteer & staff member profiles
+    match /users/{userId} {
+      allow read: if true;
+
+      allow create: if isValidUser(request.resource.data) &&
+                       request.resource.data.id == userId;
+
+      allow update: if isValidUser(request.resource.data) &&
+                       request.resource.data.id == userId &&
+                       areImmutableFieldsUnchanged(['id', 'createdAt']);
+
+      allow delete: if true;
+    }
+
+    // 2. Events collection: Nocturnal harm reduction events
+    match /events/{eventId} {
+      allow read: if true;
+
+      allow create: if isValidEvent(request.resource.data) &&
+                       request.resource.data.id == eventId;
+
+      allow update: if isValidEvent(request.resource.data) &&
+                       request.resource.data.id == eventId &&
+                       areImmutableFieldsUnchanged(['id', 'createdBy', 'createdAt']);
+
+      allow delete: if true;
+    }
+
+    // 3. Cases collection: Harm reduction / health intervention forms
+    match /cases/{caseId} {
+      allow read: if true;
+
+      allow create: if isValidCase(request.resource.data) &&
+                       request.resource.data.id == caseId;
+
+      allow update: if isValidCase(request.resource.data) &&
+                       request.resource.data.id == caseId &&
+                       areImmutableFieldsUnchanged(['id', 'eventId', 'registeredByUserId', 'timestamp']);
+
+      allow delete: if true;
+    }
+  }
+}

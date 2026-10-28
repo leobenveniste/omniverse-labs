@@ -39,7 +39,10 @@ class TradeCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: colors.outline, width: 1.0),
+        border: Border.all(
+          color: colors.outline.withValues(alpha: 0.8),
+          width: 1.0,
+        ),
       ),
       child: Material(
         color: Colors.transparent,
@@ -54,7 +57,7 @@ class TradeCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Top Row: Symbol, Direction Pill, Status
+                // Top Row: Direction Pill, Symbol, Asset Class, Screenshots Badge & P/L Status
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -94,6 +97,21 @@ class TradeCard extends StatelessWidget {
                             style: AppTypography.caption(colors.textTertiary),
                           ),
                         ),
+                        if (trade.hasScreenshots) ...[
+                          const SizedBox(width: AppSpacing.xxs),
+                          Container(
+                            padding: const EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                              color: colors.secondary.withValues(alpha: 0.15),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.image_rounded,
+                              size: 11,
+                              color: colors.secondary,
+                            ),
+                          ),
+                        ],
                       ],
                     ),
 

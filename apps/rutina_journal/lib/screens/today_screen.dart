@@ -115,13 +115,14 @@ class _TodayScreenState extends State<TodayScreen> {
                 if (s.current > maxStreak) maxStreak = s.current;
               }
               return Container(
-                margin: const EdgeInsets.symmetric(vertical: 12),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                margin: const EdgeInsets.symmetric(vertical: 11),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFC85A3B).withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(14),
+                  color: const Color(0xFFC85A3B).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: const Color(0xFFC85A3B).withValues(alpha: 0.32),
+                    color: const Color(0xFFC85A3B).withValues(alpha: 0.30),
+                    width: 1.0,
                   ),
                 ),
                 child: Row(
@@ -130,13 +131,13 @@ class _TodayScreenState extends State<TodayScreen> {
                     const Icon(
                       Icons.local_fire_department_rounded,
                       color: Color(0xFFC85A3B),
-                      size: 17,
+                      size: 16,
                     ),
-                    const SizedBox(width: 3),
+                    const SizedBox(width: 4),
                     Text(
                       '$maxStreak',
                       style: const TextStyle(
-                        fontSize: 12,
+                        fontSize: 12.5,
                         fontWeight: FontWeight.w700,
                         color: Color(0xFFC85A3B),
                       ),
@@ -411,10 +412,11 @@ class _TodayScreenState extends State<TodayScreen> {
               final isSelected = AppDateUtils.isSameDay(day, _selectedDate);
               final isToday = AppDateUtils.isSameDay(day, DateTime.now());
               final isWeekend = day.weekday == DateTime.saturday || day.weekday == DateTime.sunday;
+              final completedCount = widget.habitService.getCompletedCountForDate(day);
 
               return Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 2.5),
                   child: GestureDetector(
                     onTap: () {
                       HapticsHelper.selection();
@@ -422,26 +424,35 @@ class _TodayScreenState extends State<TodayScreen> {
                     },
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                      padding: const EdgeInsets.symmetric(vertical: 8),
                       decoration: BoxDecoration(
                         color: isSelected
                             ? theme.colorScheme.primary
                             : isToday
-                                ? theme.colorScheme.primary.withValues(alpha: 0.15)
+                                ? theme.colorScheme.primary.withValues(alpha: 0.12)
                                 : isWeekend
-                                    ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
+                                    ? theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.35)
                                     : theme.colorScheme.surface,
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                        borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: isSelected
                               ? theme.colorScheme.primary
                               : isToday
-                                  ? theme.colorScheme.primary.withValues(alpha: 0.5)
+                                  ? theme.colorScheme.primary.withValues(alpha: 0.45)
                                   : isWeekend
-                                      ? theme.colorScheme.outline.withValues(alpha: 0.4)
-                                      : theme.colorScheme.outline.withValues(alpha: 0.2),
+                                      ? theme.colorScheme.outline.withValues(alpha: 0.25)
+                                      : theme.colorScheme.outline.withValues(alpha: 0.16),
                           width: isSelected || isToday ? 1.5 : 1.0,
                         ),
+                        boxShadow: isSelected
+                            ? [
+                                BoxShadow(
+                                  color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ]
+                            : null,
                       ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -469,18 +480,32 @@ class _TodayScreenState extends State<TodayScreen> {
                               fontWeight: isSelected || isToday ? FontWeight.w700 : FontWeight.w500,
                             ),
                           ),
-                          if (isToday)
+                          const SizedBox(height: 4),
+                          // Completed habits micro-indicator or today dot
+                          if (completedCount > 0)
                             Container(
-                              margin: const EdgeInsets.only(top: 2),
+                              width: 5,
+                              height: 5,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: isSelected
+                                    ? theme.colorScheme.onPrimary
+                                    : const Color(0xFFC85A3B),
+                              ),
+                            )
+                          else if (isToday)
+                            Container(
                               width: 4,
                               height: 4,
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: isSelected
-                                    ? theme.colorScheme.onPrimary
-                                    : theme.colorScheme.primary,
+                                    ? theme.colorScheme.onPrimary.withValues(alpha: 0.7)
+                                    : theme.colorScheme.primary.withValues(alpha: 0.6),
                               ),
-                            ),
+                            )
+                          else
+                            const SizedBox(height: 5),
                         ],
                       ),
                     ),

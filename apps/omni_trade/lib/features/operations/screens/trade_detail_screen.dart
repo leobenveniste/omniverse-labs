@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/models/trade_operation.dart';
@@ -36,6 +37,54 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
   void initState() {
     super.initState();
     _trade = widget.trade;
+  }
+
+  void _openFullScreenChart(String path, String title) {
+    HapticsHelper.light();
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog.fullscreen(
+        backgroundColor: Colors.black,
+        child: Stack(
+          children: [
+            InteractiveViewer(
+              minScale: 0.8,
+              maxScale: 5.0,
+              child: Center(
+                child: Image.file(File(path), fit: BoxFit.contain),
+              ),
+            ),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                        border: Border.all(color: Colors.white24),
+                      ),
+                      child: Text(
+                        title,
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded, color: Colors.white, size: 28),
+                      style: IconButton.styleFrom(backgroundColor: Colors.black54),
+                      onPressed: () => Navigator.of(ctx).pop(),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showCloseTradeDialog() {
@@ -103,7 +152,10 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
                   });
                 }
               },
-              child: Text(l10n.t('confirmCloseAction'), style: AppTypography.body(colors.onPrimary, isBold: true)),
+              child: Text(
+                l10n.t('confirmCloseAction'),
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+              ),
             ),
           ],
         );
@@ -111,34 +163,59 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
     );
   }
 
-  void _confirmDelete() {
+  void _showDeleteDialog() {
     final colors = context.colors;
     final l10n = AppLocalizations.of(context);
+
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: colors.surface,
-        title: Text(l10n.t('deleteTradeDialogTitle'), style: AppTypography.title(colors.textPrimary)),
-        content: Text(
-          l10n.t('deleteTradeDialogPrompt'),
-          style: AppTypography.body(colors.textSecondary),
+      builder: (ctx) {
+        return AlertDialog(
+          backgroundColor: colors.surface,
+          title: Text(
+            l10n.t('deleteTradeDialogTitle'),
+            style: AppTypography.title(colors.loss),
+          ),
+          content: Text(
+            l10n.t('deleteTradeDialogPrompt'),
+            style: AppTypography.body(colors.textSecondary),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(l10n.t('cancelAction'), style: AppTypography.body(colors.textSecondary)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: colors.loss),
+              onPressed: () {
+                HapticsHelper.error();
+                widget.onDelete(_trade.id);
+                Navigator.of(ctx).pop();
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                l10n.t('deleteAction'),
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _navigateToEdit() {
+    HapticsHelper.light();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => TradeFormScreen(
+          initialTrade: _trade,
+          currencySymbol: widget.currencySymbol,
+          onSave: (updated) {
+            widget.onUpdate(updated);
+            setState(() => _trade = updated);
+          },
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.t('cancelAction'), style: AppTypography.body(colors.textSecondary)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: colors.loss),
-            onPressed: () {
-              HapticsHelper.error();
-              widget.onDelete(_trade.id);
-              Navigator.of(ctx).pop();
-              Navigator.of(context).pop();
-            },
-            child: Text(l10n.t('deleteAction'), style: AppTypography.body(colors.onLoss, isBold: true)),
-          ),
-        ],
       ),
     );
   }
@@ -147,55 +224,51 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final l10n = AppLocalizations.of(context);
+    final numFormat = NumberFormat('#,##0.00', 'en_US');
+    final dateFormat = DateFormat('MMM dd, yyyy • HH:mm');
+
     final isLong = _trade.direction == TradeDirection.long;
     final isOpen = _trade.status == TradeStatus.open;
     final pnl = _trade.realizedPnl;
-    final isPosPnl = (pnl ?? 0.0) >= 0.0;
+    final isPosPnl = (pnl ?? 0) >= 0;
     final pnlColor = isPosPnl ? colors.profit : colors.loss;
-    final numFormat = NumberFormat('#,##0.00', 'en_US');
-    final dateFormat = DateFormat('dd MMM yyyy, HH:mm');
 
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
-        title: Text('${_trade.symbol} • ${_trade.assetClass}'),
+        title: Text(_trade.symbol),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
             tooltip: l10n.t('editTradeTitle'),
-            onPressed: () {
-              HapticsHelper.light();
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (ctx) => TradeFormScreen(
-                    initialTrade: _trade,
-                    currencySymbol: widget.currencySymbol,
-                    onSave: (updated) {
-                      widget.onUpdate(updated);
-                      setState(() => _trade = updated);
-                    },
-                  ),
-                ),
-              );
-            },
+            onPressed: _navigateToEdit,
           ),
           IconButton(
             icon: Icon(Icons.delete_outline_rounded, color: colors.loss),
             tooltip: l10n.t('deleteAction'),
-            onPressed: _confirmDelete,
+            onPressed: _showDeleteDialog,
           ),
         ],
       ),
       body: ListView(
         padding: AppSpacing.paddingScreen,
         children: [
-          // Header Bento: Direction & P&L or Status
+          // Bento Hero Card: P&L or Capital Deployed
           Container(
             padding: AppSpacing.paddingCard,
             decoration: BoxDecoration(
-              color: colors.surface,
+              gradient: LinearGradient(
+                colors: colors.cardGradient,
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              border: Border.all(color: colors.outline, width: 1.0),
+              border: Border.all(
+                color: !isOpen && pnl != null
+                    ? (isPosPnl ? colors.profit : colors.loss).withValues(alpha: 0.35)
+                    : colors.outline,
+                width: 1.5,
+              ),
             ),
             child: Column(
               children: [
@@ -296,6 +369,59 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
           ),
           const SizedBox(height: AppSpacing.md),
 
+          // Chart Screenshots Section (If attached)
+          if (_trade.hasScreenshots) ...[
+            Container(
+              padding: AppSpacing.paddingCard,
+              decoration: BoxDecoration(
+                color: colors.surface,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                border: Border.all(color: colors.secondary.withValues(alpha: 0.3), width: 1.0),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.photo_size_select_actual_rounded, size: 16, color: colors.secondary),
+                      const SizedBox(width: AppSpacing.xs),
+                      Text(
+                        l10n.t('chartAttachmentsTitle'),
+                        style: AppTypography.caption(colors.textSecondary, isBold: true),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Row(
+                    children: [
+                      if (_trade.entryScreenshotPath != null && File(_trade.entryScreenshotPath!).existsSync())
+                        Expanded(
+                          child: _buildDetailChartCard(
+                            title: l10n.t('entryChartTitle'),
+                            path: _trade.entryScreenshotPath!,
+                            colors: colors,
+                            onTap: () => _openFullScreenChart(_trade.entryScreenshotPath!, l10n.t('entryChartTitle')),
+                          ),
+                        ),
+                      if (_trade.entryScreenshotPath != null && _trade.exitScreenshotPath != null)
+                        const SizedBox(width: AppSpacing.sm),
+                      if (_trade.exitScreenshotPath != null && File(_trade.exitScreenshotPath!).existsSync())
+                        Expanded(
+                          child: _buildDetailChartCard(
+                            title: l10n.t('exitChartTitle'),
+                            path: _trade.exitScreenshotPath!,
+                            colors: colors,
+                            onTap: () => _openFullScreenChart(_trade.exitScreenshotPath!, l10n.t('exitChartTitle')),
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+          ],
+
           // Setup & Mindset Breakdown
           Container(
             padding: AppSpacing.paddingCard,
@@ -356,6 +482,53 @@ class _TradeDetailScreenState extends State<TradeDetailScreen> {
           const SizedBox(height: AppSpacing.xl),
         ],
       ),
+    );
+  }
+
+  Widget _buildDetailChartCard({
+    required String title,
+    required String path,
+    required AppColors colors,
+    required VoidCallback onTap,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: AppTypography.caption(colors.textSecondary, isMedium: true)),
+        const SizedBox(height: AppSpacing.xs),
+        AspectRatio(
+          aspectRatio: 16 / 10,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                border: Border.all(color: colors.outline),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.file(File(path), fit: BoxFit.cover),
+                  Positioned(
+                    bottom: 6,
+                    right: 6,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.black54,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.fullscreen_rounded, size: 16, color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

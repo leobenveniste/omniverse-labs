@@ -20,8 +20,9 @@ class TradeDatabase {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _createDB,
+      onUpgrade: _upgradeDB,
     );
   }
 
@@ -44,13 +45,22 @@ class TradeDatabase {
         exit_date TEXT,
         strategy_tag TEXT,
         emotion_tag TEXT,
-        notes TEXT
+        notes TEXT,
+        entry_screenshot_path TEXT,
+        exit_screenshot_path TEXT
       )
     ''');
 
     await db.execute('CREATE INDEX idx_trades_status ON trades(status)');
     await db.execute('CREATE INDEX idx_trades_entry_date ON trades(entry_date)');
     await db.execute('CREATE INDEX idx_trades_asset_class ON trades(asset_class)');
+  }
+
+  Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('ALTER TABLE trades ADD COLUMN entry_screenshot_path TEXT');
+      await db.execute('ALTER TABLE trades ADD COLUMN exit_screenshot_path TEXT');
+    }
   }
 
   Future<int> insertTrade(TradeOperation trade) async {
@@ -81,28 +91,36 @@ class TradeDatabase {
     );
   }
 
+  Future<int> clearAll() async {
+    final db = await database;
+    return await db.delete('trades');
+  }
+
   Future<List<TradeOperation>> getAllTrades() async {
     final db = await database;
     final maps = await db.query(
       'trades',
       orderBy: 'entry_date DESC',
     );
-    return maps.map((e) => TradeOperation.fromMap(e)).toList();
+    return maps.map((m) => TradeOperation.fromMap(m)).toList();
   }
 
-  Future<int> getTradeCount() async {
+  Future<TradeOperation?> getTradeById(String id) async {
     final db = await database;
-    final result = await db.rawQuery('SELECT COUNT(*) as count FROM trades');
-    return Sqflite.firstIntValue(result) ?? 0;
-  }
-
-  Future<void> clearAll() async {
-    final db = await database;
-    await db.delete('trades');
+    final maps = await db.query(
+      'trades',
+      where: 'id = ?',
+      whereArgs: [id],
+      limit: 1,
+    );
+    if (maps.isNotEmpty) {
+      return TradeOperation.fromMap(maps.first);
+    }
+    return null;
   }
 
   Future<void> close() async {
     final db = await database;
-    db.close();
+    await db.close();
   }
 }

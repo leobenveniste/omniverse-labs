@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 
 class CategoryStyle {
   final Color primary;
@@ -222,6 +223,43 @@ class AppCategoryTheme {
         return custom;
       default:
         return dates;
+    }
+  }
+
+  static String getCategoryName(String category, AppLocalizations l10n) {
+    switch (category) {
+      case 'dates':
+        return l10n.t('deckDates');
+      case 'couples':
+        return l10n.t('deckCouples');
+      case 'spicy':
+        return l10n.t('deckSpicy');
+      case 'couples_challenges':
+        return l10n.t('deckCouplesChallenges');
+      case 'hot_takes':
+        return l10n.t('deckHotTakes');
+      case 'spicy_challenges':
+        return l10n.t('deckSpicyChallenges');
+      case 'most_likely':
+        return l10n.t('deckMostLikely');
+      case 'never_have_i':
+        return l10n.t('deckNeverHaveI');
+      case 'party':
+        return l10n.t('deckParty');
+      case 'friends':
+        return l10n.t('deckFriends');
+      case 'challenges':
+        return l10n.t('deckChallenges');
+      case 'debates':
+        return l10n.t('deckDebates');
+      case 'travel':
+        return l10n.t('deckTravel');
+      case 'family':
+        return l10n.t('deckFamily');
+      case 'custom':
+        return l10n.t('deckCustom');
+      default:
+        return category;
     }
   }
 }

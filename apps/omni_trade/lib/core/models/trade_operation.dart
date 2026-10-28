@@ -20,6 +20,8 @@ class TradeOperation {
   final String? strategyTag;
   final String? emotionTag;
   final String? notes;
+  final String? entryScreenshotPath;
+  final String? exitScreenshotPath;
 
   const TradeOperation({
     required this.id,
@@ -39,6 +41,8 @@ class TradeOperation {
     this.strategyTag,
     this.emotionTag,
     this.notes,
+    this.entryScreenshotPath,
+    this.exitScreenshotPath,
   });
 
   /// Total capital deployed / position value at entry
@@ -105,6 +109,9 @@ class TradeOperation {
   bool get isWinner => (realizedPnl ?? 0.0) > 0.0;
   bool get isLoser => (realizedPnl ?? 0.0) < 0.0;
   bool get isBreakEven => (realizedPnl ?? 0.0) == 0.0;
+  bool get hasScreenshots =>
+      (entryScreenshotPath != null && entryScreenshotPath!.isNotEmpty) ||
+      (exitScreenshotPath != null && exitScreenshotPath!.isNotEmpty);
 
   TradeOperation copyWith({
     String? id,
@@ -124,6 +131,8 @@ class TradeOperation {
     String? strategyTag,
     String? emotionTag,
     String? notes,
+    String? entryScreenshotPath,
+    String? exitScreenshotPath,
   }) {
     return TradeOperation(
       id: id ?? this.id,
@@ -143,6 +152,8 @@ class TradeOperation {
       strategyTag: strategyTag ?? this.strategyTag,
       emotionTag: emotionTag ?? this.emotionTag,
       notes: notes ?? this.notes,
+      entryScreenshotPath: entryScreenshotPath ?? this.entryScreenshotPath,
+      exitScreenshotPath: exitScreenshotPath ?? this.exitScreenshotPath,
     );
   }
 
@@ -165,6 +176,8 @@ class TradeOperation {
       'strategy_tag': strategyTag,
       'emotion_tag': emotionTag,
       'notes': notes,
+      'entry_screenshot_path': entryScreenshotPath,
+      'exit_screenshot_path': exitScreenshotPath,
     };
   }
 
@@ -192,6 +205,8 @@ class TradeOperation {
       strategyTag: map['strategy_tag'] as String?,
       emotionTag: map['emotion_tag'] as String?,
       notes: map['notes'] as String?,
+      entryScreenshotPath: map['entry_screenshot_path'] as String?,
+      exitScreenshotPath: map['exit_screenshot_path'] as String?,
     );
   }
 }

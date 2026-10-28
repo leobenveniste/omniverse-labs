@@ -86,14 +86,62 @@ class DashboardScreen extends StatelessWidget {
                   color: colors.proGold,
                 ),
               ),
+            )
+          else
+            Padding(
+              padding: const EdgeInsets.only(right: AppSpacing.md),
+              child: InkWell(
+                onTap: () {
+                  HapticsHelper.light();
+                  PaywallSheet.show(
+                    context,
+                    settingsProvider: settingsProvider,
+                    customReason: l10n.t('proBannerSubtitle'),
+                  );
+                },
+                borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [colors.proGold, const Color(0xFFE5A93C)],
+                    ),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                    boxShadow: [
+                      BoxShadow(
+                        color: colors.proGold.withValues(alpha: 0.35),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.stars_rounded, size: 14, color: Colors.black),
+                      const SizedBox(width: 4),
+                      Text(
+                        'PRO',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.black,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
         ],
       ),
       body: ListView(
         padding: AppSpacing.paddingScreen,
         children: [
-          // Bento Portfolio Overview Header
-          Container(
+          // Bento Portfolio Overview Header with Ambient P&L Glow
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
             padding: AppSpacing.paddingCard,
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -103,11 +151,17 @@ class DashboardScreen extends StatelessWidget {
               ),
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
               border: Border.all(
-                color: isPosPnl
-                    ? colors.profit.withValues(alpha: 0.3)
-                    : colors.loss.withValues(alpha: 0.3),
+                color: pnlColor.withValues(alpha: 0.35),
                 width: 1.2,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: pnlColor.withValues(alpha: 0.12),
+                  blurRadius: 16,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,8 +176,9 @@ class DashboardScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: pnlColor.withValues(alpha: 0.12),
+                        color: pnlColor.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                        border: Border.all(color: pnlColor.withValues(alpha: 0.4), width: 0.8),
                       ),
                       child: Text(
                         l10n.t('roiBadge', args: {'roi': '${isPosPnl ? '+' : ''}${returnPercent.toStringAsFixed(2)}'}),
@@ -137,7 +192,7 @@ class DashboardScreen extends StatelessWidget {
                   '$currency${numFormat.format(currentPortfolioVal)}',
                   style: AppTypography.display(colors.textPrimary),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 4),
                 Row(
                   children: [
                     Text(
@@ -166,6 +221,88 @@ class DashboardScreen extends StatelessWidget {
             title: l10n.t('equityCurveTitle'),
             currentVal: '${isPosPnl ? '+' : ''}$currency${numFormat.format(netPnl)}',
           ),
+          if (!settingsProvider.isPro) ...[
+            const SizedBox(height: AppSpacing.md),
+            Container(
+              padding: AppSpacing.paddingCard,
+              decoration: BoxDecoration(
+                color: colors.surface,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                border: Border.all(
+                  color: colors.proGold.withValues(alpha: 0.45),
+                  width: 1.2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: colors.proGold.withValues(alpha: 0.08),
+                    blurRadius: 12,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: colors.proGold.withValues(alpha: 0.15),
+                      border: Border.all(color: colors.proGold.withValues(alpha: 0.5)),
+                    ),
+                    child: Icon(Icons.workspace_premium_rounded, color: colors.proGold, size: 24),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.t('proBannerTitle'),
+                          style: AppTypography.body(colors.textPrimary, isBold: true),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          tradeProvider.totalCount >= 10
+                              ? l10n.t('proTradesLimitWarning', args: {'count': AppConstants.maxFreeTrades - tradeProvider.totalCount})
+                              : l10n.t('proBannerSubtitle'),
+                          style: AppTypography.caption(
+                            tradeProvider.totalCount >= 10 ? colors.loss : colors.textSecondary,
+                            isMedium: tradeProvider.totalCount >= 10,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: colors.proGold,
+                      foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                      ),
+                    ),
+                    onPressed: () {
+                      HapticsHelper.medium();
+                      PaywallSheet.show(
+                        context,
+                        settingsProvider: settingsProvider,
+                        customReason: l10n.t('proBannerSubtitle'),
+                      );
+                    },
+                    child: Text(
+                      l10n.t('proBannerCta'),
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: AppSpacing.md),
 
           // Bento KPI Grid (2x2)

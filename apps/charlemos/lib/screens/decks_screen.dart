@@ -6,8 +6,11 @@ import '../core/utils/haptics_helper.dart';
 import '../core/widgets/app_header_title.dart';
 import '../core/widgets/category_select_modal.dart';
 import '../core/widgets/paywall_sheet.dart';
+import '../core/widgets/share_card_modal.dart';
 import '../l10n/app_localizations.dart';
+import '../models/card_item.dart';
 import '../services/app_services.dart';
+import '../services/card_service.dart';
 import 'gameplay_screen.dart';
 import 'settings_screen.dart';
 
@@ -16,12 +19,14 @@ class _DeckMeta {
   final String titleKey;
   final String descKey;
   final bool isProOnly;
+  final String? badgeKey;
 
   const _DeckMeta({
     required this.id,
     required this.titleKey,
     required this.descKey,
     required this.isProOnly,
+    this.badgeKey,
   });
 }
 
@@ -48,8 +53,8 @@ const List<_DeckSection> _deckSections = [
     emoji: '👩‍❤️‍👨',
     decks: [
       _DeckMeta(id: 'dates', titleKey: 'deckDates', descKey: 'deckDatesDesc', isProOnly: false),
-      _DeckMeta(id: 'couples', titleKey: 'deckCouples', descKey: 'deckCouplesDesc', isProOnly: true),
-      _DeckMeta(id: 'spicy', titleKey: 'deckSpicy', descKey: 'deckSpicyDesc', isProOnly: true),
+      _DeckMeta(id: 'couples', titleKey: 'deckCouples', descKey: 'deckCouplesDesc', isProOnly: true, badgeKey: 'badgeCouplesFav'),
+      _DeckMeta(id: 'spicy', titleKey: 'deckSpicy', descKey: 'deckSpicyDesc', isProOnly: true, badgeKey: 'badgeMostPopular'),
       _DeckMeta(id: 'couples_challenges', titleKey: 'deckCouplesChallenges', descKey: 'deckCouplesChallengesDesc', isProOnly: true),
     ],
   ),
@@ -61,9 +66,9 @@ const List<_DeckSection> _deckSections = [
     emoji: '🍻',
     decks: [
       _DeckMeta(id: 'friends', titleKey: 'deckFriends', descKey: 'deckFriendsDesc', isProOnly: false),
-      _DeckMeta(id: 'hot_takes', titleKey: 'deckHotTakes', descKey: 'deckHotTakesDesc', isProOnly: true),
+      _DeckMeta(id: 'hot_takes', titleKey: 'deckHotTakes', descKey: 'deckHotTakesDesc', isProOnly: true, badgeKey: 'badgeTrending'),
       _DeckMeta(id: 'most_likely', titleKey: 'deckMostLikely', descKey: 'deckMostLikelyDesc', isProOnly: true),
-      _DeckMeta(id: 'never_have_i', titleKey: 'deckNeverHaveI', descKey: 'deckNeverHaveIDesc', isProOnly: true),
+      _DeckMeta(id: 'never_have_i', titleKey: 'deckNeverHaveI', descKey: 'deckNeverHaveIDesc', isProOnly: true, badgeKey: 'badgePartyHit'),
       _DeckMeta(id: 'party', titleKey: 'deckParty', descKey: 'deckPartyDesc', isProOnly: true),
       _DeckMeta(id: 'debates', titleKey: 'deckDebates', descKey: 'deckDebatesDesc', isProOnly: false),
       _DeckMeta(id: 'challenges', titleKey: 'deckChallenges', descKey: 'deckChallengesDesc', isProOnly: true),
@@ -96,13 +101,6 @@ class DecksScreen extends StatelessWidget {
     required bool isProOnly,
     required bool isPro,
   }) {
-    final l10n = AppLocalizations.of(context);
-    if (isProOnly && !isPro) {
-      HapticsHelper.warning();
-      PaywallSheet.show(context, customReason: l10n.t('proLockedDeck'));
-      return;
-    }
-
     HapticsHelper.selection();
     final cardService = AppServices.of(context).cardService;
     cardService.setCategoryFilter(categoryId);
@@ -111,6 +109,7 @@ class DecksScreen extends StatelessWidget {
       MaterialPageRoute(
         builder: (_) => GamePlayScreen(
           singleDeckTitle: title,
+          isLockedPreview: isProOnly && !isPro,
         ),
       ),
     );
@@ -181,6 +180,7 @@ class DecksScreen extends StatelessWidget {
       builder: (context, _) {
         final isPro = premiumService.isPro;
         final totalCards = cardService.totalCardsCount;
+        final dailyCard = _getDailyCard(cardService, isPro);
 
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
@@ -236,7 +236,13 @@ class DecksScreen extends StatelessWidget {
             children: [
               // Ambient Fast Presets Row
               _buildPresetsRow(context, isPro, l10n, theme),
-              const SizedBox(height: AppSpacing.md),
+              const SizedBox(height: AppSpacing.sm),
+
+              // Daily Question Hero Card
+              if (dailyCard != null) ...[
+                _buildDailyQuestionCard(context, dailyCard, l10n, theme),
+                const SizedBox(height: AppSpacing.sm),
+              ],
 
               // Total available counter bar
               Padding(
@@ -326,6 +332,7 @@ class DecksScreen extends StatelessWidget {
                           description: desc,
                           count: count,
                           isLocked: isLocked,
+                          badgeText: deck.badgeKey != null ? l10n.t(deck.badgeKey!) : null,
                           onTap: () => _openDeck(
                             context,
                             categoryId: deck.id,
@@ -511,9 +518,11 @@ class DecksScreen extends StatelessWidget {
     required String description,
     required int count,
     required bool isLocked,
+    String? badgeText,
     required VoidCallback onTap,
   }) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final catStyle = AppCategoryTheme.of(categoryId);
 
@@ -548,14 +557,16 @@ class DecksScreen extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // Ambient decorative watermark of the category icon (noticeable brand art)
+          // Ambient decorative watermark of the category icon (subtle, editorial craft)
           Positioned(
-            right: -12,
-            top: -12,
-            child: Icon(
-              catStyle.icon,
-              size: 130,
-              color: catStyle.primary.withValues(alpha: isDark ? 0.18 : 0.12),
+            right: -8,
+            top: -8,
+            child: IgnorePointer(
+              child: Icon(
+                catStyle.icon,
+                size: 96,
+                color: catStyle.primary.withValues(alpha: isDark ? 0.10 : 0.07),
+              ),
             ),
           ),
 
@@ -586,6 +597,29 @@ class DecksScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          if (badgeText != null) ...[
+                            Container(
+                              margin: const EdgeInsets.only(bottom: 5),
+                              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFC85A3B).withValues(alpha: 0.14),
+                                borderRadius: BorderRadius.circular(5),
+                                border: Border.all(
+                                  color: const Color(0xFFC85A3B).withValues(alpha: 0.45),
+                                  width: 0.8,
+                                ),
+                              ),
+                              child: Text(
+                                badgeText,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFFC85A3B),
+                                  letterSpacing: 0.4,
+                                ),
+                              ),
+                            ),
+                          ],
                           Row(
                             children: [
                               Expanded(
@@ -673,6 +707,39 @@ class DecksScreen extends StatelessWidget {
                                   ],
                                 ),
                               ),
+                              if (isLocked) ...[
+                                const SizedBox(width: AppSpacing.xs),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFE5BA5A).withValues(alpha: 0.18),
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(
+                                      color: const Color(0xFFE5BA5A).withValues(alpha: 0.6),
+                                      width: 1.0,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(
+                                        Icons.play_circle_outline_rounded,
+                                        size: 13,
+                                        color: Color(0xFFC85A3B),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        l10n.t('freePreviewBadge'),
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w800,
+                                          color: Color(0xFFC85A3B),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ],
@@ -680,14 +747,165 @@ class DecksScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: AppSpacing.xs),
                     Icon(
-                      isLocked ? Icons.lock_outline_rounded : Icons.chevron_right_rounded,
-                      color: isLocked ? const Color(0xFFD4AF37) : theme.colorScheme.onSurface.withValues(alpha: 0.35),
-                      size: 22,
+                      isLocked ? Icons.play_arrow_rounded : Icons.chevron_right_rounded,
+                      color: isLocked ? const Color(0xFFC85A3B) : theme.colorScheme.onSurface.withValues(alpha: 0.35),
+                      size: 24,
                     ),
                   ],
                 ),
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  CardItem? _getDailyCard(CardService cardService, bool isPro) {
+    final candidateCards = isPro
+        ? cardService.allCards
+        : cardService.allCards.where((c) => const {'dates', 'friends', 'debates', 'family'}.contains(c.category)).toList();
+    if (candidateCards.isEmpty) return null;
+    final now = DateTime.now();
+    final dayHash = (now.year * 10000 + now.month * 100 + now.day).abs();
+    return candidateCards[dayHash % candidateCards.length];
+  }
+
+  Widget _buildDailyQuestionCard(
+    BuildContext context,
+    CardItem dailyCard,
+    AppLocalizations l10n,
+    ThemeData theme,
+  ) {
+    final isDark = theme.brightness == Brightness.dark;
+    final catStyle = AppCategoryTheme.of(dailyCard.category);
+    final cardText = dailyCard.getText(l10n.locale.languageCode);
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFFC85A3B).withValues(alpha: isDark ? 0.22 : 0.12),
+            theme.colorScheme.surface,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        border: Border.all(
+          color: const Color(0xFFC85A3B).withValues(alpha: 0.35),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFC85A3B).withValues(alpha: isDark ? 0.16 : 0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFC85A3B).withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('☀️', style: TextStyle(fontSize: 13)),
+                    const SizedBox(width: 4),
+                    Text(
+                      l10n.t('dailyQuestionTitle').toUpperCase(),
+                      style: const TextStyle(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFFC85A3B),
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                decoration: BoxDecoration(
+                  color: catStyle.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Text(
+                  AppCategoryTheme.getCategoryName(dailyCard.category, l10n),
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: catStyle.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            '«$cardText»',
+            style: AppTypography.title(theme.colorScheme.onSurface).copyWith(
+              fontSize: 15.5,
+              fontWeight: FontWeight.w700,
+              height: 1.35,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    HapticsHelper.selection();
+                    final cardService = AppServices.of(context).cardService;
+                    cardService.setCategoryFilter(dailyCard.category);
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => GamePlayScreen(
+                          singleDeckTitle: l10n.t('dailyQuestionTitle'),
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.chat_bubble_outline_rounded, size: 16),
+                  label: Text(
+                    l10n.t('dailyQuestionAction'),
+                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFC85A3B),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.xs),
+              IconButton(
+                icon: const Icon(Icons.share_rounded, size: 20),
+                tooltip: l10n.t('shareCard'),
+                onPressed: () {
+                  HapticsHelper.light();
+                  ShareCardModal.show(
+                    context,
+                    card: dailyCard,
+                    cardText: cardText,
+                  );
+                },
+              ),
+            ],
           ),
         ],
       ),

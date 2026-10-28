@@ -8,12 +8,21 @@ class PreferencesService extends ChangeNotifier {
   static const String _keyLanguage = 'charlemos_pref_language';
   static const String _keyDevMode = 'charlemos_pref_dev_mode_unlocked';
 
+  static const String _keyCardsDrawnCount = 'charlemos_cards_drawn_count';
+  static const String _keyHasRatedApp = 'charlemos_has_rated_app';
+  static const String _keyNextRatingPromptCount = 'charlemos_next_rating_prompt_count';
+
   final SharedPreferences _prefs;
 
   AppThemePreset _themePreset = AppThemePreset.coralMist;
   ThemeMode _themeMode = ThemeMode.system;
   String? _languageCode;
   bool _devMode = false;
+  static const String _keyHasSeenGuide = 'charlemos_has_seen_guide';
+  bool _hasSeenGuide = false;
+  int _cardsDrawnCount = 0;
+  bool _hasRatedApp = false;
+  int _nextRatingPromptCount = 15;
 
   PreferencesService(this._prefs) {
     _load();
@@ -25,14 +34,31 @@ class PreferencesService extends ChangeNotifier {
   bool get isAutoLanguage => _languageCode == null || _languageCode == 'auto';
   Locale? get locale => isAutoLanguage ? null : Locale(_languageCode!);
   bool get isDevMode => _devMode;
-  static const String _keyHasSeenGuide = 'charlemos_has_seen_guide';
-  bool _hasSeenGuide = false;
-
   bool get hasSeenGuide => _hasSeenGuide;
+  int get cardsDrawnCount => _cardsDrawnCount;
+  bool get hasRatedApp => _hasRatedApp;
+  bool get shouldShowRatingPrompt => !_hasRatedApp && _cardsDrawnCount >= _nextRatingPromptCount;
 
   Future<void> setHasSeenGuide(bool value) async {
     _hasSeenGuide = value;
     await _prefs.setBool(_keyHasSeenGuide, value);
+    notifyListeners();
+  }
+
+  Future<void> incrementCardsDrawn() async {
+    _cardsDrawnCount++;
+    await _prefs.setInt(_keyCardsDrawnCount, _cardsDrawnCount);
+  }
+
+  Future<void> markRatedApp() async {
+    _hasRatedApp = true;
+    await _prefs.setBool(_keyHasRatedApp, true);
+    notifyListeners();
+  }
+
+  Future<void> postponeRatingPrompt() async {
+    _nextRatingPromptCount = _cardsDrawnCount + 30;
+    await _prefs.setInt(_keyNextRatingPromptCount, _nextRatingPromptCount);
     notifyListeners();
   }
 
@@ -50,6 +76,9 @@ class PreferencesService extends ChangeNotifier {
     _languageCode = _prefs.getString(_keyLanguage);
     _devMode = _prefs.getBool(_keyDevMode) ?? false;
     _hasSeenGuide = _prefs.getBool(_keyHasSeenGuide) ?? false;
+    _cardsDrawnCount = _prefs.getInt(_keyCardsDrawnCount) ?? 0;
+    _hasRatedApp = _prefs.getBool(_keyHasRatedApp) ?? false;
+    _nextRatingPromptCount = _prefs.getInt(_keyNextRatingPromptCount) ?? 15;
   }
 
   Future<void> setThemePreset(AppThemePreset preset) async {

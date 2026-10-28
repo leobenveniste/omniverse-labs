@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:share_plus/share_plus.dart';
 import '../core/theme/app_category_theme.dart';
 import '../core/theme/app_spacing.dart';
 import '../core/theme/app_typography.dart';
@@ -9,6 +8,8 @@ import '../core/widgets/app_header_title.dart';
 import '../core/widgets/category_select_modal.dart';
 import '../core/widgets/first_use_guide_card.dart';
 import '../core/widgets/paywall_sheet.dart';
+import '../core/widgets/rating_dialog.dart';
+import '../core/widgets/share_card_modal.dart';
 import '../l10n/app_localizations.dart';
 import '../models/card_item.dart';
 import '../services/app_services.dart';
@@ -17,10 +18,12 @@ import 'settings_screen.dart';
 
 class GamePlayScreen extends StatefulWidget {
   final String? singleDeckTitle;
+  final bool isLockedPreview;
 
   const GamePlayScreen({
     super.key,
     this.singleDeckTitle,
+    this.isLockedPreview = false,
   });
 
   @override
@@ -46,6 +49,8 @@ class _GamePlayScreenState extends State<GamePlayScreen>
 
   bool _isAnimating = false;
   bool _showGuide = false;
+  int _previewCardIndex = 1;
+  static const int _maxPreviewCards = 3;
 
   @override
   void initState() {
@@ -146,8 +151,22 @@ class _GamePlayScreenState extends State<GamePlayScreen>
     super.dispose();
   }
 
-  void _onNextCard(CardService cardService) {
+  void _onNextCard(CardService cardService, bool isPro) {
     if (_isAnimating) return;
+    if (widget.isLockedPreview && !isPro) {
+      if (_previewCardIndex >= _maxPreviewCards) {
+        setState(() {
+          _previewCardIndex = _maxPreviewCards + 1;
+        });
+        HapticsHelper.medium();
+        PaywallSheet.show(context);
+        return;
+      }
+      setState(() {
+        _previewCardIndex++;
+      });
+    }
+
     _isAnimating = true;
     HapticsHelper.selection();
 
@@ -164,13 +183,24 @@ class _GamePlayScreenState extends State<GamePlayScreen>
           setState(() {
             _isAnimating = false;
           });
+          final prefs = AppServices.of(context).preferencesService;
+          prefs.incrementCardsDrawn();
+          if (prefs.shouldShowRatingPrompt) {
+            RatingDialog.show(context);
+          }
         }
       });
     });
   }
 
-  void _onPreviousCard(CardService cardService) {
-    if (_isAnimating || !cardService.canGoPrevious) return;
+  void _onPreviousCard(CardService cardService, bool isPro) {
+    if (_isAnimating) return;
+    if (widget.isLockedPreview && !isPro && _previewCardIndex > 1) {
+      setState(() {
+        _previewCardIndex--;
+      });
+    }
+    if (!cardService.canGoPrevious) return;
     _isAnimating = true;
     HapticsHelper.selection();
 
@@ -318,6 +348,7 @@ class _GamePlayScreenState extends State<GamePlayScreen>
       builder: (context, _) {
         final currentCard = cardService.currentCard;
         final isPro = premiumService.isPro;
+        final isDark = theme.brightness == Brightness.dark;
 
         return Scaffold(
           appBar: AppBar(
@@ -380,6 +411,10 @@ class _GamePlayScreenState extends State<GamePlayScreen>
                     onDismiss: _dismissGuide,
                   ),
 
+                // Free preview counter banner
+                if (widget.isLockedPreview && !isPro && _previewCardIndex <= _maxPreviewCards)
+                  _buildPreviewCounterBanner(context, l10n, theme),
+
                 // Main Interactive Card View Area (Active decks and remaining counter row removed as requested)
                 Expanded(
                   child: Padding(
@@ -387,159 +422,230 @@ class _GamePlayScreenState extends State<GamePlayScreen>
                       horizontal: AppSpacing.md,
                       vertical: AppSpacing.sm,
                     ),
-                    child: currentCard == null
-                        ? _buildEmptyState(context, cardService, l10n)
-                        : GestureDetector(
-                            onTap: () => _onNextCard(cardService),
-                            onHorizontalDragEnd: (details) {
-                              if (details.primaryVelocity != null) {
-                                if (details.primaryVelocity! < -150) {
-                                  // Swiped Left -> Next Card
-                                  _onNextCard(cardService);
-                                } else if (details.primaryVelocity! > 150) {
-                                  // Swiped Right -> Previous Card
-                                  if (cardService.canGoPrevious) {
-                                    _onPreviousCard(cardService);
-                                  }
-                                }
-                              }
-                            },
-                            child: AnimatedBuilder(
-                              animation: Listenable.merge([
-                                _slideController,
-                                _reverseSlideController,
-                                _enterController,
-                              ]),
-                              builder: (context, child) {
-                                if (_slideController.isAnimating) {
-                                  // Exit animation (Next): Fly away to left with rotation and fade
-                                  return SlideTransition(
-                                    position: _exitSlideAnimation,
-                                    child: Transform.rotate(
-                                      angle: _exitRotationAnimation.value,
-                                      child: FadeTransition(
-                                        opacity: _exitFadeAnimation,
-                                        child: child,
+                    child: (widget.isLockedPreview && !isPro && _previewCardIndex > _maxPreviewCards)
+                        ? _buildPreviewFinishedCard(context, l10n)
+                        : (currentCard == null
+                            ? _buildEmptyState(context, cardService, l10n)
+                            : Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  // Underneath physical deck layer 2 (deepest card)
+                                  Positioned.fill(
+                                    top: 10,
+                                    bottom: 0,
+                                    left: 8,
+                                    right: 8,
+                                    child: IgnorePointer(
+                                      child: Transform.rotate(
+                                        angle: 0.012, // ~0.7 deg organic tilt
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: theme.colorScheme.surface.withValues(alpha: isDark ? 0.35 : 0.55),
+                                            borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+                                            border: Border.all(
+                                              color: theme.colorScheme.outline.withValues(alpha: isDark ? 0.20 : 0.14),
+                                              width: 1.0,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withValues(alpha: isDark ? 0.30 : 0.05),
+                                                blurRadius: 10,
+                                                offset: const Offset(0, 5),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  );
-                                } else if (_reverseSlideController.isAnimating) {
-                                  // Reverse Exit animation (Back): Fly away to right with rotation and fade
-                                  return SlideTransition(
-                                    position: _reverseExitSlideAnimation,
-                                    child: Transform.rotate(
-                                      angle: _reverseExitRotationAnimation.value,
-                                      child: FadeTransition(
-                                        opacity: _reverseExitFadeAnimation,
-                                        child: child,
+                                  ),
+                                  // Underneath physical deck layer 1 (middle card)
+                                  Positioned.fill(
+                                    top: 5,
+                                    bottom: 0,
+                                    left: 4,
+                                    right: 4,
+                                    child: IgnorePointer(
+                                      child: Transform.rotate(
+                                        angle: -0.008, // ~ -0.45 deg organic tilt
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: theme.colorScheme.surface.withValues(alpha: isDark ? 0.65 : 0.85),
+                                            borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+                                            border: Border.all(
+                                              color: theme.colorScheme.outline.withValues(alpha: isDark ? 0.28 : 0.20),
+                                              width: 1.0,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withValues(alpha: isDark ? 0.35 : 0.08),
+                                                blurRadius: 14,
+                                                offset: const Offset(0, 4),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  );
-                                } else {
-                                  // Enter animation: Scale, subtle slide, and fade in
-                                  return SlideTransition(
-                                    position: _enterSlideAnimation,
-                                    child: Transform.scale(
-                                      scale: _enterScaleAnimation.value,
-                                      child: FadeTransition(
-                                        opacity: _enterFadeAnimation,
-                                        child: child,
+                                  ),
+                                  // Foreground interactive active card
+                                  GestureDetector(
+                                    onTap: () => _onNextCard(cardService, isPro),
+                                    onHorizontalDragEnd: (details) {
+                                      if (details.primaryVelocity != null) {
+                                        if (details.primaryVelocity! < -150) {
+                                          // Swiped Left -> Next Card
+                                          _onNextCard(cardService, isPro);
+                                        } else if (details.primaryVelocity! > 150) {
+                                          // Swiped Right -> Previous Card
+                                          if (cardService.canGoPrevious) {
+                                            _onPreviousCard(cardService, isPro);
+                                          }
+                                        }
+                                      }
+                                    },
+                                    child: AnimatedBuilder(
+                                      animation: Listenable.merge([
+                                        _slideController,
+                                        _reverseSlideController,
+                                        _enterController,
+                                      ]),
+                                      builder: (context, child) {
+                                        if (_slideController.isAnimating) {
+                                          // Exit animation (Next): Fly away to left with rotation and fade
+                                          return SlideTransition(
+                                            position: _exitSlideAnimation,
+                                            child: Transform.rotate(
+                                              angle: _exitRotationAnimation.value,
+                                              child: FadeTransition(
+                                                opacity: _exitFadeAnimation,
+                                                child: child,
+                                              ),
+                                            ),
+                                          );
+                                        } else if (_reverseSlideController.isAnimating) {
+                                          // Reverse Exit animation (Back): Fly away to right with rotation and fade
+                                          return SlideTransition(
+                                            position: _reverseExitSlideAnimation,
+                                            child: Transform.rotate(
+                                              angle: _reverseExitRotationAnimation.value,
+                                              child: FadeTransition(
+                                                opacity: _reverseExitFadeAnimation,
+                                                child: child,
+                                              ),
+                                            ),
+                                          );
+                                        } else {
+                                          // Enter animation: Scale, subtle slide, and fade in
+                                          return SlideTransition(
+                                            position: _enterSlideAnimation,
+                                            child: Transform.scale(
+                                              scale: _enterScaleAnimation.value,
+                                              child: FadeTransition(
+                                                opacity: _enterFadeAnimation,
+                                                child: child,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      child: _buildCardView(
+                                        context: context,
+                                        card: currentCard,
+                                        cardService: cardService,
+                                        l10n: l10n,
                                       ),
                                     ),
-                                  );
-                                }
-                              },
-                              child: _buildCardView(
-                                context: context,
-                                card: currentCard,
-                                cardService: cardService,
-                                l10n: l10n,
-                              ),
-                            ),
-                          ),
+                                  ),
+                                ],
+                              )),
                   ),
                 ),
 
-                // Bottom Action Bar: Hint text + Buttons row
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: AppSpacing.lg,
-                    right: AppSpacing.lg,
-                    bottom: AppSpacing.lg,
-                    top: AppSpacing.xs,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Subtitle hint — its own line above buttons
-                      Text(
-                        l10n.t('tapOrSwipeNext'),
-                        textAlign: TextAlign.center,
-                        style: AppTypography.caption(
-                          theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                // Bottom Action Bar: Hint text + Buttons row (hidden when preview finished card is shown)
+                if (!(widget.isLockedPreview && !isPro && _previewCardIndex > _maxPreviewCards))
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: AppSpacing.lg,
+                      right: AppSpacing.lg,
+                      bottom: AppSpacing.lg,
+                      top: AppSpacing.xs,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Subtitle hint — its own line above buttons
+                        Text(
+                          l10n.t('tapOrSwipeNext'),
+                          textAlign: TextAlign.center,
+                          style: AppTypography.caption(
+                            theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
+                        const SizedBox(height: AppSpacing.sm),
 
-                      // Buttons row
-                      Row(
-                        children: [
-                          // "Anterior" Button (Undo / Previous Question)
-                          Tooltip(
-                            message: l10n.t('previousCard'),
-                            child: OutlinedButton(
-                              onPressed: cardService.canGoPrevious && !_isAnimating
-                                  ? () => _onPreviousCard(cardService)
-                                  : null,
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: theme.colorScheme.primary,
-                                disabledForegroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.25),
-                                side: BorderSide(
-                                  color: cardService.canGoPrevious
-                                      ? theme.colorScheme.primary.withValues(alpha: 0.5)
-                                      : theme.colorScheme.outline.withValues(alpha: 0.2),
-                                  width: 1.2,
+                        // Buttons row
+                        Row(
+                          children: [
+                            // "Anterior" Button (Undo / Previous Question)
+                            Tooltip(
+                              message: l10n.t('previousCard'),
+                              child: OutlinedButton(
+                                onPressed: cardService.canGoPrevious && !_isAnimating
+                                    ? () => _onPreviousCard(cardService, isPro)
+                                    : null,
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: theme.colorScheme.onSurface,
+                                  backgroundColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                                  disabledForegroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.25),
+                                  disabledBackgroundColor: Colors.transparent,
+                                  side: BorderSide(
+                                    color: cardService.canGoPrevious
+                                        ? theme.colorScheme.outline.withValues(alpha: 0.35)
+                                        : theme.colorScheme.outline.withValues(alpha: 0.15),
+                                    width: 1.0,
+                                  ),
+                                  minimumSize: const Size(0, 48),
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
                                 ),
-                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.undo_rounded, size: 18),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      l10n.t('previousCard'),
+                                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const Spacer(),
+
+                            // "Cambiar mazos" Button
+                            ElevatedButton.icon(
+                              onPressed: _openCategorySelector,
+                              icon: const Icon(Icons.tune_rounded, size: 19),
+                              label: Text(
+                                l10n.t('changeCategories'),
+                                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: theme.colorScheme.primary,
+                                foregroundColor: theme.colorScheme.onPrimary,
+                                minimumSize: const Size(0, 48),
+                                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                                elevation: 2,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(24),
                                 ),
                               ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.undo_rounded, size: 18),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    l10n.t('previousCard'),
-                                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
-                                  ),
-                                ],
-                              ),
                             ),
-                          ),
-                          const Spacer(),
-
-                          // "Cambiar mazos" Button
-                          ElevatedButton.icon(
-                            onPressed: _openCategorySelector,
-                            icon: const Icon(Icons.tune_rounded, size: 20),
-                            label: Text(
-                              l10n.t('changeCategories'),
-                              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: theme.colorScheme.primary,
-                              foregroundColor: theme.colorScheme.onPrimary,
-                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                              elevation: 3,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
                     ],
                   ),
                 ),
@@ -778,8 +884,10 @@ class _GamePlayScreenState extends State<GamePlayScreen>
                             constraints: const BoxConstraints(minWidth: 38, minHeight: 38),
                             onPressed: () {
                               HapticsHelper.light();
-                              Share.share(
-                                l10n.t('shareText', args: {'text': cardText}),
+                              ShareCardModal.show(
+                                context,
+                                card: card,
+                                cardText: cardText,
                               );
                             },
                           ),
@@ -830,6 +938,155 @@ class _GamePlayScreenState extends State<GamePlayScreen>
             label: Text(l10n.t('resetDeck')),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPreviewCounterBanner(
+    BuildContext context,
+    AppLocalizations l10n,
+    ThemeData theme,
+  ) {
+    return Container(
+      margin: const EdgeInsets.only(top: AppSpacing.xs, bottom: AppSpacing.xxs),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xFFC85A3B).withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFFC85A3B).withValues(alpha: 0.35),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.stars_rounded, size: 16, color: Color(0xFFC85A3B)),
+          const SizedBox(width: 6),
+          Text(
+            l10n.t('freePreviewCounter', args: {
+              'current': '$_previewCardIndex',
+              'total': '$_maxPreviewCards',
+            }),
+            style: const TextStyle(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFFC85A3B),
+              letterSpacing: 0.3,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPreviewFinishedCard(BuildContext context, AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Center(
+      child: SingleChildScrollView(
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+            border: Border.all(
+              color: const Color(0xFFC85A3B).withValues(alpha: 0.35),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFC85A3B).withValues(alpha: isDark ? 0.25 : 0.12),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFE5BA5A),
+                      Color(0xFFC85A3B),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFC85A3B).withValues(alpha: 0.35),
+                      blurRadius: 18,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.auto_awesome_rounded,
+                  size: 38,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Text(
+                l10n.t('previewFinishedTitle'),
+                textAlign: TextAlign.center,
+                style: AppTypography.title(theme.colorScheme.onSurface).copyWith(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                l10n.t('previewFinishedDesc'),
+                textAlign: TextAlign.center,
+                style: AppTypography.body(theme.colorScheme.onSurface.withValues(alpha: 0.75)),
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    HapticsHelper.medium();
+                    PaywallSheet.show(context);
+                  },
+                  icon: const Icon(Icons.workspace_premium_rounded, size: 22),
+                  label: Text(
+                    l10n.t('unlockDeckCta'),
+                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFC85A3B),
+                    foregroundColor: Colors.white,
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              TextButton(
+                onPressed: () {
+                  HapticsHelper.light();
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  l10n.t('chooseOtherDeck'),
+                  style: AppTypography.body(theme.colorScheme.primary, isMedium: true),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

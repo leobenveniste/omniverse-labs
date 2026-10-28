@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../l10n/app_localizations.dart';
 
 class MiniEquityChart extends StatelessWidget {
   final List<FlSpot> spots;
@@ -21,6 +22,7 @@ class MiniEquityChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final l10n = AppLocalizations.of(context);
     final chartColor = isPositive ? colors.profit : colors.loss;
 
     return Container(
@@ -60,7 +62,7 @@ class MiniEquityChart extends StatelessWidget {
             child: spots.isEmpty
                 ? Center(
                     child: Text(
-                      'Sin datos suficientes',
+                      l10n.t('notEnoughData'),
                       style: AppTypography.caption(colors.textTertiary),
                     ),
                   )

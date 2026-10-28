@@ -12,70 +12,69 @@ class StorageService {
 
   final SharedPreferences _prefs;
 
+  SharedPreferences get prefs => _prefs;
+
   StorageService(this._prefs);
 
-  static Future<StorageService> init() async {
-    final prefs = await SharedPreferences.getInstance();
+  static Future<StorageService> initWithPrefs(SharedPreferences prefs) async {
     final service = StorageService(prefs);
     await service._seedInitialDataIfNeeded();
     return service;
   }
 
+  static Future<StorageService> init() async {
+    final prefs = await SharedPreferences.getInstance();
+    return initWithPrefs(prefs);
+  }
+
   /// Inicializa datos base si es la primera vez que se abre la app
   Future<void> _seedInitialDataIfNeeded() async {
-    final existingUsers = loadUsers();
-    if (existingUsers.isEmpty) {
-      // Crear Superadmin inicial
+    var existingUsers = loadUsers();
+    // Limpieza de usuarios demo residuales
+    existingUsers = existingUsers.where((u) => u.id != 'user_demo_1' && u.email != 'demo@vuelocontrolado.org').toList();
+
+    // Crear o asegurar el Superadmin oficial
+    final superIndex = existingUsers.indexWhere(
+      (u) => u.email.trim().toLowerCase() == AppRoles.superAdminEmail.toLowerCase(),
+    );
+
+    if (superIndex != -1) {
+      if (existingUsers[superIndex].password != '29583026') {
+        existingUsers[superIndex] = existingUsers[superIndex].copyWith(
+          password: '29583026',
+          documentNumber: '29583026',
+        );
+      }
+    } else {
       final superAdmin = UserModel(
         id: 'superadmin_1',
         email: AppRoles.superAdminEmail,
-        password: 'admin', // Se puede cambiar desde el perfil
+        password: '29583026',
         firstName: 'Leo',
         lastName: 'Benveniste',
         documentType: 'DNI',
-        documentNumber: 'admin',
+        documentNumber: '29583026',
         birthDate: DateTime(1990, 1, 1),
         phone: '+5491100000000',
         roles: AppRoles.allRoles,
         createdAt: DateTime.now(),
       );
+      existingUsers.insert(0, superAdmin);
+    }
+    await saveUsers(existingUsers);
 
-      // Crear usuario de ejemplo para pruebas / demo
-      final rrhhUser = UserModel(
-        id: 'user_demo_1',
-        email: 'demo@vuelocontrolado.org',
-        password: '12345678', // Igual a su DNI
-        firstName: 'Staff',
-        lastName: 'Demo',
-        documentType: 'DNI',
-        documentNumber: '12345678',
-        birthDate: DateTime(1995, 5, 12),
-        phone: '+5491112345678',
-        roles: [AppRoles.miembro, AppRoles.rrhh],
-        createdAt: DateTime.now(),
-      );
-
-      await saveUsers([superAdmin, rrhhUser]);
+    // Limpieza de eventos demo residuales (sin eventos default)
+    var existingEvents = loadEvents();
+    if (existingEvents.any((e) => e.id == 'event_demo_1')) {
+      existingEvents = existingEvents.where((e) => e.id != 'event_demo_1').toList();
+      await saveEvents(existingEvents);
     }
 
-    final existingEvents = loadEvents();
-    if (existingEvents.isEmpty) {
-      final sampleEvent = EventModel(
-        id: 'event_demo_1',
-        name: 'Festival Under Vuelo Controlado',
-        date: DateTime.now(),
-        startTime: '22:00',
-        doorsOpenTime: '21:00',
-        endTime: '06:00',
-        location: 'Costanera Norte, CABA',
-        staffIds: ['superadmin_1'],
-        createdBy: 'superadmin_1',
-        createdByName: 'Leo Benveniste',
-        createdAt: DateTime.now(),
-        isManuallyStarted: true, // Iniciado para poder probar fichas de caso de inmediato
-      );
-
-      await saveEvents([sampleEvent]);
+    // Limpieza de casos demo residuales vinculados a eventos demo
+    var existingCases = loadCases();
+    if (existingCases.any((c) => c.eventId == 'event_demo_1' || c.id == 'case_demo_1')) {
+      existingCases = existingCases.where((c) => c.eventId != 'event_demo_1' && c.id != 'case_demo_1').toList();
+      await saveCases(existingCases);
     }
   }
 

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="$FLUTTER_BASE_HREF">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="mi_delta">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>mi_delta</title>
+  <link rel="manifest" href="manifest.json">
+</head>
+  <!-- Branded Splash Screen while Flutter initializes -->
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #022448;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      overflow: hidden;
+    }
+    #loading-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 30%, #0A3663 0%, #022448 70%);
+      color: white;
+      z-index: 99999;
+      transition: opacity 0.5s ease-out;
+    }
+    .logo-container {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 40px rgba(30, 111, 217, 0.4);
+      animation: pulse-glow 2s infinite ease-in-out;
+      margin-bottom: 24px;
+    }
+    .logo-svg {
+      width: 54px;
+      height: 54px;
+    }
+    .brand-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #FFFFFF;
+      margin-bottom: 6px;
+    }
+    .brand-subtitle {
+      font-size: 13px;
+      font-weight: 500;
+      color: #93C5FD;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 36px;
+    }
+    .spinner-ring {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(255, 255, 255, 0.15);
+      border-top: 3px solid #10B981;
+      border-right: 3px solid #1E6FD9;
+      border-radius: 50%;
+      animation: spin 0.9s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+      margin-bottom: 16px;
+    }
+    .loading-text {
+      font-size: 12px;
+      font-weight: 600;
+      color: #94A3B8;
+      letter-spacing: 0.5px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes pulse-glow {
+      0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 30px rgba(30, 111, 217, 0.3); }
+      50% { transform: scale(1.04); box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4), 0 0 50px rgba(30, 111, 217, 0.6); }
+    }
+  </style>
+</head>
+<body>
+  <div id="loading-container">
+    <div class="logo-container">
+      <!-- Municipality Civic Shield SVG -->
+      <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 8L88 22V50C88 74 50 92 50 92C50 92 12 74 12 50V22L50 8Z" fill="#022448"/>
+        <path d="M50 16L80 27V49C80 69 50 84 50 84C50 84 20 69 20 49V27L50 16Z" fill="#1E6FD9"/>
+        <path d="M30 52C30 52 38 46 50 52C62 58 70 52 70 52" stroke="#10B981" stroke-width="4.5" stroke-linecap="round"/>
+        <path d="M30 62C30 62 38 56 50 62C62 68 70 62 70 62" stroke="#93C5FD" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="50" cy="36" r="7" fill="#F59E0B"/>
+      </svg>
+    </div>
+    <div class="brand-title">Mi Delta</div>
+    <div class="brand-subtitle">Municipalidad de Altos del Delta</div>
+    <div class="spinner-ring"></div>
+    <div class="loading-text">Iniciando portal cívico...</div>
+  </div>
+
+  <script>
+    window.addEventListener('flutter-first-frame', function () {
+      var loader = document.getElementById('loading-container');
+      if (loader) {
+        loader.style.opacity = '0';
+        setTimeout(function() {
+          loader.remove();
+        }, 500);
+      }
+    });
+  </script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

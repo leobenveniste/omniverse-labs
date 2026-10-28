@@ -25,8 +25,13 @@ class SubscriptionService {
     }
   }
 
-  bool get isPro => _purchasedPro || (kDebugMode && _testProOverride);
-  bool get isTestProOverride => kDebugMode && _testProOverride;
+  bool get isPro {
+    if (_purchasedPro) return true;
+    final isDev = _prefs.getBool(AppConstants.keyDevMode) ?? false;
+    return (kDebugMode || isDev) && _testProOverride;
+  }
+
+  bool get isTestProOverride => _testProOverride;
   bool get isPurchasedPro => _purchasedPro;
 
   bool canLogTrade(int currentTotalTrades) {

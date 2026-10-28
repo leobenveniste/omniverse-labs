@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -6,8 +7,8 @@ import 'core/constants/app_constants.dart';
 import 'core/security/security_service.dart';
 import 'core/subscription/subscription_service.dart';
 import 'core/theme/app_theme.dart';
-import 'features/navigation/screens/main_shell_screen.dart';
 import 'features/security/screens/lock_screen.dart';
+import 'features/splash/screens/splash_screen.dart';
 import 'l10n/app_localizations.dart';
 import 'providers/security_provider.dart';
 import 'providers/settings_provider.dart';
@@ -15,6 +16,16 @@ import 'providers/trade_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Edge-to-Edge System Bar Configuration
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+    ),
+  );
 
   final prefs = await SharedPreferences.getInstance();
 
@@ -108,6 +119,34 @@ class _OmniTradeAppState extends State<OmniTradeApp> with WidgetsBindingObserver
       themeMode: settings.themeMode,
       locale: settings.locale,
       supportedLocales: AppLocalizations.supportedLocales,
+      localeListResolutionCallback: (locales, supportedLocales) {
+        // If user explicitly picked a language in Settings, use it
+        if (settings.locale != null) return settings.locale;
+
+        // Check user locales from device list
+        if (locales != null && locales.isNotEmpty) {
+          for (final userLocale in locales) {
+            for (final supported in supportedLocales) {
+              if (supported.languageCode.toLowerCase() == userLocale.languageCode.toLowerCase()) {
+                return supported;
+              }
+            }
+          }
+        }
+
+        // Secondary check via platform dispatcher
+        final platformLocales = WidgetsBinding.instance.platformDispatcher.locales;
+        for (final platformLocale in platformLocales) {
+          for (final supported in supportedLocales) {
+            if (supported.languageCode.toLowerCase() == platformLocale.languageCode.toLowerCase()) {
+              return supported;
+            }
+          }
+        }
+
+        // Global default fallback
+        return const Locale('en');
+      },
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -121,7 +160,7 @@ class _OmniTradeAppState extends State<OmniTradeApp> with WidgetsBindingObserver
               onBiometricRequested: () => security.authenticateBiometrics(),
               onUnlocked: () => security.unlock(),
             )
-          : MainShellScreen(
+          : SplashScreen(
               tradeProvider: widget.tradeProvider,
               settingsProvider: widget.settingsProvider,
               securityProvider: widget.securityProvider,
