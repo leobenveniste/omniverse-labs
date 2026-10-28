@@ -248,372 +248,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  void _showConfigureProfileSheet(BuildContext context, UserModel user) {
-    final firstNameController = TextEditingController(text: user.firstName);
-    final lastNameController = TextEditingController(text: user.lastName);
-    final emailController = TextEditingController(text: user.email);
-    final phoneController = TextEditingController(text: user.phone);
-    final instagramController =
-        TextEditingController(text: user.instagram ?? '');
-    final formKey = GlobalKey<FormState>();
-    bool isSaving = false;
-    String? currentPhotoUrl = user.photoUrl;
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (context, setSheetState) {
-            final theme = Theme.of(ctx);
-
-            Future<void> pickPhoto() async {
-              final source = await showModalBottomSheet<ImageSource?>(
-                context: ctx,
-                backgroundColor: theme.colorScheme.surface,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                ),
-                builder: (modalCtx) {
-                  return SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 16),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 36,
-                            height: 4,
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.25),
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'Foto de Perfil',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          ListTile(
-                            leading: const Icon(Icons.camera_alt_rounded,
-                                color: AppTheme.neonGreen),
-                            title: const Text('Tomar foto con la cámara'),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12)),
-                            onTap: () =>
-                                Navigator.of(modalCtx).pop(ImageSource.camera),
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.photo_library_rounded,
-                                color: AppTheme.skyBlue),
-                            title: const Text('Elegir de la galería'),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12)),
-                            onTap: () =>
-                                Navigator.of(modalCtx).pop(ImageSource.gallery),
-                          ),
-                          if (currentPhotoUrl != null &&
-                              currentPhotoUrl!.isNotEmpty)
-                            ListTile(
-                              leading: const Icon(Icons.delete_outline_rounded,
-                                  color: AppTheme.errorRed),
-                              title: const Text('Eliminar foto actual',
-                                  style: TextStyle(color: AppTheme.errorRed)),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12)),
-                              onTap: () {
-                                Navigator.of(modalCtx).pop(null);
-                                setSheetState(() => currentPhotoUrl = '');
-                              },
-                            ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              );
-
-              if (source == null) return;
-
-              try {
-                final picker = ImagePicker();
-                final picked = await picker.pickImage(
-                  source: source,
-                  maxWidth: 600,
-                  maxHeight: 600,
-                  imageQuality: 80,
-                );
-
-                if (picked != null) {
-                  final bytes = await picked.readAsBytes();
-                  final base64String =
-                      'data:image/jpeg;base64,${base64Encode(bytes)}';
-                  setSheetState(() => currentPhotoUrl = base64String);
-                }
-              } catch (e) {
-                if (ctx.mounted) {
-                  ScaffoldMessenger.of(ctx).showSnackBar(
-                    SnackBar(
-                      content: Text('Error al seleccionar imagen: $e'),
-                      backgroundColor: AppTheme.errorRed,
-                    ),
-                  );
-                }
-              }
-            }
-
-            ImageProvider? sheetAvatarImage;
-            if (currentPhotoUrl != null && currentPhotoUrl!.trim().isNotEmpty) {
-              final raw = currentPhotoUrl!.trim();
-              if (raw.startsWith('http')) {
-                sheetAvatarImage = NetworkImage(raw);
-              } else {
-                try {
-                  final clean = raw.contains(',') ? raw.split(',').last : raw;
-                  sheetAvatarImage = MemoryImage(base64Decode(clean));
-                } catch (_) {}
-              }
-            }
-
-            Future<void> saveProfile() async {
-              if (!(formKey.currentState?.validate() ?? false)) return;
-              setSheetState(() => isSaving = true);
-              HapticFeedback.mediumImpact();
-              final authService = context.read<AuthService>();
-              final ok = await authService.updateProfile(
-                firstName: firstNameController.text,
-                lastName: lastNameController.text,
-                email: emailController.text,
-                phone: phoneController.text,
-                instagram: instagramController.text,
-                photoUrl: currentPhotoUrl,
-              );
-              if (ctx.mounted) {
-                setSheetState(() => isSaving = false);
-                Navigator.of(ctx).pop();
-                if (ok) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('✓ Perfil actualizado correctamente'),
-                      backgroundColor: AppTheme.neonGreen,
-                    ),
-                  );
-                }
-              }
-            }
-
-            return Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
-                left: 20,
-                right: 20,
-                top: 12,
-              ),
-              child: SingleChildScrollView(
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: Container(
-                          width: 40,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: 0.25),
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          IconButton(
-                            style: AppTheme.headerIconButtonStyle(ctx),
-                            icon: const Icon(Icons.close, size: 20),
-                            tooltip: 'Cerrar',
-                            onPressed: isSaving
-                                ? null
-                                : () => Navigator.of(ctx).pop(),
-                          ),
-                          const SizedBox(width: 12),
-                          const Expanded(
-                            child: Text(
-                              'Editar Perfil',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                          ),
-                          FilledButton.icon(
-                            style: AppTheme.headerActionButtonStyle(ctx),
-                            onPressed: isSaving ? null : saveProfile,
-                            icon: isSaving
-                                ? const SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      strokeCap: StrokeCap.round,
-                                    ),
-                                  )
-                                : const Icon(Icons.check_rounded, size: 18),
-                            label: Text(isSaving ? 'Guardando...' : 'Guardar'),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Actualizá tus datos personales. El usuario de Instagram se reflejará en tu código QR.',
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                          color: AppTheme.textSecondaryColor(ctx),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Center(
-                        child: GestureDetector(
-                          onTap: isSaving ? null : pickPhoto,
-                          child: Stack(
-                            children: [
-                              CircleAvatar(
-                                radius: 36,
-                                backgroundColor:
-                                    theme.colorScheme.surfaceContainerHighest,
-                                backgroundImage: sheetAvatarImage,
-                                child: sheetAvatarImage == null
-                                    ? Text(
-                                        user.firstName.isNotEmpty
-                                            ? user.firstName[0].toUpperCase()
-                                            : '?',
-                                        style: TextStyle(
-                                          fontSize: 24,
-                                          color: AppTheme.primaryColor(ctx),
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      )
-                                    : null,
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Container(
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: BoxDecoration(
-                                    color: AppTheme.primaryColor(ctx),
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: theme.colorScheme.surface,
-                                      width: 2,
-                                    ),
-                                  ),
-                                  child: const Icon(
-                                    Icons.camera_alt_rounded,
-                                    size: 16,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                              controller: firstNameController,
-                              enabled: !isSaving,
-                              decoration: const InputDecoration(
-                                labelText: 'Nombre',
-                                prefixIcon: Icon(Icons.person_outline),
-                              ),
-                              validator: (v) =>
-                                  (v == null || v.trim().isEmpty)
-                                      ? 'Requerido'
-                                      : null,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: TextFormField(
-                              controller: lastNameController,
-                              enabled: !isSaving,
-                              decoration: const InputDecoration(
-                                labelText: 'Apellido',
-                              ),
-                              validator: (v) =>
-                                  (v == null || v.trim().isEmpty)
-                                      ? 'Requerido'
-                                      : null,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: emailController,
-                        enabled: !isSaving,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: const InputDecoration(
-                          labelText: 'Correo Electrónico',
-                          prefixIcon: Icon(Icons.email_outlined),
-                        ),
-                        validator: (v) {
-                          if (v == null || v.trim().isEmpty) return 'Requerido';
-                          if (!v.contains('@')) return 'Email no válido';
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: phoneController,
-                        enabled: !isSaving,
-                        keyboardType: TextInputType.phone,
-                        decoration: const InputDecoration(
-                          labelText: 'Teléfono de Contacto',
-                          prefixIcon: Icon(Icons.phone_outlined),
-                        ),
-                        validator: (v) => (v == null || v.trim().isEmpty)
-                            ? 'Requerido'
-                            : null,
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: instagramController,
-                        enabled: !isSaving,
-                        decoration: const InputDecoration(
-                          labelText: 'Usuario de Instagram',
-                          hintText: 'ej: mi_usuario (sin @)',
-                          prefixIcon: Icon(Icons.camera_alt_outlined),
-                          prefixText: '@',
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -634,17 +268,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: const AppHeaderTitle(title: 'Perfil'),
-        actions: [
-          IconButton(
-            style: AppTheme.headerIconButtonStyle(context),
-            icon: const Icon(Icons.edit_outlined),
-            tooltip: 'Editar Perfil',
-            onPressed: () {
-              HapticFeedback.lightImpact();
-              _showConfigureProfileSheet(context, user);
-            },
-          ),
-        ],
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -662,7 +285,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _buildIdCard(context, user, userIg, userIgUrl, instagramVueloUrl),
+                    _buildIdCard(context, user, userIg),
                     const SizedBox(height: 24),
                     Row(
                       children: [
@@ -701,35 +324,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  String _getRoleBadgeLabel(UserModel user) {
-    if (user.email.toLowerCase() == AppRoles.superAdminEmail.toLowerCase()) {
-      return 'Coordinación General';
-    }
-    if (user.roles.contains(AppRoles.rrhh)) {
-      return 'Gestión & RRHH';
-    }
-    if (user.roles.contains(AppRoles.produccion)) {
-      return 'Producción & Eventos';
-    }
-    if (user.roles.contains(AppRoles.organizacion)) {
-      return 'Organización';
-    }
-    if (user.roles.contains(AppRoles.comercial)) {
-      return 'Comercial';
-    }
-    final extraRoles = user.roles.where((r) => r != AppRoles.miembro).toList();
-    if (extraRoles.isNotEmpty) {
-      return extraRoles.first;
-    }
-    return 'Reducción de Daños';
-  }
-
   Widget _buildIdCard(
     BuildContext context,
     UserModel user,
     String userIg,
-    String userIgUrl,
-    String instagramVueloUrl,
   ) {
     final primary = AppTheme.primaryColor(context);
     final textPrimary = AppTheme.textPrimaryColor(context);
@@ -750,7 +348,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
     }
 
-    final roleLabel = _getRoleBadgeLabel(user);
 
     return Container(
       width: double.infinity,
@@ -853,45 +450,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
 
-                // Tag superior izquierdo: Vuelo Controlado Staff
-                Positioned(
-                  top: 14,
-                  left: 14,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.60),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.2),
-                      ),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.flight_takeoff_rounded,
-                          size: 13,
-                          color: AppTheme.neonGreen,
-                        ),
-                        SizedBox(width: 6),
-                        Text(
-                          'STAFF OFICIAL',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 0.8,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
                 // Botón superior derecho: Cambiar Foto
                 Positioned(
                   top: 12,
@@ -953,67 +511,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 6),
 
-                // Rótulo de rol y mención de Instagram
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: primary.withValues(alpha: isDark ? 0.16 : 0.10),
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: primary.withValues(alpha: 0.3),
-                        ),
-                      ),
-                      child: Text(
-                        roleLabel,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.2,
-                          color: primary,
-                        ),
-                      ),
+                if (userIg.isNotEmpty) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
                     ),
-                    if (userIg.isNotEmpty) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? const Color(0xFF1E293B)
+                          : const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.camera_alt_outlined,
+                          size: 12,
+                          color: textSecondary,
                         ),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? const Color(0xFF1E293B)
-                              : const Color(0xFFF1F5F9),
-                          borderRadius: BorderRadius.circular(8),
+                        const SizedBox(width: 4),
+                        Text(
+                          '@',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: textSecondary,
+                          ),
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.camera_alt_outlined,
-                              size: 12,
-                              color: textSecondary,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '@$userIg',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: textSecondary,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
+                      ],
+                    ),
+                  ),
+                ],
 
                 const SizedBox(height: 16),
 
@@ -1051,126 +581,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 16),
-
-                // Botones píldora para acciones de QR e Instagram
-                Row(
-                  children: [
-                    Expanded(
-                      child: PressableScale(
-                        onTap: () => _showFullscreenQrDialog(
-                          context: context,
-                          title: 'MI INSTAGRAM',
-                          data: userIgUrl,
-                          handle: userIg.isNotEmpty
-                              ? '@$userIg'
-                              : '@configura_tu_ig',
-                          icon: Icons.camera_alt_outlined,
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 11),
-                          decoration: BoxDecoration(
-                            color: primary.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: primary.withValues(alpha: 0.35),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.qr_code_rounded,
-                                  size: 16, color: primary),
-                              const SizedBox(width: 6),
-                              Text(
-                                'Mi QR',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w800,
-                                  color: primary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: PressableScale(
-                        onTap: () => _showFullscreenQrDialog(
-                          context: context,
-                          title: 'VUELO CONTROLADO',
-                          data: instagramVueloUrl,
-                          handle: '@vuelocontrolado',
-                          icon: Icons.flight_takeoff_rounded,
-                        ),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 11),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? const Color(0xFF1E293B)
-                                : const Color(0xFFF1F5F9),
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: theme.colorScheme.outline
-                                  .withValues(alpha: 0.25),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.flight_takeoff_rounded,
-                                size: 16,
-                                color: textPrimary,
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                'QR Vuelo',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w800,
-                                  color: textPrimary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 12),
-
-                // Botón Editar Información
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      side: BorderSide(
-                        color: theme.colorScheme.outline.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    icon: const Icon(Icons.edit_note_rounded, size: 18),
-                    label: const Text(
-                      'Editar Datos Personales',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    onPressed: () {
-                      HapticFeedback.lightImpact();
-                      _showConfigureProfileSheet(context, user);
-                    },
-                  ),
-                ),
               ],
             ),
           ),

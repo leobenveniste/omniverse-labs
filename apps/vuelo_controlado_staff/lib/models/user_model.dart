@@ -87,6 +87,7 @@ class UserModel {
     String? phone,
     String? instagram,
     String? photoUrl,
+    bool clearPhoto = false,
     List<String>? roles,
   }) {
     final updatedRoles = roles != null
@@ -106,7 +107,7 @@ class UserModel {
       birthDate: birthDate ?? this.birthDate,
       phone: phone ?? this.phone,
       instagram: instagram ?? this.instagram,
-      photoUrl: photoUrl ?? this.photoUrl,
+      photoUrl: clearPhoto ? null : (photoUrl ?? this.photoUrl),
       roles: updatedRoles,
       createdAt: createdAt,
     );

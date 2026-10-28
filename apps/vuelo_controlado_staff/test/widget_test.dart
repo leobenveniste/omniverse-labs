@@ -316,13 +316,14 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    // Verify name and role are present
+    // Verify name and email are present, while role tags and staff badges are removed
     expect(find.text('Camila Pérez'), findsOneWidget);
-    expect(find.text('Staff'), findsOneWidget);
-
-    // Verify 'STAFF OFICIAL' capsule and 'IDENTIFICACIÓN DIGITAL' are NOT rendered
+    expect(find.text('test@vuelocontrolado.org'), findsOneWidget);
+    expect(find.text('Staff'), findsNothing);
+    expect(find.text('STAFF OFICIAL'), findsNothing);
     expect(find.text('STAFF OFICIAL • VUELO CONTROLADO'), findsNothing);
     expect(find.text('IDENTIFICACIÓN DIGITAL DE VOLUNTARIADO'), findsNothing);
+    expect(find.text('Editar Datos Personales'), findsNothing);
 
     // Verify document number and phone are NOT rendered in profile
     expect(find.textContaining('44123987'), findsNothing);

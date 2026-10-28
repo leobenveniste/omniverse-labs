@@ -163,12 +163,16 @@ class AuthService extends ChangeNotifier {
   /// Actualiza la foto de perfil de cualquier usuario (Admin o usuario propio)
   Future<bool> updateUserPhoto({
     required String userId,
-    required String photoUrl,
+    required String? photoUrl,
   }) async {
     final index = _users.indexWhere((u) => u.id == userId);
     if (index == -1) return false;
 
-    final updated = _users[index].copyWith(photoUrl: photoUrl);
+    final isRemoving = photoUrl == null || photoUrl.trim().isEmpty;
+    final updated = _users[index].copyWith(
+      photoUrl: isRemoving ? null : photoUrl.trim(),
+      clearPhoto: isRemoving,
+    );
     _users[index] = updated;
 
     if (_currentUser?.id == userId) {
@@ -274,14 +278,21 @@ class AuthService extends ChangeNotifier {
     final index = _users.indexWhere((u) => u.id == updatedUser.id);
     if (index == -1) return false;
 
-    _users[index] = updatedUser;
-    if (_currentUser?.id == updatedUser.id) {
-      _currentUser = updatedUser;
+    final isRemovingPhoto =
+        updatedUser.photoUrl == null || updatedUser.photoUrl!.trim().isEmpty;
+    final normalizedUser = updatedUser.copyWith(
+      photoUrl: isRemovingPhoto ? null : updatedUser.photoUrl!.trim(),
+      clearPhoto: isRemovingPhoto,
+    );
+
+    _users[index] = normalizedUser;
+    if (_currentUser?.id == normalizedUser.id) {
+      _currentUser = normalizedUser;
       await _storage.saveSessionUser(_currentUser);
     }
 
     await _storage.saveUsers(_users);
-    firestoreSync?.syncUser(updatedUser);
+    firestoreSync?.syncUser(normalizedUser);
     notifyListeners();
     return true;
   }

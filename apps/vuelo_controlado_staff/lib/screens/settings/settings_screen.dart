@@ -21,8 +21,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _notificationsEnabled = true;
-
   void _showChangePasswordSheet(BuildContext context) {
     final passwordController = TextEditingController();
     final confirmController = TextEditingController();
@@ -349,7 +347,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   email: emailController.text.trim(),
                   phone: phoneController.text.trim(),
                   instagram: cleanIg.isNotEmpty ? cleanIg : null,
-                  photoUrl: currentPhotoUrl,
+                  photoUrl: (currentPhotoUrl != null &&
+                          currentPhotoUrl!.trim().isNotEmpty)
+                      ? currentPhotoUrl!.trim()
+                      : null,
+                  clearPhoto: currentPhotoUrl == null ||
+                      currentPhotoUrl!.trim().isEmpty,
                 );
 
                 final success = await authService.updateUserProfile(updatedUser);
@@ -756,21 +759,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
               const SizedBox(height: 8),
               _SettingsGroup(
                 children: [
-                  if (user != null)
-                    _SettingRow(
-                      icon: Icons.person_rounded,
-                      iconBgColor: const Color(0xFFF59E0B),
-                      title: 'Editar Perfil',
-                      trailing: Icon(
-                        Icons.chevron_right_rounded,
-                        size: 20,
-                        color: AppTheme.textSecondaryColor(context),
-                      ),
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        _showEditProfileSheet(context, user);
-                      },
-                    ),
                   _SettingRow(
                     icon: Icons.lock_rounded,
                     iconBgColor: const Color(0xFF3B82F6),
@@ -806,29 +794,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       },
                       isLast: true,
                     ),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              // SECCIÓN NOTIFICACIONES
-              const _SectionHeader(title: 'NOTIFICACIONES'),
-              const SizedBox(height: 8),
-              _SettingsGroup(
-                children: [
-                  _SettingRow(
-                    icon: Icons.notifications_rounded,
-                    iconBgColor: const Color(0xFF10B981),
-                    title: 'Notificaciones',
-                    trailing: Switch.adaptive(
-                      value: _notificationsEnabled,
-                      activeThumbColor: AppTheme.neonGreen,
-                      onChanged: (val) {
-                        HapticFeedback.selectionClick();
-                        setState(() => _notificationsEnabled = val);
-                      },
-                    ),
-                    isLast: true,
-                  ),
                 ],
               ),
               const SizedBox(height: 24),
@@ -979,7 +944,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Versión 1.0.24 (Build 27)',
+                      'Versión 1.0.25 (Build 28)',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,

@@ -19,7 +19,7 @@ service cloud.firestore {
     //   - birthDate: string or timestamp (required, max 40 chars if string)
     //   - phone: string (required, 1-30 chars)
     //   - instagram: string (optional/nullable, max 50 chars)
-    //   - photoUrl: string (optional/nullable, max 500 chars)
+    //   - photoUrl: string (optional/nullable, max 800000 chars)
     //   - roles: list of strings (required, size 1-10, valid system roles)
     //   - createdAt: string or timestamp (required, immutable, max 40 chars if string)
     //
@@ -34,7 +34,7 @@ service cloud.firestore {
     //   - endTime: string (required, 1-15 chars)
     //   - location: string (required, 1-150 chars)
     //   - address: string (optional/nullable, max 200 chars)
-    //   - imageUrl: string (optional/nullable, max 500 chars)
+    //   - imageUrl: string (optional/nullable, max 800000 chars)
     //   - requiredStaffCount: int (required, 0 to 500)
     //   - staffIds: list of strings (required, size <= 500)
     //   - createdBy: string (required, immutable, 1-128 chars)
@@ -228,7 +228,7 @@ service cloud.firestore {
              isValidDateTime(data.birthDate) &&
              data.phone is string && data.phone.size() >= 1 && data.phone.size() <= 30 &&
              isValidOptionalString('instagram', 0, 50) &&
-             isValidOptionalString('photoUrl', 0, 500) &&
+             isValidOptionalString('photoUrl', 0, 800000) &&
              data.roles is list && data.roles.size() >= 1 && data.roles.size() <= 10 &&
              data.roles.hasOnly(validRoles) &&
              isValidDateTime(data.createdAt);
@@ -349,7 +349,7 @@ service cloud.firestore {
              data.endTime is string && data.endTime.size() >= 1 && data.endTime.size() <= 15 &&
              data.location is string && data.location.size() >= 1 && data.location.size() <= 150 &&
              isValidOptionalString('address', 0, 200) &&
-             isValidOptionalString('imageUrl', 0, 500) &&
+             isValidOptionalString('imageUrl', 0, 800000) &&
              data.requiredStaffCount is int &&
              data.requiredStaffCount >= 0 && data.requiredStaffCount <= 500 &&
              data.staffIds is list && data.staffIds.size() <= 500 &&
