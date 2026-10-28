@@ -8,6 +8,10 @@ play_service_account*.json
 *.p12
 *.pepk
 
+# Firebase Client Configs
+**/firebase_options.dart
+**/google-services.json
+
 # Flutter / Dart
 .dart_tool/
 .flutter-plugins
