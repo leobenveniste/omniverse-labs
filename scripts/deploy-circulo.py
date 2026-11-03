@@ -118,8 +118,8 @@ def deploy():
         }
     ]
 
-    tracks_to_deploy = ["alpha"]
-    print(f"\n   Assigning version {version_code} to Closed Beta track: {tracks_to_deploy}...")
+    tracks_to_deploy = ["internal", "alpha"]
+    print(f"\n   Assigning version {version_code} to tracks: {tracks_to_deploy}...")
 
     def make_track_body(track_name, status):
         return {

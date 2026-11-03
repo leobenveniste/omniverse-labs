@@ -4,11 +4,30 @@ import '../theme/app_theme.dart';
 class CirculoLogoIcon extends StatelessWidget {
   final double size;
   final Color? color;
+  final bool useImage;
 
-  const CirculoLogoIcon({super.key, this.size = 28, this.color});
+  const CirculoLogoIcon({
+    super.key,
+    this.size = 28,
+    this.color,
+    this.useImage = true,
+  });
 
   @override
   Widget build(BuildContext context) {
+    if (useImage) {
+      return Image.asset(
+        'assets/images/logo_cropped.png',
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) => _buildVector(context),
+      );
+    }
+    return _buildVector(context);
+  }
+
+  Widget _buildVector(BuildContext context) {
     final effectiveColor = color ?? AppTheme.primaryColor(context);
 
     return SizedBox(
