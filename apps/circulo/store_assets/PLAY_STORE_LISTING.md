@@ -9,59 +9,50 @@
 
 ### Nombre de la Aplicación (Máx. 30 caracteres)
 ```text
-Círculo: Amigos en Grupo
+Círculo: Amigos y Grupos
 ```
 
 ### Breve Descripción (Máx. 80 caracteres)
 ```text
-Hacé amigos en grupos de 4 a 10 personas con afinidad real. Chau citas 1 a 1.
+Red social para conectar con personas afines, formar grupos y planear salidas.
 ```
 
-### Descripción Completa (Full Description - Optimizada para ASO)
+### Descripción Completa (Full Description - Optimizada para Directivas Google Play)
 ```text
-¿Querés conocer gente nueva, salir y hacer amigos sin la incomodidad ni la presión de las citas individuales (1 a 1)? 
+Círculo es una aplicación social diseñada para conectar personas afines, facilitar la formación de grupos de amistades y coordinar salidas presenciales a partir de intereses compartidos.
 
-Bienvenido/a a Círculo, la app de Omniverse Labs diseñada para formar grupos reales de amigos a partir de intereses comunes y química social.
+A diferencia de las plataformas tradicionales de interacción individual, Círculo organiza la experiencia en torno a grupos equilibrados de 4 o más integrantes, promoviendo dinámicas sociales colaborativas.
 
-🎯 ¿CÓMO FUNCIONA EL MATCH GRUPAL?
-En Círculo el match no es de a 2. El match se concreta cuando al menos 4 personas afines conectan mutuamente (o cuando te sumás a un círculo en formación de 2/4 o 3/4). Al completarse los 4 integrantes, se desbloquea automáticamente una sala de chat grupal y herramientas para organizar salidas reales.
+CARACTERÍSTICAS PRINCIPALES:
 
-✨ LOS 5 PILARES DIFERENCIALES DE CÍRCULO:
+1. Perfil de intereses y afinidad social
+• Crea tu perfil seleccionando tus pasatiempos favoritos: café de especialidad, juegos de mesa, deportes, música en vivo, cine o gastronomía.
+• Define tu rol en el grupo (organizador, conector, explorador o tranquilo) para permitir un balance adecuado en cada círculo.
+• Especifica tus zonas frecuentes y tus momentos de disponibilidad durante la semana.
 
-1. 🧭 QUÍMICA DE ROLES EN EL GRUPO
-Cada persona aporta algo único al grupo. Descubrí tu rol:
-• 🎯 Organizador: Le encanta proponer fechas, lugares y armar encuestas.
-• 💬 Conector: Rompehielos natural, dinamiza las charlas y une a todos.
-• 🧭 Explorador: Siempre al tanto de cafeterías de especialidad, bares ocultos y recitales.
-• ☕ Tranqui / Chill: Excelente vibra, cero drama, siempre dispuesto a sumarse.
-Nuestro motor equilibra los roles para que nunca falten planes ni diversión.
+2. Descubrimiento y formación de grupos
+• Explora perfiles y círculos en proceso de formación en tu zona.
+• Conexión grupal: cuando 4 personas con intereses mutuos coinciden, el círculo se consolida y se habilita automáticamente el espacio grupal.
 
-2. 👥 MODO "ENTRAR EN DUPLA"
-¿No querés buscar amigos en solitario? Vinculá tu cuenta con tu mejor amigo/a mediante un código único y busquen juntos en el mazo. Ocupan 2 lugares al mismo tiempo y completan círculos de 2/4 a 4/4 en un solo paso.
+3. Chat y mensajería grupal
+• Sala de chat exclusiva para cada grupo conformado.
+• Comparte mensajes, propuestas de salidas y coordina detalles del encuentro de manera segura.
 
-3. 🛡️ SISTEMA ANTI-GRUPOS FANTASMA
-Se acabaron los grupos donde nadie habla. Si un integrante queda inactivo en un círculo recién formado, el resto de los miembros puede votar para liberar ese asiento y recibir a un 4º amigo activo.
+4. Planificación de actividades y salidas
+• Sistema integrado para crear planes y votar fechas, horarios y lugares de encuentro.
+• Registro de asistencia grupal (check-in) para validar los encuentros completados en la vida real.
 
-4. 📍 SALIDAS REALES Y CHECK-IN CONFIRMADO (+1)
-El objetivo de Círculo es pasar de la pantalla a la vida real: café de especialidad, tardes de juegos de mesa, running, cenas o recitales. Al encontrarse en persona, confirman el Check-in y suman insignias de asistencia real a su perfil.
+5. Modo Dupla
+• Posibilidad de vincular tu cuenta con un amigo mediante un código de invitación para explorar grupos juntos.
 
-5. 🔒 PRIVACIDAD PROGRESIVA
-En el mazo de exploración, tu Instagram y WhatsApp están protegidos y ocultos. Solo se comparten dentro de tu grupo cuando vos decidís pulsar el botón de compartir, cuidando tu seguridad en todo momento.
+6. Privacidad, seguridad y moderación
+• Tu información de contacto directo se mantiene privada hasta que decidas compartirla dentro de tu grupo.
+• Herramientas de reporte y bloqueo para mantener una comunidad segura y respetuosa.
 
-💎 CÍRCULO PLUS & CONSUMIBLES:
-• Swipes diarios ilimitados.
-• Descubrí quién quiere hacer Círculo con vos con fotos y perfiles nítidos.
-• Botón "Deshacer" (Rewind) para recuperar swipes accidentales.
-• 1 Perfil Destacado (Boost) gratuito semanal incluido.
-• Cero anuncios publicitarios.
-• Paquetes de Boosts y Super-Ondas en la Tienda.
+SUSCRIPCIÓN OPCIONAL Y FUNCIONES ADICIONALES:
+Círculo ofrece la suscripción opcional Círculo Plus con funciones como swipes adicionales, visualización anticipada de postulantes y experiencia sin anuncios publicitarios, además de consumibles opcionales (destacados de perfil).
 
-🔒 SEGURIDAD Y CONFIANZA:
-• 100% Online: Tus datos están protegidos en la nube bajo los más altos estándares de seguridad y cifrado.
-• Inicio rápido y seguro con Google Sign-In y Biometría.
-• Moderación comunitaria activa con sistema de reportes y bloqueo de usuarios.
-
-Sumate hoy a Círculo y encontrá a tu próxima gran banda de amigos.
+Requisitos: Aplicación orientada a usuarios mayores de 18 años. Requiere conexión a internet.
 ```
 
 ---
