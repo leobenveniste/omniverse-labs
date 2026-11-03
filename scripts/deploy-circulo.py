@@ -110,11 +110,11 @@ def deploy():
     notes = [
         {
             "language": "es-419",
-            "text": "Círculo v1.0.0 (Build 3): Identidad visual renovada con nuevo isotipo 3D, soporte completo para Google Play Subscriptions v2 (mensual, trimestral, semestral y anual) y consumibles (Boost de Perfil y Super-Ondas)."
+            "text": "Círculo v1.0.0 (Build 5): Corrección crítica de compatibilidad nativa Theme.AppCompat para biometría, sincronización completa de Cloud Firestore y optimización de arranque seguro."
         },
         {
             "language": "en-US",
-            "text": "Círculo v1.0.0 (Build 3): Refreshed 3D crystal visual branding, full Google Play Subscriptions v2 support (monthly, quarterly, biannual, annual), and consumables (Profile Boosts & Super-Ondas)."
+            "text": "Círculo v1.0.0 (Build 5): Critical native Theme.AppCompat compatibility fix for biometrics, full Cloud Firestore synchronization, and secure launch optimization."
         }
     ]
 
