@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import socket
+import argparse
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
@@ -49,7 +50,9 @@ def get_service():
 
     return build("androidpublisher", "v3", credentials=creds, cache_discovery=False)
 
-def deploy():
+def deploy(target_tracks=None):
+    if target_tracks is None:
+        target_tracks = ["internal", "alpha", "beta"]
     if not os.path.exists(AAB_PATH):
         print(f"[ERROR] AAB bundle not found at {AAB_PATH}")
         sys.exit(1)
@@ -60,7 +63,7 @@ def deploy():
     print("=" * 65)
     print(f"📦 Package: {PACKAGE_NAME}")
     print(f"📂 AAB: {AAB_PATH} ({file_size_mb:.2f} MB)")
-    print(f"🎯 Target Track: internal")
+    print(f"🎯 Target Tracks: {', '.join(target_tracks)}")
 
     service = get_service()
     edits = service.edits()
@@ -118,7 +121,7 @@ def deploy():
         }
     ]
 
-    tracks_to_deploy = ["internal", "alpha"]
+    tracks_to_deploy = target_tracks
     print(f"\n   Assigning version {version_code} to tracks: {tracks_to_deploy}...")
 
     def make_track_body(track_name, status):
@@ -204,8 +207,19 @@ def deploy():
             raise c_err
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Deploy Circulo to Google Play Tracks")
+    parser.add_argument("--track", default=None, choices=["internal", "alpha", "beta", "production"], help="Single target track")
+    parser.add_argument("--tracks", default=None, help="Comma-separated target tracks (e.g. internal,alpha,beta)")
+    args, _ = parser.parse_known_args()
+
+    selected_tracks = None
+    if args.track:
+        selected_tracks = [args.track.strip()]
+    elif args.tracks:
+        selected_tracks = [t.strip() for t in args.tracks.split(",") if t.strip()]
+
     try:
-        deploy()
+        deploy(selected_tracks)
     except HttpError as err:
         error_body = err.content.decode("utf-8") if err.content else str(err)
         print(f"\n❌ Google Play API HTTP Error: {err.resp.status if hasattr(err, 'resp') else 'Unknown'}")
