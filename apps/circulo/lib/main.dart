@@ -70,53 +70,88 @@ class _CirculoAppBootstrapState extends State<CirculoAppBootstrap> {
     _initDependencies();
   }
 
-  Future<void> _initDependencies() async {
-    // 1. Inicialización de formatos de fecha e infraestructura
-    await Future.wait([
-      initializeDateFormatting('es', null),
-      initializeDateFormatting('en', null),
-      initializeDateFormatting('pt', null),
-      initializeDateFormatting('fr', null),
-      initializeDateFormatting('it', null),
-      initializeDateFormatting('de', null),
-      Firebase.initializeApp(
+  Future<void> _safeInitFirebase() async {
+    try {
+      await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
-      ).catchError((Object e) {
-        debugPrint('Firebase init notice: $e');
-        return Firebase.app();
-      }),
-    ]);
-
-    // 2. Servicios
-    final settingsService = SettingsService(widget.prefs);
-    final biometricService = BiometricService();
-    final firestoreService = OnlineFirestoreService();
-
-    if (mounted) {
-      setState(() => _statusText = 'Sincronizando perfiles en la nube...');
-    }
-
-    await firestoreService.init();
-
-    final authService = AuthService(firestoreService, widget.prefs);
-    final billingService = BillingService(firestoreService);
-    await billingService.initialize();
-    final adService = AdService();
-    await adService.initialize();
-    final matchEngineService = MatchEngineService(firestoreService);
-
-    if (!mounted) return;
-    setState(() {
-      _dependencies = _CirculoDependencies(
-        settingsService: settingsService,
-        biometricService: biometricService,
-        firestoreService: firestoreService,
-        authService: authService,
-        billingService: billingService,
-        adService: adService,
-        matchEngineService: matchEngineService,
       );
-    });
+    } catch (e) {
+      debugPrint('Firebase init notice: $e');
+    }
+  }
+
+  Future<void> _initDependencies() async {
+    try {
+      // 1. Inicialización de formatos de fecha e infraestructura
+      await Future.wait([
+        initializeDateFormatting('es', null),
+        initializeDateFormatting('en', null),
+        initializeDateFormatting('pt', null),
+        initializeDateFormatting('fr', null),
+        initializeDateFormatting('it', null),
+        initializeDateFormatting('de', null),
+        _safeInitFirebase(),
+      ]);
+
+      // 2. Servicios
+      final settingsService = SettingsService(widget.prefs);
+      final biometricService = BiometricService();
+      final firestoreService = OnlineFirestoreService();
+
+      if (mounted) {
+        setState(() => _statusText = 'Sincronizando perfiles en la nube...');
+      }
+
+      await firestoreService.init();
+
+      final authService = AuthService(firestoreService, widget.prefs);
+      final billingService = BillingService(firestoreService);
+      try {
+        await billingService.initialize();
+      } catch (e) {
+        debugPrint('BillingService init error: $e');
+      }
+
+      final adService = AdService();
+      try {
+        await adService.initialize();
+      } catch (e) {
+        debugPrint('AdService init error: $e');
+      }
+
+      final matchEngineService = MatchEngineService(firestoreService);
+
+      if (!mounted) return;
+      setState(() {
+        _dependencies = _CirculoDependencies(
+          settingsService: settingsService,
+          biometricService: biometricService,
+          firestoreService: firestoreService,
+          authService: authService,
+          billingService: billingService,
+          adService: adService,
+          matchEngineService: matchEngineService,
+        );
+      });
+    } catch (e, stack) {
+      debugPrint('Fatal error during _initDependencies: $e\n$stack');
+      // Resiliencia total ante cualquier fallo imprevisto
+      final settingsService = SettingsService(widget.prefs);
+      final firestoreService = OnlineFirestoreService();
+      await firestoreService.init();
+      if (!mounted) return;
+      setState(() {
+        _dependencies = _CirculoDependencies(
+          settingsService: settingsService,
+          biometricService: BiometricService(),
+          firestoreService: firestoreService,
+          authService: AuthService(firestoreService, widget.prefs),
+          billingService: BillingService(firestoreService),
+          adService: AdService(),
+          matchEngineService: MatchEngineService(firestoreService),
+        );
+      });
+    }
   }
 
   @override
@@ -129,6 +164,13 @@ class _CirculoAppBootstrapState extends State<CirculoAppBootstrap> {
         themeMode: ThemeMode.system,
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
         home: SplashScreen(statusText: _statusText),
       );
     }

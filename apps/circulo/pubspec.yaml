@@ -2,7 +2,7 @@ name: circulo
 description: "Red social para hacer amigos en grupos de 4 a 10 personas con Material 3 Expressive."
 publish_to: 'none'
 
-version: 1.0.0+3
+version: 1.0.0+4
 
 environment:
   sdk: ^3.12.1
