@@ -50,8 +50,8 @@ def get_service():
     return build("androidpublisher", "v3", credentials=creds, cache_discovery=False)
 
 def deploy(target_tracks=None):
-    if target_tracks is None:
-        target_tracks = ["internal", "alpha", "beta"]
+    if target_tracks is None or "all" in target_tracks:
+        target_tracks = ["internal", "alpha", "beta", "production"]
     if not os.path.exists(AAB_PATH):
         print(f"[ERROR] AAB bundle not found at {AAB_PATH}")
         sys.exit(1)
@@ -132,11 +132,11 @@ def deploy(target_tracks=None):
     notes = [
         {
             "language": "es-419",
-            "text": "Avance visual del formulario de acompañamiento en tiempo real, autoguardado continuo de borradores y hardening de seguridad en base de datos."
+            "text": "Actualización de roles de equipo (Organización, Comunicación, Investigación, Recursos Humanos, Comercial y Producción), acceso directo a Recursos en navegación y ajustes integrados en perfil."
         },
         {
             "language": "en-US",
-            "text": "Real-time progress indicator for event accompaniment records, continuous local draft autosave, and database security hardening."
+            "text": "Updated team roles (Organization, Communications, Research, Human Resources, Commercial, and Production), direct Resources access in navigation, and profile-integrated settings."
         }
     ]
 
@@ -148,7 +148,7 @@ def deploy(target_tracks=None):
             "track": track_name,
             "releases": [
                 {
-                    "name": f"1.0.36 (Build {version_code})",
+                    "name": f"1.0.37 (Build {version_code})",
                     "versionCodes": [str(version_code)],
                     "status": status,
                     "releaseNotes": notes
@@ -157,7 +157,7 @@ def deploy(target_tracks=None):
         }
 
     for t in tracks_to_deploy:
-        status_to_use = "completed"
+        status_to_use = "draft" if t in ["production"] else "completed"
         try:
             edits.tracks().update(
                 packageName=PACKAGE_NAME,
@@ -226,7 +226,7 @@ def deploy(target_tracks=None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Deploy Vuelo Controlado to Google Play Tracks")
-    parser.add_argument("--track", default=None, choices=["internal", "alpha", "beta", "production"], help="Single target track")
+    parser.add_argument("--track", default=None, choices=["internal", "alpha", "beta", "production", "all"], help="Single target track or 'all'")
     parser.add_argument("--tracks", default=None, help="Comma-separated target tracks (e.g. internal,alpha,beta)")
     args, _ = parser.parse_known_args()
 

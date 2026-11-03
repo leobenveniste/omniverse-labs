@@ -2,7 +2,7 @@ name: vuelo_controlado_staff
 description: "App de gestión de staff y fichas de casos para Fundación Vuelo Controlado."
 publish_to: 'none'
 
-version: 1.0.36+39
+version: 1.0.37+40
 
 environment:
   sdk: ^3.12.1
