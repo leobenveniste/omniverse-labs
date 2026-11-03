@@ -1,28 +1,49 @@
 class AppProductIds {
-  // Suscripciones
-  static const String plusMonthly = 'circulo_plus_monthly';
-  static const String plusAnnual = 'circulo_plus_annual';
+  // Suscripción Círculo Plus (Google Play Subscriptions v2)
+  static const String subscriptionCirculoPlus = 'circulo_plus';
 
-  // Consumibles
-  static const String boost1 = 'circulo_boost_1';
+  // Base Plans dentro de circulo_plus
+  static const String plusMonthly = 'plus-monthly';
+  static const String plusQuarterly = 'plus-quarterly';
+  static const String plusBiannual = 'plus-biannual';
+  static const String plusAnnual = 'plus-annual';
+
+  // Consumibles (One-time products que pueden comprarse repetidas veces)
+  // Producto 1: Boost de Perfil (x3 visibilidad durante 60 minutos)
+  static const String boost1 = 'circulo_boost';
   static const String boost5 = 'circulo_boost_5';
+
+  // Producto 2: Super-Onda (Notificación directa con halo dorado)
+  static const String superOnda1 = 'circulo_superonda';
   static const String superOnda3 = 'circulo_superonda_3';
   static const String superOnda10 = 'circulo_superonda_10';
 
-  static const List<String> allSubscriptions = [
+  static const List<String> allBasePlans = [
     plusMonthly,
+    plusQuarterly,
+    plusBiannual,
+    plusAnnual,
+  ];
+
+  static const List<String> allSubscriptions = [
+    subscriptionCirculoPlus,
+    plusMonthly,
+    plusQuarterly,
+    plusBiannual,
     plusAnnual,
   ];
 
   static const List<String> allConsumables = [
     boost1,
     boost5,
+    superOnda1,
     superOnda3,
     superOnda10,
   ];
 
   static const List<String> all = [
-    ...allSubscriptions,
+    subscriptionCirculoPlus,
+    ...allBasePlans,
     ...allConsumables,
   ];
 }

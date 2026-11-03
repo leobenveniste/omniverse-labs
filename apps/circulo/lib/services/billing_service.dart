@@ -172,7 +172,27 @@ class BillingService extends ChangeNotifier {
           isPlusActive: true,
           plusExpiresAt: now.add(const Duration(days: 30)),
           dailySwipesRemaining: 99999, // Swipes ilimitados
-          remainingBoosts: updated.remainingBoosts + 1, // 1 boost semanal incluido
+          remainingBoosts: updated.remainingBoosts + 1, // 1 boost mensual incluido
+        );
+        break;
+
+      case AppProductIds.plusQuarterly:
+        price = 12.99;
+        updated = updated.copyWith(
+          isPlusActive: true,
+          plusExpiresAt: now.add(const Duration(days: 90)),
+          dailySwipesRemaining: 99999,
+          remainingBoosts: updated.remainingBoosts + 3,
+        );
+        break;
+
+      case AppProductIds.plusBiannual:
+        price = 22.99;
+        updated = updated.copyWith(
+          isPlusActive: true,
+          plusExpiresAt: now.add(const Duration(days: 180)),
+          dailySwipesRemaining: 99999,
+          remainingBoosts: updated.remainingBoosts + 6,
         );
         break;
 
@@ -182,7 +202,7 @@ class BillingService extends ChangeNotifier {
           isPlusActive: true,
           plusExpiresAt: now.add(const Duration(days: 365)),
           dailySwipesRemaining: 99999,
-          remainingBoosts: updated.remainingBoosts + 4,
+          remainingBoosts: updated.remainingBoosts + 12,
         );
         break;
 
@@ -197,6 +217,13 @@ class BillingService extends ChangeNotifier {
         price = 7.99;
         updated = updated.copyWith(
           remainingBoosts: updated.remainingBoosts + 5,
+        );
+        break;
+
+      case AppProductIds.superOnda1:
+        price = 0.99;
+        updated = updated.copyWith(
+          remainingSuperOndas: updated.remainingSuperOndas + 1,
         );
         break;
 

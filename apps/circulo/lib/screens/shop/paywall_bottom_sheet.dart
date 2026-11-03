@@ -138,33 +138,54 @@ class _PaywallBottomSheetState extends State<PaywallBottomSheet> {
               _buildPerksList(context, l10n, textPrimary),
               const SizedBox(height: 20),
 
-              // Selector de Planes (Mensual vs Anual)
-              Row(
+              // Selector de Planes (4 Base Plans con descuentos progresivos)
+              GridView.count(
+                crossAxisCount: 2,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                childAspectRatio: 1.55,
                 children: [
-                  Expanded(
-                    child: _buildPlanCard(
-                      id: AppProductIds.plusAnnual,
-                      title: l10n.get('plansAnnual'),
-                      price: '\$39.99',
-                      period: '/ año',
-                      badge: 'Ahorro 33%',
-                      isSelected: _selectedPlan == AppProductIds.plusAnnual,
-                      onTap: () => setState(
-                          () => _selectedPlan = AppProductIds.plusAnnual),
-                    ),
+                  _buildPlanCard(
+                    id: AppProductIds.plusAnnual,
+                    title: '12 Meses',
+                    price: '\$39.99',
+                    period: '/ año',
+                    badge: '33% OFF',
+                    isSelected: _selectedPlan == AppProductIds.plusAnnual,
+                    onTap: () => setState(
+                        () => _selectedPlan = AppProductIds.plusAnnual),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _buildPlanCard(
-                      id: AppProductIds.plusMonthly,
-                      title: l10n.get('plansMonthly'),
-                      price: '\$4.99',
-                      period: '/ mes',
-                      badge: null,
-                      isSelected: _selectedPlan == AppProductIds.plusMonthly,
-                      onTap: () => setState(
-                          () => _selectedPlan = AppProductIds.plusMonthly),
-                    ),
+                  _buildPlanCard(
+                    id: AppProductIds.plusBiannual,
+                    title: '6 Meses',
+                    price: '\$22.99',
+                    period: '/ sem.',
+                    badge: '23% OFF',
+                    isSelected: _selectedPlan == AppProductIds.plusBiannual,
+                    onTap: () => setState(
+                        () => _selectedPlan = AppProductIds.plusBiannual),
+                  ),
+                  _buildPlanCard(
+                    id: AppProductIds.plusQuarterly,
+                    title: '3 Meses',
+                    price: '\$12.99',
+                    period: '/ trim.',
+                    badge: '13% OFF',
+                    isSelected: _selectedPlan == AppProductIds.plusQuarterly,
+                    onTap: () => setState(
+                        () => _selectedPlan = AppProductIds.plusQuarterly),
+                  ),
+                  _buildPlanCard(
+                    id: AppProductIds.plusMonthly,
+                    title: '1 Mes',
+                    price: '\$4.99',
+                    period: '/ mes',
+                    badge: 'Base',
+                    isSelected: _selectedPlan == AppProductIds.plusMonthly,
+                    onTap: () => setState(
+                        () => _selectedPlan = AppProductIds.plusMonthly),
                   ),
                 ],
               ),

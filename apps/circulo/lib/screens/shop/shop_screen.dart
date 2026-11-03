@@ -246,31 +246,50 @@ class _ShopScreenState extends State<ShopScreen> {
           const SizedBox(height: 16),
 
           if (!isPlus) ...[
-            // Selector de Planes
-            Row(
+            // Selector de Planes (4 Planes con descuentos progresivos)
+            GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              childAspectRatio: 1.6,
               children: [
-                Expanded(
-                  child: _buildHeroPlanOption(
-                    id: AppProductIds.plusAnnual,
-                    title: 'Anual',
-                    price: '\$39.99',
-                    subtitle: 'Ahorrás 33%',
-                    isSelected: _selectedPlan == AppProductIds.plusAnnual,
-                    onTap: () => setState(
-                        () => _selectedPlan = AppProductIds.plusAnnual),
-                  ),
+                _buildHeroPlanOption(
+                  id: AppProductIds.plusAnnual,
+                  title: '12 Meses',
+                  price: '\$39.99',
+                  subtitle: '\$3.33/m • 33% OFF',
+                  isSelected: _selectedPlan == AppProductIds.plusAnnual,
+                  onTap: () => setState(
+                      () => _selectedPlan = AppProductIds.plusAnnual),
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: _buildHeroPlanOption(
-                    id: AppProductIds.plusMonthly,
-                    title: 'Mensual',
-                    price: '\$4.99',
-                    subtitle: 'Sin compromiso',
-                    isSelected: _selectedPlan == AppProductIds.plusMonthly,
-                    onTap: () => setState(
-                        () => _selectedPlan = AppProductIds.plusMonthly),
-                  ),
+                _buildHeroPlanOption(
+                  id: AppProductIds.plusBiannual,
+                  title: '6 Meses',
+                  price: '\$22.99',
+                  subtitle: '\$3.83/m • 23% OFF',
+                  isSelected: _selectedPlan == AppProductIds.plusBiannual,
+                  onTap: () => setState(
+                      () => _selectedPlan = AppProductIds.plusBiannual),
+                ),
+                _buildHeroPlanOption(
+                  id: AppProductIds.plusQuarterly,
+                  title: '3 Meses',
+                  price: '\$12.99',
+                  subtitle: '\$4.33/m • 13% OFF',
+                  isSelected: _selectedPlan == AppProductIds.plusQuarterly,
+                  onTap: () => setState(
+                      () => _selectedPlan = AppProductIds.plusQuarterly),
+                ),
+                _buildHeroPlanOption(
+                  id: AppProductIds.plusMonthly,
+                  title: '1 Mes',
+                  price: '\$4.99',
+                  subtitle: '\$4.99/m • Base',
+                  isSelected: _selectedPlan == AppProductIds.plusMonthly,
+                  onTap: () => setState(
+                      () => _selectedPlan = AppProductIds.plusMonthly),
                 ),
               ],
             ),
@@ -572,9 +591,23 @@ class _ShopScreenState extends State<ShopScreen> {
               children: [
                 Expanded(
                   child: _buildConsumableItem(
-                    title: '3 Super-Ondas',
-                    price: '\$2.49',
+                    title: '1 Onda',
+                    price: '\$0.99',
                     badge: null,
+                    onBuy: () => _buyProduct(
+                      billingService,
+                      authService,
+                      user,
+                      AppProductIds.superOnda1,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _buildConsumableItem(
+                    title: '3 Ondas',
+                    price: '\$2.49',
+                    badge: '16% OFF',
                     onBuy: () => _buyProduct(
                       billingService,
                       authService,
@@ -583,10 +616,10 @@ class _ShopScreenState extends State<ShopScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 8),
                 Expanded(
                   child: _buildConsumableItem(
-                    title: '10 Super-Ondas',
+                    title: '10 Ondas',
                     price: '\$6.99',
                     badge: '30% OFF',
                     onBuy: () => _buyProduct(
