@@ -13,6 +13,7 @@ import 'services/auth_service.dart';
 import 'services/event_service.dart';
 import 'services/case_service.dart';
 import 'services/settings_service.dart';
+import 'services/biometric_service.dart';
 import 'theme/app_theme.dart';
 import 'screens/login_screen.dart';
 import 'screens/home_screen.dart';
@@ -60,6 +61,7 @@ class _AppDependencies {
   final CaseService caseService;
   final SettingsService settingsService;
   final FirestoreSyncService syncService;
+  final BiometricService biometricService;
 
   const _AppDependencies({
     required this.authService,
@@ -67,6 +69,7 @@ class _AppDependencies {
     required this.caseService,
     required this.settingsService,
     required this.syncService,
+    required this.biometricService,
   });
 }
 
@@ -118,6 +121,7 @@ class _AppBootstrapState extends State<AppBootstrap> {
     final eventService =
         EventService(storageService, firestoreSync: syncService);
     final caseService = CaseService(storageService, firestoreSync: syncService);
+    final biometricService = BiometricService();
 
     syncService.onUsersUpdated = authService.reloadUsersFromStorage;
     syncService.onEventsUpdated = eventService.reloadEventsFromStorage;
@@ -134,6 +138,7 @@ class _AppBootstrapState extends State<AppBootstrap> {
         caseService: caseService,
         settingsService: settingsService,
         syncService: syncService,
+        biometricService: biometricService,
       );
     });
   }
@@ -167,6 +172,7 @@ class _AppBootstrapState extends State<AppBootstrap> {
         ChangeNotifierProvider.value(value: deps.caseService),
         ChangeNotifierProvider.value(value: deps.settingsService),
         Provider.value(value: deps.syncService),
+        Provider.value(value: deps.biometricService),
       ],
       child: const VueloControladoStaffApp(),
     );

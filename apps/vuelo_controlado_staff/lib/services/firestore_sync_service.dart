@@ -56,44 +56,49 @@ class FirestoreSyncService {
   void _listenToUsers() {
     _usersSub = _firestore.collection('users').snapshots().listen(
       (snapshot) async {
-        if (snapshot.docs.isEmpty) return;
+        final localUsers = _storage.loadUsers();
+        final userMap = {for (var u in localUsers) u.id: u};
+        bool changed = false;
 
-        final cloudUsers = <UserModel>[];
+        // 1. Procesar eliminaciones remotas
+        for (final change in snapshot.docChanges) {
+          if (change.type == DocumentChangeType.removed) {
+            if (userMap.containsKey(change.doc.id)) {
+              userMap.remove(change.doc.id);
+              changed = true;
+            }
+          }
+        }
+
+        // 2. Procesar inserciones y actualizaciones
         for (final doc in snapshot.docs) {
           try {
             final data = Map<String, dynamic>.from(doc.data());
             data['id'] = doc.id;
-            cloudUsers.add(UserModel.fromJson(data));
-          } catch (e) {
-            debugPrint('Error parseando usuario de Firestore (${doc.id}): $e');
-          }
-        }
-
-        if (cloudUsers.isNotEmpty) {
-          final localUsers = _storage.loadUsers();
-          final userMap = {for (var u in localUsers) u.id: u};
-
-          bool changed = false;
-          for (final cu in cloudUsers) {
+            final cu = UserModel.fromJson(data);
             final existing = userMap[cu.id];
             if (existing == null ||
                 jsonEncode(existing.toJson()) != jsonEncode(cu.toJson())) {
               userMap[cu.id] = cu;
               changed = true;
             }
+          } catch (e) {
+            debugPrint('Error parseando usuario de Firestore (${doc.id}): $e');
+          }
+        }
+
+        if (changed || localUsers.length != userMap.length) {
+          final merged = userMap.values.toList();
+          await _storage.saveUsers(merged);
+
+          final sessionUser = _storage.loadSessionUser();
+          if (sessionUser != null && userMap.containsKey(sessionUser.id)) {
+            await _storage.saveSessionUser(userMap[sessionUser.id]);
+          } else if (sessionUser != null && !userMap.containsKey(sessionUser.id)) {
+            await _storage.saveSessionUser(null);
           }
 
-          if (changed || localUsers.length != userMap.length) {
-            final merged = userMap.values.toList();
-            await _storage.saveUsers(merged);
-
-            final sessionUser = _storage.loadSessionUser();
-            if (sessionUser != null && userMap.containsKey(sessionUser.id)) {
-              await _storage.saveSessionUser(userMap[sessionUser.id]);
-            }
-
-            onUsersUpdated?.call();
-          }
+          onUsersUpdated?.call();
         }
       },
       onError: (err) {
@@ -106,39 +111,42 @@ class FirestoreSyncService {
   void _listenToEvents() {
     _eventsSub = _firestore.collection('events').snapshots().listen(
       (snapshot) async {
-        if (snapshot.docs.isEmpty) return;
+        final localEvents = _storage.loadEvents();
+        final eventMap = {for (var e in localEvents) e.id: e};
+        bool changed = false;
 
-        final cloudEvents = <EventModel>[];
+        // 1. Procesar eliminaciones remotas
+        for (final change in snapshot.docChanges) {
+          if (change.type == DocumentChangeType.removed) {
+            if (eventMap.containsKey(change.doc.id)) {
+              eventMap.remove(change.doc.id);
+              changed = true;
+            }
+          }
+        }
+
+        // 2. Procesar inserciones y actualizaciones
         for (final doc in snapshot.docs) {
           try {
             final data = Map<String, dynamic>.from(doc.data());
             data['id'] = doc.id;
-            cloudEvents.add(EventModel.fromJson(data));
-          } catch (e) {
-            debugPrint('Error parseando evento de Firestore (${doc.id}): $e');
-          }
-        }
-
-        if (cloudEvents.isNotEmpty) {
-          final localEvents = _storage.loadEvents();
-          final eventMap = {for (var e in localEvents) e.id: e};
-
-          bool changed = false;
-          for (final ce in cloudEvents) {
+            final ce = EventModel.fromJson(data);
             final existing = eventMap[ce.id];
             if (existing == null ||
                 jsonEncode(existing.toJson()) != jsonEncode(ce.toJson())) {
               eventMap[ce.id] = ce;
               changed = true;
             }
+          } catch (e) {
+            debugPrint('Error parseando evento de Firestore (${doc.id}): $e');
           }
+        }
 
-          if (changed || localEvents.length != eventMap.length) {
-            final merged = eventMap.values.toList()
-              ..sort((a, b) => b.date.compareTo(a.date));
-            await _storage.saveEvents(merged);
-            onEventsUpdated?.call();
-          }
+        if (changed || localEvents.length != eventMap.length) {
+          final merged = eventMap.values.toList()
+            ..sort((a, b) => b.date.compareTo(a.date));
+          await _storage.saveEvents(merged);
+          onEventsUpdated?.call();
         }
       },
       onError: (err) {
@@ -151,39 +159,42 @@ class FirestoreSyncService {
   void _listenToCases() {
     _casesSub = _firestore.collection('cases').snapshots().listen(
       (snapshot) async {
-        if (snapshot.docs.isEmpty) return;
+        final localCases = _storage.loadCases();
+        final caseMap = {for (var c in localCases) c.id: c};
+        bool changed = false;
 
-        final cloudCases = <CaseModel>[];
+        // 1. Procesar eliminaciones remotas
+        for (final change in snapshot.docChanges) {
+          if (change.type == DocumentChangeType.removed) {
+            if (caseMap.containsKey(change.doc.id)) {
+              caseMap.remove(change.doc.id);
+              changed = true;
+            }
+          }
+        }
+
+        // 2. Procesar inserciones y actualizaciones
         for (final doc in snapshot.docs) {
           try {
             final data = Map<String, dynamic>.from(doc.data());
             data['id'] = doc.id;
-            cloudCases.add(CaseModel.fromJson(data));
-          } catch (e) {
-            debugPrint('Error parseando caso de Firestore (${doc.id}): $e');
-          }
-        }
-
-        if (cloudCases.isNotEmpty) {
-          final localCases = _storage.loadCases();
-          final caseMap = {for (var c in localCases) c.id: c};
-
-          bool changed = false;
-          for (final cc in cloudCases) {
+            final cc = CaseModel.fromJson(data);
             final existing = caseMap[cc.id];
             if (existing == null ||
                 jsonEncode(existing.toJson()) != jsonEncode(cc.toJson())) {
               caseMap[cc.id] = cc;
               changed = true;
             }
+          } catch (e) {
+            debugPrint('Error parseando caso de Firestore (${doc.id}): $e');
           }
+        }
 
-          if (changed || localCases.length != caseMap.length) {
-            final merged = caseMap.values.toList()
-              ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
-            await _storage.saveCases(merged);
-            onCasesUpdated?.call();
-          }
+        if (changed || localCases.length != caseMap.length) {
+          final merged = caseMap.values.toList()
+            ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
+          await _storage.saveCases(merged);
+          onCasesUpdated?.call();
         }
       },
       onError: (err) {
@@ -194,76 +205,90 @@ class FirestoreSyncService {
 
   // --- ESCRITURAS HACIA LA NUBE (OFFLINE RESILIENT) ---
 
-  Future<void> syncUser(UserModel user) async {
+  Future<bool> syncUser(UserModel user) async {
     try {
       await _firestore
           .collection('users')
           .doc(user.id)
           .set(user.toJson(), SetOptions(merge: true));
+      return true;
     } catch (e) {
       debugPrint('Error syncUser to Firestore: $e');
+      return false;
     }
   }
 
-  Future<void> deleteUser(String userId) async {
+  Future<bool> deleteUser(String userId) async {
     try {
       await _firestore.collection('users').doc(userId).delete();
+      return true;
     } catch (e) {
       debugPrint('Error deleteUser in Firestore: $e');
+      return false;
     }
   }
 
-  Future<void> syncEvent(EventModel event) async {
+  Future<bool> syncEvent(EventModel event) async {
     try {
       await _firestore
           .collection('events')
           .doc(event.id)
           .set(event.toJson(), SetOptions(merge: true));
+      return true;
     } catch (e) {
       debugPrint('Error syncEvent to Firestore: $e');
+      return false;
     }
   }
 
-  Future<void> deleteEvent(String eventId) async {
+  Future<bool> deleteEvent(String eventId) async {
     try {
       await _firestore.collection('events').doc(eventId).delete();
+      return true;
     } catch (e) {
       debugPrint('Error deleteEvent in Firestore: $e');
+      return false;
     }
   }
 
-  Future<void> syncCase(CaseModel caseItem) async {
+  Future<bool> syncCase(CaseModel caseItem) async {
     try {
       await _firestore
           .collection('cases')
           .doc(caseItem.id)
           .set(caseItem.toJson(), SetOptions(merge: true));
+      return true;
     } catch (e) {
       debugPrint('Error syncCase to Firestore: $e');
+      return false;
     }
   }
 
   // --- SINCRONIZACIÓN FORZADA / ON DEMAND ---
   Future<bool> forceSyncAll() async {
     try {
+      bool allSent = true;
       // 1. Enviar locales a la nube
       final localUsers = _storage.loadUsers();
       for (final u in localUsers) {
         if (u.id != 'user_demo_1') {
-          await syncUser(u);
+          final ok = await syncUser(u);
+          if (!ok) allSent = false;
         }
       }
 
       final localEvents = _storage.loadEvents();
       for (final e in localEvents) {
         if (e.id != 'event_demo_1') {
-          await syncEvent(e);
+          final ok = await syncEvent(e);
+          if (!ok) allSent = false;
         }
       }
 
       final localCases = _storage.loadCases();
       for (final c in localCases) {
-        await syncCase(c);
+        final ok = await syncCase(c);
+        if (!ok) allSent = false;
       }
 
       // 2. Traer y consolidar desde la nube
@@ -321,7 +346,7 @@ class FirestoreSyncService {
         onCasesUpdated?.call();
       }
 
-      return true;
+      return allSent;
     } catch (e) {
       debugPrint('Error en forceSyncAll: $e');
       return false;

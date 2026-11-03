@@ -44,6 +44,7 @@ class EventService extends ChangeNotifier {
     String? address,
     String? imageUrl,
     int requiredStaffCount = 15,
+    String region = AppRegions.buenosAires,
     required UserModel currentUser,
   }) async {
     if (!currentUser.canCreateEvents) {
@@ -61,7 +62,10 @@ class EventService extends ChangeNotifier {
       address: address?.trim().isEmpty == true ? null : address?.trim(),
       imageUrl: imageUrl?.trim().isEmpty == true ? null : imageUrl?.trim(),
       requiredStaffCount: requiredStaffCount > 0 ? requiredStaffCount : 15,
+      region: region.trim().isEmpty ? AppRegions.buenosAires : region.trim(),
       staffIds: const [], // Ningún miembro asociado automáticamente por defecto
+      confirmedStaffIds: const [],
+      absentStaffIds: const [],
       createdBy: currentUser.id,
       createdByName: currentUser.fullName,
       createdAt: DateTime.now(),
@@ -88,6 +92,7 @@ class EventService extends ChangeNotifier {
     String? address,
     String? imageUrl,
     required int requiredStaffCount,
+    String? region,
     required UserModel currentUser,
   }) async {
     if (!currentUser.canCreateEvents) {
@@ -108,6 +113,7 @@ class EventService extends ChangeNotifier {
       address: address?.trim().isEmpty == true ? null : address?.trim(),
       imageUrl: imageUrl?.trim().isEmpty == true ? null : imageUrl?.trim(),
       requiredStaffCount: requiredStaffCount > 0 ? requiredStaffCount : 15,
+      region: region != null && region.trim().isNotEmpty ? region.trim() : existing.region,
     );
 
     _events[index] = updated;
@@ -133,14 +139,14 @@ class EventService extends ChangeNotifier {
     return true;
   }
 
-  /// Permite a un miembro del staff sumarse a un evento
+  /// Permite a un miembro del staff anotarse a un evento (queda pendiente de confirmación)
   Future<bool> joinEvent(String eventId, String userId) async {
     final index = _events.indexWhere((e) => e.id == eventId);
     if (index == -1) return false;
 
     final event = _events[index];
     if (event.staffIds.contains(userId)) {
-      return true; // Ya está sumado
+      return true; // Ya está anotado
     }
 
     final updatedStaff = List<String>.from(event.staffIds)..add(userId);
@@ -160,7 +166,114 @@ class EventService extends ChangeNotifier {
 
     final event = _events[index];
     final updatedStaff = List<String>.from(event.staffIds)..remove(userId);
-    final updated = event.copyWith(staffIds: updatedStaff);
+    final updatedConfirmed = List<String>.from(event.confirmedStaffIds)..remove(userId);
+    final updatedAbsent = List<String>.from(event.absentStaffIds)..remove(userId);
+    final updatedPairs = List<EventPair>.from(event.pairs)
+      ..removeWhere((p) => p.containsUser(userId));
+
+    final updated = event.copyWith(
+      staffIds: updatedStaff,
+      confirmedStaffIds: updatedConfirmed,
+      absentStaffIds: updatedAbsent,
+      pairs: updatedPairs,
+    );
+    _events[index] = updated;
+
+    await _storage.saveEvents(_events);
+    firestoreSync?.syncEvent(updated);
+    notifyListeners();
+    return true;
+  }
+
+  /// Confirma a un miembro anotado para el evento
+  Future<bool> confirmStaffMember({
+    required String eventId,
+    required String userId,
+    required UserModel currentUser,
+  }) async {
+    final canManage = currentUser.isSuperAdmin ||
+        currentUser.hasRole(AppRoles.organizacion) ||
+        currentUser.hasRole(AppRoles.produccion) ||
+        currentUser.hasRole(AppRoles.rrhh);
+    if (!canManage) return false;
+
+    final index = _events.indexWhere((e) => e.id == eventId);
+    if (index == -1) return false;
+
+    final event = _events[index];
+    final updatedStaff = List<String>.from(event.staffIds);
+    if (!updatedStaff.contains(userId)) {
+      updatedStaff.add(userId);
+    }
+    final updatedConfirmed = List<String>.from(event.confirmedStaffIds);
+    if (!updatedConfirmed.contains(userId)) {
+      updatedConfirmed.add(userId);
+    }
+
+    final updated = event.copyWith(
+      staffIds: updatedStaff,
+      confirmedStaffIds: updatedConfirmed,
+    );
+    _events[index] = updated;
+
+    await _storage.saveEvents(_events);
+    firestoreSync?.syncEvent(updated);
+    notifyListeners();
+    return true;
+  }
+
+  /// Remueve o saca a un miembro del evento (desanota y desconfirma)
+  Future<bool> removeStaffMember({
+    required String eventId,
+    required String userId,
+    required UserModel currentUser,
+  }) async {
+    final canManage = currentUser.isSuperAdmin ||
+        currentUser.hasRole(AppRoles.organizacion) ||
+        currentUser.hasRole(AppRoles.produccion) ||
+        currentUser.hasRole(AppRoles.rrhh);
+    if (!canManage) return false;
+
+    final index = _events.indexWhere((e) => e.id == eventId);
+    if (index == -1) return false;
+
+    final event = _events[index];
+    final updatedStaff = List<String>.from(event.staffIds)..remove(userId);
+    final updatedConfirmed = List<String>.from(event.confirmedStaffIds)..remove(userId);
+    final updatedAbsent = List<String>.from(event.absentStaffIds)..remove(userId);
+    final updatedPairs = List<EventPair>.from(event.pairs)
+      ..removeWhere((p) => p.containsUser(userId));
+
+    final updated = event.copyWith(
+      staffIds: updatedStaff,
+      confirmedStaffIds: updatedConfirmed,
+      absentStaffIds: updatedAbsent,
+      pairs: updatedPairs,
+    );
+    _events[index] = updated;
+
+    await _storage.saveEvents(_events);
+    firestoreSync?.syncEvent(updated);
+    notifyListeners();
+    return true;
+  }
+
+  /// Establece la lista de miembros ausentes en el evento (para conteo de asistencia)
+  Future<bool> setAbsentStaff({
+    required String eventId,
+    required List<String> absentStaffIds,
+    required UserModel currentUser,
+  }) async {
+    final canManage = currentUser.isSuperAdmin ||
+        currentUser.hasRole(AppRoles.organizacion) ||
+        currentUser.hasRole(AppRoles.produccion) ||
+        currentUser.hasRole(AppRoles.rrhh);
+    if (!canManage) return false;
+
+    final index = _events.indexWhere((e) => e.id == eventId);
+    if (index == -1) return false;
+
+    final updated = _events[index].copyWith(absentStaffIds: absentStaffIds);
     _events[index] = updated;
 
     await _storage.saveEvents(_events);

@@ -9,6 +9,7 @@ import '../../widgets/app_header.dart';
 import '../../widgets/app_background.dart';
 import 'create_user_screen.dart';
 import 'user_detail_roles_screen.dart';
+import '../../widgets/whatsapp_icon.dart';
 
 class UsersAdminScreen extends StatefulWidget {
   const UsersAdminScreen({super.key});
@@ -339,9 +340,7 @@ class _UserTile extends StatelessWidget {
           children: [
             if (user.phone.trim().isNotEmpty)
               IconButton(
-                icon: const Icon(
-                  Icons.chat_bubble_outline_rounded,
-                  color: AppTheme.neonGreen,
+                icon: const WhatsAppIcon(
                   size: 20,
                 ),
                 tooltip: 'WhatsApp',

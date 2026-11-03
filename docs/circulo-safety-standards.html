@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estándares de Seguridad (CSAE) - Círculo | Omniverse Labs</title>
+    <style>
+        :root {
+            --primary: #7C3AED;
+            --primary-light: #F5F3FF;
+            --secondary: #F43F5E;
+            --danger: #EF4444;
+            --success: #10B981;
+            --dark-bg: #0F0D15;
+            --card-bg: #1A1625;
+            --card-border: #2D263F;
+            --text-main: #F3F4F6;
+            --text-muted: #9CA3AF;
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            line-height: 1.65;
+            color: var(--text-main);
+            background-color: var(--dark-bg);
+            padding: 32px 16px;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 44px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--card-border);
+            margin-bottom: 32px;
+        }
+
+        .brand-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-circle {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
+        }
+
+        .brand-title {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #FFFFFF;
+        }
+
+        .brand-sub {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .lang-switch {
+            display: flex;
+            gap: 8px;
+            background: #120E1C;
+            padding: 4px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .lang-btn.active {
+            background: var(--primary);
+            color: #FFFFFF;
+        }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(244, 63, 94, 0.15);
+            color: #FDA4AF;
+            border: 1px solid rgba(244, 63, 94, 0.35);
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #FFFFFF;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .meta-info {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .banner-critical {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(244, 63, 94, 0.1) 100%);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            border-left: 4px solid var(--danger);
+            border-radius: 14px;
+            padding: 20px;
+            margin: 24px 0;
+            color: #FEE2E2;
+            font-size: 15px;
+        }
+
+        .banner-critical strong {
+            color: #FFFFFF;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-top: 36px;
+            margin-bottom: 14px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 8px;
+        }
+
+        p, li {
+            color: var(--text-muted);
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        ul, ol {
+            padding-left: 24px;
+            margin-bottom: 16px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        strong {
+            color: #FFFFFF;
+        }
+
+        code {
+            background: #251F33;
+            color: #C4B5FD;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .action-box {
+            background: #13101C;
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .action-box h3 {
+            font-size: 16px;
+            color: #FFFFFF;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--card-border);
+            font-size: 13px;
+            color: #6B7280;
+            text-align: center;
+        }
+
+        .footer a {
+            color: #A78BFA;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .lang-content {
+            display: none;
+        }
+
+        .lang-content.active {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 24px 18px;
+                border-radius: 16px;
+            }
+            h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="brand-group">
+                <div class="logo-circle">🛡️</div>
+                <div>
+                    <div class="brand-title">Círculo</div>
+                    <div class="brand-sub">Omniverse Labs &bull; Estándares de Seguridad y Protección Infantil</div>
+                </div>
+            </div>
+            <div class="lang-switch">
+                <button class="lang-btn active" onclick="switchLang('es')">Español</button>
+                <button class="lang-btn" onclick="switchLang('en')">English</button>
+            </div>
+        </div>
+
+        <!-- CONTENIDO EN ESPAÑOL -->
+        <div id="lang-es" class="lang-content active">
+            <div class="badge-pill">POLÍTICA DE SEGURIDAD INFANTIL (CSAE/CSAM)</div>
+            <h1>Estándares contra el Abuso y Explotación Sexual Infantil</h1>
+            <div class="meta-info">
+                <strong>Aplicación:</strong> Círculo (<code>com.omniverselabs.circulo</code>)<br>
+                <strong>Desarrollador:</strong> Omniverse Labs &bull; Contacto de Confianza y Seguridad: <a href="mailto:omniverselabs@gmail.com" style="color: #A78BFA;">omniverselabs@gmail.com</a><br>
+                <strong>Fecha de Publicación:</strong> 3 de noviembre de 2026
+            </div>
+
+            <div class="banner-critical">
+                <strong>🚫 POLÍTICA DE TOLERANCIA CERO:</strong> Omniverse Labs prohíbe de manera estricta y absoluta cualquier forma de abuso sexual infantil, explotación sexual de menores (CSAE) y material de abuso sexual infantil (CSAM). Cualquier cuenta, contenido o comportamiento que infrinja esta política será expulsado de inmediato y denunciado formalmente ante las autoridades judiciales y organismos internacionales de protección a la infancia.
+            </div>
+
+            <h2>1. Restricción Estricta de Edad (+18)</h2>
+            <p><strong>Círculo es una plataforma diseñada y destinada exclusivamente a personas adultas mayores de 18 años.</strong></p>
+            <ul>
+                <li>No se permite el registro ni la participación de personas menores de edad en ningún servicio, chat o función de la aplicación.</li>
+                <li>Durante el registro se requiere verificación de fecha de nacimiento/edad. Si detectamos o se denuncia que un perfil pertenece a un menor de 18 años, la cuenta es cancelada de inmediato y sus datos son eliminados.</li>
+            </ul>
+
+            <h2>2. Estándares de Contenido y Conducta Prohibida</h2>
+            <p>Se consideran infracciones gravísimas y están totalmente prohibidas en Círculo:</p>
+            <ul>
+                <li>La publicación, almacenamiento, transmisión o facilitación de cualquier imagen, video, texto o representación de abuso o explotación sexual de menores (CSAM/CSAE).</li>
+                <li>Cualquier intento de contacto, seducción, acoso o captación de menores con fines sexuales (grooming o child exploitation).</li>
+                <li>La difusión de enlaces, solicitudes o referencias a material de abuso infantil en perfiles, fotos o chats grupales.</li>
+            </ul>
+
+            <h2>3. Mecanismos de Detección y Moderación</h2>
+            <p>Para resguardar a la comunidad y prevenir cualquier infracción:</p>
+            <ul>
+                <li><strong>Moderación de Imágenes y Perfiles:</strong> Las fotos de perfil y biografías pasan por filtros de moderación y auditoría para verificar el cumplimiento con nuestras directrices comunitarias.</li>
+                <li><strong>Herramientas de Reporte Comunitario:</strong> Dentro de cada sala de chat grupal y en cada tarjeta de perfil existe una opción visible para <strong>"Reportar Usuario / Contenido"</strong>.</li>
+                <li><strong>Revisión Prioritaria:</strong> Cualquier reporte clasificado con sospecha de explotación infantil tiene prioridad de atención inmediata por parte de nuestro equipo de seguridad.</li>
+            </ul>
+
+            <h2>4. Protocolo de Acción Inmediata ante Denuncias</h2>
+            <p>Ante cualquier indicio o reporte confirmado de CSAE/CSAM:</p>
+            <ol>
+                <li><strong>Bloqueo Inmediato:</strong> La cuenta es suspendida de forma instantánea e irreversible impidiendo cualquier acceso futuro.</li>
+                <li><strong>Preservación de Evidencia:</strong> Los registros necesarios son preservados de forma segura con fines periciales según lo requerido por ley.</li>
+                <li><strong>Denuncia a Autoridades:</strong> Notificamos inmediatamente al <strong>National Center for Missing & Exploited Children (NCMEC)</strong> y a las autoridades policiales y judiciales correspondientes en la jurisdicción pertinente.</li>
+            </ol>
+
+            <h2>5. Cómo Denunciar una Conducta Sospechosa</h2>
+            <div class="action-box">
+                <h3>🚨 Canales de Denuncia Directa</h3>
+                <p>Si detectas cualquier usuario o contenido que vulnere la protección de menores, comunícate de inmediato por cualquiera de las siguientes vías:</p>
+                <ul>
+                    <li><strong>En la App:</strong> Abrí el perfil o el menú del chat &rarr; pulsa <strong>"Reportar"</strong> &rarr; seleccioná la causal de seguridad.</li>
+                    <li><strong>Por Correo Electrónico:</strong> Escribinos a <a href="mailto:omniverselabs@gmail.com?subject=ALERTA%20DE%20SEGURIDAD%20INFANTIL%20-%20CSAE%20-%20C%C3%ADrculo" style="color: #F43F5E; font-weight: 700;">omniverselabs@gmail.com</a> con el asunto <code>"ALERTA DE SEGURIDAD INFANTIL - CSAE - Círculo"</code>.</li>
+                    <li><strong>Organismos Externos:</strong> También puedes denunciar directamente ante el NCMEC en <a href="https://www.cybertipline.org" target="_blank" rel="noopener noreferrer" style="color: #A78BFA;">CyberTipline (NCMEC)</a> o ante tu fuerza policial local.</li>
+                </ul>
+            </div>
+
+            <h2>6. Cooperación Permanente</h2>
+            <p>Omniverse Labs coopera plenamente con las fuerzas del orden y los organismos internacionales de defensa del menor para erradicar el abuso y la explotación sexual infantil en el ecosistema digital.</p>
+        </div>
+
+        <!-- CONTENIDO EN INGLÉS -->
+        <div id="lang-en" class="lang-content">
+            <div class="badge-pill">CHILD SAFETY POLICY (CSAE / CSAM)</div>
+            <h1>Standards Against Child Sexual Abuse and Exploitation</h1>
+            <div class="meta-info">
+                <strong>Application:</strong> Círculo (<code>com.omniverselabs.circulo</code>)<br>
+                <strong>Developer:</strong> Omniverse Labs &bull; Trust & Safety Contact: <a href="mailto:omniverselabs@gmail.com" style="color: #A78BFA;">omniverselabs@gmail.com</a><br>
+                <strong>Effective Date:</strong> November 3, 2026
+            </div>
+
+            <div class="banner-critical">
+                <strong>🚫 ZERO TOLERANCE POLICY:</strong> Omniverse Labs maintains a strict zero-tolerance policy against Child Sexual Abuse and Exploitation (CSAE) and Child Sexual Abuse Material (CSAM). Any user account, communication, or content associated with such prohibited activity will be terminated immediately and reported to law enforcement authorities and international child protection entities.
+            </div>
+
+            <h2>1. Strict Age Restriction (18+ Only)</h2>
+            <p><strong>Círculo is designed and intended strictly for adults aged 18 and older.</strong></p>
+            <ul>
+                <li>Minors are not permitted to register, create accounts, or participate in any discovery or chat feature.</li>
+                <li>Age verification is required at onboarding. Accounts identified as belonging to individuals under 18 years of age are immediately terminated and their data deleted.</li>
+            </ul>
+
+            <h2>2. Prohibited Content and Conduct</h2>
+            <p>The following activities are strictly forbidden on Círculo:</p>
+            <ul>
+                <li>Uploading, possessing, distributing, transmitting, or facilitating any form of Child Sexual Abuse Material (CSAM) or Child Sexual Exploitation and Abuse (CSAE).</li>
+                <li>Any attempt to groom, solicit, or exploit minors in any manner.</li>
+                <li>Sharing links, requests, or references to child abuse material across profile descriptions, photos, or group chats.</li>
+            </ul>
+
+            <h2>3. Detection and Moderation Systems</h2>
+            <ul>
+                <li><strong>Profile & Media Screening:</strong> Profile photographs and text fields are reviewed and subject to automated and human moderation standards.</li>
+                <li><strong>In-App User Reporting:</strong> Every profile card and group chat view contains an accessible <strong>"Report User / Content"</strong> feature.</li>
+                <li><strong>Priority Triage:</strong> Reports concerning potential child endangerment are treated with the highest urgency by our Trust & Safety team.</li>
+            </ul>
+
+            <h2>4. Enforcement and Immediate Action Protocols</h2>
+            <p>Upon receiving any credible report or detection of CSAE/CSAM:</p>
+            <ol>
+                <li><strong>Immediate Account Termination:</strong> The associated user account is permanently terminated.</li>
+                <li><strong>Evidence Preservation:</strong> Pertinent server records are securely preserved in compliance with applicable law for criminal investigation purposes.</li>
+                <li><strong>Mandatory Reporting:</strong> We promptly submit formal reports to the <strong>National Center for Missing & Exploited Children (NCMEC)</strong> and relevant law enforcement jurisdictions.</li>
+            </ol>
+
+            <h2>5. Reporting Mechanisms</h2>
+            <div class="action-box">
+                <h3>🚨 Reporting Channels</h3>
+                <p>If you observe any suspicious conduct or violations regarding child safety, report it immediately:</p>
+                <ul>
+                    <li><strong>Inside the App:</strong> Tap the user card or chat overflow menu &rarr; select <strong>"Report"</strong>.</li>
+                    <li><strong>Direct Email:</strong> Contact our team at <a href="mailto:omniverselabs@gmail.com?subject=CHILD%20SAFETY%20ALERT%20-%20CSAE%20-%20Circulo" style="color: #F43F5E; font-weight: 700;">omniverselabs@gmail.com</a> with the subject <code>"CHILD SAFETY ALERT - CSAE - Circulo"</code>.</li>
+                    <li><strong>External Authorities:</strong> You may also report directly to <a href="https://www.cybertipline.org" target="_blank" rel="noopener noreferrer" style="color: #A78BFA;">NCMEC CyberTipline</a> or your local law enforcement agency.</li>
+                </ul>
+            </div>
+
+            <h2>6. Ongoing Commitment</h2>
+            <p>Omniverse Labs is fully dedicated to maintaining a safe digital environment and assisting international organizations and law enforcement to eradicate child exploitation.</p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            &copy; 2026 Omniverse Labs. All rights reserved. &bull; <a href="circulo-privacy.html">Política de Privacidad</a> &bull; <a href="circulo-delete-account.html">Eliminar Cuenta</a> &bull; <a href="mailto:omniverselabs@gmail.com">Contacto de Seguridad</a>
+        </div>
+    </div>
+
+    <script>
+        function switchLang(lang) {
+            document.querySelectorAll('.lang-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.lang-btn').forEach(el => el.classList.remove('active'));
+
+            document.getElementById('lang-' + lang).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

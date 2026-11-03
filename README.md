@@ -41,6 +41,7 @@ Omniverse Labs/
 | **OmniTrade** | `com.omniverselabs.omnitrade` | `1.0.0+1` | Registro y bitácora de operaciones de trading, calculadora de riesgo, analíticas avanzadas, seguridad biométrica y modelo freemium. |
 | **Mi Delta** | `com.omniverselabs.mi_delta` | `1.0.0+1` | Aplicación ciudadana municipal y gestión urbana (turnos, reclamos geolocalizados con cuadrillas, tarjeta Soy Delta con QR, botón SOS/COD y alertas del río). |
 | **Vuelo Controlado Staff** | `com.omniverselabs.vuelocontrolado` | `1.0.1+4` | Gestión de staff, guardias de eventos y reducción de daños offline-first con diseño Obsidian, dock de navegación flotante y fichas médicas seguras. |
+| **Círculo** | `com.omniverselabs.circulo` | `1.0.0+1` | Red social y de descubrimiento para hacer amigos reales en grupos de 4 a 10 personas (match grupal K4, modo dupla, química de roles y modelo freemium). |
 
 ---
 

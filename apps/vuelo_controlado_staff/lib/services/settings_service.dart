@@ -6,11 +6,13 @@ class SettingsService extends ChangeNotifier {
   static const String _keyThemeMode = 'app_theme_mode';
   static const String _keyLocale = 'app_locale';
   static const String _keyAutoLocale = 'app_auto_locale';
+  static const String _keyBiometricEnabled = 'app_biometric_enabled';
 
   final SharedPreferences _prefs;
   ThemeMode _themeMode = ThemeMode.system;
   bool _isAutoLocale = true;
   Locale _locale = const Locale('es');
+  bool _biometricEnabled = false;
 
   SettingsService(this._prefs) {
     _loadSettings();
@@ -22,6 +24,7 @@ class SettingsService extends ChangeNotifier {
   bool get isAutoLocale => _isAutoLocale;
   Locale get locale => _locale;
   bool get isSpanish => _locale.languageCode == 'es';
+  bool get biometricEnabled => _biometricEnabled;
 
   void _loadSettings() {
     final savedTheme = _prefs.getString(_keyThemeMode);
@@ -42,6 +45,8 @@ class SettingsService extends ChangeNotifier {
       final savedLocale = _prefs.getString(_keyLocale);
       _locale = savedLocale == 'en' ? const Locale('en') : const Locale('es');
     }
+
+    _biometricEnabled = _prefs.getBool(_keyBiometricEnabled) ?? false;
     notifyListeners();
   }
 
@@ -75,6 +80,12 @@ class SettingsService extends ChangeNotifier {
     _locale = loc;
     await _prefs.setBool(_keyAutoLocale, false);
     await _prefs.setString(_keyLocale, loc.languageCode);
+    notifyListeners();
+  }
+
+  Future<void> setBiometricEnabled(bool enabled) async {
+    _biometricEnabled = enabled;
+    await _prefs.setBool(_keyBiometricEnabled, enabled);
     notifyListeners();
   }
 }

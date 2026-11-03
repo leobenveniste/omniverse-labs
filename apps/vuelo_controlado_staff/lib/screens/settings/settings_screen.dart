@@ -7,11 +7,11 @@ import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
 import '../../services/settings_service.dart';
 import '../../services/firestore_sync_service.dart';
+import '../../services/biometric_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/app_header.dart';
 import '../../widgets/motion_components.dart';
 import '../login_screen.dart';
-import '../users/users_admin_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -896,8 +896,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final authService = context.watch<AuthService>();
     final settingsService = context.watch<SettingsService>();
     final user = authService.currentUser;
-    final canManageTeam =
-        user != null && (user.canManageUsers || user.canCreateUsers);
     final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
@@ -924,9 +922,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 24),
               ],
 
-              // SECCIÓN PREFERENCIAS
-              const _SectionHeader(title: 'PREFERENCIAS'),
-              const SizedBox(height: 8),
+              // LISTA UNIFICADA DE CONFIGURACIÓN
               _SettingsGroup(
                 children: [
                   _SettingRow(
@@ -984,17 +980,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ],
                     ),
                     onTap: () => _showLanguageSelector(context, settingsService),
-                    isLast: true,
                   ),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              // SECCIÓN CUENTA
-              const _SectionHeader(title: 'CUENTA'),
-              const SizedBox(height: 8),
-              _SettingsGroup(
-                children: [
                   _SettingRow(
                     icon: Icons.lock_rounded,
                     iconBgColor: const Color(0xFF3B82F6),
@@ -1008,37 +994,61 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       HapticFeedback.lightImpact();
                       _showChangePasswordSheet(context);
                     },
-                    isLast: !canManageTeam,
                   ),
-                  if (canManageTeam)
-                    _SettingRow(
-                      icon: Icons.people_alt_rounded,
-                      iconBgColor: const Color(0xFF8B5CF6),
-                      title: 'Administrar equipo',
-                      trailing: Icon(
-                        Icons.chevron_right_rounded,
-                        size: 20,
-                        color: AppTheme.textSecondaryColor(context),
-                      ),
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const UsersAdminScreen(),
-                          ),
-                        );
+                  _SettingRow(
+                    icon: Icons.fingerprint_rounded,
+                    iconBgColor: const Color(0xFF10B981),
+                    title: 'Desbloqueo Biométrico',
+                    subtitle: 'Ingresar con huella dactilar o rostro',
+                    trailing: Switch.adaptive(
+                      value: settingsService.biometricEnabled,
+                      activeTrackColor: AppTheme.primaryColor(context),
+                      onChanged: (val) async {
+                        HapticFeedback.mediumImpact();
+                        if (val) {
+                          final bioService = context.read<BiometricService>();
+                          final canCheck =
+                              await bioService.canCheckBiometrics();
+                          if (!canCheck && context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                    'Tu dispositivo no tiene biometría configurada o no es compatible.'),
+                                backgroundColor: AppTheme.warningOrange,
+                              ),
+                            );
+                            return;
+                          }
+                          final authOk = await bioService.authenticate(
+                            localizedReason:
+                                'Confirmá tu identidad para activar el acceso biométrico',
+                          );
+                          if (authOk) {
+                            await settingsService.setBiometricEnabled(true);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                      '✓ Desbloqueo biométrico activado'),
+                                  backgroundColor: AppTheme.neonGreen,
+                                ),
+                              );
+                            }
+                          }
+                        } else {
+                          await settingsService.setBiometricEnabled(false);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content:
+                                    Text('Desbloqueo biométrico desactivado'),
+                              ),
+                            );
+                          }
+                        }
                       },
-                      isLast: true,
                     ),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              // SECCIÓN SINCRONIZACIÓN Y NUBE
-              const _SectionHeader(title: 'DATOS Y SINCRONIZACIÓN'),
-              const SizedBox(height: 8),
-              _SettingsGroup(
-                children: [
+                  ),
                   _SettingRow(
                     icon: Icons.cloud_sync_rounded,
                     iconBgColor: const Color(0xFF06B6D4),
@@ -1088,17 +1098,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         );
                       }
                     },
-                    isLast: true,
                   ),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              // SECCIÓN SESIÓN
-              const _SectionHeader(title: 'SESIÓN'),
-              const SizedBox(height: 8),
-              _SettingsGroup(
-                children: [
                   _SettingRow(
                     icon: Icons.logout_rounded,
                     iconBgColor: const Color(0xFFEF4444),
@@ -1180,7 +1180,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Versión 1.0.27 (Build 30)',
+                      'Versión 1.0.31 (Build 34)',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -1449,24 +1449,3 @@ class _SettingRow extends StatelessWidget {
   }
 }
 
-class _SectionHeader extends StatelessWidget {
-  final String title;
-
-  const _SectionHeader({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 6, bottom: 2),
-      child: Text(
-        title,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w900,
-          color: AppTheme.primaryColor(context),
-          letterSpacing: 0.8,
-        ),
-      ),
-    );
-  }
-}

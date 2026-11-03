@@ -7,6 +7,8 @@ service_account.json
 play_service_account*.json
 *.p12
 *.pepk
+*.aab
+*.apk
 
 # Firebase Client Configs
 **/firebase_options.dart

@@ -147,4 +147,26 @@ class StorageService {
     final raw = jsonEncode(cases.map((c) => c.toJson()).toList());
     await _prefs.setString(_casesKey, raw);
   }
+
+  // --- BORRADORES DE FICHA DE CASO (AUTOSAVE DRAFTS) ---
+  static const String _caseDraftPrefix = 'vc_staff_case_draft_';
+
+  Map<String, dynamic>? loadCaseDraft(String eventId) {
+    final raw = _prefs.getString('$_caseDraftPrefix$eventId');
+    if (raw == null || raw.isEmpty) return null;
+    try {
+      return jsonDecode(raw) as Map<String, dynamic>;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> saveCaseDraft(String eventId, Map<String, dynamic> draftData) async {
+    final raw = jsonEncode(draftData);
+    await _prefs.setString('$_caseDraftPrefix$eventId', raw);
+  }
+
+  Future<void> clearCaseDraft(String eventId) async {
+    await _prefs.remove('$_caseDraftPrefix$eventId');
+  }
 }

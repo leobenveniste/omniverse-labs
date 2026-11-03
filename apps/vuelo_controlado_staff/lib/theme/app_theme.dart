@@ -638,7 +638,7 @@ class AppTheme {
     required Color focusBorderColor,
   }) {
     return ButtonStyle(
-      minimumSize: const WidgetStatePropertyAll(Size.fromHeight(52)),
+      minimumSize: const WidgetStatePropertyAll(Size(0, 52)),
       padding: const WidgetStatePropertyAll(
         EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       ),
@@ -694,7 +694,7 @@ class AppTheme {
     required Color disabledFg,
   }) {
     return ButtonStyle(
-      minimumSize: const WidgetStatePropertyAll(Size.fromHeight(52)),
+      minimumSize: const WidgetStatePropertyAll(Size(0, 52)),
       padding: const WidgetStatePropertyAll(
         EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       ),

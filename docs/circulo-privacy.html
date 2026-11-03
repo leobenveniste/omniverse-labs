@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Privacidad - Círculo | Omniverse Labs</title>
+    <style>
+        :root {
+            --primary: #7C3AED;
+            --primary-light: #F5F3FF;
+            --primary-dark: #6D28D9;
+            --secondary: #F43F5E;
+            --secondary-light: #FFF1F2;
+            --accent-gold: #F59E0B;
+            --dark-bg: #0F0D15;
+            --card-bg: #1A1625;
+            --card-border: #2D263F;
+            --text-main: #F3F4F6;
+            --text-muted: #9CA3AF;
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            line-height: 1.65;
+            color: var(--text-main);
+            background-color: var(--dark-bg);
+            padding: 32px 16px;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 44px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--card-border);
+            margin-bottom: 32px;
+        }
+
+        .brand-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-circle {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
+        }
+
+        .brand-title {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #FFFFFF;
+        }
+
+        .brand-sub {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .lang-switch {
+            display: flex;
+            gap: 8px;
+            background: #120E1C;
+            padding: 4px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .lang-btn.active {
+            background: var(--primary);
+            color: #FFFFFF;
+        }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(124, 58, 237, 0.15);
+            color: #C4B5FD;
+            border: 1px solid rgba(124, 58, 237, 0.35);
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-size: 30px;
+            font-weight: 800;
+            color: #FFFFFF;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .meta-info {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+        }
+
+        .callout-box {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(244, 63, 94, 0.08) 100%);
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            border-left: 4px solid var(--secondary);
+            border-radius: 14px;
+            padding: 20px;
+            margin: 24px 0;
+            font-size: 15px;
+            color: #E5E7EB;
+        }
+
+        .callout-box strong {
+            color: #FFFFFF;
+        }
+
+        .nav-links-box {
+            background: #13101C;
+            border: 1px dashed var(--card-border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin: 24px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .nav-links-box a {
+            color: #A78BFA;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .nav-links-box a:hover {
+            color: var(--secondary);
+            text-decoration: underline;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-top: 36px;
+            margin-bottom: 14px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #E5E7EB;
+            margin-top: 20px;
+            margin-bottom: 8px;
+        }
+
+        p, li {
+            color: var(--text-muted);
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        ul {
+            padding-left: 24px;
+            margin-bottom: 16px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        strong {
+            color: var(--text-main);
+        }
+
+        code {
+            background: #251F33;
+            color: #C4B5FD;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .footer {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--card-border);
+            font-size: 13px;
+            color: #6B7280;
+            text-align: center;
+        }
+
+        .footer a {
+            color: #A78BFA;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .lang-content {
+            display: none;
+        }
+
+        .lang-content.active {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 24px 18px;
+                border-radius: 16px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="brand-group">
+                <div class="logo-circle">⭕</div>
+                <div>
+                    <div class="brand-title">Círculo</div>
+                    <div class="brand-sub">Omniverse Labs &bull; Amigos en Grupos Reales</div>
+                </div>
+            </div>
+            <div class="lang-switch">
+                <button class="lang-btn active" onclick="switchLang('es')">Español</button>
+                <button class="lang-btn" onclick="switchLang('en')">English</button>
+            </div>
+        </div>
+
+        <!-- Banner de Navegación a Eliminación de Cuenta -->
+        <div class="nav-links-box">
+            <span>🛡️ ¿Deseas solicitar la eliminación de tu cuenta y datos asociados?</span>
+            <a href="circulo-delete-account.html">Ir al formulario de eliminación &rarr;</a>
+        </div>
+
+        <!-- CONTENIDO EN ESPAÑOL -->
+        <div id="lang-es" class="lang-content active">
+            <div class="badge-pill">POLÍTICA DE PRIVACIDAD OFICIAL</div>
+            <h1>Política de Privacidad de Círculo</h1>
+            <div class="meta-info">
+                <strong>Aplicación:</strong> Círculo (<code>com.omniverselabs.circulo</code>)<br>
+                <strong>Desarrollador:</strong> Omniverse Labs &bull; Contacto: <a href="mailto:omniverselabs@gmail.com" style="color: #A78BFA;">omniverselabs@gmail.com</a><br>
+                <strong>Última actualización:</strong> 3 de noviembre de 2026
+            </div>
+
+            <div class="callout-box">
+                <strong>Resumen de Compromiso:</strong> En <strong>Omniverse Labs</strong> nos comprometemos a proteger la privacidad y seguridad de los usuarios de <strong>Círculo</strong>. Esta aplicación está concebida para conectar amigos en grupos de 4 a 10 personas reales ($K_4$), priorizando la química social y la transparencia. <strong>No vendemos ni comercializamos tus datos personales con terceros.</strong>
+            </div>
+
+            <h2>1. Información que Recopilamos</h2>
+            <p>Para brindarte la experiencia de descubrimiento social grupal y compatibilidad de roles, recopilamos las siguientes categorías de datos cuando utilizas la app:</p>
+            <ul>
+                <li><strong>Información del Perfil de Usuario:</strong> Nombre mostrado o apodo, dirección de correo electrónico, edad o fecha de nacimiento (para garantizar que seas mayor de 18 años), rol social seleccionado (Organizador, Conector, Explorador o Chill), biografía, intereses/etiquetas e imágenes o fotografías que decidas subir voluntariamente a tu perfil.</li>
+                <li><strong>Datos de Actividad e Interacción Social:</strong> Deslizamientos (swipes) en el mazo de descubrimiento, postulaciones a círculos en formación, vinculaciones de Modo Dupla con amigos, mensajes de texto y encuestas compartidas dentro de los chats grupales una vez desbloqueado el Círculo de 4 miembros.</li>
+                <li><strong>Información de Transacciones y Compras In-App:</strong> Si te suscribes a <em>Círculo Plus</em> o adquieres consumibles (Boosts o Super-Ondas), las transacciones son procesadas de manera segura por <strong>Google Play Billing</strong>. Nosotros recibimos únicamente identificadores alfanuméricos de compra y estado de suscripción; <strong>jamás tenemos acceso a tus números de tarjeta de crédito o cuentas bancarias</strong>.</li>
+                <li><strong>Identificadores de Publicidad y Diagnóstico:</strong> Si utilizas la versión gratuita, integramos <strong>Google Mobile Ads (AdMob)</strong> para mostrar anuncios no intrusivos alternados en el mazo. AdMob puede recopilar identificadores de publicidad móvil (AAID) y datos de diagnóstico del dispositivo de acuerdo con las políticas de Google. Al suscribirte a Círculo Plus, la publicidad se desactiva por completo.</li>
+                <li><strong>Datos de Sesión y Autenticación Biométrica:</strong> El inicio de sesión biométrico (huella o reconocimiento facial) es gestionado íntegramente por el hardware seguro del sistema operativo Android (BiometricPrompt). Ninguna plantilla biométrica sale de tu dispositivo ni se transmite a nuestros servidores.</li>
+            </ul>
+
+            <h2>2. Finalidad del Tratamiento de los Datos</h2>
+            <p>Utilizamos tu información exclusivamente para los siguientes propósitos legítimos de la aplicación:</p>
+            <ul>
+                <li><strong>Formación de Círculos ($K_4$):</strong> Calcular afinidades y emparejar a 4 personas compatibles para desbloquear chats grupales y propuestas de salidas reales.</li>
+                <li><strong>Modo Dupla:</strong> Permitir que dos amigos se vinculen mediante un código temporal para explorar el mazo juntos y ocupar 2 asientos en bloque.</li>
+                <li><strong>Gestión de Membresías y Beneficios Plus:</strong> Habilitar swipes ilimitados, fotos nítidas en la sección de pretendientes, función de Deshacer (Rewind) y bonificaciones de visibilidad.</li>
+                <li><strong>Seguridad, Moderación y Prevención de Abusos:</strong> Prevenir cuentas fraudulentas, perfiles falsos o conductas contrarias a nuestras pautas comunitarias, incluyendo la herramienta de votación comunitaria para liberar asientos inactivos.</li>
+            </ul>
+
+            <h2>3. Almacenamiento, Seguridad y Proveedores Tecnológicos</h2>
+            <p>La infraestructura técnica de Círculo está alojada en servicios certificados de <strong>Google Cloud Platform & Firebase</strong>:</p>
+            <ul>
+                <li><strong>Google Cloud Firestore:</strong> Base de datos protegida mediante Reglas de Seguridad estrictas (Security Rules) con cifrado en tránsito (TLS/HTTPS) y en reposo (AES-256).</li>
+                <li><strong>Google Sign-In & Firebase Auth:</strong> Autenticación federada segura sin almacenamiento de contraseñas en texto plano.</li>
+                <li><strong>Google Mobile Ads (AdMob):</strong> Servicio publicitario para el tier gratuito.</li>
+                <li><strong>Google Play In-App Billing:</strong> Pasarela oficial para suscripciones y consumibles.</li>
+            </ul>
+
+            <h2>4. Control del Usuario, Pausa de Visibilidad y Eliminación de Cuenta</h2>
+            <p>En estricto cumplimiento de las políticas de datos de Google Play y las regulaciones internacionales de privacidad (GDPR, LGPD y normativas locales):</p>
+            <ul>
+                <li><strong>Pausar Descubrimiento:</strong> Puedes ocultar temporalmente tu perfil del mazo en cualquier momento desde <em>Ajustes &rarr; Pausar visibilidad en Descubrimiento</em> sin perder tus grupos activos.</li>
+                <li><strong>Eliminación de Cuenta In-App:</strong> Puedes eliminar tu cuenta de forma inmediata dirigiéndote a <em>Ajustes &rarr; Legal y Privacidad &rarr; Eliminar mi cuenta y datos</em>. Esta acción borra tu perfil, fotos, historial de swipes y mensajes de chat de inmediato.</li>
+                <li><strong>Eliminación de Cuenta vía Web (Sin necesidad de la app):</strong> Cumpliendo con la directiva de Google Play, cualquier usuario puede solicitar el borrado permanente de su cuenta y datos sin reinstalar la app visitando nuestra página de <a href="circulo-delete-account.html" style="color: #A78BFA; font-weight: 700;">Solicitud de Eliminación de Cuenta</a> o escribiendo a <a href="mailto:omniverselabs@gmail.com?subject=Solicitud%20de%20Eliminación%20de%20Cuenta%20-%20Círculo" style="color: #A78BFA;">omniverselabs@gmail.com</a>.</li>
+            </ul>
+
+            <h2>5. Conservación de Datos y Límites Legales</h2>
+            <p>Tus datos personales y de actividad social se conservan únicamente mientras mantengas activa tu cuenta. Al solicitar la eliminación, los datos de perfil y chats se purgan de forma definitiva. Ciertos identificadores alfanuméricos de recibos de compra en Google Play se conservan de forma anonimizada exclusivamente por el tiempo exigido por normativas fiscales, contables y de prevención de fraudes bancarios.</p>
+
+            <h2>6. Privacidad de Menores de Edad y Estándares CSAE</h2>
+            <p><strong>Círculo está restringida estrictamente a personas de 18 años o más.</strong> No permitimos el registro ni recopilamos deliberadamente información de menores de edad. Si tomamos conocimiento de que una cuenta pertenece a un menor de 18 años, procederemos a su inmediata eliminación de nuestros sistemas.</p>
+            <p>Para conocer nuestros estándares contra el abuso y explotación sexual infantil, consulta nuestros <a href="circulo-safety-standards.html" style="color: #A78BFA; font-weight: 700;">Estándares de Seguridad Infantil (CSAE)</a>.</p>
+
+            <h2>7. Modificaciones a esta Política</h2>
+            <p>Nos reservamos el derecho de actualizar esta política de privacidad ante mejoras funcionales o cambios normativos. Cualquier modificación relevante será notificada a través de la aplicación o en este mismo sitio web indicando la fecha de última revisión.</p>
+
+            <h2>8. Contacto</h2>
+            <p>Para consultas, reclamos o ejercicio de tus derechos de acceso, rectificación, portabilidad o cancelación de datos:</p>
+            <ul>
+                <li><strong>Equipo de Privacidad:</strong> Omniverse Labs</li>
+                <li><strong>Correo de Contacto:</strong> <a href="mailto:omniverselabs@gmail.com" style="color: #A78BFA; font-weight: 700;">omniverselabs@gmail.com</a></li>
+            </ul>
+        </div>
+
+        <!-- CONTENIDO EN INGLÉS -->
+        <div id="lang-en" class="lang-content">
+            <div class="badge-pill">OFFICIAL PRIVACY POLICY</div>
+            <h1>Círculo Privacy Policy</h1>
+            <div class="meta-info">
+                <strong>Application:</strong> Círculo (<code>com.omniverselabs.circulo</code>)<br>
+                <strong>Developer:</strong> Omniverse Labs &bull; Contact: <a href="mailto:omniverselabs@gmail.com" style="color: #A78BFA;">omniverselabs@gmail.com</a><br>
+                <strong>Last Updated:</strong> November 3, 2026
+            </div>
+
+            <div class="callout-box">
+                <strong>Privacy Commitment:</strong> At <strong>Omniverse Labs</strong>, we are committed to safeguarding your privacy and data security. <strong>Círculo</strong> is built to connect real friends in groups of 4 to 10 people ($K_4$), prioritizing chemistry and social comfort. <strong>We do not sell or trade your personal data with third parties.</strong>
+            </div>
+
+            <h2>1. Information We Collect</h2>
+            <p>To provide our group discovery engine and role compatibility chemistry, we collect the following categories of data when you use the app:</p>
+            <ul>
+                <li><strong>User Profile Information:</strong> Display name or nickname, email address, age or birthdate (to verify you are at least 18 years old), chosen social role (Organizer, Connector, Explorer, or Chill), biography, tags/interests, and profile photographs you voluntarily upload.</li>
+                <li><strong>Social Activity and Interaction:</strong> Discovery card swipes, applications to forming circles, Duo Mode connections with friends, group chat text messages, and polls created once the 4-person Circle is completed.</li>
+                <li><strong>In-App Purchases and Transactions:</strong> Subscriptions to <em>Círculo Plus</em> or consumables (Boosts or Super-Ondas) are securely processed through <strong>Google Play Billing</strong>. We only receive verification tokens and subscription statuses; <strong>we never access or store your credit card or financial account numbers</strong>.</li>
+                <li><strong>Advertising & Diagnostic Identifiers:</strong> In the free tier, we integrate <strong>Google Mobile Ads (AdMob)</strong> to show non-intrusive alternate cards. AdMob may collect mobile advertising IDs (AAID) and device diagnostics in accordance with Google policies. Subscribing to Círculo Plus removes all ads completely.</li>
+                <li><strong>Biometric Security:</strong> Biometric login is handled exclusively on-device by Android’s secure BiometricPrompt. No biometric data ever leaves your device or touches our servers.</li>
+            </ul>
+
+            <h2>2. Purpose of Data Processing</h2>
+            <p>Your data is processed strictly for the following purposes:</p>
+            <ul>
+                <li><strong>Circle Match ($K_4$):</strong> Calculating affinities to bring together 4 compatible individuals and unlock real-life social planning.</li>
+                <li><strong>Duo Mode:</strong> Allowing two friends to link via temporary codes and swipe together to occupy two seats at once.</li>
+                <li><strong>Círculo Plus Benefits:</strong> Providing unlimited daily swipes, unblurred likes received, rewind swipes, and visibility boosts.</li>
+                <li><strong>Safety & Abuse Prevention:</strong> Preventing fraudulent accounts and enforcing community guidelines through voting and moderation tools.</li>
+            </ul>
+
+            <h2>3. Security & Cloud Infrastructure</h2>
+            <p>Círculo runs on certified <strong>Google Cloud Platform & Firebase</strong> infrastructure:</p>
+            <ul>
+                <li><strong>Cloud Firestore:</strong> Secured with granular Firestore Security Rules and encrypted in transit (TLS/HTTPS) and at rest (AES-256).</li>
+                <li><strong>Google Sign-In & Firebase Auth:</strong> Federated, passwordless, and token-based identity verification.</li>
+                <li><strong>Google Mobile Ads & Google Play Billing:</strong> Official Google APIs adhering to Google Play Developer Policies.</li>
+            </ul>
+
+            <h2>4. User Rights and Account Deletion</h2>
+            <ul>
+                <li><strong>Pause Discovery:</strong> Hide your card from the deck anytime from <em>Settings &rarr; Pause Discovery</em> without leaving your active circles.</li>
+                <li><strong>In-App Deletion:</strong> Instantly delete your account and all associated data via <em>Settings &rarr; Legal & Privacy &rarr; Delete my account and data</em>.</li>
+                <li><strong>Web-based Deletion (Outside the app):</strong> In accordance with Google Play rules, you can request full account deletion without reinstalling the app on our <a href="circulo-delete-account.html" style="color: #A78BFA; font-weight: 700;">Account Deletion Request Page</a> or by emailing <a href="mailto:omniverselabs@gmail.com?subject=Account%20Deletion%20Request%20-%20Circulo" style="color: #A78BFA;">omniverselabs@gmail.com</a>.</li>
+            </ul>
+
+            <h2>5. Data Retention</h2>
+            <p>Your profile, swipes, and messages are permanently deleted upon account closure. Certain transaction records processed by Google Play Billing are retained anonymously solely to comply with legal, tax, and anti-fraud regulations.</p>
+
+            <h2>6. Children's Privacy and CSAE Standards</h2>
+            <p><strong>Círculo is strictly restricted to users aged 18 and older.</strong> We do not knowingly collect personal information from individuals under 18.</p>
+            <p>To read our published safety standards against child sexual abuse and exploitation, please review our <a href="circulo-safety-standards.html" style="color: #A78BFA; font-weight: 700;">Child Safety Standards (CSAE)</a>.</p>
+
+            <h2>7. Contact</h2>
+            <p>For questions or data subject requests, please contact us at:</p>
+            <ul>
+                <li><strong>Developer:</strong> Omniverse Labs</li>
+                <li><strong>Email:</strong> <a href="mailto:omniverselabs@gmail.com" style="color: #A78BFA; font-weight: 700;">omniverselabs@gmail.com</a></li>
+            </ul>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            &copy; 2026 Omniverse Labs. All rights reserved. &bull; <a href="circulo-delete-account.html">Eliminar Cuenta / Account Deletion</a> &bull; <a href="mailto:omniverselabs@gmail.com">Soporte / Support</a>
+        </div>
+    </div>
+
+    <script>
+        function switchLang(lang) {
+            document.querySelectorAll('.lang-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.lang-btn').forEach(el => el.classList.remove('active'));
+
+            document.getElementById('lang-' + lang).classList.add('active');
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>

@@ -62,6 +62,28 @@ class _CasesHubScreenState extends State<CasesHubScreen> {
     return events.first;
   }
 
+  String _formatHabilitationMessage(EventModel event) {
+    final now = DateTime.now();
+    final isToday = event.date.year == now.year &&
+        event.date.month == now.month &&
+        event.date.day == now.day;
+    final timeStr = event.doorsOpenTime.isNotEmpty
+        ? event.doorsOpenTime
+        : event.startTime;
+
+    if (isToday) {
+      return 'Fichas habilitadas hoy a las $timeStr hs';
+    } else {
+      try {
+        final dateFormatted =
+            DateFormat('EEEE d \'de\' MMMM', 'es').format(event.date);
+        return 'Fichas habilitadas el $dateFormatted a las $timeStr hs';
+      } catch (_) {
+        return 'Fichas habilitadas el ${event.date.day}/${event.date.month}/${event.date.year} a las $timeStr hs';
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final eventService = context.watch<EventService>();
@@ -361,7 +383,7 @@ class _CasesHubScreenState extends State<CasesHubScreen> {
                                             ),
                                             const SizedBox(width: 8),
                                             Text(
-                                              'Fichas habilitadas a las ${selectedEvent.doorsOpenTime.isNotEmpty ? selectedEvent.doorsOpenTime : selectedEvent.startTime} hs',
+                                              _formatHabilitationMessage(selectedEvent),
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w500,

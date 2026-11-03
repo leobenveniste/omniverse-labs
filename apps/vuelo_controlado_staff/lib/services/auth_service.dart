@@ -83,6 +83,7 @@ class AuthService extends ChangeNotifier {
 
       _currentUser = foundUser;
       await _storage.saveSessionUser(_currentUser);
+      await _storage.prefs.setString('vc_staff_last_email', foundUser.email);
       _isLoading = false;
       notifyListeners();
       return true;
@@ -99,6 +100,31 @@ class AuthService extends ChangeNotifier {
     _currentUser = null;
     await _storage.saveSessionUser(null);
     notifyListeners();
+  }
+
+  /// Retorna el último usuario que inició sesión
+  UserModel? getLastLoggedInUser() {
+    final lastEmail = _storage.prefs.getString('vc_staff_last_email');
+    if (lastEmail == null || lastEmail.isEmpty) {
+      if (_users.isNotEmpty) return _users.first;
+      return null;
+    }
+    try {
+      return _users.firstWhere(
+        (u) => u.email.trim().toLowerCase() == lastEmail.trim().toLowerCase(),
+      );
+    } catch (_) {
+      return _users.isNotEmpty ? _users.first : null;
+    }
+  }
+
+  /// Inicia sesión biométrica directa para el último usuario verificado
+  Future<bool> loginWithBiometrics(UserModel user) async {
+    _currentUser = user;
+    await _storage.saveSessionUser(_currentUser);
+    await _storage.prefs.setString('vc_staff_last_email', user.email);
+    notifyListeners();
+    return true;
   }
 
   /// Actualiza la contraseña del usuario actual
@@ -311,6 +337,9 @@ class AuthService extends ChangeNotifier {
     DateTime? birthDate,
     String? photoUrl,
     List<String>? roles,
+    String? region,
+    int? manualAttendanceCount,
+    bool clearManualAttendance = false,
   }) async {
     _errorMessage = null;
     final index = _users.indexWhere((u) => u.id == userId);
@@ -362,6 +391,8 @@ class AuthService extends ChangeNotifier {
       birthDate: birthDate ?? existing.birthDate,
       photoUrl: photoUrl ?? existing.photoUrl,
       roles: cleanRoles,
+      region: region != null && region.trim().isNotEmpty ? region.trim() : existing.region,
+      manualAttendanceCount: clearManualAttendance ? null : (manualAttendanceCount ?? existing.manualAttendanceCount),
     );
 
     _users[index] = updated;
@@ -371,6 +402,40 @@ class AuthService extends ChangeNotifier {
       await _storage.saveSessionUser(_currentUser);
     }
 
+    await _storage.saveUsers(_users);
+    firestoreSync?.syncUser(updated);
+    notifyListeners();
+    return true;
+  }
+
+  /// Actualiza la región de un usuario (exclusivo para administración de equipo)
+  Future<bool> updateUserRegion(String userId, String newRegion) async {
+    final index = _users.indexWhere((u) => u.id == userId);
+    if (index == -1) return false;
+    final updated = _users[index].copyWith(region: newRegion);
+    _users[index] = updated;
+    if (_currentUser?.id == userId) {
+      _currentUser = updated;
+      await _storage.saveSessionUser(_currentUser);
+    }
+    await _storage.saveUsers(_users);
+    firestoreSync?.syncUser(updated);
+    notifyListeners();
+    return true;
+  }
+
+  /// Actualiza o limpia el ajuste manual de asistencias de un usuario
+  Future<bool> updateUserManualAttendance(String userId, int? attendanceCount) async {
+    final index = _users.indexWhere((u) => u.id == userId);
+    if (index == -1) return false;
+    final updated = _users[index].copyWith(
+      manualAttendanceCount: attendanceCount,
+    );
+    _users[index] = updated;
+    if (_currentUser?.id == userId) {
+      _currentUser = updated;
+      await _storage.saveSessionUser(_currentUser);
+    }
     await _storage.saveUsers(_users);
     firestoreSync?.syncUser(updated);
     notifyListeners();

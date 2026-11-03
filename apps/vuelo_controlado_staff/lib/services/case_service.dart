@@ -162,4 +162,12 @@ class CaseService extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  // --- BORRADORES TEMPORALES ---
+  Map<String, dynamic>? getDraft(String eventId) => _storage.loadCaseDraft(eventId);
+
+  Future<void> saveDraft(String eventId, Map<String, dynamic> data) =>
+      _storage.saveCaseDraft(eventId, data);
+
+  Future<void> clearDraft(String eventId) => _storage.clearCaseDraft(eventId);
 }

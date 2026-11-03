@@ -63,6 +63,29 @@ class _CaseFormScreenState extends State<CaseFormScreen> {
   late final TextEditingController _relevantInfoController;
 
   bool _isSaving = false;
+  bool _checkedDraft = false;
+  bool _hasDraftLoaded = false;
+
+  double get _formProgress {
+    int total = 4;
+    int filled = 0;
+    if (_gender.isNotEmpty && _ageRange.isNotEmpty && _moment.isNotEmpty) {
+      filled++;
+    }
+    if (_consumedSubstances.isNotEmpty) {
+      filled++;
+    }
+    if (_physicalSymptoms.isNotEmpty ||
+        _psychologicalSymptoms.isNotEmpty ||
+        _otherPhysicalSymptomsController.text.trim().isNotEmpty) {
+      filled++;
+    }
+    if (_resolution.isNotEmpty &&
+        _attendingStaffController.text.trim().isNotEmpty) {
+      filled++;
+    }
+    return filled / total;
+  }
 
   static const List<String> _genderOptions = ['M', 'F', 'No binario'];
   static const List<String> _ageOptions = [
@@ -210,6 +233,133 @@ class _CaseFormScreenState extends State<CaseFormScreen> {
         _attendingStaffController.text = currentUser.fullName;
       }
     }
+    if (!_checkedDraft && widget.existingCase == null) {
+      _checkedDraft = true;
+      final caseService = context.read<CaseService>();
+      final draft = caseService.getDraft(widget.event.id);
+      if (draft != null) {
+        _restoreDraft(draft);
+      }
+    }
+  }
+
+  void _triggerAutoSave() {
+    if (widget.existingCase != null) return;
+    final caseService = context.read<CaseService>();
+    final draftData = {
+      'gender': _gender,
+      'ageRange': _ageRange,
+      'moment': _moment,
+      'duration': _duration,
+      'arrivalMode': _arrivalMode,
+      'accompaniedBy': _accompaniedByController.text,
+      'consumedSubstances': _consumedSubstances,
+      'substanceQuantities': _substanceQuantities,
+      'mdmaPillName': _mdmaPillNameController.text,
+      'otherSubstanceName': _otherSubstanceNameController.text,
+      'otherSubstanceQuantity': _otherSubstanceQuantityController.text,
+      'isFirstTimeConsuming': _isFirstTimeConsuming,
+      'hasUnderlyingCondition': _hasUnderlyingCondition,
+      'underlyingConditionDetail': _underlyingConditionDetailController.text,
+      'physicalSymptoms': _physicalSymptoms.toList(),
+      'otherPhysicalSymptoms': _otherPhysicalSymptomsController.text,
+      'psychologicalSymptoms': _psychologicalSymptoms.toList(),
+      'healthTeamIntervened': _healthTeamIntervened,
+      'isComplexCase': _isComplexCase,
+      'resolution': _resolution,
+      'otherResolution': _otherResolutionController.text,
+      'attendingStaff': _attendingStaffController.text,
+      'relevantInfo': _relevantInfoController.text,
+      'savedAt': DateTime.now().toIso8601String(),
+    };
+    caseService.saveDraft(widget.event.id, draftData);
+    if (!_hasDraftLoaded && mounted) {
+      setState(() => _hasDraftLoaded = true);
+    }
+  }
+
+  void _restoreDraft(Map<String, dynamic> draft) {
+    _gender = draft['gender'] ?? _gender;
+    _ageRange = draft['ageRange'] ?? _ageRange;
+    _moment = draft['moment'] ?? _moment;
+    _duration = draft['duration'] ?? _duration;
+    _arrivalMode = draft['arrivalMode'] ?? _arrivalMode;
+    _accompaniedByController.text = draft['accompaniedBy'] ?? '';
+    _consumedSubstances = draft['consumedSubstances'] ?? _consumedSubstances;
+    final rawSubs = draft['substanceQuantities'];
+    if (rawSubs is Map) {
+      _substanceQuantities.clear();
+      rawSubs.forEach((k, v) => _substanceQuantities[k.toString()] = v.toString());
+    }
+    _mdmaPillNameController.text = draft['mdmaPillName'] ?? '';
+    _otherSubstanceNameController.text = draft['otherSubstanceName'] ?? '';
+    _otherSubstanceQuantityController.text =
+        draft['otherSubstanceQuantity'] ?? '';
+    _isFirstTimeConsuming =
+        draft['isFirstTimeConsuming'] ?? _isFirstTimeConsuming;
+    _hasUnderlyingCondition =
+        draft['hasUnderlyingCondition'] ?? _hasUnderlyingCondition;
+    _underlyingConditionDetailController.text =
+        draft['underlyingConditionDetail'] ?? '';
+    final rawPhys = draft['physicalSymptoms'];
+    if (rawPhys is List) {
+      _physicalSymptoms.clear();
+      _physicalSymptoms.addAll(rawPhys.map((e) => e.toString()));
+    }
+    _otherPhysicalSymptomsController.text =
+        draft['otherPhysicalSymptoms'] ?? '';
+    final rawPsych = draft['psychologicalSymptoms'];
+    if (rawPsych is List) {
+      _psychologicalSymptoms.clear();
+      _psychologicalSymptoms.addAll(rawPsych.map((e) => e.toString()));
+    }
+    _healthTeamIntervened = draft['healthTeamIntervened'] == true;
+    _isComplexCase = draft['isComplexCase'] == true;
+    _resolution = draft['resolution'] ?? _resolution;
+    _otherResolutionController.text = draft['otherResolution'] ?? '';
+    if (draft['attendingStaff'] != null &&
+        (draft['attendingStaff'] as String).isNotEmpty) {
+      _attendingStaffController.text = draft['attendingStaff'];
+    }
+    _relevantInfoController.text = draft['relevantInfo'] ?? '';
+    _hasDraftLoaded = true;
+  }
+
+  void _discardDraft() {
+    HapticFeedback.mediumImpact();
+    final caseService = context.read<CaseService>();
+    caseService.clearDraft(widget.event.id);
+    setState(() {
+      _hasDraftLoaded = false;
+      _gender = 'M';
+      _ageRange = '18 – 25';
+      _moment = 'Main';
+      _duration = 'hasta 30\'';
+      _arrivalMode = 'Solx';
+      _accompaniedByController.clear();
+      _consumedSubstances = 'Si';
+      _substanceQuantities.clear();
+      _mdmaPillNameController.clear();
+      _otherSubstanceNameController.clear();
+      _otherSubstanceQuantityController.clear();
+      _isFirstTimeConsuming = 'No';
+      _hasUnderlyingCondition = 'No';
+      _underlyingConditionDetailController.clear();
+      _physicalSymptoms.clear();
+      _otherPhysicalSymptomsController.clear();
+      _psychologicalSymptoms.clear();
+      _healthTeamIntervened = false;
+      _isComplexCase = false;
+      _resolution = 'Recuperación íntegra';
+      _otherResolutionController.clear();
+      _relevantInfoController.clear();
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Borrador descartado'),
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
@@ -338,6 +488,10 @@ class _CaseFormScreenState extends State<CaseFormScreen> {
     setState(() => _isSaving = false);
 
     if (success) {
+      if (widget.existingCase == null) {
+        await caseService.clearDraft(widget.event.id);
+      }
+      if (!mounted) return;
       HapticFeedback.mediumImpact();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -450,7 +604,9 @@ class _CaseFormScreenState extends State<CaseFormScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
+              _buildProgressBar(context),
+              const SizedBox(height: 12),
 
               // 1. Perfil & Contexto
               _buildSectionCard(
@@ -952,6 +1108,95 @@ class _CaseFormScreenState extends State<CaseFormScreen> {
     );
   }
 
+  Widget _buildProgressBar(BuildContext context) {
+    final progress = _formProgress;
+    final percent = (progress * 100).toInt();
+    final primary = AppTheme.primaryColor(context);
+    final isDark = AppTheme.isDark(context);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppTheme.cardColor(context),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.borderColor(context)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.edit_note_rounded, size: 18, color: primary),
+              const SizedBox(width: 8),
+              Text(
+                'Avance de la ficha: $percent%',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.textPrimaryColor(context),
+                ),
+              ),
+              const Spacer(),
+              if (_hasDraftLoaded && widget.existingCase == null) ...[
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: primary.withValues(alpha: isDark ? 0.2 : 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.save_outlined, size: 12, color: primary),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Autoguardado',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 6),
+                InkWell(
+                  onTap: _discardDraft,
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    child: Text(
+                      'Descartar',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: AppTheme.errorRed,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 6,
+              backgroundColor:
+                  isDark ? const Color(0xFF2C2C2C) : const Color(0xFFE5E7EB),
+              valueColor: AlwaysStoppedAnimation<Color>(primary),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildLabel(String text) {
     return Text(
       text,
@@ -1014,7 +1259,11 @@ class _CaseFormScreenState extends State<CaseFormScreen> {
     final isDark = AppTheme.isDark(context);
 
     return PressableScale(
-      onTap: onSelected,
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onSelected();
+        _triggerAutoSave();
+      },
       targetScale: 0.94,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
@@ -1055,7 +1304,11 @@ class _CaseFormScreenState extends State<CaseFormScreen> {
     final isDark = AppTheme.isDark(context);
 
     return PressableScale(
-      onTap: onTap,
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+        _triggerAutoSave();
+      },
       targetScale: 0.94,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),

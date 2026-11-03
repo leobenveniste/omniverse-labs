@@ -1,6 +1,7 @@
 import 'event_unified_report.dart';
 import 'event_pair.dart';
 import 'event_round_log.dart';
+import 'user_model.dart';
 
 class EventModel {
   final String id;
@@ -14,6 +15,9 @@ class EventModel {
   final String? imageUrl;
   final int requiredStaffCount;
   final List<String> staffIds;
+  final List<String> confirmedStaffIds;
+  final List<String> absentStaffIds;
+  final String region;
   final String createdBy;
   final String createdByName;
   final DateTime createdAt;
@@ -35,6 +39,9 @@ class EventModel {
     this.imageUrl,
     this.requiredStaffCount = 4,
     required this.staffIds,
+    this.confirmedStaffIds = const [],
+    this.absentStaffIds = const [],
+    this.region = AppRegions.buenosAires,
     required this.createdBy,
     required this.createdByName,
     required this.createdAt,
@@ -49,6 +56,13 @@ class EventModel {
     return staffIds.contains(userId);
   }
 
+  bool isUserRegistered(String userId) => staffIds.contains(userId);
+
+  bool isUserConfirmed(String userId) => confirmedStaffIds.contains(userId);
+
+  bool isUserAttended(String userId) =>
+      isPast && isUserConfirmed(userId) && !absentStaffIds.contains(userId);
+
   /// Retorna la pareja asignada para un usuario si existe
   EventPair? getPairForUser(String userId) {
     try {
@@ -59,17 +73,20 @@ class EventModel {
   }
 
   int get currentStaffCount => staffIds.length;
+  int get confirmedStaffCount => confirmedStaffIds.length;
+  int get pendingStaffCount =>
+      staffIds.where((id) => !confirmedStaffIds.contains(id)).length;
 
   bool get isQuotaFull =>
-      requiredStaffCount > 0 && currentStaffCount >= requiredStaffCount;
+      requiredStaffCount > 0 && confirmedStaffCount >= requiredStaffCount;
 
   double get quotaProgress => requiredStaffCount > 0
-      ? (currentStaffCount / requiredStaffCount).clamp(0.0, 1.0)
+      ? (confirmedStaffCount / requiredStaffCount).clamp(0.0, 1.0)
       : 1.0;
 
   String get quotaText => requiredStaffCount > 0
-      ? '$currentStaffCount / $requiredStaffCount staff'
-      : '$currentStaffCount staff';
+      ? '$confirmedStaffCount / $requiredStaffCount staff'
+      : '$confirmedStaffCount staff';
 
   /// Fecha y hora de inicio calculada
   DateTime get startDateTime {
@@ -132,6 +149,9 @@ class EventModel {
     String? imageUrl,
     int? requiredStaffCount,
     List<String>? staffIds,
+    List<String>? confirmedStaffIds,
+    List<String>? absentStaffIds,
+    String? region,
     bool? isManuallyStarted,
     bool? isManuallyClosed,
     EventUnifiedReport? unifiedReport,
@@ -150,6 +170,9 @@ class EventModel {
       imageUrl: imageUrl ?? this.imageUrl,
       requiredStaffCount: requiredStaffCount ?? this.requiredStaffCount,
       staffIds: staffIds ?? this.staffIds,
+      confirmedStaffIds: confirmedStaffIds ?? this.confirmedStaffIds,
+      absentStaffIds: absentStaffIds ?? this.absentStaffIds,
+      region: region ?? this.region,
       createdBy: createdBy,
       createdByName: createdByName,
       createdAt: createdAt,
@@ -174,6 +197,9 @@ class EventModel {
       'imageUrl': imageUrl,
       'requiredStaffCount': requiredStaffCount,
       'staffIds': staffIds,
+      'confirmedStaffIds': confirmedStaffIds,
+      'absentStaffIds': absentStaffIds,
+      'region': region,
       'createdBy': createdBy,
       'createdByName': createdByName,
       'createdAt': createdAt.toIso8601String(),
@@ -205,6 +231,11 @@ class EventModel {
           .toList();
     }
 
+    final rawStaff = List<String>.from(map['staffIds'] ?? []);
+    final rawConfirmed = map['confirmedStaffIds'] != null
+        ? List<String>.from(map['confirmedStaffIds'])
+        : List<String>.from(rawStaff);
+
     return EventModel(
       id: map['id'] ?? '',
       name: map['name'] ?? '',
@@ -218,7 +249,10 @@ class EventModel {
       address: map['address'],
       imageUrl: map['imageUrl'],
       requiredStaffCount: map['requiredStaffCount'] ?? 4,
-      staffIds: List<String>.from(map['staffIds'] ?? []),
+      staffIds: rawStaff,
+      confirmedStaffIds: rawConfirmed,
+      absentStaffIds: List<String>.from(map['absentStaffIds'] ?? []),
+      region: map['region'] ?? AppRegions.buenosAires,
       createdBy: map['createdBy'] ?? '',
       createdByName: map['createdByName'] ?? '',
       createdAt: map['createdAt'] != null

@@ -38,6 +38,18 @@ class _EventsListScreenState extends State<EventsListScreen> {
   // Filtros de tiempo: por defecto solo está activo próximos eventos.
   bool _filterUpcoming = true;
   bool _filterPast = false;
+  String? _selectedRegion;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_selectedRegion == null) {
+      final user = context.read<AuthService>().currentUser;
+      _selectedRegion = (user != null && user.region.isNotEmpty)
+          ? user.region
+          : AppRegions.buenosAires;
+    }
+  }
 
   bool _isPastEvent(EventModel event) => event.isPast;
 
@@ -50,16 +62,28 @@ class _EventsListScreenState extends State<EventsListScreen> {
     final currentUser = authService.currentUser;
     final allEvents = eventService.events;
     final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+
+    final currentRegion = _selectedRegion ??
+        (currentUser != null && currentUser.region.isNotEmpty
+            ? currentUser.region
+            : AppRegions.buenosAires);
+
+    // Filtrar primero por región seleccionada
+    final regionEvents = allEvents.where((e) {
+      if (currentRegion == AppRegions.allRegions) return true;
+      return e.region == currentRegion;
+    }).toList();
 
     // Solo roles de admin y organización pueden crear nuevos eventos desde el header
     final canCreateEvent = currentUser != null &&
         (currentUser.isSuperAdmin ||
             currentUser.hasRole(AppRoles.organizacion));
 
-    // Evento actual destacado (si existe uno en curso o fechado hoy)
+    // Evento actual destacado dentro de la región seleccionada
     EventModel? currentEvent;
     try {
-      currentEvent = allEvents.firstWhere((e) => _isCurrentEvent(e));
+      currentEvent = regionEvents.firstWhere((e) => _isCurrentEvent(e));
     } catch (_) {
       currentEvent = null;
     }
@@ -69,7 +93,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
     final bool showAll =
         (_filterUpcoming && _filterPast) || (!_filterUpcoming && !_filterPast);
 
-    final filteredEvents = allEvents.where((e) {
+    final filteredEvents = regionEvents.where((e) {
       if (showAll) return true;
       if (_filterUpcoming) return !_isPastEvent(e);
       if (_filterPast) return _isPastEvent(e);
@@ -111,37 +135,98 @@ class _EventsListScreenState extends State<EventsListScreen> {
           constraints: const BoxConstraints(maxWidth: 720),
           child: CustomScrollView(
             slivers: [
-              // Barra de filtros por tiempo y Evento actual
+              // Barra de filtros por región y tiempo
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Filtros de Tiempo en la parte superior
-                      Row(
-                        children: [
-                          _buildFilterChip(
-                            label: 'Próximos',
-                            isSelected: _filterUpcoming,
-                            icon: Icons.upcoming_outlined,
-                            onTap: () {
-                              HapticFeedback.selectionClick();
-                              setState(
-                                  () => _filterUpcoming = !_filterUpcoming);
-                            },
-                          ),
-                          const SizedBox(width: 8),
-                          _buildFilterChip(
-                            label: 'Pasados',
-                            isSelected: _filterPast,
-                            icon: Icons.history_rounded,
-                            onTap: () {
-                              HapticFeedback.selectionClick();
-                              setState(() => _filterPast = !_filterPast);
-                            },
-                          ),
-                        ],
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            // 1. Selector de Región
+                            Container(
+                              height: 38,
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: primary.withValues(alpha: 0.3),
+                                ),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  value: currentRegion,
+                                  icon: Icon(Icons.arrow_drop_down_rounded, color: primary),
+                                  dropdownColor: theme.cardColor,
+                                  borderRadius: BorderRadius.circular(16),
+                                  style: TextStyle(
+                                    color: theme.colorScheme.onSurface,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  items: [
+                                    const DropdownMenuItem(
+                                      value: AppRegions.allRegions,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.public, size: 15),
+                                          SizedBox(width: 6),
+                                          Text(AppRegions.allRegions),
+                                        ],
+                                      ),
+                                    ),
+                                    ...AppRegions.all.map((r) => DropdownMenuItem(
+                                          value: r,
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(Icons.place_outlined, size: 15),
+                                              SizedBox(width: 6),
+                                              Text(r),
+                                            ],
+                                          ),
+                                        )),
+                                  ],
+                                  onChanged: (val) {
+                                    if (val != null) {
+                                      HapticFeedback.selectionClick();
+                                      setState(() => _selectedRegion = val);
+                                    }
+                                  },
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+
+                            // 2. Chip Próximos
+                            _buildFilterChip(
+                              label: 'Próximos',
+                              isSelected: _filterUpcoming,
+                              icon: Icons.upcoming_outlined,
+                              onTap: () {
+                                HapticFeedback.selectionClick();
+                                setState(() => _filterUpcoming = !_filterUpcoming);
+                              },
+                            ),
+                            const SizedBox(width: 8),
+
+                            // 3. Chip Pasados
+                            _buildFilterChip(
+                              label: 'Pasados',
+                              isSelected: _filterPast,
+                              icon: Icons.history_rounded,
+                              onTap: () {
+                                HapticFeedback.selectionClick();
+                                setState(() => _filterPast = !_filterPast);
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 16),
 
@@ -185,21 +270,31 @@ class _EventsListScreenState extends State<EventsListScreen> {
                           Icon(
                             Icons.event_busy_outlined,
                             size: 56,
-                            color:
-                                theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
                           ),
                           const SizedBox(height: 12),
                           Text(
                             (_filterPast && !_filterUpcoming)
-                                ? 'No hay eventos pasados registrados.'
-                                : 'No hay próximos eventos',
+                                ? 'No hay eventos pasados registrados en $currentRegion.'
+                                : 'No hay próximos eventos en $currentRegion.',
+                            textAlign: TextAlign.center,
                             style: TextStyle(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.7),
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
+                          if (currentRegion != AppRegions.allRegions) ...[
+                            const SizedBox(height: 16),
+                            FilledButton.tonalIcon(
+                              icon: const Icon(Icons.public_rounded, size: 18),
+                              label: const Text('Explorar todas las regiones'),
+                              onPressed: () {
+                                HapticFeedback.lightImpact();
+                                setState(() => _selectedRegion = AppRegions.allRegions);
+                              },
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -355,35 +450,69 @@ class _CurrentEventHeroCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: primary,
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.bolt_rounded,
-                            size: 14,
-                            color: AppTheme.onPrimaryColor(context),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 4,
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'EVENTO ACTUAL / EN CURSO',
-                            style: TextStyle(
-                              color: AppTheme.onPrimaryColor(context),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 0.4,
+                          decoration: BoxDecoration(
+                            color: primary,
+                            borderRadius: BorderRadius.circular(24),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.bolt_rounded,
+                                size: 14,
+                                color: AppTheme.onPrimaryColor(context),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'EVENTO ACTUAL / EN CURSO',
+                                style: TextStyle(
+                                  color: AppTheme.onPrimaryColor(context),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 0.4,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: primary.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(
+                              color: primary.withValues(alpha: 0.5),
                             ),
                           ),
-                        ],
-                      ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.place_outlined, size: 14, color: primary),
+                              const SizedBox(width: 4),
+                              Text(
+                                event.region,
+                                style: TextStyle(
+                                  color: theme.colorScheme.onSurface,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 12),
                     Text(
@@ -498,14 +627,27 @@ class _CurrentEventHeroCard extends StatelessWidget {
                           color: primary,
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          event.requiredStaffCount > 0
-                              ? '${event.currentStaffCount} / ${event.requiredStaffCount}'
-                              : '${event.currentStaffCount}',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: theme.colorScheme.onSurface,
+                        Text.rich(
+                          TextSpan(
+                            text: event.requiredStaffCount > 0
+                                ? '${event.confirmedStaffCount} / ${event.requiredStaffCount}'
+                                : '${event.confirmedStaffCount}',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                            children: [
+                              if (event.confirmedStaffCount > 0 && event.pendingStaffCount > 0)
+                                TextSpan(
+                                  text: ' (+${event.pendingStaffCount} pendientes)',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFFFFB300),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -629,21 +771,57 @@ class _EventCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Row(
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        Icon(
-                          Icons.calendar_today_outlined,
-                          size: 16,
-                          color: textSecondary,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          dateString,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: textSecondary,
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
                           ),
+                          decoration: BoxDecoration(
+                            color: primary.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: primary.withValues(alpha: 0.3),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.place_outlined, size: 12, color: primary),
+                              const SizedBox(width: 4),
+                              Text(
+                                event.region,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.calendar_today_outlined,
+                              size: 14,
+                              color: textSecondary,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              dateString,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: textSecondary,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -729,14 +907,27 @@ class _EventCard extends StatelessWidget {
                           color: primary,
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          event.requiredStaffCount > 0
-                              ? '${event.currentStaffCount} / ${event.requiredStaffCount}'
-                              : '${event.currentStaffCount}',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: theme.colorScheme.onSurface,
+                        Text.rich(
+                          TextSpan(
+                            text: event.requiredStaffCount > 0
+                                ? '${event.confirmedStaffCount} / ${event.requiredStaffCount}'
+                                : '${event.confirmedStaffCount}',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                            children: [
+                              if (event.confirmedStaffCount > 0 && event.pendingStaffCount > 0)
+                                TextSpan(
+                                  text: ' (+${event.pendingStaffCount} pendientes)',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFFFFB300),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                         const SizedBox(width: 12),

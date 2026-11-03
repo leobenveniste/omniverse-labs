@@ -9,6 +9,8 @@ import 'package:vuelo_controlado_staff/models/case_model.dart';
 import 'package:vuelo_controlado_staff/services/storage_service.dart';
 import 'package:vuelo_controlado_staff/services/auth_service.dart';
 import 'package:vuelo_controlado_staff/services/event_service.dart';
+import 'package:vuelo_controlado_staff/services/case_service.dart';
+import 'package:vuelo_controlado_staff/services/settings_service.dart';
 
 void main() {
   group('UserModel Tests', () {
@@ -430,6 +432,35 @@ void main() {
       expect(synced.isSyncedToDrive, isTrue);
       expect(synced.toSpreadsheetRow()[19], 'Sincronizado');
     });
+
+    test('CaseService draft autosave, recovery and clearance', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storage = StorageService(prefs);
+      final caseService = CaseService(storage);
+
+      const eventId = 'event_test_123';
+      expect(caseService.getDraft(eventId), isNull);
+
+      final draftPayload = {
+        'gender': 'No binario',
+        'ageRange': '26 – 35',
+        'moment': 'Final',
+        'consumedSubstances': 'Si',
+        'substanceQuantities': {'MDMA Cristal': '1 dedo'},
+        'attendingStaff': 'Voluntarix VC',
+      };
+
+      await caseService.saveDraft(eventId, draftPayload);
+      final loaded = caseService.getDraft(eventId);
+      expect(loaded, isNotNull);
+      expect(loaded!['gender'], 'No binario');
+      expect(loaded['ageRange'], '26 – 35');
+      expect(loaded['attendingStaff'], 'Voluntarix VC');
+
+      await caseService.clearDraft(eventId);
+      expect(caseService.getDraft(eventId), isNull);
+    });
   });
 
   group('AuthService User Management Tests', () {
@@ -600,6 +631,294 @@ void main() {
       final authorizedDelete = await eventService.deleteEvent(event.id, superadmin);
       expect(authorizedDelete, isTrue);
       expect(eventService.getEventById(event.id), isNull);
+    });
+
+    test('Event region, confirmation, and attendance calculation', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storage = StorageService(prefs);
+      final eventService = EventService(storage);
+
+      final admin = UserModel(
+        id: 'admin_1',
+        email: 'admin@vuelocontrolado.org',
+        password: 'pass',
+        firstName: 'Admin',
+        lastName: 'Org',
+        documentType: 'DNI',
+        documentNumber: '111',
+        birthDate: DateTime(1990, 1, 1),
+        phone: '111',
+        roles: [AppRoles.miembro, AppRoles.organizacion],
+        region: AppRegions.cordoba,
+        createdAt: DateTime.now(),
+      );
+
+      final volunteer = UserModel(
+        id: 'vol_1',
+        email: 'vol@vuelocontrolado.org',
+        password: 'pass',
+        firstName: 'Vol',
+        lastName: 'Member',
+        documentType: 'DNI',
+        documentNumber: '222',
+        birthDate: DateTime(1995, 1, 1),
+        phone: '222',
+        roles: [AppRoles.miembro],
+        createdAt: DateTime.now(),
+      );
+
+      expect(volunteer.region, AppRegions.buenosAires);
+      expect(admin.region, AppRegions.cordoba);
+
+      // Create event in Rosario
+      await eventService.createEvent(
+        name: 'Festival Rosario',
+        date: DateTime.now().subtract(const Duration(days: 5)),
+        startTime: '18:00',
+        doorsOpenTime: '19:00',
+        endTime: '03:00',
+        location: 'Rosario Predio',
+        region: AppRegions.rosario,
+        requiredStaffCount: 10,
+        currentUser: admin,
+      );
+
+      final event = eventService.events.first;
+      expect(event.region, AppRegions.rosario);
+
+      // Volunteer joins -> is registered, pending confirmation
+      await eventService.joinEvent(event.id, volunteer.id);
+      var currentEvent = eventService.getEventById(event.id)!;
+      expect(currentEvent.isUserRegistered(volunteer.id), isTrue);
+      expect(currentEvent.isUserConfirmed(volunteer.id), isFalse);
+      expect(currentEvent.pendingStaffCount, 1);
+      expect(currentEvent.confirmedStaffCount, 0);
+
+      // Past event where volunteer was NOT confirmed -> 0 attendance
+      expect(volunteer.getAttendanceCount(eventService.events), 0);
+
+      // Admin confirms volunteer
+      await eventService.confirmStaffMember(
+        eventId: event.id,
+        userId: volunteer.id,
+        currentUser: admin,
+      );
+      currentEvent = eventService.getEventById(event.id)!;
+      expect(currentEvent.isUserConfirmed(volunteer.id), isTrue);
+      expect(currentEvent.confirmedStaffCount, 1);
+      expect(currentEvent.pendingStaffCount, 0);
+
+      // Now volunteer attended 1 past event
+      expect(volunteer.getAttendanceCount(eventService.events), 1);
+
+      // If marked absent in closure report -> 0 attendance
+      await eventService.setAbsentStaff(
+        eventId: event.id,
+        absentStaffIds: [volunteer.id],
+        currentUser: admin,
+      );
+      expect(volunteer.getAttendanceCount(eventService.events), 0);
+
+      // If volunteer has manualAttendanceCount, it combines with automatic calculation (0 + 7 = 7)
+      final manualUser = volunteer.copyWith(manualAttendanceCount: 7);
+      expect(manualUser.getAttendanceCount(eventService.events), 7);
+    });
+
+    test('Combined attendance calculation: manual + automatic events flow', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storage = StorageService(prefs);
+      final eventService = EventService(storage);
+      final authService = AuthService(storage);
+
+      final admin = UserModel(
+        id: 'u_admin',
+        email: 'leobenveniste@vuelocontrolado.org',
+        password: 'pass',
+        firstName: 'Leo',
+        lastName: 'B',
+        documentType: 'DNI',
+        documentNumber: '111',
+        birthDate: DateTime(1990, 1, 1),
+        phone: '123',
+        roles: [AppRoles.miembro, AppRoles.organizacion],
+        createdAt: DateTime.now(),
+      );
+
+      var user = UserModel(
+        id: 'u_vol_1',
+        email: 'vol@vuelocontrolado.org',
+        password: 'pass',
+        firstName: 'Lucas',
+        lastName: 'Diaz',
+        documentType: 'DNI',
+        documentNumber: '222',
+        birthDate: DateTime(1995, 1, 1),
+        phone: '456',
+        roles: [AppRoles.miembro],
+        createdAt: DateTime.now(),
+      );
+
+      await storage.saveUsers([admin, user]);
+      authService.reloadUsersFromStorage();
+
+      // Case 1: Initially 0 events. Admin manually assigns 3 events
+      user = user.copyWith(manualAttendanceCount: 3);
+      expect(user.getAutomaticAttendanceCount(eventService.events), 0);
+      expect(user.getAttendanceCount(eventService.events), 3);
+
+      // User attends 1 new event -> Total becomes 4 (3 manual + 1 auto)
+      final event1 = EventModel(
+        id: 'ev_1',
+        name: 'Evento Festival 1',
+        date: DateTime.now().subtract(const Duration(days: 2)),
+        startTime: '18:00',
+        doorsOpenTime: '17:00',
+        endTime: '23:00',
+        location: 'Club A',
+        staffIds: [user.id],
+        confirmedStaffIds: [user.id],
+        createdBy: admin.id,
+        createdByName: admin.fullName,
+        createdAt: DateTime.now().subtract(const Duration(days: 3)),
+      );
+      await storage.saveEvents([event1]);
+      eventService.reloadEventsFromStorage();
+
+      expect(user.getAutomaticAttendanceCount(eventService.events), 1);
+      expect(user.getAttendanceCount(eventService.events), 4);
+
+      // Case 2: Editing user info with 1 app event already attended
+      // When opening edit dialog, total shows 4. If admin wants to set total to 3:
+      // Requested total = 3. Auto count = 1. Manual portion to save = 3 - 1 = 2.
+      final autoCount = user.getAutomaticAttendanceCount(eventService.events);
+      const requestedTotal = 3;
+      final manualToSave = requestedTotal - autoCount; // 2
+
+      await authService.updateUserByAdmin(
+        userId: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        documentType: user.documentType,
+        documentNumber: user.documentNumber,
+        phone: user.phone,
+        manualAttendanceCount: manualToSave,
+      );
+
+      user = authService.users.firstWhere((u) => u.id == user.id);
+      expect(user.manualAttendanceCount, 2);
+      expect(user.getAutomaticAttendanceCount(eventService.events), 1);
+      // Total updated value is 3
+      expect(user.getAttendanceCount(eventService.events), 3);
+
+      // From that updated value, automatic counting continues!
+      // User attends a second event (event2)
+      final event2 = EventModel(
+        id: 'ev_2',
+        name: 'Evento Festival 2',
+        date: DateTime.now().subtract(const Duration(days: 1)),
+        startTime: '18:00',
+        doorsOpenTime: '17:00',
+        endTime: '23:00',
+        location: 'Club B',
+        staffIds: [user.id],
+        confirmedStaffIds: [user.id],
+        createdBy: admin.id,
+        createdByName: admin.fullName,
+        createdAt: DateTime.now().subtract(const Duration(days: 2)),
+      );
+      await storage.saveEvents([event1, event2]);
+      eventService.reloadEventsFromStorage();
+
+      expect(user.getAutomaticAttendanceCount(eventService.events), 2);
+      // Total is now 4 (2 manual + 2 auto)!
+      expect(user.getAttendanceCount(eventService.events), 4);
+
+      // User attends a third event (event3)
+      final event3 = EventModel(
+        id: 'ev_3',
+        name: 'Evento Festival 3',
+        date: DateTime.now().subtract(const Duration(days: 1)),
+        startTime: '10:00',
+        doorsOpenTime: '09:00',
+        endTime: '14:00',
+        location: 'Club C',
+        staffIds: [user.id],
+        confirmedStaffIds: [user.id],
+        createdBy: admin.id,
+        createdByName: admin.fullName,
+        createdAt: DateTime.now().subtract(const Duration(days: 2)),
+      );
+      await storage.saveEvents([event1, event2, event3]);
+      eventService.reloadEventsFromStorage();
+
+      expect(user.getAutomaticAttendanceCount(eventService.events), 3);
+      // Total is now 5 (2 manual + 3 auto)!
+      expect(user.getAttendanceCount(eventService.events), 5);
+    });
+  });
+
+  group('Biometric & Settings Tests', () {
+    test('SettingsService persists biometric preference toggle', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final settings = SettingsService(prefs);
+
+      expect(settings.biometricEnabled, isFalse);
+
+      await settings.setBiometricEnabled(true);
+      expect(settings.biometricEnabled, isTrue);
+
+      // Verify persistence with a new instance
+      final settingsReloaded = SettingsService(prefs);
+      expect(settingsReloaded.biometricEnabled, isTrue);
+
+      await settingsReloaded.setBiometricEnabled(false);
+      expect(settingsReloaded.biometricEnabled, isFalse);
+    });
+
+    test('AuthService handles biometric login and last user memory', () async {
+      SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      final storage = StorageService(prefs);
+
+      final user = UserModel(
+        id: 'u_bio_1',
+        email: 'bio.user@vuelocontrolado.org',
+        password: 'securePassword123',
+        firstName: 'Camila',
+        lastName: 'Suarez',
+        documentType: 'DNI',
+        documentNumber: '40111222',
+        birthDate: DateTime(1996, 4, 12),
+        phone: '1133445566',
+        roles: [AppRoles.miembro],
+        createdAt: DateTime.now(),
+      );
+
+      await storage.saveUsers([user]);
+      final authService = AuthService(storage);
+
+      expect(authService.currentUser, isNull);
+      expect(authService.getLastLoggedInUser()?.email, user.email);
+
+      // Perform biometric direct login
+      final success = await authService.loginWithBiometrics(user);
+      expect(success, isTrue);
+      expect(authService.currentUser?.id, user.id);
+      expect(authService.isAuthenticated, isTrue);
+      expect(authService.getLastLoggedInUser()?.email, user.email);
+
+      // Verify persistent session in storage
+      expect(storage.loadSessionUser()?.id, user.id);
+
+      // Logout clears current session but retains last user for quick biometric re-login
+      await authService.logout();
+      expect(authService.currentUser, isNull);
+      expect(authService.isAuthenticated, isFalse);
+      expect(authService.getLastLoggedInUser()?.email, user.email);
     });
   });
 }

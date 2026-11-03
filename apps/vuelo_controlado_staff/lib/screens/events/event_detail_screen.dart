@@ -17,6 +17,7 @@ import '../cases/case_form_screen.dart';
 import '../cases/event_cases_screen.dart';
 import 'create_event_screen.dart';
 import 'event_unified_report_screen.dart';
+import '../../widgets/whatsapp_icon.dart';
 
 class EventDetailScreen extends StatefulWidget {
   final String eventId;
@@ -37,6 +38,7 @@ class EventDetailScreen extends StatefulWidget {
 class _EventDetailScreenState extends State<EventDetailScreen> {
   bool _isTogglingStaff = false;
   bool _isDeleting = false;
+  int _staffSegment = 0; // 0: Confirmados, 1: Pendientes
 
   String _formatDetailDate(DateTime date) {
     try {
@@ -134,9 +136,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       final confirm = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('Dejar Evento'),
+          title: const Text('Bajarse del Evento'),
           content: const Text(
-            '¿Estás seguro de que querés salir del staff asignado a este evento?',
+            '¿Estás seguro de que querés bajarte de este evento?',
           ),
           actions: [
             TextButton(
@@ -150,7 +152,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                 minimumSize: const Size(0, 44),
               ),
               onPressed: () => Navigator.of(ctx).pop(true),
-              child: const Text('Salir'),
+              child: const Text('Bajarse'),
             ),
           ],
         ),
@@ -169,10 +171,57 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       setState(() => _isTogglingStaff = false);
       messenger.showSnackBar(
         const SnackBar(
-          content: Text('✓ ¡Te sumaste al staff de este evento!'),
+          content: Text('✓ ¡Te anotaste en este evento! Quedó pendiente de confirmación.'),
           backgroundColor: AppTheme.neonGreen,
         ),
       );
+    }
+  }
+
+  Future<void> _confirmRemoveStaffMember(
+    EventModel event,
+    UserModel member,
+    UserModel currentUser,
+  ) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Sacar del Evento'),
+        content: Text(
+          '¿Estás seguro de que querés sacar a ${member.fullName} de este evento?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: AppTheme.errorRed,
+              foregroundColor: Colors.white,
+              minimumSize: const Size(0, 44),
+            ),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Sacar'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true && mounted) {
+      final ok = await context.read<EventService>().removeStaffMember(
+            eventId: event.id,
+            userId: member.id,
+            currentUser: currentUser,
+          );
+      if (ok && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('✓ Se removió a ${member.fullName} del evento.'),
+            backgroundColor: AppTheme.neonGreen,
+          ),
+        );
+      }
     }
   }
 
@@ -868,6 +917,11 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             currentUser.hasRole(AppRoles.organizacion) ||
             currentUser.hasRole(AppRoles.produccion));
     final canManagePairs = canManageEventClose;
+    final canManageStaff = currentUser != null &&
+        (currentUser.isSuperAdmin ||
+            currentUser.hasRole(AppRoles.organizacion) ||
+            currentUser.hasRole(AppRoles.produccion) ||
+            currentUser.hasRole(AppRoles.rrhh));
     final isStarted = event.hasStarted;
     final cases = caseService.getCasesForEvent(event.id);
     final primary = AppTheme.primaryColor(context);
@@ -1014,60 +1068,101 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Banner superior de participación en el evento
+                  // Banner superior de inscripción / confirmación en el evento
                   if (isStaff) ...[
                     Builder(
                       builder: (context) {
+                        final isConfirmed = event.isUserConfirmed(currentUser.id);
                         final myPair = event.getPairForUser(currentUser.id);
                         final partnerName = myPair?.getPartnerName(currentUser.id);
-                        final participationText = partnerName != null
-                            ? 'Estás participando de este evento en pareja con $partnerName'
-                            : 'Estás participando de este evento';
+
+                        final bannerColor = isConfirmed
+                            ? primary
+                            : AppTheme.amberWarning;
 
                         return Container(
-                          margin: const EdgeInsets.only(bottom: 12),
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(bottom: 16),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 12,
                           ),
                           decoration: BoxDecoration(
-                            color: primary.withValues(alpha: 0.15),
+                            color: bannerColor.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: primary.withValues(alpha: 0.4),
-                              width: 1.5,
+                              color: bannerColor.withValues(alpha: 0.35),
+                              width: 1.2,
                             ),
                           ),
                           child: Row(
                             children: [
-                              Icon(
-                                partnerName != null
-                                    ? Icons.people_alt_rounded
-                                    : Icons.check_circle_rounded,
-                                color: primary,
-                                size: 22,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  participationText,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    color: primary,
+                              Container(
+                                width: 36,
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: bannerColor.withValues(alpha: 0.18),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Center(
+                                  child: Icon(
+                                    isConfirmed
+                                        ? (partnerName != null
+                                            ? Icons.people_alt_rounded
+                                            : Icons.check_circle_rounded)
+                                        : Icons.schedule_rounded,
+                                    color: bannerColor,
+                                    size: 20,
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      isConfirmed
+                                          ? 'Estás confirmado'
+                                          : 'Estás anotado',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w800,
+                                        color: bannerColor,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      isConfirmed
+                                          ? (partnerName != null
+                                              ? 'En pareja con $partnerName'
+                                              : 'Formás parte del equipo de este evento')
+                                          : 'Pendiente de confirmación por Organización',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppTheme.textSecondaryColor(context),
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 10),
                               OutlinedButton(
                                 style: OutlinedButton.styleFrom(
                                   visualDensity: VisualDensity.compact,
+                                  minimumSize: Size.zero,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 12,
-                                    vertical: 6,
+                                    vertical: 8,
                                   ),
                                   side: BorderSide(
-                                    color: primary.withValues(alpha: 0.6),
+                                    color: bannerColor.withValues(alpha: 0.6),
+                                    width: 1.2,
                                   ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
@@ -1087,7 +1182,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                         child: CircularProgressIndicator(
                                           strokeWidth: 2,
                                           strokeCap: StrokeCap.round,
-                                          color: primary,
+                                          color: bannerColor,
                                         ),
                                       )
                                     : Text(
@@ -1095,7 +1190,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                         style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w700,
-                                          color: primary,
+                                          color: bannerColor,
                                         ),
                                       ),
                               ),
@@ -1255,30 +1350,36 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceAround,
                                   children: [
-                                    _HorarioCol(
-                                      label: 'Inicio',
-                                      time: '${event.startTime} hs',
-                                      icon: Icons.play_arrow_outlined,
+                                    Expanded(
+                                      child: _HorarioCol(
+                                        label: 'Inicio',
+                                        time: '${event.startTime} hs',
+                                        icon: Icons.play_arrow_outlined,
+                                      ),
                                     ),
                                     Container(
                                       width: 1,
                                       height: 32,
                                       color: borderColor,
                                     ),
-                                    _HorarioCol(
-                                      label: 'Puertas',
-                                      time: '${event.doorsOpenTime} hs',
-                                      icon: Icons.meeting_room_outlined,
+                                    Expanded(
+                                      child: _HorarioCol(
+                                        label: 'Puertas',
+                                        time: '${event.doorsOpenTime} hs',
+                                        icon: Icons.meeting_room_outlined,
+                                      ),
                                     ),
                                     Container(
                                       width: 1,
                                       height: 32,
                                       color: borderColor,
                                     ),
-                                    _HorarioCol(
-                                      label: 'Cierre',
-                                      time: '${event.endTime} hs',
-                                      icon: Icons.nightlight_outlined,
+                                    Expanded(
+                                      child: _HorarioCol(
+                                        label: 'Cierre',
+                                        time: '${event.endTime} hs',
+                                        icon: Icons.nightlight_outlined,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -1665,293 +1766,570 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     const SizedBox(height: 16),
                   ],
 
-                  // SECCIÓN: STAFF Y PAREJAS (Lista Unificada)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Vuelos disponibles',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          color: textPrimary,
-                          letterSpacing: 0.2,
-                        ),
-                      ),
-                      if (canManagePairs &&
-                          staffUsers.where((u) => event.getPairForUser(u.id) == null).length >= 2) ...[
-                        TextButton.icon(
-                          style: TextButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            minimumSize: Size.zero,
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            foregroundColor: primary,
-                          ),
-                          icon: const Icon(Icons.group_add_rounded, size: 16),
-                          label: const Text(
-                            'Armar Pareja',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          onPressed: () => _showAddPairDialog(
-                            context,
-                            event,
-                            staffUsers,
-                            currentUser,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                  const SizedBox(height: 8),
+                  // SECCIÓN: STAFF Y ANOTADOS (Confirmados vs Pendientes)
+                  Builder(
+                    builder: (context) {
+                      final confirmedUsers = staffUsers
+                          .where((u) => event.isUserConfirmed(u.id))
+                          .toList();
+                      final pendingUsers = staffUsers
+                          .where((u) => !event.isUserConfirmed(u.id))
+                          .toList();
 
-                  if (staffUsers.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 4,
-                        vertical: 12,
-                      ),
-                      child: Text(
-                        'Aún no hay miembros anotados en este evento.',
-                        style: TextStyle(
-                          color: textSecondary,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    )
-                  else
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: staffUsers.length,
-                      itemBuilder: (context, index) {
-                        final member = staffUsers[index];
-                        final pair = event.getPairForUser(member.id);
-                        final hasPair = pair != null;
-                        final partnerName = pair?.getPartnerName(member.id);
-
-                        ImageProvider? avatarImage;
-                        if (member.photoUrl != null &&
-                            member.photoUrl!.trim().isNotEmpty) {
-                          final raw = member.photoUrl!.trim();
-                          if (raw.startsWith('http')) {
-                            avatarImage = NetworkImage(raw);
-                          } else {
-                            try {
-                              final cleanBase64 = raw.contains(',')
-                                  ? raw.split(',').last
-                                  : raw;
-                              avatarImage =
-                                  MemoryImage(base64Decode(cleanBase64));
-                            } catch (_) {
-                              avatarImage = null;
-                            }
-                          }
-                        }
-
-                        final unassignedCount = staffUsers
-                            .where((u) => event.getPairForUser(u.id) == null)
-                            .length;
-
-                        return Container(
-                          margin: const EdgeInsets.symmetric(vertical: 4),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: surfaceContainer.withValues(alpha: 0.5),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: hasPair
-                                  ? AppTheme.emeraldDark.withValues(alpha: 0.25)
-                                  : borderColor.withValues(alpha: 0.6),
-                            ),
-                          ),
-                          child: Row(
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              CircleAvatar(
-                                radius: 18,
-                                backgroundColor: surfaceContainer,
-                                backgroundImage: avatarImage,
-                                child: avatarImage == null
-                                    ? Text(
-                                        member.firstName.isNotEmpty
-                                            ? member.firstName[0].toUpperCase()
-                                            : '?',
-                                        style: TextStyle(
-                                          color: primary,
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      )
-                                    : null,
-                              ),
-                              const SizedBox(width: 12),
                               Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      member.fullName,
-                                      style: TextStyle(
-                                        color: textPrimary,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    if (hasPair)
-                                      Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          const Icon(
-                                            Icons.link_rounded,
-                                            size: 13,
-                                            color: AppTheme.emeraldDark,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Flexible(
-                                            child: Text(
-                                              'En pareja con $partnerName',
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w700,
-                                                color: AppTheme.emeraldDark,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    else
-                                      Text(
-                                        'Sin pareja asignada',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                          color: textSecondary,
-                                        ),
-                                      ),
-                                  ],
+                                child: Text(
+                                  'Staff del Evento (${event.confirmedStaffCount}/${event.requiredStaffCount})',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w900,
+                                    color: textPrimary,
+                                    letterSpacing: 0.2,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              if (member.phone.trim().isNotEmpty)
-                                Tooltip(
-                                  message: 'Enviar WhatsApp',
-                                  child: IconButton(
-                                    icon: const Icon(
-                                      Icons.chat_bubble_outline_rounded,
-                                      size: 18,
-                                      color: AppTheme.neonGreen,
+                              if (canManagePairs &&
+                                  confirmedUsers.where((u) => event.getPairForUser(u.id) == null).length >= 2) ...[
+                                TextButton.icon(
+                                  style: TextButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 4,
                                     ),
-                                    visualDensity: VisualDensity.compact,
-                                    onPressed: () {
-                                      HapticFeedback.lightImpact();
-                                      _launchWhatsApp(member.phone);
-                                    },
+                                    minimumSize: Size.zero,
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    foregroundColor: primary,
+                                  ),
+                                  icon: const Icon(Icons.group_add_rounded, size: 16),
+                                  label: const Text(
+                                    'Armar Pareja',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  onPressed: () => _showAddPairDialog(
+                                    context,
+                                    event,
+                                    confirmedUsers,
+                                    currentUser,
                                   ),
                                 ),
-                              if (canManagePairs) ...[
-                                if (hasPair)
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.link_off_rounded,
-                                      size: 18,
-                                      color: AppTheme.errorRed,
-                                    ),
-                                    tooltip: 'Desvincular pareja',
-                                    onPressed: () async {
-                                      HapticFeedback.lightImpact();
-                                      final confirm = await showDialog<bool>(
-                                        context: context,
-                                        builder: (ctx) => AlertDialog(
-                                          title: const Text('Desvincular Pareja'),
-                                          content: Text(
-                                            '¿Desvincular la pareja entre ${pair.user1Name} y ${pair.user2Name}?',
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () =>
-                                                  Navigator.of(ctx).pop(false),
-                                              child: const Text('Cancelar'),
-                                            ),
-                                            FilledButton(
-                                              style: FilledButton.styleFrom(
-                                                backgroundColor:
-                                                    AppTheme.errorRed,
-                                              ),
-                                              onPressed: () =>
-                                                  Navigator.of(ctx).pop(true),
-                                              child: const Text('Desvincular'),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-
-                                      if (confirm == true && context.mounted) {
-                                        final eventService =
-                                            context.read<EventService>();
-                                        final ok =
-                                            await eventService.removeEventPair(
-                                          eventId: event.id,
-                                          pairId: pair.id,
-                                          currentUser: currentUser,
-                                        );
-                                        if (ok && context.mounted) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
-                                                  '✓ Pareja desvinculada.'),
-                                              backgroundColor:
-                                                  AppTheme.neonGreen,
-                                            ),
-                                          );
-                                        }
-                                      }
-                                    },
-                                  )
-                                else if (unassignedCount >= 2)
-                                  TextButton.icon(
-                                    style: TextButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
-                                      ),
-                                      minimumSize: Size.zero,
-                                      tapTargetSize:
-                                          MaterialTapTargetSize.shrinkWrap,
-                                      foregroundColor: primary,
-                                    ),
-                                    icon: const Icon(Icons.add_link_rounded,
-                                        size: 15),
-                                    label: const Text(
-                                      'Asignar',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                    onPressed: () => _showAddPairDialog(
-                                      context,
-                                      event,
-                                      staffUsers,
-                                      currentUser,
-                                      preselectedUserId: member.id,
-                                    ),
-                                  ),
                               ],
                             ],
                           ),
-                        );
-                      },
-                    ),
+                          const SizedBox(height: 12),
+
+                          // Selector SegmentedButton Confirmados / Anotados
+                          SizedBox(
+                            width: double.infinity,
+                            child: SegmentedButton<int>(
+                              style: SegmentedButton.styleFrom(
+                                visualDensity: VisualDensity.compact,
+                                textStyle: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              segments: [
+                                ButtonSegment<int>(
+                                  value: 0,
+                                  label: Text('Confirmados (${confirmedUsers.length})'),
+                                  icon: const Icon(Icons.check_circle_outline_rounded, size: 16),
+                                ),
+                                ButtonSegment<int>(
+                                  value: 1,
+                                  label: Text('Anotados (${pendingUsers.length})'),
+                                  icon: const Icon(Icons.hourglass_top_rounded, size: 16),
+                                ),
+                              ],
+                              selected: {_staffSegment},
+                              onSelectionChanged: (newSelection) {
+                                HapticFeedback.selectionClick();
+                                setState(() => _staffSegment = newSelection.first);
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+
+                          // Lista de usuarios según la pestaña seleccionada
+                          if (_staffSegment == 0) ...[
+                            if (confirmedUsers.isEmpty)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                  vertical: 12,
+                                ),
+                                child: Text(
+                                  'Aún no hay miembros confirmados en este evento.',
+                                  style: TextStyle(
+                                    color: textSecondary,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              )
+                            else
+                              ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: confirmedUsers.length,
+                                itemBuilder: (context, index) {
+                                  final member = confirmedUsers[index];
+                                  final pair = event.getPairForUser(member.id);
+                                  final hasPair = pair != null;
+                                  final partnerName = pair?.getPartnerName(member.id);
+                                  final attendanceCount = member.getAttendanceCount(eventService.events);
+
+                                  ImageProvider? avatarImage;
+                                  if (member.photoUrl != null &&
+                                      member.photoUrl!.trim().isNotEmpty) {
+                                    final raw = member.photoUrl!.trim();
+                                    if (raw.startsWith('http')) {
+                                      avatarImage = NetworkImage(raw);
+                                    } else {
+                                      try {
+                                        final cleanBase64 = raw.contains(',')
+                                            ? raw.split(',').last
+                                            : raw;
+                                        avatarImage = MemoryImage(base64Decode(cleanBase64));
+                                      } catch (_) {
+                                        avatarImage = null;
+                                      }
+                                    }
+                                  }
+
+                                  final unassignedCount = confirmedUsers
+                                      .where((u) => event.getPairForUser(u.id) == null)
+                                      .length;
+
+                                  return Container(
+                                    margin: const EdgeInsets.symmetric(vertical: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: surfaceContainer.withValues(alpha: 0.5),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: hasPair
+                                            ? AppTheme.emeraldDark.withValues(alpha: 0.25)
+                                            : borderColor.withValues(alpha: 0.6),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 18,
+                                          backgroundColor: surfaceContainer,
+                                          backgroundImage: avatarImage,
+                                          child: avatarImage == null
+                                              ? Text(
+                                                  member.firstName.isNotEmpty
+                                                      ? member.firstName[0].toUpperCase()
+                                                      : '?',
+                                                  style: TextStyle(
+                                                    color: primary,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                )
+                                              : null,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Flexible(
+                                                    child: Text(
+                                                      member.fullName,
+                                                      style: TextStyle(
+                                                        color: textPrimary,
+                                                        fontWeight: FontWeight.w700,
+                                                        fontSize: 14,
+                                                      ),
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                  if (canManageStaff) ...[
+                                                    const SizedBox(width: 6),
+                                                    Container(
+                                                      padding: const EdgeInsets.symmetric(
+                                                        horizontal: 6,
+                                                        vertical: 1.5,
+                                                      ),
+                                                      decoration: BoxDecoration(
+                                                        color: primary.withValues(alpha: 0.12),
+                                                        borderRadius: BorderRadius.circular(6),
+                                                        border: Border.all(
+                                                          color: primary.withValues(alpha: 0.25),
+                                                        ),
+                                                      ),
+                                                      child: Text(
+                                                        '$attendanceCount asist.',
+                                                        style: TextStyle(
+                                                          fontSize: 11,
+                                                          fontWeight: FontWeight.w700,
+                                                          color: primary,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ],
+                                              ),
+                                              const SizedBox(height: 2),
+                                              if (hasPair)
+                                                Row(
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    const Icon(
+                                                      Icons.link_rounded,
+                                                      size: 13,
+                                                      color: AppTheme.emeraldDark,
+                                                    ),
+                                                    const SizedBox(width: 4),
+                                                    Flexible(
+                                                      child: Text(
+                                                        'En pareja con $partnerName',
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight: FontWeight.w700,
+                                                          color: AppTheme.emeraldDark,
+                                                        ),
+                                                        overflow: TextOverflow.ellipsis,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )
+                                              else
+                                                Text(
+                                                  'Sin pareja asignada',
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: textSecondary,
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                        ),
+                                        if (member.phone.trim().isNotEmpty)
+                                          Tooltip(
+                                            message: 'Enviar WhatsApp',
+                                            child: IconButton(
+                                              icon: const WhatsAppIcon(size: 18),
+                                              visualDensity: VisualDensity.compact,
+                                              onPressed: () {
+                                                HapticFeedback.lightImpact();
+                                                _launchWhatsApp(member.phone);
+                                              },
+                                            ),
+                                          ),
+                                        if (canManagePairs) ...[
+                                          if (hasPair)
+                                            IconButton(
+                                              icon: const Icon(
+                                                Icons.link_off_rounded,
+                                                size: 18,
+                                                color: AppTheme.errorRed,
+                                              ),
+                                              tooltip: 'Desvincular pareja',
+                                              onPressed: () async {
+                                                HapticFeedback.lightImpact();
+                                                final confirm = await showDialog<bool>(
+                                                  context: context,
+                                                  builder: (ctx) => AlertDialog(
+                                                    title: const Text('Desvincular Pareja'),
+                                                    content: Text(
+                                                      '¿Desvincular la pareja entre ${pair.user1Name} y ${pair.user2Name}?',
+                                                    ),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () =>
+                                                            Navigator.of(ctx).pop(false),
+                                                        child: const Text('Cancelar'),
+                                                      ),
+                                                      FilledButton(
+                                                        style: FilledButton.styleFrom(
+                                                          backgroundColor: AppTheme.errorRed,
+                                                        ),
+                                                        onPressed: () =>
+                                                            Navigator.of(ctx).pop(true),
+                                                        child: const Text('Desvincular'),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+
+                                                if (confirm == true && context.mounted) {
+                                                  final ok = await eventService.removeEventPair(
+                                                    eventId: event.id,
+                                                    pairId: pair.id,
+                                                    currentUser: currentUser,
+                                                  );
+                                                  if (ok && context.mounted) {
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text('✓ Pareja desvinculada.'),
+                                                        backgroundColor: AppTheme.neonGreen,
+                                                      ),
+                                                    );
+                                                  }
+                                                }
+                                              },
+                                            )
+                                          else if (unassignedCount >= 2)
+                                            TextButton.icon(
+                                              style: TextButton.styleFrom(
+                                                padding: const EdgeInsets.symmetric(
+                                                  horizontal: 8,
+                                                  vertical: 4,
+                                                ),
+                                                minimumSize: Size.zero,
+                                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                foregroundColor: primary,
+                                              ),
+                                              icon: const Icon(Icons.add_link_rounded, size: 15),
+                                              label: const Text(
+                                                'Asignar',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                              onPressed: () => _showAddPairDialog(
+                                                context,
+                                                event,
+                                                confirmedUsers,
+                                                currentUser,
+                                                preselectedUserId: member.id,
+                                              ),
+                                            ),
+                                        ],
+                                        if (canManageStaff)
+                                          IconButton(
+                                            icon: const Icon(
+                                              Icons.person_remove_outlined,
+                                              size: 18,
+                                              color: AppTheme.errorRed,
+                                            ),
+                                            tooltip: 'Sacar del evento',
+                                            onPressed: () => _confirmRemoveStaffMember(
+                                              event,
+                                              member,
+                                              currentUser,
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                          ] else ...[
+                            // Pestaña: Anotados (Pendientes)
+                            if (pendingUsers.isEmpty)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                  vertical: 12,
+                                ),
+                                child: Text(
+                                  'No hay miembros anotados pendientes de confirmación.',
+                                  style: TextStyle(
+                                    color: textSecondary,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              )
+                            else
+                              ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: pendingUsers.length,
+                                itemBuilder: (context, index) {
+                                  final member = pendingUsers[index];
+                                  final attendanceCount = member.getAttendanceCount(eventService.events);
+
+                                  ImageProvider? avatarImage;
+                                  if (member.photoUrl != null &&
+                                      member.photoUrl!.trim().isNotEmpty) {
+                                    final raw = member.photoUrl!.trim();
+                                    if (raw.startsWith('http')) {
+                                      avatarImage = NetworkImage(raw);
+                                    } else {
+                                      try {
+                                        final cleanBase64 = raw.contains(',')
+                                            ? raw.split(',').last
+                                            : raw;
+                                        avatarImage = MemoryImage(base64Decode(cleanBase64));
+                                      } catch (_) {
+                                        avatarImage = null;
+                                      }
+                                    }
+                                  }
+
+                                  return Container(
+                                    margin: const EdgeInsets.symmetric(vertical: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 8,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: surfaceContainer.withValues(alpha: 0.5),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: AppTheme.amberWarning.withValues(alpha: 0.25),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        CircleAvatar(
+                                          radius: 18,
+                                          backgroundColor: surfaceContainer,
+                                          backgroundImage: avatarImage,
+                                          child: avatarImage == null
+                                              ? Text(
+                                                  member.firstName.isNotEmpty
+                                                      ? member.firstName[0].toUpperCase()
+                                                      : '?',
+                                                  style: const TextStyle(
+                                                    color: AppTheme.amberWarning,
+                                                    fontWeight: FontWeight.w700,
+                                                  ),
+                                                )
+                                              : null,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Flexible(
+                                                    child: Text(
+                                                      member.fullName,
+                                                      style: TextStyle(
+                                                        color: textPrimary,
+                                                        fontWeight: FontWeight.w700,
+                                                        fontSize: 14,
+                                                      ),
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                  if (canManageStaff) ...[
+                                                    const SizedBox(width: 6),
+                                                    Container(
+                                                      padding: const EdgeInsets.symmetric(
+                                                        horizontal: 6,
+                                                        vertical: 1.5,
+                                                      ),
+                                                      decoration: BoxDecoration(
+                                                        color: AppTheme.amberWarning.withValues(alpha: 0.12),
+                                                        borderRadius: BorderRadius.circular(6),
+                                                        border: Border.all(
+                                                          color: AppTheme.amberWarning.withValues(alpha: 0.25),
+                                                        ),
+                                                      ),
+                                                      child: Text(
+                                                        '$attendanceCount asist.',
+                                                        style: const TextStyle(
+                                                          fontSize: 11,
+                                                          fontWeight: FontWeight.w700,
+                                                          color: AppTheme.amberWarning,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ],
+                                              ),
+                                              const SizedBox(height: 2),
+                                              Text(
+                                                'Pendiente de confirmación',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: textSecondary,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        if (member.phone.trim().isNotEmpty)
+                                          Tooltip(
+                                            message: 'Enviar WhatsApp',
+                                            child: IconButton(
+                                              icon: const WhatsAppIcon(size: 18),
+                                              visualDensity: VisualDensity.compact,
+                                              onPressed: () {
+                                                HapticFeedback.lightImpact();
+                                                _launchWhatsApp(member.phone);
+                                              },
+                                            ),
+                                          ),
+                                        if (canManageStaff) ...[
+                                          FilledButton.tonalIcon(
+                                            style: FilledButton.styleFrom(
+                                              visualDensity: VisualDensity.compact,
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 10,
+                                                vertical: 4,
+                                              ),
+                                              minimumSize: Size.zero,
+                                              backgroundColor: AppTheme.neonGreen.withValues(alpha: 0.15),
+                                              foregroundColor: AppTheme.neonGreen,
+                                            ),
+                                            icon: const Icon(Icons.check_rounded, size: 16),
+                                            label: const Text(
+                                              'Confirmar',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                            onPressed: () async {
+                                              HapticFeedback.lightImpact();
+                                              await eventService.confirmStaffMember(
+                                                eventId: event.id,
+                                                userId: member.id,
+                                                currentUser: currentUser,
+                                              );
+                                            },
+                                          ),
+                                          IconButton(
+                                            icon: const Icon(
+                                              Icons.close_rounded,
+                                              size: 18,
+                                              color: AppTheme.errorRed,
+                                            ),
+                                            tooltip: 'Sacar del evento',
+                                            onPressed: () => _confirmRemoveStaffMember(
+                                              event,
+                                              member,
+                                              currentUser,
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                          ],
+                        ],
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -1980,29 +2358,36 @@ class _HorarioCol extends StatelessWidget {
     final textSecondary = AppTheme.textSecondaryColor(context);
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 14, color: primary),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                color: textSecondary,
-                fontWeight: FontWeight.w500,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 14, color: primary),
+              const SizedBox(width: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: textSecondary,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
         const SizedBox(height: 4),
-        Text(
-          time,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            color: textPrimary,
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            time,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: textPrimary,
+            ),
           ),
         ),
       ],

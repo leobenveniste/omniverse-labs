@@ -129,11 +129,11 @@ def deploy():
     notes = [
         {
             "language": "es-419",
-            "text": "Nueva gestión de parejas de guardia por roles de Organización y Producción, registro de rondas con bottom sheet táctil, y actualización de foto de perfil desde ajustes."
+            "text": "Avance visual del formulario de acompañamiento en tiempo real, autoguardado continuo de borradores y hardening de seguridad en base de datos."
         },
         {
             "language": "en-US",
-            "text": "New guard pair management for Organization and Production roles, round logs bottom sheet, and profile picture upload."
+            "text": "Real-time progress indicator for event accompaniment records, continuous local draft autosave, and database security hardening."
         }
     ]
 
@@ -145,7 +145,7 @@ def deploy():
             "track": track_name,
             "releases": [
                 {
-                    "name": f"1.0.23 (Build {version_code})",
+                    "name": f"1.0.33 (Build {version_code})",
                     "versionCodes": [str(version_code)],
                     "status": status,
                     "releaseNotes": notes

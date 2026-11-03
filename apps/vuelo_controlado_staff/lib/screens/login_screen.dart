@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import '../services/settings_service.dart';
+import '../services/biometric_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/motion_components.dart';
 import 'home_screen.dart';
@@ -20,6 +22,8 @@ class _LoginScreenState extends State<LoginScreen>
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   late final AnimationController _shakeController;
+  bool _attemptedAutoBiometric = false;
+  bool _isBiometricAuthenticating = false;
 
   @override
   void initState() {
@@ -28,6 +32,75 @@ class _LoginScreenState extends State<LoginScreen>
       vsync: this,
       duration: const Duration(milliseconds: 380),
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAutoBiometrics();
+    });
+  }
+
+  Future<void> _checkAutoBiometrics() async {
+    if (!mounted || _attemptedAutoBiometric) return;
+    _attemptedAutoBiometric = true;
+
+    final authService = context.read<AuthService>();
+    final lastUser = authService.getLastLoggedInUser();
+    if (lastUser != null && _emailController.text.isEmpty) {
+      _emailController.text = lastUser.email;
+    }
+
+    final settings = context.read<SettingsService>();
+    if (!settings.biometricEnabled || lastUser == null) return;
+
+    await _handleBiometricLogin(autoPrompt: true);
+  }
+
+  Future<void> _handleBiometricLogin({bool autoPrompt = false}) async {
+    if (_isBiometricAuthenticating) return;
+    final biometricService = context.read<BiometricService>();
+    final authService = context.read<AuthService>();
+    final lastUser = authService.getLastLoggedInUser();
+
+    if (lastUser == null) {
+      if (!autoPrompt && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No hay una cuenta previa recordada para ingreso biométrico.'),
+            backgroundColor: AppTheme.warningOrange,
+          ),
+        );
+      }
+      return;
+    }
+
+    setState(() => _isBiometricAuthenticating = true);
+
+    try {
+      final authenticated = await biometricService.authenticate(
+        localizedReason: 'Identificate como ${lastUser.fullName} para acceder',
+      );
+
+      if (authenticated && mounted) {
+        HapticFeedback.mediumImpact();
+        await authService.loginWithBiometrics(lastUser);
+        if (mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const HomeScreen()),
+          );
+        }
+      } else if (!authenticated && !autoPrompt && mounted) {
+        HapticFeedback.heavyImpact();
+        _shakeController.forward(from: 0.0);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Autenticación biométrica no completada.'),
+            backgroundColor: AppTheme.warningOrange,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isBiometricAuthenticating = false);
+      }
+    }
   }
 
   @override
@@ -80,6 +153,8 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   Widget build(BuildContext context) {
     final authService = context.watch<AuthService>();
+    final settingsService = context.watch<SettingsService>();
+    final lastUser = authService.getLastLoggedInUser();
     final isLoading = authService.isLoading;
     final mediaQuery = MediaQuery.of(context);
     final isCompact = mediaQuery.size.height < 700;
@@ -418,6 +493,46 @@ class _LoginScreenState extends State<LoginScreen>
                                     ),
                                   ),
                                 ),
+                                if (settingsService.biometricEnabled && lastUser != null) ...[
+                                  const SizedBox(height: 16),
+                                  SizedBox(
+                                    height: 50,
+                                    child: OutlinedButton.icon(
+                                      key: const ValueKey('biometric_login_button'),
+                                      onPressed: isLoading || _isBiometricAuthenticating
+                                          ? null
+                                          : () => _handleBiometricLogin(),
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor: AppTheme.neonGreen,
+                                        side: BorderSide(
+                                          color: AppTheme.neonGreen.withValues(alpha: 0.45),
+                                          width: 1.5,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(16),
+                                        ),
+                                      ),
+                                      icon: _isBiometricAuthenticating
+                                          ? const SizedBox(
+                                              width: 18,
+                                              height: 18,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: AppTheme.neonGreen,
+                                              ),
+                                            )
+                                          : const Icon(Icons.fingerprint_rounded, size: 24),
+                                      label: Text(
+                                        'Ingresar con Biometría (${lastUser.firstName})',
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w700,
+                                          letterSpacing: 0.2,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ],
                             ),
                           ),

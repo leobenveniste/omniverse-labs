@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
+import '../../services/event_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/app_header.dart';
 import '../../widgets/app_background.dart';
@@ -282,6 +283,10 @@ class _UserDetailRolesScreenState extends State<UserDetailRolesScreen> {
 
   void _showEditUserModal(BuildContext context, UserModel user) {
     final formKey = GlobalKey<FormState>();
+    final allEvents = context.read<EventService>().events;
+    final autoCount = user.getAutomaticAttendanceCount(allEvents);
+    final totalCount = user.getAttendanceCount(allEvents);
+
     final firstNameController = TextEditingController(text: user.firstName);
     final lastNameController = TextEditingController(text: user.lastName);
     final emailController = TextEditingController(text: user.email);
@@ -290,6 +295,11 @@ class _UserDetailRolesScreenState extends State<UserDetailRolesScreen> {
     final phoneController = TextEditingController(text: user.phone);
     final instagramController =
         TextEditingController(text: user.instagram ?? '');
+    String selectedRegion =
+        user.region.isNotEmpty ? user.region : AppRegions.buenosAires;
+    final attendanceController = TextEditingController(
+      text: totalCount.toString(),
+    );
     String selectedDocType =
         user.documentType.isNotEmpty ? user.documentType : 'DNI';
     bool isSaving = false;
@@ -375,6 +385,20 @@ class _UserDetailRolesScreenState extends State<UserDetailRolesScreen> {
                                         docNumberController.text.trim();
                                     final docChanged = oldDoc != newDoc;
 
+                                    final attText = attendanceController.text.trim();
+                                    int? manualToSave;
+                                    bool clearManual = false;
+                                    if (attText.isEmpty) {
+                                      clearManual = true;
+                                      manualToSave = null;
+                                    } else {
+                                      final requestedTotal =
+                                          int.tryParse(attText) ?? totalCount;
+                                      manualToSave = (requestedTotal >= autoCount)
+                                          ? (requestedTotal - autoCount)
+                                          : 0;
+                                    }
+
                                     final success =
                                         await authService.updateUserByAdmin(
                                       userId: user.id,
@@ -388,6 +412,9 @@ class _UserDetailRolesScreenState extends State<UserDetailRolesScreen> {
                                       phone: phoneController.text.trim(),
                                       instagram:
                                           instagramController.text.trim(),
+                                      region: selectedRegion,
+                                      manualAttendanceCount: manualToSave,
+                                      clearManualAttendance: clearManual,
                                     );
 
                                     if (ctx.mounted) {
@@ -604,6 +631,57 @@ class _UserDetailRolesScreenState extends State<UserDetailRolesScreen> {
                           prefixText: '@',
                         ),
                       ),
+                      const SizedBox(height: 16),
+
+                      // Región
+                      DropdownButtonFormField<String>(
+                        initialValue: selectedRegion,
+                        decoration: const InputDecoration(
+                          labelText: 'Región asignada *',
+                          prefixIcon: Icon(Icons.location_city_outlined),
+                        ),
+                        items: AppRegions.all.map((r) {
+                          return DropdownMenuItem<String>(
+                            value: r,
+                            child: Text(r),
+                          );
+                        }).toList(),
+                        onChanged: isSaving
+                            ? null
+                            : (val) {
+                                if (val != null) {
+                                  setSheetState(() => selectedRegion = val);
+                                }
+                              },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Asistencias Totales (Combinación Automática + Manual)
+                      TextFormField(
+                        controller: attendanceController,
+                        enabled: !isSaving,
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          labelText: 'Asistencias Totales',
+                          hintText: totalCount.toString(),
+                          prefixIcon:
+                              const Icon(Icons.event_available_outlined),
+                          helperText:
+                              'Total: $autoCount automáticas en app + ${user.manualAttendanceCount ?? 0} manuales. Los nuevos eventos a los que asista se sumarán automáticamente.',
+                          helperMaxLines: 2,
+                        ),
+                        validator: (v) {
+                          if (v == null || v.trim().isEmpty) return null;
+                          final parsed = int.tryParse(v.trim());
+                          if (parsed == null || parsed < 0) {
+                            return 'Ingresá un número válido mayor o igual a 0';
+                          }
+                          if (parsed < autoCount) {
+                            return 'No puede ser menor a las $autoCount asistencias registradas en la app';
+                          }
+                          return null;
+                        },
+                      ),
                       const SizedBox(height: 8),
                     ],
                   ),
@@ -619,6 +697,7 @@ class _UserDetailRolesScreenState extends State<UserDetailRolesScreen> {
   @override
   Widget build(BuildContext context) {
     final authService = context.watch<AuthService>();
+    final theme = Theme.of(context);
     final currentUser = authService.currentUser;
     final isSuperAdmin = currentUser?.isSuperAdmin ?? false;
     final primary = AppTheme.primaryColor(context);
@@ -873,6 +952,75 @@ class _UserDetailRolesScreenState extends State<UserDetailRolesScreen> {
                                           fontWeight: FontWeight.w700,
                                         ),
                                       ),
+                                    const SizedBox(height: 6),
+                                    Wrap(
+                                      spacing: 8,
+                                      runSpacing: 4,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: primary.withValues(alpha: 0.12),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            border: Border.all(
+                                              color: primary.withValues(alpha: 0.3),
+                                            ),
+                                          ),
+                                          child: Text(
+                                            user.region,
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w700,
+                                              color: primary,
+                                            ),
+                                          ),
+                                        ),
+                                        Builder(
+                                          builder: (ctx) {
+                                            final currentTargetUser = user;
+                                            if (currentTargetUser == null) {
+                                              return const SizedBox.shrink();
+                                            }
+                                            final allEvents = ctx
+                                                .watch<EventService>()
+                                                .events;
+                                            final count = currentTargetUser
+                                                .getAttendanceCount(allEvents);
+                                            final auto = currentTargetUser
+                                                .getAutomaticAttendanceCount(allEvents);
+                                            final manual =
+                                                currentTargetUser.manualAttendanceCount ?? 0;
+                                            return Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 8,
+                                                vertical: 2,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: theme.colorScheme
+                                                    .surfaceContainerHighest,
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              child: Text(
+                                                manual > 0
+                                                    ? '$count asistencias ($auto app + $manual manual)'
+                                                    : '$count asistencias',
+                                                style: TextStyle(
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: textSecondary,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
                                   ],
                                 ),
                               ),

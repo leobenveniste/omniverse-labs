@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../models/event_model.dart';
+import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
 import '../../services/event_service.dart';
 import '../../theme/app_theme.dart';
@@ -35,6 +36,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   bool _isPickingImage = false;
 
   DateTime? _selectedDate;
+  String _selectedRegion = AppRegions.buenosAires;
 
   // Horarios por default requeridos: 14hs (inicio), 16hs (puertas), 01hs (cierre)
   TimeOfDay _startTime = const TimeOfDay(hour: 14, minute: 0);
@@ -71,6 +73,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
       if (e.imageUrl != null && e.imageUrl!.trim().isNotEmpty) {
         _existingImageUrl = e.imageUrl!.trim();
+      }
+      _selectedRegion = e.region;
+    } else {
+      final currentUser = Provider.of<AuthService>(context, listen: false).currentUser;
+      if (currentUser != null && currentUser.region.isNotEmpty) {
+        _selectedRegion = currentUser.region;
       }
     }
   }
@@ -323,6 +331,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         imageUrl: finalImage,
         requiredStaffCount:
             int.tryParse(_requiredStaffController.text.trim()) ?? 15,
+        region: _selectedRegion,
         currentUser: currentUser,
       );
     } else {
@@ -339,6 +348,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         imageUrl: finalImage,
         requiredStaffCount:
             int.tryParse(_requiredStaffController.text.trim()) ?? 15,
+        region: _selectedRegion,
         currentUser: currentUser,
       );
     }
@@ -529,6 +539,30 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         prefixIcon:
                             Icon(Icons.signpost_outlined, color: primary),
                       ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // 5b. Región del Evento
+                    DropdownButtonFormField<String>(
+                      initialValue: _selectedRegion,
+                      decoration: InputDecoration(
+                        labelText: 'Región del evento *',
+                        prefixIcon: Icon(Icons.location_city_outlined, color: primary),
+                      ),
+                      dropdownColor: Theme.of(context).cardColor,
+                      items: AppRegions.all.map((r) {
+                        return DropdownMenuItem<String>(
+                          value: r,
+                          child: Text(r),
+                        );
+                      }).toList(),
+                      onChanged: _isSaving
+                          ? null
+                          : (val) {
+                              if (val != null) {
+                                setState(() => _selectedRegion = val);
+                              }
+                            },
                     ),
                     const SizedBox(height: 24),
 

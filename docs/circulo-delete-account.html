@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitud de Eliminación de Cuenta - Círculo | Omniverse Labs</title>
+    <style>
+        :root {
+            --primary: #7C3AED;
+            --primary-light: #F5F3FF;
+            --secondary: #F43F5E;
+            --accent-gold: #F59E0B;
+            --danger: #EF4444;
+            --dark-bg: #0F0D15;
+            --card-bg: #1A1625;
+            --card-border: #2D263F;
+            --text-main: #F3F4F6;
+            --text-muted: #9CA3AF;
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            line-height: 1.65;
+            color: var(--text-main);
+            background-color: var(--dark-bg);
+            padding: 32px 16px;
+        }
+
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 44px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--card-border);
+            margin-bottom: 32px;
+        }
+
+        .brand-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-circle {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--danger) 0%, var(--primary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.35);
+        }
+
+        .brand-title {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #FFFFFF;
+        }
+
+        .brand-sub {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .lang-switch {
+            display: flex;
+            gap: 8px;
+            background: #120E1C;
+            padding: 4px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .lang-btn.active {
+            background: var(--danger);
+            color: #FFFFFF;
+        }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(239, 68, 68, 0.15);
+            color: #FCA5A5;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #FFFFFF;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .meta-info {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .warning-card {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-left: 4px solid var(--danger);
+            border-radius: 14px;
+            padding: 20px;
+            margin: 24px 0;
+            color: #FEE2E2;
+            font-size: 15px;
+        }
+
+        .warning-card strong {
+            color: #FFFFFF;
+        }
+
+        .step-card {
+            background: #13101C;
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .step-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 14px;
+        }
+
+        .step-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 18px 0;
+            font-size: 14px;
+        }
+
+        .data-table th, .data-table td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .data-table th {
+            color: #FFFFFF;
+            background: #120E1C;
+            font-weight: 700;
+        }
+
+        .data-table td {
+            color: var(--text-muted);
+        }
+
+        .tag-deleted {
+            display: inline-block;
+            background: rgba(239, 68, 68, 0.2);
+            color: #F87171;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 11px;
+        }
+
+        .tag-retained {
+            display: inline-block;
+            background: rgba(245, 158, 11, 0.2);
+            color: #FBBF24;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 11px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #E5E7EB;
+            margin-bottom: 6px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 14px;
+            background: #0F0D15;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            color: #FFFFFF;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--danger);
+        }
+
+        .btn-submit {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--danger) 0%, #DC2626 100%);
+            color: #FFFFFF;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(239, 68, 68, 0.35);
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-submit:hover {
+            opacity: 0.95;
+            transform: translateY(-1px);
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-top: 36px;
+            margin-bottom: 14px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 8px;
+        }
+
+        p, li {
+            color: var(--text-muted);
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        ol, ul {
+            padding-left: 24px;
+            margin-bottom: 16px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        strong {
+            color: #FFFFFF;
+        }
+
+        code {
+            background: #251F33;
+            color: #C4B5FD;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .footer {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--card-border);
+            font-size: 13px;
+            color: #6B7280;
+            text-align: center;
+        }
+
+        .footer a {
+            color: #A78BFA;
+            text-decoration: none;
+        }
+
+        .lang-content {
+            display: none;
+        }
+
+        .lang-content.active {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 24px 18px;
+                border-radius: 16px;
+            }
+            h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="brand-group">
+                <div class="logo-circle">🗑️</div>
+                <div>
+                    <div class="brand-title">Círculo</div>
+                    <div class="brand-sub">Omniverse Labs &bull; Centro de Privacidad y Gestión de Datos</div>
+                </div>
+            </div>
+            <div class="lang-switch">
+                <button class="lang-btn active" onclick="switchLang('es')">Español</button>
+                <button class="lang-btn" onclick="switchLang('en')">English</button>
+            </div>
+        </div>
+
+        <!-- CONTENIDO EN ESPAÑOL -->
+        <div id="lang-es" class="lang-content active">
+            <div class="badge-pill">CUMPLIMIENTO DE POLÍTICAS DE GOOGLE PLAY</div>
+            <h1>Solicitud de Eliminación de Cuenta y Datos</h1>
+            <div class="meta-info">
+                <strong>Aplicación:</strong> Círculo (<code>com.omniverselabs.circulo</code>)<br>
+                <strong>Desarrollador:</strong> Omniverse Labs &bull; Correo: <a href="mailto:omniverselabs@gmail.com" style="color: #A78BFA;">omniverselabs@gmail.com</a>
+            </div>
+
+            <div class="warning-card">
+                <strong>⚠️ Advertencia de Acción Irreversible:</strong> Al solicitar la eliminación de tu cuenta, tu perfil, fotografías, historial social de afinidades, vínculos en Modo Dupla y mensajes de chat serán purgados de forma permanente e irrecuperable.
+            </div>
+
+            <h2>Métodos Disponibles para Solicitar la Eliminación</h2>
+
+            <!-- Opción 1: In-App -->
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-num">1</div>
+                    <div class="step-title">Opción A: Desde la propia aplicación (Instantánea)</div>
+                </div>
+                <p>Si aún tienes la aplicación instalada en tu teléfono Android, puedes eliminar tu cuenta en tiempo real:</p>
+                <ol>
+                    <li>Abre la aplicación <strong>Círculo</strong>.</li>
+                    <li>Ve a la pestaña <strong>Perfil</strong> (ícono inferior derecho).</li>
+                    <li>Toca el botón de <strong>Ajustes</strong> (engranaje ⚙️ en la esquina superior).</li>
+                    <li>Desplázate hasta la sección <strong>Legal y Privacidad</strong>.</li>
+                    <li>Pulsa el botón rojo <strong>"Eliminar mi cuenta y datos"</strong> y confirma la acción en la ventana emergente.</li>
+                </ol>
+                <p style="margin-top: 10px; font-size: 13px; color: #10B981;">✓ <strong>Plazo:</strong> Inmediato (0 minutos). Tu sesión se cierra y tus registros son borrados al instante.</p>
+            </div>
+
+            <!-- Opción 2: Vía Web / Formulario -->
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-num">2</div>
+                    <div class="step-title">Opción B: Solicitud vía Web o Correo (Sin tener la app instalada)</div>
+                </div>
+                <p>Si desinstalaste la aplicación o no tienes acceso a tu dispositivo, puedes enviar tu solicitud directamente desde este formulario web. Nuestro equipo procesará la baja y te enviará confirmación por correo electrónico:</p>
+
+                <form id="delete-form-es" onsubmit="handleFormSubmit(event, 'es')" style="margin-top: 20px;">
+                    <div class="form-group">
+                        <label class="form-label" for="email-es">Correo Electrónico registrado en Círculo *</label>
+                        <input class="form-input" type="email" id="email-es" placeholder="tu-email@gmail.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="name-es">Nombre o Apodo de Perfil</label>
+                        <input class="form-input" type="text" id="name-es" placeholder="Ej. Valentina o Leo">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="reason-es">Motivo de la baja (Opcional)</label>
+                        <input class="form-input" type="text" id="reason-es" placeholder="Ej. Ya encontré mi grupo de amigos / No uso la app">
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        <span>🗑️ Solicitar Eliminación Definitiva de Cuenta</span>
+                    </button>
+                </form>
+                <p style="margin-top: 14px; font-size: 13px; color: #9CA3AF;">
+                    También puedes escribirnos directamente a <a href="mailto:omniverselabs@gmail.com?subject=Solicitud%20de%20Eliminación%20de%20Cuenta%20-%20Círculo" style="color: #A78BFA; font-weight: 700;">omniverselabs@gmail.com</a> con el asunto <code>"Solicitud de Eliminación de Cuenta - Círculo"</code> indicando tu correo electrónico registrado.
+                </p>
+                <p style="font-size: 13px; color: #10B981;">✓ <strong>Plazo de procesamiento web:</strong> Máximo de 48 a 72 horas hábiles.</p>
+            </div>
+
+            <h2>Alcance del Tratamiento de Datos (Qué se elimina vs. Qué se conserva)</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Categoría de Dato</th>
+                        <th>Estado</th>
+                        <th>Detalle & Fundamento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Perfil y Cuenta</strong><br><small>Nombre, email, bio, fotos, fecha de nacimiento, rol</small></td>
+                        <td><span class="tag-deleted">ELIMINADO DEFINITIVO</span></td>
+                        <td>Se purga irreversiblemente de Google Cloud Firestore.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Historial Social</strong><br><small>Swipes, likes dados y recibidos, postulaciones a círculos</small></td>
+                        <td><span class="tag-deleted">ELIMINADO DEFINITIVO</span></td>
+                        <td>Se borran todos los registros de afinidades del motor de emparejamiento.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Modo Dupla</strong><br><small>Códigos de vinculación y par de amistad</small></td>
+                        <td><span class="tag-deleted">ELIMINADO DEFINITIVO</span></td>
+                        <td>El vínculo queda disuelto de forma instantánea.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mensajería de Grupos</strong><br><small>Mensajes de texto y encuestas en chats K4</small></td>
+                        <td><span class="tag-deleted">ELIMINADO DEFINITIVO</span></td>
+                        <td>Tus mensajes se borran de las salas de chat y el asiento queda libre.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Check-ins de Salidas</strong><br><small>Puntos de salida real e insignias de verificación</small></td>
+                        <td><span class="tag-deleted">ELIMINADO DEFINITIVO</span></td>
+                        <td>Puntos y sellos de presencia física se eliminan con el perfil.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Recibos de Compras Google Play</strong><br><small>IDs de transacción de Círculo Plus o consumibles</small></td>
+                        <td><span class="tag-retained">RETENCIÓN OBLIGATORIA</span></td>
+                        <td>Conservados de forma anonimizada exclusivamente por imperativo legal y tributario (prevención de fraudes y auditoría contable requerida por la normativa vigente).</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Contacto y Soporte</h2>
+            <p>Si tienes preguntas o necesitas asistencia con tu solicitud de datos, contáctanos:</p>
+            <ul>
+                <li><strong>Responsable:</strong> Omniverse Labs</li>
+                <li><strong>Email Oficial:</strong> <a href="mailto:omniverselabs@gmail.com" style="color: #A78BFA; font-weight: 700;">omniverselabs@gmail.com</a></li>
+                <li><strong>Política de Privacidad Completa:</strong> <a href="circulo-privacy.html" style="color: #A78BFA;">Ver Política de Privacidad de Círculo</a></li>
+            </ul>
+        </div>
+
+        <!-- CONTENIDO EN INGLÉS -->
+        <div id="lang-en" class="lang-content">
+            <div class="badge-pill">GOOGLE PLAY POLICY COMPLIANCE</div>
+            <h1>Account and Data Deletion Request</h1>
+            <div class="meta-info">
+                <strong>Application:</strong> Círculo (<code>com.omniverselabs.circulo</code>)<br>
+                <strong>Developer:</strong> Omniverse Labs &bull; Email: <a href="mailto:omniverselabs@gmail.com" style="color: #A78BFA;">omniverselabs@gmail.com</a>
+            </div>
+
+            <div class="warning-card">
+                <strong>⚠️ Irreversible Action Warning:</strong> Requesting account deletion will permanently erase your profile, photos, social affinities, swipes, Duo Mode bonds, and chat messages. This action cannot be undone.
+            </div>
+
+            <h2>Available Deletion Methods</h2>
+
+            <!-- Option 1: In-App -->
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-num">1</div>
+                    <div class="step-title">Option A: In-App Deletion (Instantaneous)</div>
+                </div>
+                <p>If you still have the Círculo app installed on your Android device:</p>
+                <ol>
+                    <li>Open <strong>Círculo</strong>.</li>
+                    <li>Go to the <strong>Profile</strong> tab (bottom right icon).</li>
+                    <li>Tap the <strong>Settings</strong> icon (gear ⚙️ in the top corner).</li>
+                    <li>Scroll down to the <strong>Legal & Privacy</strong> section.</li>
+                    <li>Tap the red button <strong>"Delete my account and data"</strong> and confirm in the pop-up dialog.</li>
+                </ol>
+                <p style="margin-top: 10px; font-size: 13px; color: #10B981;">✓ <strong>Timeline:</strong> Instant (0 minutes). Session terminates and data is purged immediately.</p>
+            </div>
+
+            <!-- Option 2: Web Form -->
+            <div class="step-card">
+                <div class="step-header">
+                    <div class="step-num">2</div>
+                    <div class="step-title">Option B: Web Request (Without reinstalling the app)</div>
+                </div>
+                <p>If you uninstalled the app or cannot access your phone, you can request account deletion using this web form:</p>
+
+                <form id="delete-form-en" onsubmit="handleFormSubmit(event, 'en')" style="margin-top: 20px;">
+                    <div class="form-group">
+                        <label class="form-label" for="email-en">Registered Email Address in Círculo *</label>
+                        <input class="form-input" type="email" id="email-en" placeholder="your-email@gmail.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="name-en">Profile Display Name / Nickname</label>
+                        <input class="form-input" type="text" id="name-en" placeholder="e.g. Alex or Leo">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="reason-en">Reason for leaving (Optional)</label>
+                        <input class="form-input" type="text" id="reason-en" placeholder="e.g. Found friends / No longer using the app">
+                    </div>
+
+                    <button type="submit" class="btn-submit">
+                        <span>🗑️ Submit Permanent Account Deletion Request</span>
+                    </button>
+                </form>
+                <p style="margin-top: 14px; font-size: 13px; color: #9CA3AF;">
+                    Alternatively, send an email directly to <a href="mailto:omniverselabs@gmail.com?subject=Account%20Deletion%20Request%20-%20Circulo" style="color: #A78BFA; font-weight: 700;">omniverselabs@gmail.com</a> with the subject <code>"Account Deletion Request - Circulo"</code> stating your registered email address.
+                </p>
+                <p style="font-size: 13px; color: #10B981;">✓ <strong>Web Processing Timeline:</strong> Within 48 to 72 business hours with email confirmation.</p>
+            </div>
+
+            <h2>Data Scope (Permanently Deleted vs. Retained)</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Data Category</th>
+                        <th>Status</th>
+                        <th>Legal Basis & Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Profile & Account</strong><br><small>Name, email, photos, birthday, role, bio</small></td>
+                        <td><span class="tag-deleted">PERMANENTLY DELETED</span></td>
+                        <td>Irreversibly purged from Cloud Firestore.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Social Swipes & Graph</strong><br><small>Swipes, likes given/received, circle applications</small></td>
+                        <td><span class="tag-deleted">PERMANENTLY DELETED</span></td>
+                        <td>Purged from matching engine and affinity records.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Duo Mode</strong><br><small>Pair codes and friendship linkages</small></td>
+                        <td><span class="tag-deleted">PERMANENTLY DELETED</span></td>
+                        <td>Disbanded immediately.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Group Chat Messages</strong><br><small>Chat texts and polls in K4 circles</small></td>
+                        <td><span class="tag-deleted">PERMANENTLY DELETED</span></td>
+                        <td>Removed from group chat rooms; seat is released.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Check-in Badges</strong><br><small>Physical verification stamps & locations</small></td>
+                        <td><span class="tag-deleted">PERMANENTLY DELETED</span></td>
+                        <td>Removed with user profile.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Google Play In-App Purchase Records</strong><br><small>Transaction tokens for Círculo Plus or consumables</small></td>
+                        <td><span class="tag-retained">STATUTORY RETENTION</span></td>
+                        <td>Retained in anonymized format strictly to comply with financial, tax, and anti-fraud statutory requirements under applicable law.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Contact</h2>
+            <ul>
+                <li><strong>Team:</strong> Omniverse Labs</li>
+                <li><strong>Email:</strong> <a href="mailto:omniverselabs@gmail.com" style="color: #A78BFA; font-weight: 700;">omniverselabs@gmail.com</a></li>
+                <li><strong>Full Privacy Policy:</strong> <a href="circulo-privacy.html" style="color: #A78BFA;">Read Círculo Privacy Policy</a></li>
+            </ul>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            &copy; 2026 Omniverse Labs. All rights reserved. &bull; <a href="circulo-privacy.html">Política de Privacidad / Privacy Policy</a> &bull; <a href="mailto:omniverselabs@gmail.com">omniverselabs@gmail.com</a>
+        </div>
+    </div>
+
+    <script>
+        function switchLang(lang) {
+            document.querySelectorAll('.lang-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.lang-btn').forEach(el => el.classList.remove('active'));
+
+            document.getElementById('lang-' + lang).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function handleFormSubmit(event, lang) {
+            event.preventDefault();
+            const email = document.getElementById('email-' + lang).value;
+            const name = document.getElementById('name-' + lang).value;
+            const reason = document.getElementById('reason-' + lang).value;
+
+            const subject = encodeURIComponent(
+                lang === 'es' 
+                    ? 'Solicitud de Eliminación de Cuenta - Círculo (' + email + ')' 
+                    : 'Account Deletion Request - Circulo (' + email + ')'
+            );
+
+            const body = encodeURIComponent(
+                (lang === 'es' ? 'Hola equipo de Omniverse Labs,\n\nSolicito la eliminación definitiva e irreversible de mi cuenta en Círculo y de todos mis datos personales asociados según las directivas de Google Play.\n\n' : 'Hello Omniverse Labs Team,\n\nI request the permanent and irreversible deletion of my Círculo account and all associated personal data in accordance with Google Play policies.\n\n') +
+                'Email: ' + email + '\n' +
+                'Nombre/Name: ' + (name || 'No especificado / Not specified') + '\n' +
+                'Motivo/Reason: ' + (reason || 'No especificado / Not specified') + '\n\n' +
+                (lang === 'es' ? 'Comprendo que esta acción es permanente y no podré recuperar mi cuenta.' : 'I understand that this action is permanent and my account cannot be recovered.')
+            );
+
+            window.location.href = 'mailto:omniverselabs@gmail.com?subject=' + subject + '&body=' + body;
+        }
+    </script>
+</body>
+</html>

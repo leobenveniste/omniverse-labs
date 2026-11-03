@@ -61,12 +61,14 @@ class _EventUnifiedReportScreenState extends State<EventUnifiedReportScreen> {
   bool _hasFreeWater = true;
   String _perceivedDensity = 'Media';
   final Set<String> _selectedWeather = {};
+  late final Set<String> _absentStaffIds;
 
   bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
+    _absentStaffIds = Set<String>.from(widget.event.absentStaffIds);
     final rep = widget.event.unifiedReport;
 
     _durationController =
@@ -249,6 +251,14 @@ class _EventUnifiedReportScreenState extends State<EventUnifiedReportScreen> {
       currentUser: currentUser,
     );
 
+    if (success) {
+      await eventService.setAbsentStaff(
+        eventId: widget.event.id,
+        absentStaffIds: _absentStaffIds.toList(),
+        currentUser: currentUser,
+      );
+    }
+
     if (!mounted) return;
     setState(() => _isSaving = false);
 
@@ -273,6 +283,7 @@ class _EventUnifiedReportScreenState extends State<EventUnifiedReportScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = context.watch<AuthService>();
     final isDark = AppTheme.isDark(context);
     final primary = AppTheme.primaryColor(context);
     final dateStr = DateFormat('dd/MM/yyyy').format(widget.event.date);
@@ -749,6 +760,63 @@ class _EventUnifiedReportScreenState extends State<EventUnifiedReportScreen> {
                   ),
                 ],
               ),
+              if (widget.event.confirmedStaffIds.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                _buildSectionCard(
+                  title: '5. Asistencia del Staff Confirmado',
+                  icon: Icons.how_to_reg_rounded,
+                  children: [
+                    Text(
+                      'Marcá los miembros que estuvieron presentes. Quienes queden desmarcados figurarán como ausentes y no sumarán asistencia.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppTheme.textSecondaryColor(context),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ...authService.users
+                        .where((u) => widget.event.confirmedStaffIds.contains(u.id))
+                        .map((member) {
+                      final isAttended = !_absentStaffIds.contains(member.id);
+                      return CheckboxListTile(
+                        contentPadding: EdgeInsets.zero,
+                        dense: true,
+                        title: Text(
+                          member.fullName,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppTheme.textPrimaryColor(context),
+                          ),
+                        ),
+                        subtitle: Text(
+                          isAttended
+                              ? 'Presente (suma asistencia)'
+                              : 'Ausente (no suma asistencia)',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isAttended
+                                ? AppTheme.neonGreen
+                                : AppTheme.errorRed,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        value: isAttended,
+                        activeColor: primary,
+                        onChanged: (val) {
+                          setState(() {
+                            if (val == true) {
+                              _absentStaffIds.remove(member.id);
+                            } else {
+                              _absentStaffIds.add(member.id);
+                            }
+                          });
+                        },
+                      );
+                    }),
+                  ],
+                ),
+              ],
             ],
           ),
         ),

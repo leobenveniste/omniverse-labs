@@ -12,7 +12,7 @@ import 'events/event_detail_screen.dart';
 import 'cases/cases_hub_screen.dart';
 import 'cases/case_form_screen.dart';
 import 'profile/profile_screen.dart';
-import 'help/help_screen.dart';
+import 'vuelos/vuelos_screen.dart';
 import 'settings/settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -174,12 +174,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               // Espacio central para el botón principal Perfil en el notch
               const SizedBox(width: 56),
-              // Tab 3: Ayuda
+              // Tab 3: Vuelos
               _buildNavItem(
                 index: 3,
-                icon: Icons.help_outline_rounded,
-                activeIcon: Icons.help_rounded,
-                label: 'Ayuda',
+                icon: Icons.hub_outlined,
+                activeIcon: Icons.hub_rounded,
+                label: 'Vuelos',
               ),
               // Tab 4: Configuración
               _buildNavItem(
@@ -282,7 +282,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 2:
         return const ProfileScreen();
       case 3:
-        return const HelpScreen();
+        return const VuelosScreen();
       case 4:
         return const SettingsScreen();
       default:

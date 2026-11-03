@@ -7,10 +7,10 @@ service cloud.firestore {
     // ===============================================================
     //
     // Collection: users/{userId}
-    // Document ID: userId (UUID or user identifier)
+    // Document ID: userId (UUID or user identifier matching request.auth.uid)
     // Fields:
     //   - id: string (required, immutable, 1-128 chars, matches document ID)
-    //   - email: string (required, valid email format, 1-100 chars)
+    //   - email: string (required, valid email format, 3-100 chars)
     //   - password: string (optional/nullable, 0-100 chars)
     //   - firstName: string (required, 1-60 chars)
     //   - lastName: string (required, 1-60 chars)
@@ -21,6 +21,8 @@ service cloud.firestore {
     //   - instagram: string (optional/nullable, max 50 chars)
     //   - photoUrl: string (optional/nullable, max 800000 chars)
     //   - roles: list of strings (required, size 1-10, valid system roles)
+    //   - region: string (optional/nullable, max 50 chars)
+    //   - manualAttendanceCount: int (optional/nullable, 0 to 100000)
     //   - createdAt: string or timestamp (required, immutable, max 40 chars if string)
     //
     // Collection: events/{eventId}
@@ -37,60 +39,21 @@ service cloud.firestore {
     //   - imageUrl: string (optional/nullable, max 800000 chars)
     //   - requiredStaffCount: int (required, 0 to 500)
     //   - staffIds: list of strings (required, size <= 500)
+    //   - confirmedStaffIds: list of strings (optional/nullable, size <= 500)
+    //   - absentStaffIds: list of strings (optional/nullable, size <= 500)
+    //   - region: string (optional/nullable, max 50 chars)
     //   - createdBy: string (required, immutable, 1-128 chars)
     //   - createdByName: string (required, 1-100 chars)
     //   - createdAt: string or timestamp (required, immutable, max 40 chars if string)
     //   - isManuallyStarted: bool (required)
     //   - isManuallyClosed: bool (required)
     //   - unifiedReport: map (optional)
-    //       - durationTotal: string (max 50 chars)
-    //       - producer: string (max 120 chars)
-    //       - vueloPresent: bool
-    //       - eventType: string (max 60 chars)
-    //       - otherEventType: string (optional/nullable, max 100 chars)
-    //       - timeSlot: string (max 60 chars)
-    //       - otherTimeSlot: string (optional/nullable, max 100 chars)
-    //       - spaceType: string (max 60 chars)
-    //       - dayNumber: string (max 60 chars)
-    //       - otherDayNumber: string (optional/nullable, max 100 chars)
-    //       - hasFreeWater: bool
-    //       - perceivedDensity: string (max 60 chars)
-    //       - weatherTypes: list of strings (size <= 20)
-    //       - medicalAttendedCount: int (>= 0, <= 100000)
-    //       - medicalTransferredCount: int (>= 0, <= 100000)
-    //       - vcAttendedCount: int (>= 0, <= 100000)
-    //       - medicalComposition: map (size <= 50)
-    //       - medicalOther1Name: string (optional/nullable, max 100 chars)
-    //       - medicalOther1Count: int (optional/nullable, >= 0, <= 100000)
-    //       - medicalOther2Name: string (optional/nullable, max 100 chars)
-    //       - medicalOther2Count: int (optional/nullable, >= 0, <= 100000)
-    //       - vueloVolunteersCount: string (max 60 chars)
-    //       - vueloFruitQuantity: string (max 60 chars)
-    //       - otherRelevantInfo: string (max 3000 chars)
-    //       - completedByUserId: string (1-128 chars)
-    //       - completedByUserName: string (1-100 chars)
-    //       - completedAt: string or timestamp
     //   - pairs: list of maps (optional, size <= 250)
-    //       - id: string (1-128 chars)
-    //       - user1Id: string (1-128 chars)
-    //       - user1Name: string (1-100 chars)
-    //       - user2Id: string (1-128 chars)
-    //       - user2Name: string (1-100 chars)
-    //       - createdAt: string or timestamp (max 40 chars if string)
     //   - roundLogs: list of maps (optional, size <= 500)
-    //       - id: string (1-128 chars)
-    //       - timestamp: string or timestamp (max 40 chars if string)
-    //       - memberId: string (1-128 chars)
-    //       - memberName: string (1-100 chars)
-    //       - partnerId: string or null (optional, max 128 chars)
-    //       - partnerName: string or null (optional, max 100 chars)
-    //       - detectedCasesCount: int or float (>= 0, <= 100000)
-    //       - callsCount: int or float (>= 0, <= 100000)
-    //       - observations: string (max 3000 chars)
     //
     // Collection: cases/{caseId}
     // Document ID: caseId (UUID or case identifier)
-    // Fields (Legacy & Structured "Registro Unificado de Atenciones"):
+    // Fields:
     //   - id: string (required, immutable, 1-128 chars, matches document ID)
     //   - eventId: string (required, immutable, 1-128 chars)
     //   - eventName: string (required, 1-120 chars)
@@ -139,6 +102,7 @@ service cloud.firestore {
     // ===============================================================
     // Helper Functions
     // ===============================================================
+
 
     function hasRequiredFields(fields) {
       return request.resource.data.keys().hasAll(fields);
@@ -205,7 +169,8 @@ service cloud.firestore {
       let allowed = [
         'id', 'email', 'password', 'firstName', 'lastName',
         'documentType', 'documentNumber', 'birthDate', 'phone',
-        'instagram', 'photoUrl', 'roles', 'createdAt'
+        'instagram', 'photoUrl', 'roles', 'region', 'manualAttendanceCount',
+        'createdAt'
       ];
       let required = [
         'id', 'email', 'firstName', 'lastName',
@@ -231,6 +196,8 @@ service cloud.firestore {
              isValidOptionalString('photoUrl', 0, 800000) &&
              data.roles is list && data.roles.size() >= 1 && data.roles.size() <= 10 &&
              data.roles.hasOnly(validRoles) &&
+             isValidOptionalString('region', 0, 50) &&
+             (!('manualAttendanceCount' in data) || data.manualAttendanceCount == null || (data.manualAttendanceCount is int && data.manualAttendanceCount >= 0 && data.manualAttendanceCount <= 100000)) &&
              isValidDateTime(data.createdAt);
     }
 
@@ -329,7 +296,8 @@ service cloud.firestore {
       let allowed = [
         'id', 'name', 'date', 'startTime', 'doorsOpenTime', 'endTime',
         'location', 'address', 'imageUrl', 'requiredStaffCount',
-        'staffIds', 'createdBy', 'createdByName', 'createdAt',
+        'staffIds', 'confirmedStaffIds', 'absentStaffIds', 'region',
+        'createdBy', 'createdByName', 'createdAt',
         'isManuallyStarted', 'isManuallyClosed', 'unifiedReport',
         'pairs', 'roundLogs'
       ];
@@ -353,6 +321,9 @@ service cloud.firestore {
              data.requiredStaffCount is int &&
              data.requiredStaffCount >= 0 && data.requiredStaffCount <= 500 &&
              data.staffIds is list && data.staffIds.size() <= 500 &&
+             isValidOptionalList('confirmedStaffIds', 500) &&
+             isValidOptionalList('absentStaffIds', 500) &&
+             isValidOptionalString('region', 0, 50) &&
              data.createdBy is string && data.createdBy.size() >= 1 && data.createdBy.size() <= 128 &&
              data.createdByName is string && data.createdByName.size() >= 1 && data.createdByName.size() <= 100 &&
              isValidDateTime(data.createdAt) &&
