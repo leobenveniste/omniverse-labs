@@ -110,11 +110,11 @@ def deploy():
     notes = [
         {
             "language": "es-419",
-            "text": "Versión 1.0.0 inicial de Círculo: Conectá en grupos de 4 a 10 amigos reales. Match grupal K4, modo dupla, química de roles y suscripción Círculo Plus."
+            "text": "Círculo v1.0.0 (Build 3): Identidad visual renovada con nuevo isotipo 3D, soporte completo para Google Play Subscriptions v2 (mensual, trimestral, semestral y anual) y consumibles (Boost de Perfil y Super-Ondas)."
         },
         {
             "language": "en-US",
-            "text": "Initial v1.0.0 release of Círculo: Connect in real groups of 4 to 10 friends. K4 group matching, Duo mode, role chemistry, and Círculo Plus membership."
+            "text": "Círculo v1.0.0 (Build 3): Refreshed 3D crystal visual branding, full Google Play Subscriptions v2 support (monthly, quarterly, biannual, annual), and consumables (Profile Boosts & Super-Ondas)."
         }
     ]
 
