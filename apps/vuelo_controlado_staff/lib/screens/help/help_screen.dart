@@ -62,7 +62,7 @@ class HelpScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: const AppHeaderTitle(title: 'Ayuda'),
+        title: const AppHeaderTitle(title: 'Recursos'),
       ),
       body: Align(
         alignment: Alignment.topCenter,

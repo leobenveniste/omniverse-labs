@@ -25,23 +25,30 @@ class AppRoles {
 
   static const String miembro = 'Miembro';
   static const String organizacion = 'Organización';
-  static const String rrhh = 'RRHH';
-  static const String produccion = 'Producción';
+  static const String comunicacion = 'Comunicación';
+  static const String investigacion = 'Investigación';
+  static const String recursosHumanos = 'Recursos Humanos';
+  static const String rrhh = 'RRHH'; // Alias de compatibilidad
   static const String comercial = 'Comercial';
+  static const String produccion = 'Producción';
 
   static const List<String> allRoles = [
     miembro,
     organizacion,
-    rrhh,
-    produccion,
+    comunicacion,
+    investigacion,
+    recursosHumanos,
     comercial,
+    produccion,
   ];
 
   static const List<String> assignableRoles = [
     organizacion,
-    rrhh,
-    produccion,
+    comunicacion,
+    investigacion,
+    recursosHumanos,
     comercial,
+    produccion,
   ];
 }
 
@@ -99,6 +106,10 @@ class UserModel {
 
   bool hasRole(String role) {
     if (isSuperAdmin) return true;
+    if (role == AppRoles.recursosHumanos || role == AppRoles.rrhh) {
+      return roles.contains(AppRoles.recursosHumanos) ||
+          roles.contains(AppRoles.rrhh);
+    }
     return roles.contains(role);
   }
 
@@ -109,7 +120,10 @@ class UserModel {
 
   bool get canManageUsers => isSuperAdmin;
 
-  bool get canCreateUsers => isSuperAdmin || roles.contains(AppRoles.rrhh);
+  bool get canCreateUsers =>
+      isSuperAdmin ||
+      roles.contains(AppRoles.recursosHumanos) ||
+      roles.contains(AppRoles.rrhh);
 
   bool get canViewCommercial =>
       isSuperAdmin || roles.contains(AppRoles.comercial);

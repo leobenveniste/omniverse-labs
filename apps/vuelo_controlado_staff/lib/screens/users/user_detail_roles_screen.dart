@@ -45,10 +45,22 @@ class _UserDetailRolesScreenState extends State<UserDetailRolesScreen> {
     if (role == AppRoles.miembro) return; // Inamovible
     HapticFeedback.selectionClick();
     setState(() {
-      if (value) {
-        if (!_currentRoles.contains(role)) _currentRoles.add(role);
+      if (role == AppRoles.recursosHumanos || role == AppRoles.rrhh) {
+        if (value) {
+          if (!_currentRoles.contains(AppRoles.recursosHumanos)) {
+            _currentRoles.add(AppRoles.recursosHumanos);
+          }
+          _currentRoles.remove(AppRoles.rrhh);
+        } else {
+          _currentRoles.remove(AppRoles.recursosHumanos);
+          _currentRoles.remove(AppRoles.rrhh);
+        }
       } else {
-        _currentRoles.remove(role);
+        if (value) {
+          if (!_currentRoles.contains(role)) _currentRoles.add(role);
+        } else {
+          _currentRoles.remove(role);
+        }
       }
     });
   }
@@ -1091,18 +1103,27 @@ class _UserDetailRolesScreenState extends State<UserDetailRolesScreen> {
                       onChanged: (v) => _toggleRole(AppRoles.organizacion, v),
                     ),
                     _RoleSwitchTile(
-                      title: AppRoles.produccion,
+                      title: AppRoles.comunicacion,
                       subtitle:
-                          'Permite crear eventos y gestionar la logística técnica.',
-                      value: _currentRoles.contains(AppRoles.produccion),
-                      onChanged: (v) => _toggleRole(AppRoles.produccion, v),
+                          'Difusión institucional, redes sociales y comunicación oficial.',
+                      value: _currentRoles.contains(AppRoles.comunicacion),
+                      onChanged: (v) => _toggleRole(AppRoles.comunicacion, v),
                     ),
                     _RoleSwitchTile(
-                      title: AppRoles.rrhh,
+                      title: AppRoles.investigacion,
                       subtitle:
-                          'Permite dar de alta nuevos usuarios y gestionar credenciales.',
-                      value: _currentRoles.contains(AppRoles.rrhh),
-                      onChanged: (v) => _toggleRole(AppRoles.rrhh, v),
+                          'Análisis de datos, reportes de impacto e investigación de campo.',
+                      value: _currentRoles.contains(AppRoles.investigacion),
+                      onChanged: (v) => _toggleRole(AppRoles.investigacion, v),
+                    ),
+                    _RoleSwitchTile(
+                      title: AppRoles.recursosHumanos,
+                      subtitle:
+                          'Permite dar de alta nuevos usuarios y gestionar credenciales del equipo.',
+                      value: _currentRoles.contains(AppRoles.recursosHumanos) ||
+                          _currentRoles.contains(AppRoles.rrhh),
+                      onChanged: (v) =>
+                          _toggleRole(AppRoles.recursosHumanos, v),
                     ),
                     _RoleSwitchTile(
                       title: AppRoles.comercial,
@@ -1110,6 +1131,13 @@ class _UserDetailRolesScreenState extends State<UserDetailRolesScreen> {
                           'Acceso a métricas de eventos y reportes comerciales.',
                       value: _currentRoles.contains(AppRoles.comercial),
                       onChanged: (v) => _toggleRole(AppRoles.comercial, v),
+                    ),
+                    _RoleSwitchTile(
+                      title: AppRoles.produccion,
+                      subtitle:
+                          'Permite crear eventos y gestionar la logística técnica.',
+                      value: _currentRoles.contains(AppRoles.produccion),
+                      onChanged: (v) => _toggleRole(AppRoles.produccion, v),
                     ),
                   ],
                 ],

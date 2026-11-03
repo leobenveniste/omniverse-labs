@@ -10,7 +10,7 @@ import '../../services/event_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/app_header.dart';
 import '../../widgets/motion_components.dart';
-import '../help/help_screen.dart';
+import '../settings/settings_screen.dart';
 
 class DonationUtils {
   static const String donationUrl =
@@ -425,13 +425,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           IconButton(
             style: AppTheme.headerIconButtonStyle(context),
-            icon: const Icon(Icons.help_outline_rounded, size: 22),
-            tooltip: 'Ayuda y Protocolos',
+            icon: const Icon(Icons.settings_outlined, size: 22),
+            tooltip: 'Ajustes',
             onPressed: () {
               HapticFeedback.lightImpact();
               Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (_) => const HelpScreen(),
+                  builder: (_) => const SettingsScreen(),
                 ),
               );
             },

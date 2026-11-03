@@ -13,7 +13,7 @@ import 'cases/cases_hub_screen.dart';
 import 'cases/case_form_screen.dart';
 import 'profile/profile_screen.dart';
 import 'vuelos/vuelos_screen.dart';
-import 'settings/settings_screen.dart';
+import 'help/help_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -27,8 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
   // 0: Eventos
   // 1: Casos
   // 2: Perfil (Center Hero FAB - Botón Principal - Pantalla Inicial)
-  // 3: Ayuda
-  // 4: Configuración
+  // 3: Vuelos
+  // 4: Recursos (Guías y Protocolos)
   int _currentIndex = 2;
 
   // Subnavegación persistente en tabs
@@ -181,12 +181,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 activeIcon: Icons.hub_rounded,
                 label: 'Vuelos',
               ),
-              // Tab 4: Configuración
+              // Tab 4: Recursos
               _buildNavItem(
                 index: 4,
-                icon: Icons.settings_outlined,
-                activeIcon: Icons.settings_rounded,
-                label: 'Ajustes',
+                icon: Icons.menu_book_outlined,
+                activeIcon: Icons.menu_book_rounded,
+                label: 'Recursos',
               ),
             ],
           ),
@@ -284,7 +284,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 3:
         return const VuelosScreen();
       case 4:
-        return const SettingsScreen();
+        return const HelpScreen();
       default:
         return const ProfileScreen();
     }

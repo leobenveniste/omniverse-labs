@@ -178,7 +178,8 @@ service cloud.firestore {
         'roles', 'createdAt'
       ];
       let validRoles = [
-        'Miembro', 'Organización', 'RRHH', 'Producción', 'Comercial', 'SuperAdmin', 'superadmin'
+        'Organización', 'Comunicación', 'Investigación', 'Recursos Humanos', 'RRHH',
+        'Comercial', 'Producción', 'Miembro', 'SuperAdmin', 'superadmin'
       ];
 
       return hasOnlyAllowedFields(allowed) &&
