@@ -243,11 +243,11 @@ void main() {
     expect(find.text('STAFF'), findsNothing);
 
     // Comprobar los 5 links de navegación:
-    // Eventos, Casos, Perfil (Center Hero FAB), Vuelos, Ajustes
+    // Eventos, Casos, Perfil (Center Hero FAB), Vuelos, Recursos
     expect(find.text('Eventos'), findsWidgets);
     expect(find.text('Casos'), findsOneWidget);
     expect(find.text('Vuelos'), findsOneWidget);
-    expect(find.text('Ajustes'), findsOneWidget);
+    expect(find.text('Recursos'), findsOneWidget);
     expect(find.byTooltip('Mi Credencial y Perfil'), findsOneWidget);
   });
 

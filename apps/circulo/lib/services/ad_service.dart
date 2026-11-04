@@ -46,7 +46,6 @@ class AdService extends ChangeNotifier {
       await MobileAds.instance.initialize();
       _isInitialized = true;
       notifyListeners();
-      loadBannerAd();
     } catch (e) {
       debugPrint('AdService initialize notice: $e');
       _isSimulationMode = true;
@@ -105,6 +104,9 @@ class AdService extends ChangeNotifier {
     if (cycle.isOdd) {
       return PromoCardType.plusPromo;
     } else {
+      if (_currentBannerAd == null && !_isSimulationMode) {
+        loadBannerAd();
+      }
       return PromoCardType.googleAd;
     }
   }
