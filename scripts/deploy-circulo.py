@@ -113,11 +113,11 @@ def deploy(target_tracks=None):
     notes = [
         {
             "language": "es-419",
-            "text": "Círculo v1.0.0 (Build 6): Corrección definitiva del cierre inmediato al iniciar en Android. Eliminación de optimizaciones R8 agresivas, estabilización de temas nativos y protección de errores globales."
+            "text": "Círculo v1.0.0 (Build 7): Rendimiento instantáneo de inicio con persistencia local de Firestore, carga en segundo plano de servicios de facturación/anuncios, eliminación de optimización R8 y nuevo isotipo 3D."
         },
         {
             "language": "en-US",
-            "text": "Círculo v1.0.0 (Build 6): Definitive fix for immediate startup crash on Android. Removed aggressive R8 optimization, stabilized native activity themes, and added global error shielding."
+            "text": "Círculo v1.0.0 (Build 7): Instant launch performance with local Firestore persistence, non-blocking background billing/ads, clean native packaging, and refreshed 3D brand logo."
         }
     ]
 
@@ -138,8 +138,7 @@ def deploy(target_tracks=None):
         }
 
     for t in tracks_to_deploy:
-        # En apps en estado borrador (draft), Google Play exige que las releases de tracks externos sean 'draft'
-        status_to_use = "draft" if t in ["alpha", "beta", "production"] else "completed"
+        status_to_use = "draft" if t in ["production", "beta"] else "completed"
         try:
             edits.tracks().update(
                 packageName=PACKAGE_NAME,
@@ -159,8 +158,45 @@ def deploy(target_tracks=None):
             ).execute()
             print(f"   ✅ Track [{t.upper()}] configured with status 'draft'")
 
-    # 4. Validate Edit
-    print("\n4️⃣ Validating edit session...")
+    # 4. Upload Store Listing Graphics (Icon & Feature Graphic)
+    print("\n4️⃣ Uploading App Icon and Feature Graphic to store listings...")
+    for lang in ["es-419", "en-US"]:
+        if os.path.exists(ICON_PATH):
+            try:
+                edits.images().deleteall(
+                    packageName=PACKAGE_NAME, editId=edit_id, language=lang, imageType="icon"
+                ).execute()
+            except Exception:
+                pass
+            media = MediaFileUpload(ICON_PATH, mimetype="image/png")
+            edits.images().upload(
+                packageName=PACKAGE_NAME,
+                editId=edit_id,
+                language=lang,
+                imageType="icon",
+                media_body=media
+            ).execute()
+            print(f"   ✅ [icon] updated for [{lang}]")
+
+        if os.path.exists(FEATURE_PATH):
+            try:
+                edits.images().deleteall(
+                    packageName=PACKAGE_NAME, editId=edit_id, language=lang, imageType="featureGraphic"
+                ).execute()
+            except Exception:
+                pass
+            media = MediaFileUpload(FEATURE_PATH, mimetype="image/png")
+            edits.images().upload(
+                packageName=PACKAGE_NAME,
+                editId=edit_id,
+                language=lang,
+                imageType="featureGraphic",
+                media_body=media
+            ).execute()
+            print(f"   ✅ [featureGraphic] updated for [{lang}]")
+
+    # 5. Validate Edit
+    print("\n5️⃣ Validating edit session...")
     need_changes_not_sent = False
     try:
         edits.validate(packageName=PACKAGE_NAME, editId=edit_id).execute()
@@ -173,8 +209,8 @@ def deploy(target_tracks=None):
             need_changes_not_sent = True
             print("   ℹ️ Will commit with changesNotSentForReview=True.")
 
-    # 5. Commit Edit
-    print("\n5️⃣ Committing and publishing release to Google Play Console...")
+    # 6. Commit Edit
+    print("\n6️⃣ Committing and publishing release to Google Play Console...")
     try:
         if need_changes_not_sent:
             commit_res = edits.commit(

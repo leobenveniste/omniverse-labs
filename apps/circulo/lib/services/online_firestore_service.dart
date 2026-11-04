@@ -63,7 +63,7 @@ class OnlineFirestoreService {
       final fs = _firestore;
       if (fs != null) {
         fs.settings = const Settings(
-          persistenceEnabled: false, // 100% Online por seguridad
+          persistenceEnabled: true, // Cache local y offline habilitado para inicio instantáneo
         );
         _isOnlineActive = true;
         _listenToUsersOnline();
@@ -649,9 +649,11 @@ class OnlineFirestoreService {
       ),
     ];
 
+    // 1. Carga inmediata síncrona en memoria para inicio instantáneo
     for (final u in seedUsers) {
-      await upsertUser(u);
+      _cachedUsers[u.id] = u;
     }
+    _usersStreamController.add(_cachedUsers.values.toList());
 
     // 3. Círculo en formación (3/4) listo para match con el usuario actual
     final circle3of4 = CircleGroupModel(
@@ -720,12 +722,13 @@ class OnlineFirestoreService {
       createdAt: DateTime.now().subtract(const Duration(days: 5)),
     );
 
-    await upsertGroup(circle3of4);
-    await upsertGroup(circle2of4);
-    await upsertGroup(activeExpandedGroup);
+    _cachedGroups[circle3of4.id] = circle3of4;
+    _cachedGroups[circle2of4.id] = circle2of4;
+    _cachedGroups[activeExpandedGroup.id] = activeExpandedGroup;
+    _groupsStreamController.add(_cachedGroups.values.toList());
 
-    // Mensaje de rompehielos inicial en el grupo activo
-    await sendMessage(GroupMessageModel(
+    // Mensaje de rompehielos inicial en memoria
+    final seedMsg = GroupMessageModel(
       id: 'msg_welcome_seed',
       groupId: activeExpandedGroup.id,
       senderId: 'system',
@@ -734,10 +737,11 @@ class OnlineFirestoreService {
       text:
           '¡Bienvenidos al Círculo! 🚀 A todos les gusta el café de especialidad y la música en vivo. ¿Cuál es su cafetería o recital favorito?',
       timestamp: DateTime.now().subtract(const Duration(days: 4)),
-    ));
+    );
+    _cachedMessages.putIfAbsent(activeExpandedGroup.id, () => []).add(seedMsg);
 
-    // Plan propuesto en el grupo activo
-    await upsertPlan(GroupPlanModel(
+    // Plan propuesto en memoria
+    final seedPlan = GroupPlanModel(
       id: 'plan_seed_coffee',
       groupId: activeExpandedGroup.id,
       creatorId: 'user_valen',
@@ -755,6 +759,52 @@ class OnlineFirestoreService {
       checkedInUserIds: [],
       isCompleted: false,
       createdAt: DateTime.now().subtract(const Duration(hours: 12)),
+    );
+    _cachedPlans.putIfAbsent(activeExpandedGroup.id, () => []).add(seedPlan);
+
+    // 2. Sincronización en segundo plano con la nube sin bloquear el arranque de la app
+    unawaited(_syncSeedDataToFirestore(
+      seedUsers,
+      [circle3of4, circle2of4, activeExpandedGroup],
+      seedMsg,
+      seedPlan,
     ));
+  }
+
+  Future<void> _syncSeedDataToFirestore(
+    List<UserModel> users,
+    List<CircleGroupModel> groups,
+    GroupMessageModel message,
+    GroupPlanModel plan,
+  ) async {
+    if (!_isOnlineActive || _firestore == null) return;
+    try {
+      for (final u in users) {
+        await _firestore!
+            .collection('circulo_users')
+            .doc(u.id)
+            .set(u.toJson(), SetOptions(merge: true))
+            .catchError((_) {});
+      }
+      for (final g in groups) {
+        await _firestore!
+            .collection('circulo_groups')
+            .doc(g.id)
+            .set(g.toJson(), SetOptions(merge: true))
+            .catchError((_) {});
+      }
+      await _firestore!
+          .collection('circulo_messages')
+          .doc(message.id)
+          .set(message.toJson(), SetOptions(merge: true))
+          .catchError((_) {});
+      await _firestore!
+          .collection('circulo_plans')
+          .doc(plan.id)
+          .set(plan.toJson(), SetOptions(merge: true))
+          .catchError((_) {});
+    } catch (e) {
+      debugPrint('Background cloud seed notice: $e');
+    }
   }
 }

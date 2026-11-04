@@ -116,20 +116,16 @@ class _CirculoAppBootstrapState extends State<CirculoAppBootstrap> {
 
       final authService = AuthService(firestoreService, widget.prefs);
       final billingService = BillingService(firestoreService);
-      try {
-        await billingService.initialize();
-      } catch (e) {
-        debugPrint('BillingService init error: $e');
-      }
-
       final adService = AdService();
-      try {
-        await adService.initialize();
-      } catch (e) {
-        debugPrint('AdService init error: $e');
-      }
-
       final matchEngineService = MatchEngineService(firestoreService);
+
+      // Inicialización asíncrona no bloqueante
+      unawaited(billingService.initialize().catchError((e) {
+        debugPrint('BillingService init error: $e');
+      }));
+      unawaited(adService.initialize().catchError((e) {
+        debugPrint('AdService init error: $e');
+      }));
 
       if (!mounted) return;
       setState(() {

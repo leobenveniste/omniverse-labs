@@ -5,6 +5,7 @@ import socket
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
 from googleapiclient.errors import HttpError
 
 socket.setdefaulttimeout(120)
@@ -162,8 +163,49 @@ def main():
     ).execute()
     print("   ✅ [en-US] updated successfully!")
 
-    # 3. Validate
-    print("\n3️⃣ Validating edit session...")
+    # 3. Upload Store Listing Graphics (Icon & Feature Graphic)
+    print("\n3️⃣ Uploading App Icon and Feature Graphic...")
+    store_assets_dir = os.path.join(r"C:\Projects\Omniverse Labs\apps\circulo\store_assets")
+    icon_path = os.path.join(store_assets_dir, "icon_512x512.png")
+    fg_path = os.path.join(store_assets_dir, "feature_graphic_1024x500.png")
+
+    for lang in ["es-419", "en-US"]:
+        if os.path.exists(icon_path):
+            try:
+                edits.images().deleteall(
+                    packageName=PACKAGE_NAME, editId=edit_id, language=lang, imageType="icon"
+                ).execute()
+            except Exception:
+                pass
+            media = MediaFileUpload(icon_path, mimetype="image/png")
+            edits.images().upload(
+                packageName=PACKAGE_NAME,
+                editId=edit_id,
+                language=lang,
+                imageType="icon",
+                media_body=media
+            ).execute()
+            print(f"   ✅ [icon] uploaded for [{lang}]")
+
+        if os.path.exists(fg_path):
+            try:
+                edits.images().deleteall(
+                    packageName=PACKAGE_NAME, editId=edit_id, language=lang, imageType="featureGraphic"
+                ).execute()
+            except Exception:
+                pass
+            media = MediaFileUpload(fg_path, mimetype="image/png")
+            edits.images().upload(
+                packageName=PACKAGE_NAME,
+                editId=edit_id,
+                language=lang,
+                imageType="featureGraphic",
+                media_body=media
+            ).execute()
+            print(f"   ✅ [featureGraphic] uploaded for [{lang}]")
+
+    # 4. Validate
+    print("\n4️⃣ Validating edit session...")
     need_changes_not_sent = False
     try:
         edits.validate(packageName=PACKAGE_NAME, editId=edit_id).execute()
@@ -175,8 +217,8 @@ def main():
         if "changesnotsentforreview" in err_msg.lower():
             need_changes_not_sent = True
 
-    # 4. Commit
-    print("\n4️⃣ Committing to Google Play Console...")
+    # 5. Commit
+    print("\n5️⃣ Committing to Google Play Console...")
     if need_changes_not_sent:
         edits.commit(packageName=PACKAGE_NAME, editId=edit_id, changesNotSentForReview=True).execute()
     else:
