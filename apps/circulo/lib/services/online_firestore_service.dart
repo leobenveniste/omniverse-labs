@@ -214,6 +214,8 @@ class OnlineFirestoreService {
     }
   }
 
+  List<SwipeInteractionModel> get currentSwipes => _cachedSwipes;
+
   List<SwipeInteractionModel> getSwipesFromUser(String userId) {
     return _cachedSwipes.where((s) => s.fromUserId == userId).toList();
   }
@@ -230,6 +232,50 @@ class OnlineFirestoreService {
       return true;
     }
     return false;
+  }
+
+  Future<bool> removeSwipe({
+    required String fromUserId,
+    required String targetId,
+  }) async {
+    final idx = _cachedSwipes.indexWhere(
+      (s) => s.fromUserId == fromUserId && s.targetId == targetId,
+    );
+    if (idx != -1) {
+      final removed = _cachedSwipes.removeAt(idx);
+      if (_isOnlineActive && _firestore != null) {
+        try {
+          await _firestore!.collection('circulo_swipes').doc(removed.id).delete();
+        } catch (_) {}
+      }
+      return true;
+    }
+    return false;
+  }
+
+  Future<bool> cancelApplication({
+    required String groupId,
+    required String userId,
+  }) async {
+    final group = await getGroupById(groupId);
+    if (group == null) return false;
+
+    final votes = Map<String, List<String>>.from(group.candidateVotes);
+    votes.remove(userId);
+
+    final members = List<String>.from(group.memberIds);
+    if (!group.isActiveGroup) {
+      members.remove(userId);
+    }
+
+    final updated = group.copyWith(
+      candidateVotes: votes,
+      memberIds: members,
+      lastActivityAt: DateTime.now(),
+    );
+    await upsertGroup(updated);
+    await removeSwipe(fromUserId: userId, targetId: groupId);
+    return true;
   }
 
   // --- GRUPOS ONLINE ---

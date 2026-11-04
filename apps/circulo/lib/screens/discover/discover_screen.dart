@@ -20,6 +20,12 @@ import '../circles/group_match_celebration_dialog.dart';
 import '../shop/paywall_bottom_sheet.dart';
 import '../shop/shop_screen.dart';
 
+enum DiscoveryDeckFilter {
+  people,
+  circles,
+  all,
+}
+
 class DiscoverScreen extends StatefulWidget {
   const DiscoverScreen({super.key});
 
@@ -28,7 +34,7 @@ class DiscoverScreen extends StatefulWidget {
 }
 
 class _DiscoverScreenState extends State<DiscoverScreen> {
-  bool _circlesOnly = false;
+  DiscoveryDeckFilter _deckFilter = DiscoveryDeckFilter.people;
   String? _regionFilter;
   int _minAge = 18;
   int _maxAge = 65;
@@ -124,7 +130,8 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
       regionFilter: _regionFilter,
       minAge: _minAge,
       maxAge: _maxAge,
-      circlesOnly: _circlesOnly,
+      circlesOnly: _deckFilter == DiscoveryDeckFilter.circles,
+      peopleOnly: _deckFilter == DiscoveryDeckFilter.people,
     );
 
     final primary = AppTheme.primaryColor(context);
@@ -312,26 +319,31 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
               ],
             ),
           ),
-          // Selector Modo Todo / Solo Círculos 3/4
+          // Selector Modo Personas (Default) / Círculos / Todos
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: SegmentedButton<bool>(
+            child: SegmentedButton<DiscoveryDeckFilter>(
               segments: [
                 ButtonSegment(
-                  value: false,
-                  label: Text(l10n.get('filterAll')),
-                  icon: const Icon(Icons.style_outlined, size: 16),
+                  value: DiscoveryDeckFilter.people,
+                  label: Text(l10n.get('filterPeopleOnly')),
+                  icon: const Icon(Icons.person_outline_rounded, size: 16),
                 ),
                 ButtonSegment(
-                  value: true,
+                  value: DiscoveryDeckFilter.circles,
                   label: Text(l10n.get('filterCirclesOnly')),
                   icon: const Icon(Icons.flash_on_rounded, size: 16),
                 ),
+                ButtonSegment(
+                  value: DiscoveryDeckFilter.all,
+                  label: Text(l10n.get('filterAll')),
+                  icon: const Icon(Icons.style_outlined, size: 16),
+                ),
               ],
-              selected: {_circlesOnly},
+              selected: {_deckFilter},
               onSelectionChanged: (val) {
                 HapticFeedback.selectionClick();
-                setState(() => _circlesOnly = val.first);
+                setState(() => _deckFilter = val.first);
               },
             ),
           ),
@@ -372,7 +384,7 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                             OutlinedButton(
                               onPressed: () {
                                 setState(() {
-                                  _circlesOnly = false;
+                                  _deckFilter = DiscoveryDeckFilter.people;
                                   _regionFilter = null;
                                 });
                               },
@@ -479,9 +491,9 @@ class _DiscoverScreenState extends State<DiscoverScreen> {
                         final ok = await engine.undoLastSwipe(user.id);
                         if (ok && context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Swipe deshecho con éxito'),
-                              duration: Duration(seconds: 1),
+                            SnackBar(
+                              content: Text(l10n.get('swipeUndoneSuccess')),
+                              duration: const Duration(seconds: 1),
                               behavior: SnackBarBehavior.floating,
                             ),
                           );

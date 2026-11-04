@@ -37,6 +37,20 @@ class AppRoles {
   static const String moderador = 'Moderador';
 }
 
+class AppGenders {
+  static const String female = 'female';
+  static const String male = 'male';
+  static const String nonBinary = 'non_binary';
+  static const String preferNotToSay = 'prefer_not_to_say';
+
+  static const List<String> all = [
+    female,
+    male,
+    nonBinary,
+    preferNotToSay,
+  ];
+}
+
 class GroupRoles {
   static const String organizer = 'organizer';
   static const String connector = 'connector';
@@ -151,6 +165,7 @@ class UserModel {
   final String firstName;
   final String lastName;
   final DateTime birthDate;
+  final String gender;
   final String phone;
   final String? instagram;
   final String? photoUrl;
@@ -192,6 +207,7 @@ class UserModel {
     required this.firstName,
     required this.lastName,
     required this.birthDate,
+    this.gender = '',
     this.phone = '',
     this.instagram,
     this.photoUrl,
@@ -262,6 +278,7 @@ class UserModel {
     String? firstName,
     String? lastName,
     DateTime? birthDate,
+    String? gender,
     String? phone,
     String? instagram,
     String? photoUrl,
@@ -306,6 +323,7 @@ class UserModel {
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       birthDate: birthDate ?? this.birthDate,
+      gender: gender ?? this.gender,
       phone: phone ?? this.phone,
       instagram: instagram ?? this.instagram,
       photoUrl: clearPhoto ? null : (photoUrl ?? this.photoUrl),
@@ -359,6 +377,7 @@ class UserModel {
       'firstName': firstName,
       'lastName': lastName,
       'birthDate': birthDate.toIso8601String(),
+      'gender': gender,
       'phone': phone,
       'instagram': instagram,
       'photoUrl': photoUrl,
@@ -404,6 +423,7 @@ class UserModel {
       birthDate: map['birthDate'] != null
           ? DateTime.parse(map['birthDate'])
           : DateTime(2000, 1, 1),
+      gender: map['gender'] as String? ?? '',
       phone: map['phone'] ?? '',
       instagram: map['instagram'],
       photoUrl: map['photoUrl'],

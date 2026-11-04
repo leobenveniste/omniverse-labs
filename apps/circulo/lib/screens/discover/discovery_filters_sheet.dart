@@ -90,7 +90,7 @@ class _DiscoveryFiltersSheetState extends State<DiscoveryFiltersSheet> {
             items: [
               DropdownMenuItem(
                 value: AppRegions.allRegions,
-                child: const Text('Todas las regiones'),
+                child: Text(l10n.get('allRegions')),
               ),
               ...AppRegions.all.map((r) {
                 return DropdownMenuItem(value: r, child: Text(r));

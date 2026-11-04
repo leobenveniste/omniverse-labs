@@ -35,9 +35,10 @@ class _DuoModeSheetState extends State<DuoModeSheet> {
       if (ok) {
         HapticFeedback.mediumImpact();
         Navigator.of(context).pop();
+        final l10n = AppLocalizations.of(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('¡Dupla vinculada con éxito!'),
+          SnackBar(
+            content: Text(l10n.get('duoLinkedSuccess')),
             backgroundColor: AppTheme.emeraldMint,
           ),
         );

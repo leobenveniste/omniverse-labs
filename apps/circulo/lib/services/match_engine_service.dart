@@ -95,6 +95,7 @@ class MatchEngineService extends ChangeNotifier {
     int? minAge,
     int? maxAge,
     bool circlesOnly = false,
+    bool peopleOnly = false,
   }) {
     final swipes = _firestore.getSwipesFromUser(currentUser.id);
     final swipedTargetIds = swipes.map((s) => s.targetId).toSet();
@@ -102,52 +103,54 @@ class MatchEngineService extends ChangeNotifier {
     final deck = <DeckCandidateItem>[];
 
     // 1. Círculos en formación (3/4) y Grupos abiertos en expansión
-    for (final group in _firestore.currentGroups) {
-      if (group.memberIds.contains(currentUser.id)) continue;
-      if (swipedTargetIds.contains(group.id)) continue;
-      if (regionFilter != null &&
-          regionFilter.isNotEmpty &&
-          regionFilter != AppRegions.allRegions &&
-          group.region != regionFilter) {
-        continue;
-      }
+    if (!peopleOnly) {
+      for (final group in _firestore.currentGroups) {
+        if (group.memberIds.contains(currentUser.id)) continue;
+        if (swipedTargetIds.contains(group.id)) continue;
+        if (regionFilter != null &&
+            regionFilter.isNotEmpty &&
+            regionFilter != AppRegions.allRegions &&
+            group.region != regionFilter) {
+          continue;
+        }
 
-      final members = <UserModel>[];
-      for (final mId in group.memberIds) {
-        final m = _firestore.currentUsers.firstWhere(
-          (u) => u.id == mId,
-          orElse: () => UserModel(
-            id: mId,
-            email: '',
-            passwordHash: '',
-            firstName: 'Amigo',
-            lastName: '',
-            birthDate: DateTime(1998, 1, 1),
-            duoInviteCode: '',
-            createdAt: DateTime.now(),
-          ),
+        final members = <UserModel>[];
+        for (final mId in group.memberIds) {
+          final m = _firestore.currentUsers.firstWhere(
+            (u) => u.id == mId,
+            orElse: () => UserModel(
+              id: mId,
+              email: '',
+              passwordHash: '',
+              firstName: 'Amigo',
+              lastName: '',
+              birthDate: DateTime(1998, 1, 1),
+              duoInviteCode: '',
+              createdAt: DateTime.now(),
+            ),
+          );
+          members.add(m);
+        }
+
+        final score = calculateCompatibilityScore(
+          currentUser: currentUser,
+          candidateGroup: group,
+          groupMembers: members,
         );
-        members.add(m);
+
+        final isAlmostFull = group.memberIds.length == 3 && group.maxMembers == 4;
+
+        deck.add(DeckCandidateItem(
+          type: isAlmostFull
+              ? DeckCandidateType.formingCircle
+              : DeckCandidateType.expandedGroup,
+          group: group,
+          groupMembers: members,
+          affinityScore: score,
+          sharedInterests: group.sharedInterests,
+          sharedPlans: group.sharedPlans,
+        ));
       }
-
-      final score = calculateCompatibilityScore(
-        currentUser: currentUser,
-        candidateGroup: group,
-        groupMembers: members,
-      );
-
-      final isAlmostFull = group.memberIds.length == 3 && group.maxMembers == 4;
-
-      deck.add(DeckCandidateItem(
-        type: isAlmostFull
-            ? DeckCandidateType.formingCircle
-            : DeckCandidateType.expandedGroup,
-        group: group,
-        groupMembers: members,
-        affinityScore: score,
-        sharedInterests: group.sharedInterests,
-        sharedPlans: group.sharedPlans,
-      ));
     }
 
     if (circlesOnly) {

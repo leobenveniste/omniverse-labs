@@ -27,6 +27,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _neighborhoodCtrl = TextEditingController();
 
   DateTime _birthDate = DateTime(2000, 1, 1);
+  String _selectedGender = AppGenders.preferNotToSay;
   String _selectedRegion = AppRegions.buenosAires;
   bool _obscurePassword = true;
 
@@ -55,6 +56,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _handleRegister() async {
+    final l10n = AppLocalizations.of(context);
     final first = _firstNameCtrl.text.trim();
     final last = _lastNameCtrl.text.trim();
     final email = _emailCtrl.text.trim();
@@ -63,8 +65,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (first.isEmpty || last.isEmpty || email.isEmpty || pass.isEmpty) {
       HapticFeedback.heavyImpact();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor completá los campos obligatorios.'),
+        SnackBar(
+          content: Text(l10n.get('fillRequiredFields')),
           backgroundColor: AppTheme.warmAmber,
         ),
       );
@@ -73,8 +75,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     if (pass.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('La contraseña debe tener al menos 6 caracteres.'),
+        SnackBar(
+          content: Text(l10n.get('passwordMinLength')),
           backgroundColor: AppTheme.warmAmber,
         ),
       );
@@ -88,6 +90,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       firstName: first,
       lastName: last,
       birthDate: _birthDate,
+      gender: _selectedGender,
       region: _selectedRegion,
       neighborhood: _neighborhoodCtrl.text.trim(),
       phone: _phoneCtrl.text.trim(),
@@ -122,6 +125,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return AppScaffold(
       title: l10n.get('registerTitle'),
       subtitle: l10n.get('registerSubtitle'),
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back_rounded),
+        tooltip: l10n.get('cancel'),
+        onPressed: () => Navigator.of(context).pop(),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(
+            l10n.get('cancel'),
+            style: TextStyle(
+              color: primary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
+      ],
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Column(
@@ -250,6 +270,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 16),
 
+            // Selector Género
+            DropdownButtonFormField<String>(
+              initialValue: _selectedGender,
+              decoration: InputDecoration(
+                labelText: l10n.get('genderLabel'),
+                prefixIcon: const Icon(Icons.person_outline_rounded, size: 20),
+              ),
+              items: [
+                DropdownMenuItem(
+                  value: AppGenders.female,
+                  child: Text(l10n.get('genderFemale')),
+                ),
+                DropdownMenuItem(
+                  value: AppGenders.male,
+                  child: Text(l10n.get('genderMale')),
+                ),
+                DropdownMenuItem(
+                  value: AppGenders.nonBinary,
+                  child: Text(l10n.get('genderNonBinary')),
+                ),
+                DropdownMenuItem(
+                  value: AppGenders.preferNotToSay,
+                  child: Text(l10n.get('genderPreferNotToSay')),
+                ),
+              ],
+              onChanged: (val) {
+                if (val != null) setState(() => _selectedGender = val);
+              },
+            ),
+            const SizedBox(height: 16),
+
             // Región y Barrio
             DropdownButtonFormField<String>(
               initialValue: _selectedRegion,
@@ -302,6 +353,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
               loadingLabel: l10n.get('creatingAccount'),
               isLoading: auth.isLoading,
               onPressed: _handleRegister,
+            ),
+            const SizedBox(height: 12),
+
+            // Botón Cancelar y Volver
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                l10n.get('cancel'),
+                style: TextStyle(
+                  color: textSecondary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
             const SizedBox(height: 24),
           ],

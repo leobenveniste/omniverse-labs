@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
 import '../../services/biometric_service.dart';
 import '../../services/settings_service.dart';
@@ -36,13 +35,6 @@ class _LoginScreenState extends State<LoginScreen>
       vsync: this,
       duration: const Duration(milliseconds: 380),
     );
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final auth = context.read<AuthService>();
-      final lastUser = auth.getLastLoggedInUser();
-      if (lastUser != null && _emailController.text.isEmpty) {
-        _emailController.text = lastUser.email;
-      }
-    });
   }
 
   @override
@@ -58,11 +50,12 @@ class _LoginScreenState extends State<LoginScreen>
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
+      final l10n = AppLocalizations.of(context);
       HapticFeedback.heavyImpact();
       _shakeController.forward(from: 0.0);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor completá tu correo y contraseña.'),
+        SnackBar(
+          content: Text(l10n.get('fillEmailAndPassword')),
           backgroundColor: AppTheme.warmAmber,
         ),
       );
@@ -347,34 +340,6 @@ class _LoginScreenState extends State<LoginScreen>
                                 onPressed: _handleBiometricLogin,
                               ),
                             ],
-
-                            // Acceso rápido para pruebas
-                            const Divider(height: 28),
-                            Wrap(
-                              alignment: WrapAlignment.center,
-                              spacing: 8,
-                              children: [
-                                ActionChip(
-                                  label: const Text('Superadmin Demo',
-                                      style: TextStyle(fontSize: 11)),
-                                  onPressed: () {
-                                    _emailController.text =
-                                        AppRoles.superAdminEmail;
-                                    _passwordController.text = '29583026';
-                                    _handleLogin();
-                                  },
-                                ),
-                                ActionChip(
-                                  label: const Text('Usuario Demo (Valen)',
-                                      style: TextStyle(fontSize: 11)),
-                                  onPressed: () {
-                                    _emailController.text = 'valen@circulo.app';
-                                    _passwordController.text = '123456';
-                                    _handleLogin();
-                                  },
-                                ),
-                              ],
-                            ),
                           ],
                         ),
                       ),

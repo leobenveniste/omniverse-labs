@@ -10,6 +10,7 @@ import '../../services/settings_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/app_scaffold.dart';
 import '../../l10n/app_localizations.dart';
+import '../auth/login_screen.dart';
 import '../auth/welcome_guide_screen.dart';
 import '../admin/admin_dashboard_screen.dart';
 
@@ -41,7 +42,7 @@ class SettingsScreen extends StatelessWidget {
               children: [
                 RadioListTile<String>(
                   title: Text(l10n.get('themeAuto')),
-                  subtitle: const Text('Sigue la configuración de tu teléfono'),
+                  subtitle: Text(l10n.get('themeAutoSubtitle')),
                   value: 'system',
                   groupValue: settings.themeModeName,
                   activeColor: primary,
@@ -224,6 +225,12 @@ class SettingsScreen extends StatelessWidget {
             onPressed: () async {
               HapticFeedback.mediumImpact();
               await auth.logout();
+              if (context.mounted) {
+                Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
             },
           ),
           const SizedBox(height: 16),
@@ -288,6 +295,10 @@ class SettingsScreen extends StatelessWidget {
                     backgroundColor: AppTheme.darkSurface,
                     content: Text(l10n.get('deleteAccountSuccessNotice')),
                   ),
+                );
+                Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  (route) => false,
                 );
               }
             },

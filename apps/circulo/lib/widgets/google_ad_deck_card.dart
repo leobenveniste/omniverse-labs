@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../services/ad_service.dart';
 import '../l10n/app_localizations.dart';
 import 'motion_components.dart';
 
@@ -16,9 +14,6 @@ class GoogleAdDeckCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final adService = context.watch<AdService>();
-    final bannerAd = adService.currentBannerAd;
-    final isLoaded = adService.isBannerAdLoaded;
 
     return Container(
       decoration: BoxDecoration(

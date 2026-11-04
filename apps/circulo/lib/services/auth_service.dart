@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import '../models/user_model.dart';
@@ -44,18 +45,14 @@ class AuthService extends ChangeNotifier {
   UserModel? getLastLoggedInUser() {
     final lastEmail = _prefs.getString(_lastEmailKey);
     if (lastEmail == null || lastEmail.isEmpty) {
-      return _firestore.currentUsers.isNotEmpty
-          ? _firestore.currentUsers.first
-          : null;
+      return null;
     }
     for (final u in _firestore.currentUsers) {
       if (u.email.trim().toLowerCase() == lastEmail.trim().toLowerCase()) {
         return u;
       }
     }
-    return _firestore.currentUsers.isNotEmpty
-        ? _firestore.currentUsers.first
-        : null;
+    return null;
   }
 
   Future<bool> login(String email, String password) async {
@@ -117,6 +114,7 @@ class AuthService extends ChangeNotifier {
     required String lastName,
     required DateTime birthDate,
     required String region,
+    String gender = AppGenders.preferNotToSay,
     String neighborhood = '',
     String phone = '',
     String? instagram,
@@ -146,6 +144,7 @@ class AuthService extends ChangeNotifier {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         birthDate: birthDate,
+        gender: gender,
         phone: phone.trim(),
         instagram: instagram?.replaceAll('@', '').trim(),
         region: region.trim(),
@@ -180,9 +179,28 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Simulación/Fallback seguro y nativo de Google Sign-In
-      final targetEmail = fallbackEmail ?? 'usuario.google@circulo.app';
-      final targetName = fallbackName ?? 'Amigo Google';
+      final googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
+      // Forzar que Google siempre muestre el diálogo de selección de cuentas
+      try {
+        await googleSignIn.signOut();
+      } catch (_) {}
+
+      final account = await googleSignIn.signIn();
+      if (account == null) {
+        // Usuario canceló la selección de cuenta
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+
+      final targetEmail = account.email.trim().toLowerCase();
+      final displayName = account.displayName?.trim() ?? '';
+      final firstFromGoogle = displayName.isNotEmpty
+          ? displayName.split(' ').first
+          : (fallbackName ?? 'Usuario Google');
+      final lastFromGoogle = displayName.isNotEmpty && displayName.split(' ').length > 1
+          ? displayName.split(' ').sublist(1).join(' ')
+          : '';
 
       var user = await _firestore.getUserByEmail(targetEmail);
       if (user == null) {
@@ -193,11 +211,10 @@ class AuthService extends ChangeNotifier {
           email: targetEmail,
           passwordHash: _hashPassword('google_auth_oauth2'),
           authProvider: 'google',
-          firstName: targetName.split(' ').first,
-          lastName: targetName.split(' ').length > 1
-              ? targetName.split(' ').sublist(1).join(' ')
-              : '',
-          birthDate: DateTime(1997, 6, 15),
+          firstName: firstFromGoogle,
+          lastName: lastFromGoogle,
+          photoUrl: account.photoUrl,
+          birthDate: DateTime(2000, 1, 1),
           duoInviteCode: code,
           onboardingCompleted: false,
           createdAt: DateTime.now(),
@@ -228,10 +245,38 @@ class AuthService extends ChangeNotifier {
     required List<String> favoritePlans,
     required String socialVibe,
     required List<String> availabilitySlots,
+    String? firstName,
+    String? lastName,
+    DateTime? birthDate,
+    String? gender,
+    String? region,
+    String? neighborhood,
+    String? phone,
+    String? instagram,
   }) async {
     if (_currentUser == null) return false;
 
     final updated = _currentUser!.copyWith(
+      firstName: firstName != null && firstName.trim().isNotEmpty
+          ? firstName.trim()
+          : _currentUser!.firstName,
+      lastName: lastName != null && lastName.trim().isNotEmpty
+          ? lastName.trim()
+          : _currentUser!.lastName,
+      birthDate: birthDate ?? _currentUser!.birthDate,
+      gender: gender ?? _currentUser!.gender,
+      region: region != null && region.trim().isNotEmpty
+          ? region.trim()
+          : _currentUser!.region,
+      neighborhood: neighborhood != null && neighborhood.trim().isNotEmpty
+          ? neighborhood.trim()
+          : _currentUser!.neighborhood,
+      phone: phone != null && phone.trim().isNotEmpty
+          ? phone.trim()
+          : _currentUser!.phone,
+      instagram: instagram != null
+          ? instagram.replaceAll('@', '').trim()
+          : _currentUser!.instagram,
       bio: bio.trim(),
       photoUrl: photoUrl,
       groupRole: groupRole,
@@ -338,6 +383,10 @@ class AuthService extends ChangeNotifier {
   Future<void> logout() async {
     _currentUser = null;
     await _prefs.remove(_sessionUserKey);
+    await _prefs.remove(_lastEmailKey);
+    try {
+      await GoogleSignIn().signOut();
+    } catch (_) {}
     notifyListeners();
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../models/user_model.dart';
 import '../../services/auth_service.dart';
@@ -9,6 +10,7 @@ import '../../widgets/async_feedback_components.dart';
 import '../../widgets/interest_tag_chip.dart';
 import '../../l10n/app_localizations.dart';
 import '../home_shell_screen.dart';
+import 'login_screen.dart';
 
 class OnboardingWizardScreen extends StatefulWidget {
   const OnboardingWizardScreen({super.key});
@@ -20,7 +22,13 @@ class OnboardingWizardScreen extends StatefulWidget {
 class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
   int _currentStep = 0;
 
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
+  final _neighborhoodController = TextEditingController();
   final _bioController = TextEditingController();
+  DateTime _birthDate = DateTime(2000, 1, 1);
+  String _selectedGender = AppGenders.preferNotToSay;
+  String _selectedRegion = AppRegions.buenosAires;
   String? _photoUrl;
   String _selectedRole = GroupRoles.chill;
   String _selectedVibe = AppVibes.balanced;
@@ -33,6 +41,16 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
     super.initState();
     final user = context.read<AuthService>().currentUser;
     if (user != null) {
+      _firstNameController.text = user.firstName;
+      _lastNameController.text = user.lastName;
+      _neighborhoodController.text = user.neighborhood;
+      _birthDate = user.birthDate;
+      if (user.gender.isNotEmpty) {
+        _selectedGender = user.gender;
+      }
+      if (user.region.isNotEmpty) {
+        _selectedRegion = user.region;
+      }
       _bioController.text = user.bio;
       _photoUrl = user.photoUrl;
       _selectedRole = user.groupRole;
@@ -45,8 +63,55 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
 
   @override
   void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _neighborhoodController.dispose();
     _bioController.dispose();
     super.dispose();
+  }
+
+  Future<void> _selectBirthDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _birthDate,
+      firstDate: DateTime(1940),
+      lastDate: DateTime.now().subtract(const Duration(days: 365 * 18)), // +18
+    );
+    if (picked != null) {
+      setState(() => _birthDate = picked);
+    }
+  }
+
+  Future<void> _handleCancel() async {
+    final l10n = AppLocalizations.of(context);
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.get('cancel')),
+        content: Text(l10n.get('exitOnboardingConfirm')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l10n.get('cancel')),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l10n.get('confirm')),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true && mounted) {
+      final auth = context.read<AuthService>();
+      await auth.logout();
+      if (mounted) {
+        Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+          (route) => false,
+        );
+      }
+    }
   }
 
   Future<void> _handleFinish() async {
@@ -55,8 +120,8 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
 
     if (_selectedInterests.length < 3) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Por favor seleccioná al menos 3 intereses.'),
+        SnackBar(
+          content: Text(l10n.get('selectMinInterests')),
           backgroundColor: AppTheme.warmAmber,
         ),
       );
@@ -70,6 +135,12 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
       successMessage: l10n.get('savedSuccess'),
       task: () async {
         return await auth.completeOnboarding(
+          firstName: _firstNameController.text.trim(),
+          lastName: _lastNameController.text.trim(),
+          birthDate: _birthDate,
+          gender: _selectedGender,
+          region: _selectedRegion,
+          neighborhood: _neighborhoodController.text.trim(),
           bio: _bioController.text.trim(),
           photoUrl: _photoUrl,
           groupRole: _selectedRole,
@@ -107,6 +178,18 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
       showHelpButton: false,
       title: l10n.get('appName'),
       subtitle: 'Paso ${_currentStep + 1} de 4 • ${stepTitles[_currentStep]}',
+      actions: [
+        TextButton(
+          onPressed: _handleCancel,
+          child: Text(
+            l10n.get('cancel'),
+            style: TextStyle(
+              color: textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
       body: Column(
         children: [
           // Barra de progreso de 4 pasos
@@ -165,6 +248,18 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
                         : l10n.get('continueBtn'),
                     onPressed: () {
                       HapticFeedback.lightImpact();
+                      if (_currentStep == 0) {
+                        if (_firstNameController.text.trim().isEmpty ||
+                            _lastNameController.text.trim().isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(l10n.get('fillRequiredFields')),
+                              backgroundColor: AppTheme.warmAmber,
+                            ),
+                          );
+                          return;
+                        }
+                      }
                       if (_currentStep < 3) {
                         setState(() => _currentStep++);
                       } else {
@@ -199,7 +294,7 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
     }
   }
 
-  // Paso 1: Foto y Bio
+  // Paso 1: Perfil Completo, Foto y Bio
   Widget _buildStep1(
     AppLocalizations l10n,
     Color textPrimary,
@@ -208,47 +303,168 @@ class _OnboardingWizardScreenState extends State<OnboardingWizardScreen> {
     final primary = AppTheme.primaryColor(context);
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        GestureDetector(
-          onTap: () {
-            // Selección de avatar predefinido o foto
-            setState(() {
-              _photoUrl =
-                  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400';
-            });
-          },
-          child: Container(
-            width: 110,
-            height: 110,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: primary.withValues(alpha: 0.15),
-              border: Border.all(color: primary, width: 2),
-            ),
-            child: ClipOval(
-              child: _photoUrl != null && _photoUrl!.isNotEmpty
-                  ? Image.network(
-                      _photoUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => const Icon(
-                        Icons.add_a_photo_rounded,
-                        size: 32,
+        Center(
+          child: GestureDetector(
+            onTap: () {
+              // Selección de avatar predefinido o foto
+              setState(() {
+                _photoUrl =
+                    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400';
+              });
+            },
+            child: Container(
+              width: 104,
+              height: 104,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: primary.withValues(alpha: 0.15),
+                border: Border.all(color: primary, width: 2),
+              ),
+              child: ClipOval(
+                child: _photoUrl != null && _photoUrl!.isNotEmpty
+                    ? Image.network(
+                        _photoUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, _, _) => const Icon(
+                          Icons.add_a_photo_rounded,
+                          size: 32,
+                        ),
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add_a_photo_rounded,
+                              size: 28, color: primary),
+                          const SizedBox(height: 4),
+                          const Text('Foto', style: TextStyle(fontSize: 11)),
+                        ],
                       ),
-                    )
-                  : Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.add_a_photo_rounded,
-                            size: 32, color: primary),
-                        const SizedBox(height: 4),
-                        const Text('Foto', style: TextStyle(fontSize: 11)),
-                      ],
-                    ),
+              ),
             ),
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 20),
+
+        // Nombre y Apellido
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _firstNameController,
+                textCapitalization: TextCapitalization.words,
+                decoration: InputDecoration(
+                  labelText: '${l10n.get('firstNameLabel')} *',
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextField(
+                controller: _lastNameController,
+                textCapitalization: TextCapitalization.words,
+                decoration: InputDecoration(
+                  labelText: '${l10n.get('lastNameLabel')} *',
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+
+        // Selector Fecha de Nacimiento
+        InkWell(
+          onTap: _selectBirthDate,
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceContainer(context),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppTheme.borderColor(context)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.cake_outlined, size: 20),
+                    const SizedBox(width: 12),
+                    Text(
+                      '${l10n.get('birthDateLabel')}: ${DateFormat('dd/MM/yyyy').format(_birthDate)}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+                const Icon(Icons.edit_calendar_rounded, size: 18),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // Selector Género
+        DropdownButtonFormField<String>(
+          initialValue: _selectedGender,
+          decoration: InputDecoration(
+            labelText: l10n.get('genderLabel'),
+            prefixIcon: const Icon(Icons.person_outline_rounded, size: 20),
+          ),
+          items: [
+            DropdownMenuItem(
+              value: AppGenders.female,
+              child: Text(l10n.get('genderFemale')),
+            ),
+            DropdownMenuItem(
+              value: AppGenders.male,
+              child: Text(l10n.get('genderMale')),
+            ),
+            DropdownMenuItem(
+              value: AppGenders.nonBinary,
+              child: Text(l10n.get('genderNonBinary')),
+            ),
+            DropdownMenuItem(
+              value: AppGenders.preferNotToSay,
+              child: Text(l10n.get('genderPreferNotToSay')),
+            ),
+          ],
+          onChanged: (val) {
+            if (val != null) setState(() => _selectedGender = val);
+          },
+        ),
+        const SizedBox(height: 16),
+
+        // Región y Barrio
+        DropdownButtonFormField<String>(
+          initialValue: _selectedRegion,
+          decoration: InputDecoration(
+            labelText: l10n.get('regionLabel'),
+            prefixIcon: const Icon(Icons.place_outlined, size: 20),
+          ),
+          items: AppRegions.all.map((r) {
+            return DropdownMenuItem(value: r, child: Text(r));
+          }).toList(),
+          onChanged: (val) {
+            if (val != null) setState(() => _selectedRegion = val);
+          },
+        ),
+        const SizedBox(height: 16),
+
+        TextField(
+          controller: _neighborhoodController,
+          decoration: InputDecoration(
+            labelText: l10n.get('neighborhoodLabel'),
+            prefixIcon: const Icon(Icons.location_city_rounded, size: 20),
+          ),
+        ),
+        const SizedBox(height: 20),
+
+        // Bio
         Align(
           alignment: Alignment.centerLeft,
           child: Text(
