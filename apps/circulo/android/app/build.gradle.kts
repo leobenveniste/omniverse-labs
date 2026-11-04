@@ -46,10 +46,6 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
         }
     }
 }
@@ -58,10 +54,6 @@ kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
-}
-
-dependencies {
-    implementation("androidx.appcompat:appcompat:1.7.0")
 }
 
 flutter {

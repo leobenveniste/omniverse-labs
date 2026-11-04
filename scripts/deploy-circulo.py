@@ -113,11 +113,11 @@ def deploy(target_tracks=None):
     notes = [
         {
             "language": "es-419",
-            "text": "Círculo v1.0.0 (Build 5): Corrección crítica de compatibilidad nativa Theme.AppCompat para biometría, sincronización completa de Cloud Firestore y optimización de arranque seguro."
+            "text": "Círculo v1.0.0 (Build 6): Corrección definitiva del cierre inmediato al iniciar en Android. Eliminación de optimizaciones R8 agresivas, estabilización de temas nativos y protección de errores globales."
         },
         {
             "language": "en-US",
-            "text": "Círculo v1.0.0 (Build 5): Critical native Theme.AppCompat compatibility fix for biometrics, full Cloud Firestore synchronization, and secure launch optimization."
+            "text": "Círculo v1.0.0 (Build 6): Definitive fix for immediate startup crash on Android. Removed aggressive R8 optimization, stabilized native activity themes, and added global error shielding."
         }
     ]
 

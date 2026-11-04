@@ -24,7 +24,17 @@ import 'screens/home_shell_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    debugPrint('Global FlutterError: ${details.exception}');
+  };
+
+  try {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  } catch (e) {
+    debugPrint('SystemUI edgeToEdge notice: $e');
+  }
 
   final prefs = await SharedPreferences.getInstance();
 
