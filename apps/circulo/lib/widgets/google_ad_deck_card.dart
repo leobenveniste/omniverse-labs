@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import '../services/ad_service.dart';
 import '../l10n/app_localizations.dart';
@@ -88,21 +87,8 @@ class GoogleAdDeckCard extends StatelessWidget {
               ),
               const Spacer(),
 
-              // Contenido central: AdWidget oficial de Google Mobile Ads o tarjeta patrocinada
-              if (isLoaded && bannerAd != null)
-                Center(
-                  child: Container(
-                    width: bannerAd.size.width.toDouble(),
-                    height: bannerAd.size.height.toDouble(),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: AdWidget(ad: bannerAd),
-                  ),
-                )
-              else
-                _buildSponsoredFallback(context, isDark),
+              // Contenido central: Tarjeta patrocinada oficial de Círculo
+              _buildSponsoredFallback(context, isDark),
 
               const Spacer(),
 

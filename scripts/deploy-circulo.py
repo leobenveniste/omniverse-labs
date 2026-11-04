@@ -52,7 +52,7 @@ def get_service():
 
 def deploy(target_tracks=None):
     if target_tracks is None:
-        target_tracks = ["internal", "alpha", "beta"]
+        target_tracks = ["internal", "alpha"]
     if not os.path.exists(AAB_PATH):
         print(f"[ERROR] AAB bundle not found at {AAB_PATH}")
         sys.exit(1)
@@ -113,11 +113,11 @@ def deploy(target_tracks=None):
     notes = [
         {
             "language": "es-419",
-            "text": "Círculo v1.0.0 (Build 7): Rendimiento instantáneo de inicio con persistencia local de Firestore, carga en segundo plano de servicios de facturación/anuncios, eliminación de optimización R8 y nuevo isotipo 3D."
+            "text": "Círculo v1.0.0: Estabilización de arquitectura nativa FlutterActivity, eliminación de dependencias superfluas e inicio instantáneo en Android."
         },
         {
             "language": "en-US",
-            "text": "Círculo v1.0.0 (Build 7): Instant launch performance with local Firestore persistence, non-blocking background billing/ads, clean native packaging, and refreshed 3D brand logo."
+            "text": "Círculo v1.0.0: Native FlutterActivity architecture stabilization, removal of extraneous dependencies, and guaranteed instant startup on Android."
         }
     ]
 
