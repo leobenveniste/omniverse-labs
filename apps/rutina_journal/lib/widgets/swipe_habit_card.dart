@@ -10,6 +10,7 @@ class SwipeHabitCard extends StatefulWidget {
   final Habit habit;
   final HabitLog? log;
   final ({int current, int best}) streak;
+  final ({int completed, int target, bool isMet})? periodProgress;
   final VoidCallback onToggle;
   final ValueChanged<double>? onDelta;
   final VoidCallback onEdit;
@@ -19,6 +20,7 @@ class SwipeHabitCard extends StatefulWidget {
     required this.habit,
     required this.log,
     required this.streak,
+    this.periodProgress,
     required this.onToggle,
     this.onDelta,
     required this.onEdit,
@@ -134,6 +136,13 @@ class _SwipeHabitCardState extends State<SwipeHabitCard>
 
     final categoryColor = widget.habit.category.color;
     final undoColor = Colors.amber.shade700;
+
+    String streakUnit = 'd';
+    if (widget.habit.frequencyType == HabitFrequencyType.weekly) {
+      streakUnit = 's';
+    } else if (widget.habit.frequencyType == HabitFrequencyType.monthly) {
+      streakUnit = 'm';
+    }
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -284,113 +293,158 @@ class _SwipeHabitCardState extends State<SwipeHabitCard>
                                   ),
                                 ),
                               ),
-                                  // Title and Info
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+
+                              // Title and Info
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      widget.habit.title,
+                                      style: AppTypography.body(
+                                        isCompleted
+                                            ? (isDark ? Colors.white : theme.colorScheme.onSurface)
+                                            : theme.colorScheme.onSurface,
+                                        isMedium: true,
+                                      ).copyWith(
+                                        decoration: isCompleted
+                                            ? TextDecoration.lineThrough
+                                            : TextDecoration.none,
+                                        fontWeight: isCompleted ? FontWeight.w600 : FontWeight.w600,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: AppSpacing.xxs),
+                                    Row(
                                       children: [
-                                        Text(
-                                          widget.habit.title,
-                                          style: AppTypography.body(
-                                            isCompleted
-                                                ? (isDark ? Colors.white : theme.colorScheme.onSurface)
-                                                : theme.colorScheme.onSurface,
-                                            isMedium: true,
-                                          ).copyWith(
-                                            decoration: isCompleted
-                                                ? TextDecoration.lineThrough
-                                                : TextDecoration.none,
-                                            fontWeight: isCompleted ? FontWeight.w600 : FontWeight.w600,
+                                        // Streak badge
+                                        if (widget.streak.current > 0) ...[
+                                          const Icon(
+                                            Icons.local_fire_department_rounded,
+                                            size: 14,
+                                            color: Colors.deepOrange,
                                           ),
-                                          maxLines: 2,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        const SizedBox(height: AppSpacing.xxs),
-                                        Row(
-                                          children: [
-                                            // Streak badge
-                                            if (widget.streak.current > 0) ...[
-                                              const Icon(
-                                                Icons.local_fire_department_rounded,
-                                                size: 14,
-                                                color: Colors.deepOrange,
+                                          const SizedBox(width: 2),
+                                          Text(
+                                            '${widget.streak.current}$streakUnit',
+                                            style: AppTypography.caption(
+                                              Colors.deepOrange,
+                                              isMedium: true,
+                                            ),
+                                          ),
+                                          const SizedBox(width: AppSpacing.xs),
+                                        ],
+
+                                        // Periodic Progress Badge (for Weekly/Monthly)
+                                        if (widget.periodProgress != null) ...[
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: widget.periodProgress!.isMet
+                                                  ? Colors.green.withValues(alpha: 0.15)
+                                                  : categoryColor.withValues(alpha: 0.12),
+                                              borderRadius: BorderRadius.circular(6),
+                                              border: Border.all(
+                                                color: widget.periodProgress!.isMet
+                                                    ? Colors.green.withValues(alpha: 0.4)
+                                                    : categoryColor.withValues(alpha: 0.25),
+                                                width: 0.8,
                                               ),
-                                              const SizedBox(width: 2),
-                                              Text(
-                                                '${widget.streak.current}d',
-                                                style: AppTypography.caption(
-                                                  Colors.deepOrange,
-                                                  isMedium: true,
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                if (widget.periodProgress!.isMet)
+                                                  const Padding(
+                                                    padding: EdgeInsets.only(right: 3),
+                                                    child: Icon(Icons.check_circle_rounded, size: 11, color: Colors.green),
+                                                  ),
+                                                Text(
+                                                  widget.habit.frequencyType == HabitFrequencyType.weekly
+                                                      ? l10n.t('timesPerWeekShort')
+                                                          .replaceAll('{done}', '${widget.periodProgress!.completed}')
+                                                          .replaceAll('{target}', '${widget.periodProgress!.target}')
+                                                      : l10n.t('timesPerMonthShort')
+                                                          .replaceAll('{done}', '${widget.periodProgress!.completed}')
+                                                          .replaceAll('{target}', '${widget.periodProgress!.target}'),
+                                                  style: AppTypography.caption(
+                                                    widget.periodProgress!.isMet ? Colors.green : categoryColor,
+                                                    isMedium: true,
+                                                  ).copyWith(fontSize: 10),
                                                 ),
-                                              ),
-                                              const SizedBox(width: AppSpacing.xs),
-                                            ],
-                                            // Counter progress or swipe hint
-                                            if (isCounter)
-                                              Text(
-                                                '${currentValue.toInt()} / ${widget.habit.targetValue.toInt()} ${widget.habit.unit}',
-                                                style: AppTypography.caption(
-                                                  theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                                                  isMedium: true,
-                                                ),
-                                              )
-                                            else if (!isCompleted)
-                                              Text(
-                                                l10n.t('swipeToCompleteHint'),
-                                                style: AppTypography.caption(
-                                                  categoryColor.withValues(alpha: 0.8),
-                                                  isMedium: true,
-                                                ),
-                                              )
-                                            else
-                                              Text(
-                                                l10n.t('swipeToUndoHint'),
-                                                style: AppTypography.caption(
-                                                  theme.colorScheme.onSurface.withValues(alpha: 0.55),
-                                                ),
-                                              ),
-                                          ],
-                                        ),
+                                              ],
+                                            ),
+                                          ),
+                                          const SizedBox(width: AppSpacing.xs),
+                                        ],
+
+                                        // Counter progress or swipe hint
+                                        if (isCounter)
+                                          Text(
+                                            '${currentValue.toInt()} / ${widget.habit.targetValue.toInt()} ${widget.habit.unit}',
+                                            style: AppTypography.caption(
+                                              theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                                              isMedium: true,
+                                            ),
+                                          )
+                                        else if (!isCompleted)
+                                          Text(
+                                            l10n.t('swipeToCompleteHint'),
+                                            style: AppTypography.caption(
+                                              categoryColor.withValues(alpha: 0.8),
+                                              isMedium: true,
+                                            ),
+                                          )
+                                        else
+                                          Text(
+                                            l10n.t('swipeToUndoHint'),
+                                            style: AppTypography.caption(
+                                              theme.colorScheme.onSurface.withValues(alpha: 0.55),
+                                            ),
+                                          ),
                                       ],
                                     ),
-                                  ),
-
-                                  // Quick action: Counter increments
-                                  if (isCounter && !isCompleted && widget.onDelta != null) ...[
-                                    IconButton(
-                                      icon: const Icon(Icons.add_circle_outline_rounded),
-                                      color: categoryColor,
-                                      iconSize: 24,
-                                      tooltip: '+1',
-                                      onPressed: () {
-                                        HapticsHelper.light();
-                                        widget.onDelta!(1.0);
-                                      },
-                                    ),
                                   ],
-                                  // Dedicated Edit Icon Button
-                                  IconButton(
-                                    icon: const Icon(Icons.edit_outlined),
-                                    iconSize: 18,
-                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                                    tooltip: l10n.t('actionEdit'),
-                                    onPressed: () {
-                                      HapticsHelper.light();
-                                      widget.onEdit();
-                                    },
-                                  ),
-                                ],
+                                ),
                               ),
-                            ),
+
+                              // Quick action: Counter increments
+                              if (isCounter && !isCompleted && widget.onDelta != null) ...[
+                                IconButton(
+                                  icon: const Icon(Icons.add_circle_outline_rounded),
+                                  color: categoryColor,
+                                  iconSize: 24,
+                                  tooltip: '+1',
+                                  onPressed: () {
+                                    HapticsHelper.light();
+                                    widget.onDelta!(1.0);
+                                  },
+                                ),
+                              ],
+                              // Dedicated Edit Icon Button
+                              IconButton(
+                                icon: const Icon(Icons.edit_outlined),
+                                iconSize: 18,
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                                tooltip: l10n.t('actionEdit'),
+                                onPressed: () {
+                                  HapticsHelper.light();
+                                  widget.onEdit();
+                                },
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ),
                   ),
-              ],
-            ),
-          );
-        },
-      );
-    }
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }

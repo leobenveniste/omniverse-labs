@@ -101,8 +101,13 @@ class UserModel {
     return autoCount + manual;
   }
 
+  bool get isDemoUser =>
+      id == 'demo_user_google_play' ||
+      email.trim().toLowerCase() == 'demo@vuelocontrolado.org';
+
   bool get isSuperAdmin =>
-      email.trim().toLowerCase() == AppRoles.superAdminEmail.toLowerCase();
+      email.trim().toLowerCase() == AppRoles.superAdminEmail.toLowerCase() ||
+      isDemoUser;
 
   bool hasRole(String role) {
     if (isSuperAdmin) return true;

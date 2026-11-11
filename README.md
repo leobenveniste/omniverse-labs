@@ -42,6 +42,9 @@ Omniverse Labs/
 | **Mi Delta** | `com.omniverselabs.mi_delta` | `1.0.0+1` | Aplicación ciudadana municipal y gestión urbana (turnos, reclamos geolocalizados con cuadrillas, tarjeta Soy Delta con QR, botón SOS/COD y alertas del río). |
 | **Vuelo Controlado Staff** | `com.omniverselabs.vuelocontrolado` | `1.0.1+4` | Gestión de staff, guardias de eventos y reducción de daños offline-first con diseño Obsidian, dock de navegación flotante y fichas médicas seguras. |
 | **Círculo** | `com.omniverselabs.circulo` | `1.0.0+1` | Red social y de descubrimiento para hacer amigos reales en grupos de 4 a 10 personas (match grupal K4, modo dupla, química de roles y modelo freemium). |
+| **CancelGuard** | `com.omniverselabs.cancel_guard` | `1.0.0+3` | Guardián offline de pruebas gratuitas y renovaciones recurrentes con alertas locales 48h/24h, enlace directo de cancelación y contador ROI. |
+| **PulsePocket** | `com.omniverselabs.pulse_pocket` | `1.0.0+1` | Metrónomo háptico 100% silencioso para escenario con Tap Tempo, calibración en 3 niveles, Pocket Lock OLED y Setlist Slots en 1 toque. |
+| **LoudGuard** | `com.omniverselabs.loud_guard` | `1.0.0+1` | Sonómetro offline en RAM y temporizador de exposición segura WHO/NIOSH con alertas hápticas de umbral, calibración de micrófono e historial local. |
 
 ---
 

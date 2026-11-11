@@ -11,6 +11,7 @@ import 'package:vuelo_controlado_staff/services/auth_service.dart';
 import 'package:vuelo_controlado_staff/services/event_service.dart';
 import 'package:vuelo_controlado_staff/services/case_service.dart';
 import 'package:vuelo_controlado_staff/services/settings_service.dart';
+import 'package:vuelo_controlado_staff/services/demo_data.dart';
 
 void main() {
   group('UserModel Tests', () {
@@ -919,6 +920,137 @@ void main() {
       expect(authService.currentUser, isNull);
       expect(authService.isAuthenticated, isFalse);
       expect(authService.getLastLoggedInUser()?.email, user.email);
+    });
+  });
+
+  group('Google Play Review Demo Mode Tests', () {
+    test('DemoData validates official and alternative demo credentials', () {
+      expect(DemoData.isDemoLogin('demo@vuelocontrolado.org', 'demo1234'), isTrue);
+      expect(DemoData.isDemoLogin('demo@vuelocontrolado.com', 'demo2026'), isTrue);
+      expect(DemoData.isDemoLogin('demo', 'demo'), isTrue);
+      expect(DemoData.isDemoLogin('DEMO@VUELOCONTROLADO.ORG', 'demo1234'), isTrue);
+
+      expect(DemoData.isDemoLogin('demo@vuelocontrolado.org', 'wrongpass'), isFalse);
+      expect(DemoData.isDemoLogin('unknown@vuelocontrolado.org', 'demo1234'), isFalse);
+    });
+
+    test('AuthService demo login grants Superadmin capabilities without modifying persistent users', () async {
+      SharedPreferences.setMockInitialValues({});
+      final storage = await StorageService.init();
+
+      final realAdmin = UserModel(
+        id: 'real_admin_1',
+        email: 'real@vuelocontrolado.org',
+        password: 'pass',
+        firstName: 'Real',
+        lastName: 'Admin',
+        documentType: 'DNI',
+        documentNumber: '11111111',
+        birthDate: DateTime(1990, 1, 1),
+        phone: '11111111',
+        roles: [AppRoles.miembro],
+        createdAt: DateTime.now(),
+      );
+      await storage.saveUsers([realAdmin]);
+
+      final authService = AuthService(storage);
+      final success = await authService.login('demo@vuelocontrolado.org', 'demo1234');
+
+      expect(success, isTrue);
+      expect(authService.isDemoMode, isTrue);
+      expect(authService.currentUser?.id, DemoData.demoUserId);
+      expect(authService.currentUser?.isSuperAdmin, isTrue);
+      expect(authService.currentUser?.isDemoUser, isTrue);
+      expect(authService.currentUser?.canCreateEvents, isTrue);
+      expect(authService.currentUser?.canManageUsers, isTrue);
+      expect(authService.currentUser?.canCreateUsers, isTrue);
+
+      // Verify users returned in demo mode are the simulated staff
+      expect(authService.users.length, greaterThanOrEqualTo(5));
+      expect(authService.users.any((u) => u.id == 'demo_staff_leo'), isTrue);
+      // Real storage remains unchanged
+      expect(storage.loadUsers().length, 1);
+      expect(storage.loadUsers().first.id, 'real_admin_1');
+
+      // Modifying demo user in-memory does not persist to storage
+      await authService.createUser(
+        email: 'nuevo.voluntario@demo.org',
+        firstName: 'Nuevo',
+        lastName: 'Demo',
+        documentType: 'DNI',
+        documentNumber: '44444444',
+        birthDate: DateTime(2000, 1, 1),
+        phone: '11223344',
+        initialRoles: [AppRoles.miembro],
+      );
+
+      expect(authService.users.any((u) => u.email == 'nuevo.voluntario@demo.org'), isTrue);
+      expect(storage.loadUsers().length, 1);
+
+      // Logout restores normal mode
+      await authService.logout();
+      expect(authService.isDemoMode, isFalse);
+      expect(authService.currentUser, isNull);
+      expect(authService.users.length, 1);
+      expect(authService.users.first.id, 'real_admin_1');
+    });
+
+    test('EventService and CaseService sandbox isolation in demo mode', () async {
+      SharedPreferences.setMockInitialValues({});
+      final storage = await StorageService.init();
+
+      final authService = AuthService(storage);
+      final eventService = EventService(storage, authService: authService);
+      final caseService = CaseService(storage, authService: authService);
+
+      // Before demo login, real lists are empty
+      expect(eventService.events.isEmpty, isTrue);
+      expect(caseService.allCases.isEmpty, isTrue);
+
+      // Login as demo
+      await authService.login('demo@vuelocontrolado.org', 'demo1234');
+
+      // Now simulated events and cases are visible
+      expect(eventService.events.length, 3);
+      expect(caseService.allCases.length, 3);
+      expect(eventService.events.any((e) => e.id == 'demo_event_today'), isTrue);
+
+      // Create a demo event in memory
+      final createdEvent = await eventService.createEvent(
+        name: 'Evento Prueba Revisor',
+        date: DateTime.now().add(const Duration(days: 2)),
+        startTime: '20:00',
+        doorsOpenTime: '21:00',
+        endTime: '04:00',
+        location: 'Club Demo',
+        currentUser: authService.currentUser!,
+      );
+      expect(createdEvent, isTrue);
+      expect(eventService.events.any((e) => e.name == 'Evento Prueba Revisor'), isTrue);
+      // Persistent storage has 0 events
+      expect(storage.loadEvents().isEmpty, isTrue);
+
+      // Create a demo case in memory
+      final createdCase = await caseService.createCase(
+        eventId: 'demo_event_today',
+        eventName: 'Festival Mandarine Nocturna 2026',
+        currentUser: authService.currentUser!,
+        interventionType: 'Recuperación íntegra',
+        substances: ['Alcohol'],
+        symptoms: 'Deshidratación',
+        observations: 'Prueba de ficha por revisor Google Play',
+      );
+      expect(createdCase, isTrue);
+      expect(caseService.allCases.length, 4);
+      // Persistent storage has 0 cases
+      expect(storage.loadCases().isEmpty, isTrue);
+
+      // Logging out clears demo state and preserves clean storage
+      await authService.logout();
+      expect(eventService.events.isEmpty, isTrue);
+      expect(caseService.allCases.isEmpty, isTrue);
+      expect(storage.loadEvents().isEmpty, isTrue);
+      expect(storage.loadCases().isEmpty, isTrue);
     });
   });
 }

@@ -125,7 +125,7 @@ Los siguientes archivos ya están generados con las medidas y especificaciones e
 ### Paso 2: Declaraciones del Contenido de la Aplicación
 En el menú lateral izquierdo, andá a **Contenido de la aplicación** y completá las tareas pendientes:
 1. **Acceso a la app:** Seleccionar *"Todas o algunas funciones están restringidas (inicio de sesión)"* y proporcionar credenciales de prueba:
-   - Email: `leobenveniste@vuelocontrolado.org`
+   - Email: `leo.benveniste@gmail.com`
    - Clave: `29583026`
    - O indicar que existe registro público libre en la app.
 2. **Anuncios:** Seleccionar *"Sí, mi aplicación contiene anuncios"* (Google Mobile Ads AdMob).

@@ -199,10 +199,16 @@ class _TodayScreenState extends State<TodayScreen> {
             );
             final dateKey = AppDateUtils.toDateKey(cleanSelected);
 
+            final dailyHabits = widget.habitService.getDailyHabits(cleanSelected);
+            final weeklyHabits = widget.habitService.getWeeklyHabits();
+            final monthlyHabits = widget.habitService.getMonthlyHabits();
+
             final habits = widget.habitService.getHabitsForDate(cleanSelected);
             final doneCount = widget.habitService.getCompletedCountForDate(cleanSelected);
             final totalCount = habits.length;
             final completionRate = widget.habitService.getCompletionRateForDate(cleanSelected);
+
+            final hasAnyHabits = dailyHabits.isNotEmpty || weeklyHabits.isNotEmpty || monthlyHabits.isNotEmpty;
 
             return ListView(
               padding: const EdgeInsets.only(bottom: 88),
@@ -286,59 +292,40 @@ class _TodayScreenState extends State<TodayScreen> {
                 const SizedBox(height: AppSpacing.xs),
 
                 // Habits List or Empty state
-                if (habits.isEmpty)
+                if (!hasAnyHabits)
                   _buildEmptyState(context, l10n)
-                else
-                  ...habits.map((habit) {
-                    final log = widget.habitService.getLog(habit.id, dateKey);
-                    final streak = widget.habitService.calculateStreak(habit.id);
+                else ...[
+                  // Section 1: Daily Habits
+                  if (dailyHabits.isNotEmpty) ...[
+                    if (weeklyHabits.isNotEmpty || monthlyHabits.isNotEmpty)
+                      _buildSectionHeader(context, l10n.t('sectionDailyHabits'), Icons.today_rounded),
+                    ...dailyHabits.map((habit) => _buildHabitItem(habit, cleanSelected, dateKey)),
+                  ],
 
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                        vertical: AppSpacing.xs,
-                      ),
-                      child: SwipeHabitCard(
-                        habit: habit,
-                        log: log,
-                        streak: streak,
-                        onToggle: () {
-                          final wasCompleted = log?.completed ?? false;
-                          widget.habitService.toggleHabit(habit.id, cleanSelected);
-                          if (!wasCompleted) {
-                            final todayHabits = widget.habitService.getHabitsForDate(cleanSelected);
-                            final doneCount = widget.habitService.getCompletedCountForDate(cleanSelected);
-                            final allDone = todayHabits.isNotEmpty && doneCount >= todayHabits.length;
+                  // Section 2: Weekly Habits
+                  if (weeklyHabits.isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    _buildSectionHeader(context, l10n.t('sectionWeeklyHabits'), Icons.view_week_rounded),
+                    ...weeklyHabits.map((habit) => _buildHabitItem(
+                          habit,
+                          cleanSelected,
+                          dateKey,
+                          periodProgress: widget.habitService.getWeeklyProgress(habit.id, cleanSelected),
+                        )),
+                  ],
 
-                            if (allDone) {
-                              AppServices.of(context).audioService.playAllHabitsCompleteSound();
-                              _showAllHabitsCompletedDialog(context);
-                            } else {
-                              AppServices.of(context).audioService.playHabitChime();
-                            }
-                          }
-                        },
-                        onDelta: (delta) {
-                          final wasCompleted = log?.completed ?? false;
-                          widget.habitService.updateCounter(habit.id, cleanSelected, delta);
-                          final isCompletedNow = widget.habitService.isCompleted(habit.id, dateKey);
-                          if (!wasCompleted && isCompletedNow) {
-                            final todayHabits = widget.habitService.getHabitsForDate(cleanSelected);
-                            final doneCount = widget.habitService.getCompletedCountForDate(cleanSelected);
-                            final allDone = todayHabits.isNotEmpty && doneCount >= todayHabits.length;
-
-                            if (allDone) {
-                              AppServices.of(context).audioService.playAllHabitsCompleteSound();
-                              _showAllHabitsCompletedDialog(context);
-                            } else {
-                              AppServices.of(context).audioService.playHabitChime();
-                            }
-                          }
-                        },
-                        onEdit: () => _openEditHabitDialog(context, habit),
-                      ),
-                    );
-                  }),
+                  // Section 3: Monthly Habits
+                  if (monthlyHabits.isNotEmpty) ...[
+                    const SizedBox(height: AppSpacing.sm),
+                    _buildSectionHeader(context, l10n.t('sectionMonthlyHabits'), Icons.calendar_month_rounded),
+                    ...monthlyHabits.map((habit) => _buildHabitItem(
+                          habit,
+                          cleanSelected,
+                          dateKey,
+                          periodProgress: widget.habitService.getMonthlyProgress(habit.id, cleanSelected),
+                        )),
+                  ],
+                ],
               ],
             );
           },
@@ -621,6 +608,80 @@ class _TodayScreenState extends State<TodayScreen> {
     );
   }
 
+  Widget _buildSectionHeader(BuildContext context, String title, IconData icon) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.sm, AppSpacing.md, AppSpacing.xs),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: theme.colorScheme.primary),
+          const SizedBox(width: AppSpacing.xs),
+          Text(
+            title,
+            style: AppTypography.caption(theme.colorScheme.onSurface, isMedium: true),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHabitItem(
+    Habit habit,
+    DateTime cleanSelected,
+    String dateKey, {
+    ({int completed, int target, bool isMet})? periodProgress,
+  }) {
+    final log = widget.habitService.getLog(habit.id, dateKey);
+    final streak = widget.habitService.calculateStreak(habit.id);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.xs,
+      ),
+      child: SwipeHabitCard(
+        habit: habit,
+        log: log,
+        streak: streak,
+        periodProgress: periodProgress,
+        onToggle: () {
+          final wasCompleted = log?.completed ?? false;
+          widget.habitService.toggleHabit(habit.id, cleanSelected);
+          if (!wasCompleted) {
+            final todayHabits = widget.habitService.getHabitsForDate(cleanSelected);
+            final doneCount = widget.habitService.getCompletedCountForDate(cleanSelected);
+            final allDone = todayHabits.isNotEmpty && doneCount >= todayHabits.length;
+
+            if (allDone) {
+              AppServices.of(context).audioService.playAllHabitsCompleteSound();
+              _showAllHabitsCompletedDialog(context);
+            } else {
+              AppServices.of(context).audioService.playHabitChime();
+            }
+          }
+        },
+        onDelta: (delta) {
+          final wasCompleted = log?.completed ?? false;
+          widget.habitService.updateCounter(habit.id, cleanSelected, delta);
+          final isCompletedNow = widget.habitService.isCompleted(habit.id, dateKey);
+          if (!wasCompleted && isCompletedNow) {
+            final todayHabits = widget.habitService.getHabitsForDate(cleanSelected);
+            final doneCount = widget.habitService.getCompletedCountForDate(cleanSelected);
+            final allDone = todayHabits.isNotEmpty && doneCount >= todayHabits.length;
+
+            if (allDone) {
+              AppServices.of(context).audioService.playAllHabitsCompleteSound();
+              _showAllHabitsCompletedDialog(context);
+            } else {
+              AppServices.of(context).audioService.playHabitChime();
+            }
+          }
+        },
+        onEdit: () => _openEditHabitDialog(context, habit),
+      ),
+    );
+  }
+
   void _openAddHabitDialog(BuildContext context) {
     final premiumService = AppServices.of(context).premiumService;
     if (!premiumService.isPro && widget.habitService.habits.length >= 5) {
@@ -639,6 +700,8 @@ class _TodayScreenState extends State<TodayScreen> {
         required type,
         required double targetValue,
         required String unit,
+        HabitFrequencyType frequencyType = HabitFrequencyType.daily,
+        int frequencyTarget = 7,
         required List<int> frequencyDays,
         String? reminderTime,
         required bool reminderEnabled,
@@ -649,6 +712,8 @@ class _TodayScreenState extends State<TodayScreen> {
           type: type,
           targetValue: targetValue,
           unit: unit,
+          frequencyType: frequencyType,
+          frequencyTarget: frequencyTarget,
           frequencyDays: frequencyDays,
           reminderTime: reminderTime,
           reminderEnabled: reminderEnabled,
@@ -667,6 +732,8 @@ class _TodayScreenState extends State<TodayScreen> {
         required type,
         required double targetValue,
         required String unit,
+        HabitFrequencyType frequencyType = HabitFrequencyType.daily,
+        int frequencyTarget = 7,
         required List<int> frequencyDays,
         String? reminderTime,
         required bool reminderEnabled,
@@ -677,6 +744,8 @@ class _TodayScreenState extends State<TodayScreen> {
           type: type,
           targetValue: targetValue,
           unit: unit,
+          frequencyType: frequencyType,
+          frequencyTarget: frequencyTarget,
           frequencyDays: frequencyDays,
           reminderTime: reminderTime,
           reminderEnabled: reminderEnabled,

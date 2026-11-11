@@ -4,6 +4,7 @@ import '../models/habit.dart';
 import '../models/habit_category.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
+import '../utils/haptics_helper.dart';
 import 'state_button.dart';
 
 class HabitEditDialog extends StatefulWidget {
@@ -14,6 +15,8 @@ class HabitEditDialog extends StatefulWidget {
     required HabitType type,
     required double targetValue,
     required String unit,
+    HabitFrequencyType frequencyType,
+    int frequencyTarget,
     required List<int> frequencyDays,
     String? reminderTime,
     required bool reminderEnabled,
@@ -36,6 +39,8 @@ class HabitEditDialog extends StatefulWidget {
       required HabitType type,
       required double targetValue,
       required String unit,
+      HabitFrequencyType frequencyType,
+      int frequencyTarget,
       required List<int> frequencyDays,
       String? reminderTime,
       required bool reminderEnabled,
@@ -65,6 +70,8 @@ class _HabitEditDialogState extends State<HabitEditDialog> {
 
   late HabitCategory _selectedCategory;
   late HabitType _selectedType;
+  late HabitFrequencyType _selectedFrequencyType;
+  late int _frequencyTarget;
   late List<int> _frequencyDays;
   late bool _reminderEnabled;
   TimeOfDay _reminderTime = const TimeOfDay(hour: 8, minute: 0);
@@ -83,7 +90,14 @@ class _HabitEditDialogState extends State<HabitEditDialog> {
     _unitController = TextEditingController(text: h?.unit ?? '');
     _selectedCategory = h?.category ?? HabitCategory.health;
     _selectedType = h?.type ?? HabitType.boolean;
-    _frequencyDays = h?.frequencyDays ?? [1, 2, 3, 4, 5, 6, 7];
+    _selectedFrequencyType = h?.frequencyType ?? HabitFrequencyType.daily;
+    _frequencyDays = h?.frequencyDays != null
+        ? List<int>.from(h!.frequencyDays)
+        : [1, 2, 3, 4, 5, 6, 7];
+    _frequencyTarget = h?.frequencyTarget ??
+        (_selectedFrequencyType == HabitFrequencyType.daily
+            ? _frequencyDays.length
+            : (_selectedFrequencyType == HabitFrequencyType.weekly ? 3 : 1));
     _reminderEnabled = h?.reminderEnabled ?? false;
 
     if (h?.reminderTime != null) {
@@ -131,6 +145,8 @@ class _HabitEditDialogState extends State<HabitEditDialog> {
         type: _selectedType,
         targetValue: target,
         unit: _unitController.text.trim(),
+        frequencyType: _selectedFrequencyType,
+        frequencyTarget: _frequencyTarget,
         frequencyDays: _frequencyDays,
         reminderTime: timeStr,
         reminderEnabled: _reminderEnabled,
@@ -144,6 +160,51 @@ class _HabitEditDialogState extends State<HabitEditDialog> {
         setState(() => _saveState = ButtonState.error);
       }
     }
+  }
+
+  Widget _buildDayChip(BuildContext context, int weekday) {
+    final theme = Theme.of(context);
+    final isSelected = _frequencyDays.contains(weekday);
+    const dayLetters = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+    final letter = dayLetters[weekday - 1];
+
+    return InkWell(
+      onTap: () {
+        HapticsHelper.selection();
+        setState(() {
+          if (isSelected) {
+            if (_frequencyDays.length > 1) {
+              _frequencyDays.remove(weekday);
+            }
+          } else {
+            _frequencyDays.add(weekday);
+            _frequencyDays.sort();
+          }
+          _frequencyTarget = _frequencyDays.length;
+        });
+      },
+      borderRadius: BorderRadius.circular(20),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: isSelected ? theme.colorScheme.primary : theme.colorScheme.surfaceContainerHighest,
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: isSelected ? theme.colorScheme.primary : theme.colorScheme.outlineVariant,
+          ),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          letter,
+          style: AppTypography.caption(
+            isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
+            isMedium: true,
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -246,6 +307,174 @@ class _HabitEditDialogState extends State<HabitEditDialog> {
                 );
               }).toList(),
             ),
+            const SizedBox(height: AppSpacing.md),
+
+            // Frequency Selector
+            Text(
+              l10n.t('habitFrequencyLabel'),
+              style: AppTypography.caption(theme.colorScheme.onSurface, isMedium: true),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Row(
+              children: HabitFrequencyType.values.map((ft) {
+                final isSelected = _selectedFrequencyType == ft;
+                return Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                    child: ChoiceChip(
+                      label: Center(
+                        child: Text(
+                          l10n.t(ft.localizationKey),
+                          style: AppTypography.caption(
+                            isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
+                            isMedium: true,
+                          ),
+                        ),
+                      ),
+                      selected: isSelected,
+                      selectedColor: theme.colorScheme.primary,
+                      onSelected: (val) {
+                        if (val) {
+                          HapticsHelper.selection();
+                          setState(() {
+                            _selectedFrequencyType = ft;
+                            if (ft == HabitFrequencyType.daily) {
+                              _frequencyTarget = _frequencyDays.length;
+                            } else if (ft == HabitFrequencyType.weekly) {
+                              _frequencyTarget = _frequencyTarget.clamp(1, 7);
+                              if (_frequencyTarget > 7 || _frequencyTarget < 1) _frequencyTarget = 3;
+                            } else if (ft == HabitFrequencyType.monthly) {
+                              if (_frequencyTarget > 31 || _frequencyTarget < 1) _frequencyTarget = 1;
+                            }
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+
+            // Frequency configuration UI
+            if (_selectedFrequencyType == HabitFrequencyType.daily) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  for (int i = 1; i <= 7; i++) _buildDayChip(context, i),
+                ],
+              ),
+            ] else if (_selectedFrequencyType == HabitFrequencyType.weekly) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                  border: Border.all(color: theme.colorScheme.outlineVariant),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.t('timesPerWeekLabel'),
+                          style: AppTypography.caption(theme.colorScheme.onSurface, isMedium: true),
+                        ),
+                        Text(
+                          l10n.t('timesPerWeekValue').replaceAll('{count}', '$_frequencyTarget'),
+                          style: AppTypography.body(theme.colorScheme.primary, isMedium: true),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.remove_circle_outline_rounded),
+                          color: _frequencyTarget > 1 ? theme.colorScheme.primary : theme.colorScheme.outline,
+                          onPressed: _frequencyTarget > 1
+                              ? () {
+                                  HapticsHelper.light();
+                                  setState(() => _frequencyTarget--);
+                                }
+                              : null,
+                        ),
+                        Text(
+                          '$_frequencyTarget',
+                          style: AppTypography.title(theme.colorScheme.onSurface),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.add_circle_outline_rounded),
+                          color: _frequencyTarget < 7 ? theme.colorScheme.primary : theme.colorScheme.outline,
+                          onPressed: _frequencyTarget < 7
+                              ? () {
+                                  HapticsHelper.light();
+                                  setState(() => _frequencyTarget++);
+                                }
+                              : null,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ] else if (_selectedFrequencyType == HabitFrequencyType.monthly) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                  border: Border.all(color: theme.colorScheme.outlineVariant),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.t('timesPerMonthLabel'),
+                          style: AppTypography.caption(theme.colorScheme.onSurface, isMedium: true),
+                        ),
+                        Text(
+                          l10n.t('timesPerMonthValue').replaceAll('{count}', '$_frequencyTarget'),
+                          style: AppTypography.body(theme.colorScheme.primary, isMedium: true),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.remove_circle_outline_rounded),
+                          color: _frequencyTarget > 1 ? theme.colorScheme.primary : theme.colorScheme.outline,
+                          onPressed: _frequencyTarget > 1
+                              ? () {
+                                  HapticsHelper.light();
+                                  setState(() => _frequencyTarget--);
+                                }
+                              : null,
+                        ),
+                        Text(
+                          '$_frequencyTarget',
+                          style: AppTypography.title(theme.colorScheme.onSurface),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.add_circle_outline_rounded),
+                          color: _frequencyTarget < 31 ? theme.colorScheme.primary : theme.colorScheme.outline,
+                          onPressed: _frequencyTarget < 31
+                              ? () {
+                                  HapticsHelper.light();
+                                  setState(() => _frequencyTarget++);
+                                }
+                              : null,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: AppSpacing.md),
 
             // Habit Type Selector

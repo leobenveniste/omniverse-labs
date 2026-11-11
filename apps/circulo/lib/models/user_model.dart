@@ -32,7 +32,7 @@ class AppRegions {
 }
 
 class AppRoles {
-  static const String superAdminEmail = 'leobenveniste@vuelocontrolado.org';
+  static const String superAdminEmail = 'leo.benveniste@gmail.com';
   static const String miembro = 'Miembro';
   static const String moderador = 'Moderador';
 }

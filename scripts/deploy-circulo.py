@@ -52,7 +52,7 @@ def get_service():
 
 def deploy(target_tracks=None):
     if target_tracks is None:
-        target_tracks = ["internal", "alpha"]
+        target_tracks = ["internal", "alpha", "beta", "production"]
     if not os.path.exists(AAB_PATH):
         print(f"[ERROR] AAB bundle not found at {AAB_PATH}")
         sys.exit(1)
@@ -113,11 +113,11 @@ def deploy(target_tracks=None):
     notes = [
         {
             "language": "es-419",
-            "text": "Círculo v1.0.0: Estabilización de arquitectura nativa FlutterActivity, eliminación de dependencias superfluas e inicio instantáneo en Android."
+            "text": "Círculo v1.0.0 (Build 11): Actualización de integración con Firebase Omniverse Labs, optimizaciones de rendimiento y mejoras en la estabilidad de inicio de sesión."
         },
         {
             "language": "en-US",
-            "text": "Círculo v1.0.0: Native FlutterActivity architecture stabilization, removal of extraneous dependencies, and guaranteed instant startup on Android."
+            "text": "Círculo v1.0.0 (Build 11): Omniverse Labs Firebase integration update, performance optimizations, and authentication stability enhancements."
         }
     ]
 

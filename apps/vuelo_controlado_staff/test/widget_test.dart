@@ -57,6 +57,48 @@ void main() {
     expect(find.text('Ingresar'), findsOneWidget);
   });
 
+  testWidgets('LoginScreen logs in as demo user when credentials are typed',
+      (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    final storageService = StorageService(prefs);
+    final settingsService = SettingsService(prefs);
+    final authService = AuthService(storageService);
+    final eventService = EventService(storageService, authService: authService);
+    final caseService = CaseService(storageService, authService: authService);
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: authService),
+          ChangeNotifierProvider.value(value: eventService),
+          ChangeNotifierProvider.value(value: caseService),
+          ChangeNotifierProvider.value(value: settingsService),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.darkTheme,
+          home: const LoginScreen(),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    final textFields = find.byType(TextField);
+    expect(textFields, findsNWidgets(2));
+
+    await tester.enterText(textFields.at(0), 'demo@vuelocontrolado.org');
+    await tester.enterText(textFields.at(1), 'demo1234');
+
+    final enterButton = find.text('Ingresar');
+    await tester.tap(enterButton);
+    await tester.pumpAndSettle();
+
+    expect(authService.isDemoMode, isTrue);
+    expect(authService.currentUser?.email, 'demo@vuelocontrolado.org');
+    expect(authService.isAuthenticated, isTrue);
+  });
+
   testWidgets('EventsListScreen renders event cards with timing capsules and no ErrorWidgets',
       (WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({});

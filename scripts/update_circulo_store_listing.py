@@ -21,78 +21,86 @@ SCOPES = ["https://www.googleapis.com/auth/androidpublisher"]
 PACKAGE_NAME = "com.omniverselabs.circulo"
 
 ES_TITLE = "Círculo: Amigos y Grupos"
-ES_SHORT = "Red social para conectar con personas afines, formar grupos y planear salidas."
-ES_FULL = """Círculo es una aplicación social diseñada para conectar personas afines, facilitar la formación de grupos de amistades y coordinar salidas presenciales a partir de intereses compartidos.
+ES_SHORT = "Descubrí personas afines, formá grupos de 4 amigos y coordiná salidas."
+ES_FULL = """Círculo es una aplicación diseñada para facilitar la amistad y los planes grupales entre personas con intereses compartidos.
 
-A diferencia de las plataformas tradicionales de interacción individual, Círculo organiza la experiencia en torno a grupos equilibrados de 4 o más integrantes, promoviendo dinámicas sociales colaborativas.
+La aplicación ayuda a formar grupos de 4 personas en tu ciudad o zona para organizar salidas y actividades presenciales de forma segura y colaborativa.
 
-CARACTERÍSTICAS PRINCIPALES:
+¿CÓMO FUNCIONA CÍRCULO?
 
-1. Perfil de intereses y afinidad social
-• Crea tu perfil seleccionando tus pasatiempos favoritos: café de especialidad, juegos de mesa, deportes, música en vivo, cine o gastronomía.
-• Define tu rol en el grupo (organizador, conector, explorador o tranquilo) para permitir un balance adecuado en cada círculo.
-• Especifica tus zonas frecuentes y tus momentos de disponibilidad durante la semana.
+1. Creá tu perfil de intereses:
+• Seleccioná tus actividades y pasatiempos favoritos (café, juegos de mesa, deportes, gastronomía, salidas al aire libre, cine, etc.).
+• Elegí tu rol preferido en el grupo (organizador, conector, explorador o tranquilo) para lograr un grupo equilibrado.
+• Indicá tus zonas frecuentes y tu disponibilidad habitual.
 
-2. Descubrimiento y formación de grupos
-• Explora perfiles y círculos en proceso de formación en tu zona.
-• Conexión grupal: cuando 4 personas con intereses mutuos coinciden, el círculo se consolida y se habilita automáticamente el espacio grupal.
+2. Descubrí personas y grupos en formación:
+• Explorá perfiles de usuarios de tu zona que compartan tus mismos gustos.
+• Cuando 4 personas coinciden mutuamente en intereses, se crea un "Círculo" automáticamente.
 
-3. Chat y mensajería grupal
-• Sala de chat exclusiva para cada grupo conformado.
-• Comparte mensajes, propuestas de salidas y coordina detalles del encuentro de manera segura.
+3. Chat grupal exclusivo:
+• Cada grupo de 4 cuenta con su propia sala de mensajería privada.
+• Compartí mensajes y ponete de acuerdo con los demás integrantes sin compartir tu número de teléfono.
 
-4. Planificación de actividades y salidas
-• Sistema integrado para crear planes y votar fechas, horarios y lugares de encuentro.
-• Registro de asistencia grupal (check-in) para validar los encuentros completados en la vida real.
+4. Creación y votación de salidas:
+• Proponé actividades con fecha, hora y punto de encuentro.
+• Votá los planes propuestos por otros miembros del grupo.
+• Realizá check-in grupal durante el encuentro para registrar las salidas completadas.
 
-5. Modo Dupla
-• Posibilidad de vincular tu cuenta con un amigo mediante un código de invitación para explorar grupos juntos.
+5. Modo Dupla:
+• Vinculá tu cuenta con un amigo o amiga mediante un código de invitación para explorar y unirse a grupos juntos.
 
-6. Privacidad, seguridad y moderación
-• Tu información de contacto directo se mantiene privada hasta que decidas compartirla dentro de tu grupo.
-• Herramientas de reporte y bloqueo para mantener una comunidad segura y respetuosa.
+6. Seguridad y privacidad:
+• Tus datos de contacto directo permanecen privados dentro de la app.
+• Herramientas integradas para reportar y bloquear comportamientos inadecuados.
+• Opción de eliminar tu cuenta y tus datos en cualquier momento desde los ajustes.
 
-SUSCRIPCIÓN OPCIONAL Y FUNCIONES ADICIONALES:
-Círculo ofrece la suscripción opcional Círculo Plus con funciones como swipes adicionales, visualización anticipada de postulantes y experiencia sin anuncios publicitarios, además de consumibles opcionales (destacados de perfil).
+FUNCIONES OPCIONALES:
+Círculo es de descarga y uso gratuito. De forma opcional, ofrece la suscripción "Círculo Plus" y elementos consumibles para obtener funciones adicionales como visualización anticipada de perfiles y destacados.
 
-Requisitos: Aplicación orientada a usuarios mayores de 18 años. Requiere conexión a internet."""
+Requisitos:
+• Dirigida exclusivamente a mayores de 18 años.
+• Requiere conexión a internet activa."""
 
 EN_TITLE = "Círculo: Group Friends & Meet"
-EN_SHORT = "Social network to meet like-minded people, form groups, and plan real meetups."
-EN_FULL = """Círculo is a social networking app designed to help you discover like-minded people, form real-world friendship groups, and organize social outings based on shared hobbies and availability.
+EN_SHORT = "Meet like-minded friends, form balanced 4-person groups, and coordinate meetups."
+EN_FULL = """Círculo is an app designed to foster genuine friendships and group activities among people with shared interests.
 
-Unlike traditional one-on-one networking apps, Círculo focuses on balanced group connections of 4 or more people, making it natural and pressure-free to meet new friends.
+The app helps form 4-person circles in your city or neighborhood to organize safe, collaborative real-world outings.
 
-KEY FEATURES:
+HOW CÍRCULO WORKS:
 
-1. Detailed Profiles & Shared Interests
-• Build your profile by selecting your favorite activities: specialty coffee, board games, running, live music, dining, tech, and cultural events.
-• Choose your group dynamic role (Organizer, Connector, Explorer, or Chill) to ensure balanced groups.
-• Set your favorite neighborhoods and weekly availability.
+1. Create Your Profile:
+• Select your favorite activities and hobbies (specialty coffee, board games, sports, dining, outdoor events, movies, etc.).
+• Pick your preferred group role (Organizer, Connector, Explorer, or Chill) for balanced group dynamics.
+• Set your primary areas and general availability.
 
-2. Group Matching & Formation
-• Discover compatible individuals and forming groups in your local area.
-• Group match system: once 4 compatible members connect, the group is unlocked and a private group space is activated.
+2. Discover People & Forming Circles:
+• Explore local user profiles that share your passions.
+• When 4 people mutually connect based on shared interests, a "Circle" is automatically established.
 
-3. Private Group Messaging
-• Dedicated chat rooms for each formed circle.
-• Coordinate conversations, share ideas, and plan activities within the group.
+3. Dedicated Group Chat:
+• Every 4-person circle has its own private group messaging space.
+• Coordinate conversations and discuss meetup details without sharing personal phone numbers.
 
-4. Meetup & Event Planning
-• Built-in tools to propose dates, pick locations, and vote on activities.
-• Meetup confirmation and check-in badges for completed in-person gatherings.
+4. Plan and Vote on Outings:
+• Suggest activities with specific times, dates, and meeting spots.
+• Vote on plans proposed by circle members.
+• Complete group check-ins during meetups to track verified outings.
 
-5. Duo Mode
+5. Duo Mode:
 • Pair your account with a close friend using an invite code to join forming circles together.
 
-6. Privacy & Safety Standards
-• Personal contact details remain protected until you choose to share them with your confirmed circle.
-• Comprehensive reporting and blocking tools to maintain a safe, welcoming community.
+6. Safety and Privacy:
+• Direct contact details remain protected within the app.
+• Integrated reporting and blocking tools to maintain a safe community.
+• Clear account and data deletion options available at any time in Settings.
 
-OPTIONAL MEMBERSHIP & PREMIUM FEATURES:
-Círculo offers an optional subscription (Círculo Plus) providing extra discovery swipes, previewing interested members, and an ad-free experience, alongside optional profile boosts.
+OPTIONAL FEATURES:
+Círculo is free to download and use. An optional "Círculo Plus" subscription and consumable items are available for extra features like early profile previews and profile spotlights.
 
-Requirements: Designed for users aged 18 and older. Requires an active internet connection."""
+Requirements:
+• Intended exclusively for users aged 18 and older.
+• Requires an active internet connection."""
 
 def get_service():
     if not os.path.exists(OAUTH_TOKEN_STORE):

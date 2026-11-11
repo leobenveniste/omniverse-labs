@@ -5,31 +5,65 @@ import '../models/user_model.dart';
 import '../models/event_model.dart';
 import 'storage_service.dart';
 import 'firestore_sync_service.dart';
+import 'auth_service.dart';
+import 'demo_data.dart';
 
 class CaseService extends ChangeNotifier {
   final StorageService _storage;
   final FirestoreSyncService? firestoreSync;
+  final AuthService? authService;
   List<CaseModel> _cases = [];
+  List<CaseModel> _demoCases = [];
 
-  CaseService(this._storage, {this.firestoreSync}) {
+  CaseService(
+    this._storage, {
+    this.firestoreSync,
+    this.authService,
+  }) {
     _cases = _storage.loadCases();
+    _demoCases = DemoData.getDemoCases();
+    authService?.addListener(_onAuthChanged);
+  }
+
+  void _onAuthChanged() {
+    if (isDemoMode && _demoCases.isEmpty) {
+      _demoCases = DemoData.getDemoCases();
+    }
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    authService?.removeListener(_onAuthChanged);
+    super.dispose();
+  }
+
+  bool get isDemoMode => authService?.isDemoMode ?? false;
+
+  void resetDemoData() {
+    _demoCases = DemoData.getDemoCases();
+    notifyListeners();
   }
 
   /// Recarga casos cuando Firestore detecta cambios remotos
   void reloadCasesFromStorage() {
+    if (isDemoMode) return;
     _cases = _storage.loadCases();
     notifyListeners();
   }
 
-  List<CaseModel> get allCases => List.unmodifiable(_cases);
+  List<CaseModel> get allCases =>
+      List.unmodifiable(isDemoMode ? _demoCases : _cases);
 
   List<CaseModel> getCasesForEvent(String eventId) {
-    return _cases.where((c) => c.eventId == eventId).toList()
+    final list = isDemoMode ? _demoCases : _cases;
+    return list.where((c) => c.eventId == eventId).toList()
       ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
   }
 
   int getPendingSyncCount(String eventId) {
-    return _cases.where((c) => c.eventId == eventId && !c.isSyncedToDrive).length;
+    final list = isDemoMode ? _demoCases : _cases;
+    return list.where((c) => c.eventId == eventId && !c.isSyncedToDrive).length;
   }
 
   /// Registra una nueva ficha de caso 100% offline
@@ -119,6 +153,13 @@ class CaseService extends ChangeNotifier {
       );
     }
 
+    if (isDemoMode) {
+      _demoCases.insert(0, newCase);
+      await clearDraft(targetEventId);
+      notifyListeners();
+      return true;
+    }
+
     _cases.insert(0, newCase);
     await _storage.saveCases(_cases);
     firestoreSync?.syncCase(newCase);
@@ -128,6 +169,17 @@ class CaseService extends ChangeNotifier {
 
   /// Actualiza una ficha de caso existente 100% offline
   Future<bool> updateCase(CaseModel updatedCase) async {
+    if (isDemoMode) {
+      final index = _demoCases.indexWhere((c) => c.id == updatedCase.id);
+      if (index != -1) {
+        _demoCases[index] = updatedCase;
+      } else {
+        _demoCases.insert(0, updatedCase);
+      }
+      notifyListeners();
+      return true;
+    }
+
     final index = _cases.indexWhere((c) => c.id == updatedCase.id);
     if (index != -1) {
       _cases[index] = updatedCase;
@@ -144,6 +196,20 @@ class CaseService extends ChangeNotifier {
   /// Marca casos como sincronizados con Google Drive
   Future<void> markCasesAsSynced(String eventId) async {
     final now = DateTime.now();
+
+    if (isDemoMode) {
+      for (int i = 0; i < _demoCases.length; i++) {
+        if (_demoCases[i].eventId == eventId && !_demoCases[i].isSyncedToDrive) {
+          _demoCases[i] = _demoCases[i].copyWith(
+            isSyncedToDrive: true,
+            syncedAt: now,
+          );
+        }
+      }
+      notifyListeners();
+      return;
+    }
+
     bool changed = false;
 
     for (int i = 0; i < _cases.length; i++) {

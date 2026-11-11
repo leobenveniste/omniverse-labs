@@ -118,11 +118,19 @@ class _AppBootstrapState extends State<AppBootstrap> {
     // 3. Inicializar servicio de sincronización en la nube (Firestore)
     final syncService = FirestoreSyncService(storageService);
     final authService = AuthService(storageService, firestoreSync: syncService);
-    final eventService =
-        EventService(storageService, firestoreSync: syncService);
-    final caseService = CaseService(storageService, firestoreSync: syncService);
+    final eventService = EventService(
+      storageService,
+      firestoreSync: syncService,
+      authService: authService,
+    );
+    final caseService = CaseService(
+      storageService,
+      firestoreSync: syncService,
+      authService: authService,
+    );
     final biometricService = BiometricService();
 
+    syncService.isDemoMode = () => authService.isDemoMode;
     syncService.onUsersUpdated = authService.reloadUsersFromStorage;
     syncService.onEventsUpdated = eventService.reloadEventsFromStorage;
     syncService.onCasesUpdated = caseService.reloadCasesFromStorage;

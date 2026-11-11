@@ -132,11 +132,11 @@ def deploy(target_tracks=None):
     notes = [
         {
             "language": "es-419",
-            "text": "Actualización de roles de equipo (Organización, Comunicación, Investigación, Recursos Humanos, Comercial y Producción), acceso directo a Recursos en navegación y ajustes integrados en perfil."
+            "text": "Mejoras de estabilidad y soporte de verificación de credenciales de acceso seguro para revisión."
         },
         {
             "language": "en-US",
-            "text": "Updated team roles (Organization, Communications, Research, Human Resources, Commercial, and Production), direct Resources access in navigation, and profile-integrated settings."
+            "text": "Stability improvements and secure credential verification support for review access."
         }
     ]
 
@@ -148,7 +148,7 @@ def deploy(target_tracks=None):
             "track": track_name,
             "releases": [
                 {
-                    "name": f"1.0.37 (Build {version_code})",
+                    "name": f"1.0.38 (Build {version_code})",
                     "versionCodes": [str(version_code)],
                     "status": status,
                     "releaseNotes": notes
@@ -157,7 +157,7 @@ def deploy(target_tracks=None):
         }
 
     for t in tracks_to_deploy:
-        status_to_use = "draft" if t in ["production"] else "completed"
+        status_to_use = "completed"
         try:
             edits.tracks().update(
                 packageName=PACKAGE_NAME,

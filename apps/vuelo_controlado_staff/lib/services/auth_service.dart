@@ -3,12 +3,14 @@ import 'package:uuid/uuid.dart';
 import '../models/user_model.dart';
 import 'storage_service.dart';
 import 'firestore_sync_service.dart';
+import 'demo_data.dart';
 
 class AuthService extends ChangeNotifier {
   final StorageService _storage;
   final FirestoreSyncService? firestoreSync;
   UserModel? _currentUser;
   List<UserModel> _users = [];
+  List<UserModel> _demoUsers = [];
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -17,7 +19,9 @@ class AuthService extends ChangeNotifier {
   }
 
   UserModel? get currentUser => _currentUser;
-  List<UserModel> get users => List.unmodifiable(_users);
+  bool get isDemoMode => _currentUser?.id == DemoData.demoUserId;
+  List<UserModel> get users =>
+      List.unmodifiable(isDemoMode ? _demoUsers : _users);
   bool get isAuthenticated => _currentUser != null;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
@@ -25,8 +29,10 @@ class AuthService extends ChangeNotifier {
   void _init() {
     _users = _storage.loadUsers();
     _currentUser = _storage.loadSessionUser();
-    // Si la sesión guardada es de un usuario actualizado, refrescar datos
-    if (_currentUser != null) {
+    if (_currentUser?.id == DemoData.demoUserId) {
+      _demoUsers = DemoData.getDemoUsers();
+      _currentUser = DemoData.getDemoUser();
+    } else if (_currentUser != null) {
       final index = _users.indexWhere((u) => u.id == _currentUser!.id);
       if (index != -1) {
         _currentUser = _users[index];
@@ -37,6 +43,7 @@ class AuthService extends ChangeNotifier {
 
   /// Recarga usuarios cuando se detectan cambios remotos desde Firestore
   void reloadUsersFromStorage() {
+    if (isDemoMode) return;
     _init();
   }
 
@@ -49,6 +56,18 @@ class AuthService extends ChangeNotifier {
     try {
       final cleanEmail = email.trim().toLowerCase();
       final cleanPassword = password.trim();
+
+      // Detección de cuenta Demo para Google Play Review (Modo Sandbox aislado)
+      if (DemoData.isDemoLogin(cleanEmail, cleanPassword)) {
+        _currentUser = DemoData.getDemoUser();
+        _demoUsers = DemoData.getDemoUsers();
+        await _storage.saveSessionUser(_currentUser);
+        await _storage.prefs.setString('vc_staff_last_email', _currentUser!.email);
+        _isLoading = false;
+        _errorMessage = null;
+        notifyListeners();
+        return true;
+      }
 
       // Buscar usuario en base de datos local
       final userIndex = _users.indexWhere(
@@ -98,6 +117,7 @@ class AuthService extends ChangeNotifier {
   /// Cierra la sesión activa
   Future<void> logout() async {
     _currentUser = null;
+    _demoUsers = [];
     await _storage.saveSessionUser(null);
     notifyListeners();
   }
@@ -120,6 +140,14 @@ class AuthService extends ChangeNotifier {
 
   /// Inicia sesión biométrica directa para el último usuario verificado
   Future<bool> loginWithBiometrics(UserModel user) async {
+    if (user.id == DemoData.demoUserId) {
+      _currentUser = DemoData.getDemoUser();
+      _demoUsers = DemoData.getDemoUsers();
+      await _storage.saveSessionUser(_currentUser);
+      await _storage.prefs.setString('vc_staff_last_email', user.email);
+      notifyListeners();
+      return true;
+    }
     _currentUser = user;
     await _storage.saveSessionUser(_currentUser);
     await _storage.prefs.setString('vc_staff_last_email', user.email);
@@ -131,6 +159,17 @@ class AuthService extends ChangeNotifier {
   Future<bool> updatePassword(String newPassword) async {
     if (_currentUser == null) return false;
     if (newPassword.trim().isEmpty) return false;
+
+    if (isDemoMode) {
+      final updated = _currentUser!.copyWith(password: newPassword.trim());
+      _currentUser = updated;
+      final index = _demoUsers.indexWhere((u) => u.id == updated.id);
+      if (index != -1) {
+        _demoUsers[index] = updated;
+      }
+      notifyListeners();
+      return true;
+    }
 
     final updated = _currentUser!.copyWith(password: newPassword.trim());
     final index = _users.indexWhere((u) => u.id == updated.id);
@@ -165,6 +204,24 @@ class AuthService extends ChangeNotifier {
       cleanIg = cleanIg.substring(1);
     }
 
+    if (isDemoMode) {
+      final updated = _currentUser!.copyWith(
+        firstName: cleanFirst.isNotEmpty ? cleanFirst : _currentUser!.firstName,
+        lastName: cleanLast.isNotEmpty ? cleanLast : _currentUser!.lastName,
+        email: cleanEmail.isNotEmpty ? cleanEmail : _currentUser!.email,
+        phone: cleanPhone.isNotEmpty ? cleanPhone : _currentUser!.phone,
+        instagram: cleanIg,
+        photoUrl: photoUrl ?? _currentUser!.photoUrl,
+      );
+      _currentUser = updated;
+      final index = _demoUsers.indexWhere((u) => u.id == updated.id);
+      if (index != -1) {
+        _demoUsers[index] = updated;
+      }
+      notifyListeners();
+      return true;
+    }
+
     final updated = _currentUser!.copyWith(
       firstName: cleanFirst.isNotEmpty ? cleanFirst : _currentUser!.firstName,
       lastName: cleanLast.isNotEmpty ? cleanLast : _currentUser!.lastName,
@@ -191,6 +248,22 @@ class AuthService extends ChangeNotifier {
     required String userId,
     required String? photoUrl,
   }) async {
+    if (isDemoMode) {
+      final index = _demoUsers.indexWhere((u) => u.id == userId);
+      if (index == -1) return false;
+      final isRemoving = photoUrl == null || photoUrl.trim().isEmpty;
+      final updated = _demoUsers[index].copyWith(
+        photoUrl: isRemoving ? null : photoUrl.trim(),
+        clearPhoto: isRemoving,
+      );
+      _demoUsers[index] = updated;
+      if (_currentUser?.id == userId) {
+        _currentUser = updated;
+      }
+      notifyListeners();
+      return true;
+    }
+
     final index = _users.indexWhere((u) => u.id == userId);
     if (index == -1) return false;
 
@@ -228,6 +301,34 @@ class AuthService extends ChangeNotifier {
     _errorMessage = null;
     final cleanEmail = email.trim().toLowerCase();
     final cleanDoc = documentNumber.trim();
+
+    if (isDemoMode) {
+      if (_demoUsers.any((u) => u.email.trim().toLowerCase() == cleanEmail)) {
+        _errorMessage = 'Ya existe un usuario registrado con el email $cleanEmail.';
+        notifyListeners();
+        return false;
+      }
+      final rolesList = initialRoles.contains(AppRoles.miembro)
+          ? initialRoles
+          : [AppRoles.miembro, ...initialRoles];
+      final newUser = UserModel(
+        id: const Uuid().v4(),
+        email: cleanEmail,
+        password: cleanDoc,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        documentType: documentType.trim(),
+        documentNumber: cleanDoc,
+        birthDate: birthDate,
+        phone: phone.trim(),
+        photoUrl: photoUrl,
+        roles: rolesList,
+        createdAt: DateTime.now(),
+      );
+      _demoUsers.add(newUser);
+      notifyListeners();
+      return true;
+    }
 
     if (_users.any((u) => u.email.trim().toLowerCase() == cleanEmail)) {
       _errorMessage = 'Ya existe un usuario registrado con el email $cleanEmail.';
@@ -276,6 +377,21 @@ class AuthService extends ChangeNotifier {
       return false;
     }
 
+    if (isDemoMode) {
+      final index = _demoUsers.indexWhere((u) => u.id == userId);
+      if (index == -1) return false;
+      final cleanRoles = newRoles.contains(AppRoles.miembro)
+          ? newRoles
+          : [AppRoles.miembro, ...newRoles];
+      final updated = _demoUsers[index].copyWith(roles: cleanRoles);
+      _demoUsers[index] = updated;
+      if (_currentUser!.id == userId) {
+        _currentUser = updated;
+      }
+      notifyListeners();
+      return true;
+    }
+
     final index = _users.indexWhere((u) => u.id == userId);
     if (index == -1) return false;
 
@@ -301,6 +417,23 @@ class AuthService extends ChangeNotifier {
 
   /// Actualizar datos de perfil
   Future<bool> updateUserProfile(UserModel updatedUser) async {
+    if (isDemoMode) {
+      final index = _demoUsers.indexWhere((u) => u.id == updatedUser.id);
+      if (index == -1) return false;
+      final isRemovingPhoto =
+          updatedUser.photoUrl == null || updatedUser.photoUrl!.trim().isEmpty;
+      final normalizedUser = updatedUser.copyWith(
+        photoUrl: isRemovingPhoto ? null : updatedUser.photoUrl!.trim(),
+        clearPhoto: isRemovingPhoto,
+      );
+      _demoUsers[index] = normalizedUser;
+      if (_currentUser?.id == normalizedUser.id) {
+        _currentUser = normalizedUser;
+      }
+      notifyListeners();
+      return true;
+    }
+
     final index = _users.indexWhere((u) => u.id == updatedUser.id);
     if (index == -1) return false;
 
@@ -342,6 +475,48 @@ class AuthService extends ChangeNotifier {
     bool clearManualAttendance = false,
   }) async {
     _errorMessage = null;
+
+    if (isDemoMode) {
+      final index = _demoUsers.indexWhere((u) => u.id == userId);
+      if (index == -1) {
+        _errorMessage = 'Usuario no encontrado.';
+        notifyListeners();
+        return false;
+      }
+      final existing = _demoUsers[index];
+      final cleanEmail = email.trim().toLowerCase();
+      final cleanDoc = documentNumber.trim();
+      final bool docChanged = existing.documentNumber.trim() != cleanDoc;
+      final String passwordToSet = docChanged ? cleanDoc : existing.password;
+      List<String> cleanRoles = existing.roles;
+      if (roles != null) {
+        cleanRoles = roles.contains(AppRoles.miembro)
+            ? roles
+            : [AppRoles.miembro, ...roles];
+      }
+      final updated = existing.copyWith(
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: cleanEmail,
+        documentType: documentType.trim(),
+        documentNumber: cleanDoc,
+        password: passwordToSet,
+        phone: phone.trim(),
+        instagram: instagram?.trim(),
+        birthDate: birthDate ?? existing.birthDate,
+        photoUrl: photoUrl ?? existing.photoUrl,
+        roles: cleanRoles,
+        region: region != null && region.trim().isNotEmpty ? region.trim() : existing.region,
+        manualAttendanceCount: clearManualAttendance ? null : (manualAttendanceCount ?? existing.manualAttendanceCount),
+      );
+      _demoUsers[index] = updated;
+      if (_currentUser?.id == userId) {
+        _currentUser = updated;
+      }
+      notifyListeners();
+      return true;
+    }
+
     final index = _users.indexWhere((u) => u.id == userId);
     if (index == -1) {
       _errorMessage = 'Usuario no encontrado.';
@@ -410,6 +585,18 @@ class AuthService extends ChangeNotifier {
 
   /// Actualiza la región de un usuario (exclusivo para administración de equipo)
   Future<bool> updateUserRegion(String userId, String newRegion) async {
+    if (isDemoMode) {
+      final index = _demoUsers.indexWhere((u) => u.id == userId);
+      if (index == -1) return false;
+      final updated = _demoUsers[index].copyWith(region: newRegion);
+      _demoUsers[index] = updated;
+      if (_currentUser?.id == userId) {
+        _currentUser = updated;
+      }
+      notifyListeners();
+      return true;
+    }
+
     final index = _users.indexWhere((u) => u.id == userId);
     if (index == -1) return false;
     final updated = _users[index].copyWith(region: newRegion);
@@ -426,6 +613,20 @@ class AuthService extends ChangeNotifier {
 
   /// Actualiza o limpia el ajuste manual de asistencias de un usuario
   Future<bool> updateUserManualAttendance(String userId, int? attendanceCount) async {
+    if (isDemoMode) {
+      final index = _demoUsers.indexWhere((u) => u.id == userId);
+      if (index == -1) return false;
+      final updated = _demoUsers[index].copyWith(
+        manualAttendanceCount: attendanceCount,
+      );
+      _demoUsers[index] = updated;
+      if (_currentUser?.id == userId) {
+        _currentUser = updated;
+      }
+      notifyListeners();
+      return true;
+    }
+
     final index = _users.indexWhere((u) => u.id == userId);
     if (index == -1) return false;
     final updated = _users[index].copyWith(
@@ -446,6 +647,25 @@ class AuthService extends ChangeNotifier {
   /// El superadmin del sistema no puede ser eliminado bajo ninguna circunstancia.
   Future<bool> deleteUser(String userId) async {
     _errorMessage = null;
+
+    if (isDemoMode) {
+      final index = _demoUsers.indexWhere((u) => u.id == userId);
+      if (index == -1) {
+        _errorMessage = 'Usuario no encontrado.';
+        notifyListeners();
+        return false;
+      }
+      final userToDelete = _demoUsers[index];
+      if (userToDelete.isSuperAdmin || userToDelete.id == DemoData.demoUserId) {
+        _errorMessage = 'No se puede eliminar la cuenta de Superadmin demo.';
+        notifyListeners();
+        return false;
+      }
+      _demoUsers.removeAt(index);
+      notifyListeners();
+      return true;
+    }
+
     final index = _users.indexWhere((u) => u.id == userId);
     if (index == -1) {
       _errorMessage = 'Usuario no encontrado.';

@@ -6,6 +6,7 @@ import '../models/user_model.dart';
 import '../models/event_model.dart';
 import '../models/case_model.dart';
 import 'storage_service.dart';
+import 'demo_data.dart';
 
 class FirestoreSyncService {
   final StorageService _storage;
@@ -18,6 +19,7 @@ class FirestoreSyncService {
   VoidCallback? onUsersUpdated;
   VoidCallback? onEventsUpdated;
   VoidCallback? onCasesUpdated;
+  bool Function()? isDemoMode;
 
   bool _initialized = false;
 
@@ -56,6 +58,7 @@ class FirestoreSyncService {
   void _listenToUsers() {
     _usersSub = _firestore.collection('users').snapshots().listen(
       (snapshot) async {
+        if (isDemoMode?.call() == true) return;
         final localUsers = _storage.loadUsers();
         final userMap = {for (var u in localUsers) u.id: u};
         bool changed = false;
@@ -111,6 +114,7 @@ class FirestoreSyncService {
   void _listenToEvents() {
     _eventsSub = _firestore.collection('events').snapshots().listen(
       (snapshot) async {
+        if (isDemoMode?.call() == true) return;
         final localEvents = _storage.loadEvents();
         final eventMap = {for (var e in localEvents) e.id: e};
         bool changed = false;
@@ -159,6 +163,7 @@ class FirestoreSyncService {
   void _listenToCases() {
     _casesSub = _firestore.collection('cases').snapshots().listen(
       (snapshot) async {
+        if (isDemoMode?.call() == true) return;
         final localCases = _storage.loadCases();
         final caseMap = {for (var c in localCases) c.id: c};
         bool changed = false;
@@ -206,6 +211,11 @@ class FirestoreSyncService {
   // --- ESCRITURAS HACIA LA NUBE (OFFLINE RESILIENT) ---
 
   Future<bool> syncUser(UserModel user) async {
+    if (isDemoMode?.call() == true ||
+        user.id == DemoData.demoUserId ||
+        user.id.startsWith('demo_')) {
+      return true;
+    }
     try {
       await _firestore
           .collection('users')
@@ -219,6 +229,11 @@ class FirestoreSyncService {
   }
 
   Future<bool> deleteUser(String userId) async {
+    if (isDemoMode?.call() == true ||
+        userId == DemoData.demoUserId ||
+        userId.startsWith('demo_')) {
+      return true;
+    }
     try {
       await _firestore.collection('users').doc(userId).delete();
       return true;
@@ -229,6 +244,9 @@ class FirestoreSyncService {
   }
 
   Future<bool> syncEvent(EventModel event) async {
+    if (isDemoMode?.call() == true || event.id.startsWith('demo_')) {
+      return true;
+    }
     try {
       await _firestore
           .collection('events')
@@ -242,6 +260,9 @@ class FirestoreSyncService {
   }
 
   Future<bool> deleteEvent(String eventId) async {
+    if (isDemoMode?.call() == true || eventId.startsWith('demo_')) {
+      return true;
+    }
     try {
       await _firestore.collection('events').doc(eventId).delete();
       return true;
@@ -252,6 +273,9 @@ class FirestoreSyncService {
   }
 
   Future<bool> syncCase(CaseModel caseItem) async {
+    if (isDemoMode?.call() == true || caseItem.id.startsWith('demo_')) {
+      return true;
+    }
     try {
       await _firestore
           .collection('cases')
@@ -266,6 +290,7 @@ class FirestoreSyncService {
 
   // --- SINCRONIZACIÓN FORZADA / ON DEMAND ---
   Future<bool> forceSyncAll() async {
+    if (isDemoMode?.call() == true) return true;
     try {
       bool allSent = true;
       // 1. Enviar locales a la nube
@@ -355,6 +380,7 @@ class FirestoreSyncService {
 
   // --- SEED INICIAL EN FIRESTORE Y LIMPIEZA DE DEMOS ---
   Future<void> _seedCloudIfEmpty() async {
+    if (isDemoMode?.call() == true) return;
     try {
       // Limpiar documentos demo residuales en la nube si existiesen
       try {

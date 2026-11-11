@@ -64,6 +64,115 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
         edit_id = edit_res["id"]
         print(f"Edit Session Created: {edit_id}")
 
+        if package_name == "com.omniverselabs.cancel_guard":
+            store_dir = r"c:\Projects\Omniverse Labs\apps\cancel_guard\store_assets\play_store"
+            icon_path = os.path.join(store_dir, "icon_512x512.png")
+            feature_path = os.path.join(store_dir, "feature_graphic_1024x500.jpg")
+
+            try:
+                print("Updating Store Listing for CancelGuard...")
+                edits.listings().update(
+                    packageName=package_name,
+                    editId=edit_id,
+                    language="en-US",
+                    body={
+                        "title": "CancelGuard: Trial Alerts",
+                        "shortDescription": "Stop paying for forgotten free trials. 100% offline, zero ads, 48h alerts.",
+                        "fullDescription": (
+                            "Pay $1.49 once. Stop losing $30+ to forgotten free trials.\n\n"
+                            "Most subscription trackers want a monthly fee or your bank login just to remind you to cancel. CancelGuard is the opposite: a fast, 100% offline, single-purchase utility that pays for itself the very first time you dodge an unwanted charge.\n\n"
+                            "WHY CANCELGUARD?\n"
+                            "• Instant ROI, Zero Subscriptions: Pay once, own it forever. No recurring fees, no locked pro tiers, no ads—a subscription blocker that never charges you a subscription.\n"
+                            "• Automatic 48h & 24h \"Cancel By\" Alerts: Dual-stage local alarms warn you before a 7-day, 14-day, 30-day trial or annual renewal hits your card (customizable to 24h, 48h, 72h, or 7 days).\n"
+                            "• 1-Tap Cancel Escape Hatch: Don't hunt through buried account menus. Tap your notification and use Open Cancel Link to jump straight to Google Play Subscriptions or your saved service cancellation page.\n"
+                            "• ROI Trophy & Saved Ledger: Every time you tap Mark Cancelled, CancelGuard banks the dodged amount into your Total Saved counter and tracks your ROI multiplier.\n"
+                            "• 10-Second Entry: Built-in quick presets (Netflix, Spotify, Adobe CC, ChatGPT, YouTube, Google One, Gym) plus custom entries, multi-currency symbols ($, €, £, R$, ARS$), and instant English/Spanish toggle.\n"
+                            "• 100% Offline & Zero Tracking: No accounts, no bank connections, no cloud servers, and zero analytics SDKs. Your financial reminders never leave your phone."
+                        ),
+                    }
+                ).execute()
+
+                edits.listings().update(
+                    packageName=package_name,
+                    editId=edit_id,
+                    language="es-419",
+                    body={
+                        "title": "CancelGuard: Pruebas & Subs",
+                        "shortDescription": "Evita cobros por pruebas olvidadas. 100% offline, sin anuncios, alertas 48h.",
+                        "fullDescription": (
+                            "Paga una sola vez y deja de perder dinero en pruebas gratuitas olvidadas.\n\n"
+                            "La mayoría de las apps de suscripciones te cobran una cuota mensual o te piden vincular tu banco. CancelGuard hace lo contrario: una herramienta ultrarrápida, 100% offline y de pago único que se paga sola la primera vez que evitas un cobro inesperado.\n\n"
+                            "¿POR QUÉ CANCELGUARD?\n"
+                            "• Retorno inmediato, cero suscripciones: Paga una vez, úsala para siempre. Sin mensualidades, sin anuncios ni cuentas obligatorias.\n"
+                            "• Alertas automáticas 48h y 24h antes: Recordatorios locales en tu teléfono antes de que una prueba de 7, 14 o 30 días o una renovación anual se cobre en tu tarjeta (personalizable a 24h, 48h, 72h o 7 días).\n"
+                            "• Link de Baja en 1 Toque (Escape Hatch): Toca tu alerta y abre directamente Google Play Suscripciones o el enlace de cancelación del servicio sin perder tiempo buscando menús.\n"
+                            "• Trofeo ROI de Ahorro: Al tocar Marcar Cancelada, el monto evitado se suma a tu contador Total Ahorrado para mostrar cuánto recuperaste.\n"
+                            "• Carga en 10 Segundos: Atajos rápidos (Netflix, Spotify, Adobe CC, ChatGPT, YouTube, Google One, Gimnasio), selector de moneda ($, €, £, R$, ARS$) e idioma Español/Inglés.\n"
+                            "• 100% Offline y Privado: Sin servidores, sin acceso bancario y sin rastreadores. Tus datos nunca salen de tu dispositivo."
+                        ),
+                    }
+                ).execute()
+                print("CancelGuard Store Listings Updated (en-US & es-419)!")
+            except Exception as e:
+                print(f"CancelGuard Listing notice: {e}")
+
+            for lang in ["en-US", "es-419"]:
+                if os.path.exists(icon_path):
+                    try:
+                        edits.images().upload(
+                            packageName=package_name,
+                            editId=edit_id,
+                            language=lang,
+                            imageType="icon",
+                            media_body=MediaFileUpload(icon_path, mimetype="image/png")
+                        ).execute()
+                        print(f"CancelGuard Icon updated for {lang}")
+                    except Exception as e:
+                        print(f"CancelGuard Icon notice ({lang}): {e}")
+
+                if os.path.exists(feature_path):
+                    try:
+                        edits.images().upload(
+                            packageName=package_name,
+                            editId=edit_id,
+                            language=lang,
+                            imageType="featureGraphic",
+                            media_body=MediaFileUpload(feature_path, mimetype="image/jpeg")
+                        ).execute()
+                        print(f"CancelGuard Feature Graphic updated for {lang}")
+                    except Exception as e:
+                        print(f"CancelGuard Feature Graphic notice ({lang}): {e}")
+
+                try:
+                    edits.images().deleteall(
+                        packageName=package_name,
+                        editId=edit_id,
+                        language=lang,
+                        imageType="phoneScreenshots"
+                    ).execute()
+                except Exception:
+                    pass
+
+                for ss_name in [
+                    "screenshot_01_vault.png",
+                    "screenshot_02_quick_add.png",
+                    "screenshot_03_escape_hatch.png",
+                    "screenshot_04_roi_history.png",
+                ]:
+                    ss_file = os.path.join(store_dir, ss_name)
+                    if os.path.exists(ss_file):
+                        try:
+                            edits.images().upload(
+                                packageName=package_name,
+                                editId=edit_id,
+                                language=lang,
+                                imageType="phoneScreenshots",
+                                media_body=MediaFileUpload(ss_file, mimetype="image/png")
+                            ).execute()
+                            print(f"CancelGuard Screenshot {ss_name} updated for {lang}")
+                        except Exception as e:
+                            print(f"CancelGuard Screenshot notice ({lang}): {e}")
+
         if package_name == "com.omniverselabs.empacarte":
             icon_path = r"c:\Projects\Omniverse Labs\apps\empacarte\assets\images\store\app_icon_512x512.png"
             feature_path = r"c:\Projects\Omniverse Labs\apps\empacarte\assets\images\store\feature_graphic_1024x500.jpg"
@@ -726,6 +835,341 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
             else:
                 raise e
 
+        if package_name == "com.omniverselabs.cancel_guard":
+            store_dir = r"c:\Projects\Omniverse Labs\apps\cancel_guard\store_assets\play_store"
+            icon_path = os.path.join(store_dir, "icon_512x512.png")
+            feature_path = os.path.join(store_dir, "feature_graphic_1024x500.jpg")
+
+            try:
+                print("Updating Store Listing for CancelGuard...")
+                edits.listings().update(
+                    packageName=package_name,
+                    editId=edit_id,
+                    language="en-US",
+                    body={
+                        "title": "CancelGuard: Trial Alerts",
+                        "shortDescription": "Stop paying for forgotten free trials. 100% offline, zero ads, 48h alerts.",
+                        "fullDescription": (
+                            "Pay $1.49 once. Stop losing $30+ to forgotten free trials.\n\n"
+                            "Most subscription trackers want a monthly fee or your bank login just to remind you to cancel. CancelGuard is the opposite: a fast, 100% offline, single-purchase utility that pays for itself the very first time you dodge an unwanted charge.\n\n"
+                            "WHY CANCELGUARD?\n"
+                            "• Instant ROI, Zero Subscriptions: Pay once, own it forever. No recurring fees, no locked pro tiers, no ads—a subscription blocker that never charges you a subscription.\n"
+                            "• Automatic 48h & 24h \"Cancel By\" Alerts: Dual-stage local alarms warn you before a 7-day, 14-day, 30-day trial or annual renewal hits your card (customizable to 24h, 48h, 72h, or 7 days).\n"
+                            "• 1-Tap Cancel Escape Hatch: Don't hunt through buried account menus. Tap your notification and use Open Cancel Link to jump straight to Google Play Subscriptions or your saved service cancellation page.\n"
+                            "• ROI Trophy & Saved Ledger: Every time you tap Mark Cancelled, CancelGuard banks the dodged amount into your Total Saved counter and tracks your ROI multiplier.\n"
+                            "• 10-Second Entry: Built-in quick presets (Netflix, Spotify, Adobe CC, ChatGPT, YouTube, Google One, Gym) plus custom entries, multi-currency symbols ($, €, £, R$, ARS$), and instant English/Spanish toggle.\n"
+                            "• 100% Offline & Zero Tracking: No accounts, no bank connections, no cloud servers, and zero analytics SDKs. Your financial reminders never leave your phone."
+                        ),
+                    }
+                ).execute()
+
+                edits.listings().update(
+                    packageName=package_name,
+                    editId=edit_id,
+                    language="es-419",
+                    body={
+                        "title": "CancelGuard: Pruebas & Subs",
+                        "shortDescription": "Evita cobros por pruebas olvidadas. 100% offline, sin anuncios, alertas 48h.",
+                        "fullDescription": (
+                            "Paga una sola vez y deja de perder dinero en pruebas gratuitas olvidadas.\n\n"
+                            "La mayoría de las apps de suscripciones te cobran una cuota mensual o te piden vincular tu banco. CancelGuard hace lo contrario: una herramienta ultrarrápida, 100% offline y de pago único que se paga sola la primera vez que evitas un cobro inesperado.\n\n"
+                            "¿POR QUÉ CANCELGUARD?\n"
+                            "• Retorno inmediato, cero suscripciones: Paga una vez, úsala para siempre. Sin mensualidades, sin anuncios ni cuentas obligatorias.\n"
+                            "• Alertas automáticas 48h y 24h antes: Recordatorios locales en tu teléfono antes de que una prueba de 7, 14 o 30 días o una renovación anual se cobre en tu tarjeta (personalizable a 24h, 48h, 72h o 7 días).\n"
+                            "• Link de Baja en 1 Toque (Escape Hatch): Toca tu alerta y abre directamente Google Play Suscripciones o el enlace de cancelación del servicio sin perder tiempo buscando menús.\n"
+                            "• Trofeo ROI de Ahorro: Al tocar Marcar Cancelada, el monto evitado se suma a tu contador Total Ahorrado para mostrar cuánto recuperaste.\n"
+                            "• Carga en 10 Segundos: Atajos rápidos (Netflix, Spotify, Adobe CC, ChatGPT, YouTube, Google One, Gimnasio), selector de moneda ($, €, £, R$, ARS$) e idioma Español/Inglés.\n"
+                            "• 100% Offline y Privado: Sin servidores, sin acceso bancario y sin rastreadores. Tus datos nunca salen de tu dispositivo."
+                        ),
+                    }
+                ).execute()
+                print("CancelGuard Store Listings Updated (en-US & es-419)!")
+            except Exception as e:
+                print(f"CancelGuard Listing notice: {e}")
+
+            for lang in ["en-US", "es-419"]:
+                if os.path.exists(icon_path):
+                    try:
+                        edits.images().upload(
+                            packageName=package_name,
+                            editId=edit_id,
+                            language=lang,
+                            imageType="icon",
+                            media_body=MediaFileUpload(icon_path, mimetype="image/png")
+                        ).execute()
+                        print(f"CancelGuard Icon updated for {lang}")
+                    except Exception as e:
+                        print(f"CancelGuard Icon notice ({lang}): {e}")
+
+                if os.path.exists(feature_path):
+                    try:
+                        edits.images().upload(
+                            packageName=package_name,
+                            editId=edit_id,
+                            language=lang,
+                            imageType="featureGraphic",
+                            media_body=MediaFileUpload(feature_path, mimetype="image/jpeg")
+                        ).execute()
+                        print(f"CancelGuard Feature Graphic updated for {lang}")
+                    except Exception as e:
+                        print(f"CancelGuard Feature Graphic notice ({lang}): {e}")
+
+                try:
+                    edits.images().deleteall(
+                        packageName=package_name,
+                        editId=edit_id,
+                        language=lang,
+                        imageType="phoneScreenshots"
+                    ).execute()
+                except Exception:
+                    pass
+
+                for ss_name in [
+                    "screenshot_01_vault.png",
+                    "screenshot_02_quick_add.png",
+                    "screenshot_03_escape_hatch.png",
+                    "screenshot_04_roi_history.png",
+                ]:
+                    ss_file = os.path.join(store_dir, ss_name)
+                    if os.path.exists(ss_file):
+                        try:
+                            edits.images().upload(
+                                packageName=package_name,
+                                editId=edit_id,
+                                language=lang,
+                                imageType="phoneScreenshots",
+                                media_body=MediaFileUpload(ss_file, mimetype="image/png")
+                            ).execute()
+                            print(f"CancelGuard Screenshot {ss_name} updated for {lang}")
+                        except Exception as e:
+                            print(f"CancelGuard Screenshot notice ({lang}): {e}")
+
+        elif package_name == "com.omniverselabs.pulse_pocket":
+            store_dir = r"c:\Projects\Omniverse Labs\apps\pulse_pocket\store_assets\play_store"
+            icon_path = os.path.join(store_dir, "icon_512x512.png")
+            feature_path = os.path.join(store_dir, "feature_graphic_1024x500.jpg")
+
+            try:
+                print("Updating Store Listing for PulsePocket...")
+                edits.listings().update(
+                    packageName=package_name,
+                    editId=edit_id,
+                    language="en-US",
+                    body={
+                        "title": "PulsePocket: Silent Metronome",
+                        "shortDescription": "Silent haptic pocket metronome with tap tempo, Pocket Lock & setlists.",
+                        "fullDescription": (
+                            "Keep locked into the groove — with zero click bleed into stage mics.\n\n"
+                            "PulsePocket is a purpose-built, 100% offline silent metronome and tap-tempo console for drummers, acoustic guitarists, worship bands, vocalists, and pit musicians. Pay $1.49 once and own a distraction-free stage utility forever — no subscriptions, no ads, and no accounts.\n\n"
+                            "WHY MUSICIANS USE PULSEPOCKET\n"
+                            "• Strictly Silent Haptic Engine: Zero audio engine means zero accidental click sound bleeding into condenser mics, live recordings, or quiet acoustic rooms.\n"
+                            "• 3-Level Haptic Strength Calibration: Tune motor output between Normal, Strong, and Stage Max with distinct accent weight on Beat 1 — feel every bar clearly in your pocket or holster.\n"
+                            "• Pocket Lock Blackout Guard: One tap dims the display to pure OLED black and blocks stray pocket or fabric touches while keeping your screen wakelock and rhythm engine running. Hold anywhere for 1.2s to unlock.\n"
+                            "• Instant Tap Tempo: Large stage-ready touch pad calculates your rolling BPM in 2+ taps across 30–260 BPM.\n"
+                            "• 1-Tap Setlist Slots: Save up to 12 song presets (name, BPM, meter) and jump between tracks in one tap mid-set. Supports 2/4, 3/4, 4/4, 5/4, 6/8, and 7/8.\n"
+                            "• Dark Stage & Light Modes: High-contrast Dark OLED stage mode and crisp Light rehearsal mode in English and Spanish.\n\n"
+                            "PRIVATE BY DESIGN — WORKS IN AIRPLANE MODE\n"
+                            "PulsePocket requires zero accounts, collects zero analytics or telemetry, and stores all setlists locally on your device."
+                        ),
+                    }
+                ).execute()
+
+                edits.listings().update(
+                    packageName=package_name,
+                    editId=edit_id,
+                    language="es-419",
+                    body={
+                        "title": "PulsePocket: Metrónomo Háptico",
+                        "shortDescription": "Metrónomo háptico silencioso con tap tempo, bloqueo de bolsillo y setlists.",
+                        "fullDescription": (
+                            "Mantén el pulso exacto sin filtrar ruido de clic en tus micrófonos.\n\n"
+                            "PulsePocket es un metrónomo silencioso y tap-tempo 100% fuera de línea diseñado para bateristas, guitarristas acústicos, vocalistas y músicos en vivo. Paga una sola vez y ten una herramienta de escenario para siempre: sin suscripciones, sin anuncios y sin cuentas.\n\n"
+                            "CARACTERÍSTICAS PRINCIPALES\n"
+                            "• Motor Háptico 100% Silencioso: Sin motor de audio para garantizar cero filtraciones en micrófonos de estudio o presentaciones acústicas.\n"
+                            "• Calibración de 3 Niveles: Elige intensidad Normal, Fuerte o Escenario con acento diferenciado en el tiempo 1 del compás.\n"
+                            "• Bloqueo de Bolsillo (Pocket Lock): Oscurece la pantalla a negro OLED y bloquea toques accidentales en tu bolsillo manteniendo activos la vibración y el bloqueo de reposo. Mantén presionado 1.2s para desbloquear.\n"
+                            "• Tap Tempo Instantáneo: Panel amplio de escenario para calcular BPM al instante entre 30 y 260 BPM.\n"
+                            "• Setlist en 1 Toque: Guarda hasta 12 canciones (nombre, BPM y compás: 2/4, 3/4, 4/4, 5/4, 6/8 y 7/8) para saltar entre temas en vivo.\n"
+                            "• Modo Oscuro OLED y Claro + Español/Inglés.\n\n"
+                            "PRIVACIDAD TOTAL — FUNCIONA EN MODO AVIÓN\n"
+                            "Cero cuentas, cero servidores y cero analíticas. Todo tu setlist permanece guardado exclusivamente en tu dispositivo."
+                        ),
+                    }
+                ).execute()
+                print("PulsePocket Store Listings Updated (en-US & es-419)!")
+            except Exception as e:
+                print(f"PulsePocket Listing notice: {e}")
+
+            for lang in ["en-US", "es-419"]:
+                if os.path.exists(icon_path):
+                    try:
+                        edits.images().upload(
+                            packageName=package_name,
+                            editId=edit_id,
+                            language=lang,
+                            imageType="icon",
+                            media_body=MediaFileUpload(icon_path, mimetype="image/png")
+                        ).execute()
+                        print(f"PulsePocket Icon updated for {lang}")
+                    except Exception as e:
+                        print(f"PulsePocket Icon notice ({lang}): {e}")
+
+                if os.path.exists(feature_path):
+                    try:
+                        edits.images().upload(
+                            packageName=package_name,
+                            editId=edit_id,
+                            language=lang,
+                            imageType="featureGraphic",
+                            media_body=MediaFileUpload(feature_path, mimetype="image/jpeg")
+                        ).execute()
+                        print(f"PulsePocket Feature Graphic updated for {lang}")
+                    except Exception as e:
+                        print(f"PulsePocket Feature Graphic notice ({lang}): {e}")
+
+                try:
+                    edits.images().deleteall(
+                        packageName=package_name,
+                        editId=edit_id,
+                        language=lang,
+                        imageType="phoneScreenshots"
+                    ).execute()
+                except Exception:
+                    pass
+
+                for ss_name in [
+                    "screenshot_01_stage_console.png",
+                    "screenshot_02_pocket_lock.png",
+                    "screenshot_03_setlist_slots.png",
+                    "screenshot_04_settings_haptics.png",
+                ]:
+                    ss_file = os.path.join(store_dir, ss_name)
+                    if os.path.exists(ss_file):
+                        try:
+                            edits.images().upload(
+                                packageName=package_name,
+                                editId=edit_id,
+                                language=lang,
+                                imageType="phoneScreenshots",
+                                media_body=MediaFileUpload(ss_file, mimetype="image/png")
+                            ).execute()
+                            print(f"PulsePocket Screenshot {ss_name} updated for {lang}")
+                        except Exception as e:
+                            print(f"PulsePocket Screenshot notice ({lang}): {e}")
+
+        elif package_name == "com.omniverselabs.loud_guard":
+            store_dir = r"c:\Projects\Omniverse Labs\apps\loud_guard\store_assets\play_store"
+            icon_path = os.path.join(store_dir, "icon_512x512.png")
+            feature_path = os.path.join(store_dir, "feature_graphic_1024x500.jpg")
+
+            try:
+                print("Updating Store Listing for LoudGuard...")
+                edits.listings().update(
+                    packageName=package_name,
+                    editId=edit_id,
+                    language="en-US",
+                    body={
+                        "title": "LoudGuard: Offline dB Meter",
+                        "shortDescription": "Offline decibel meter & WHO safe-exposure timer. Zero ads, zero recording.",
+                        "fullDescription": (
+                            "Measure sound levels anywhere — with zero ads, zero accounts, and zero audio recording.\n\n"
+                            "LoudGuard is a 100% offline decibel (dB) meter and hearing-safety exposure timer built for concerts, rehearsals, nurseries, workshops, classrooms, and quiet spaces. Pay $1.49 once and own a distraction-free acoustic utility forever — no subscriptions, no pop-up ads, and no cloud uploads.\n\n"
+                            "WHY LOUDGUARD?\n"
+                            "• RAM-Only Live Decibel Meter: Measures real-time dB SPL (Current, Min, Avg, and Peak) with a live rolling sparkline and color-coded safety zones. Audio buffers stay strictly in temporary memory and are never recorded or saved to disk.\n"
+                            "• WHO / NIOSH Safe-Exposure Timer: Translates raw decibels into practical hearing safety (85 dB = 8h limit, 94 dB = 1h limit, 100 dB = 15m limit) and tracks cumulative Daily Noise Dose % across your session.\n"
+                            "• Silent Haptic Threshold Alerts: Set a ceiling (85 dB, 90 dB, or 95 dB) to feel a subtle pocket vibration when a venue or machine enters damaging levels.\n"
+                            "• Custom Mic Calibration: Fine-tune offset from -15.0 dB to +15.0 dB in 0.5 dB steps to match reference SPL hardware.\n"
+                            "• Offline Check Snapshots: Save timestamped Avg & Peak dB readings locally (Nursery, Concert, Rehearsal, Workshop, Office) with zero cloud sync.\n"
+                            "• Dark & Light Modes + Bilingual UI: High-contrast OLED Dark mode and crisp Light mode in English and Spanish.\n\n"
+                            "PRIVATE BY DESIGN — ZERO INTERNET PERMISSION\n"
+                            "LoudGuard uses no analytics SDKs, creates no audio files, and requires zero network access. Check sound levels in airplane mode, basements, studios, and festivals with total privacy."
+                        ),
+                    }
+                ).execute()
+
+                edits.listings().update(
+                    packageName=package_name,
+                    editId=edit_id,
+                    language="es-419",
+                    body={
+                        "title": "LoudGuard: Sonómetro Offline",
+                        "shortDescription": "Sonómetro offline y temporizador seguro WHO. Sin anuncios ni grabaciones.",
+                        "fullDescription": (
+                            "Mide el nivel de sonido en cualquier lugar — sin anuncios, sin cuentas y sin grabar audio.\n\n"
+                            "LoudGuard es un medidor de decibelios (dB) y temporizador de exposición segura 100% fuera de línea pensado para recitales, ensayos, cuartos de bebé, talleres y espacios de trabajo. Paga $1.49 una sola vez y ten una herramienta acústica limpia para siempre: sin suscripciones ni servidores.\n\n"
+                            "¿POR QUÉ LOUDGUARD?\n"
+                            "• Sonómetro en Vivo Solo en RAM: Mide dB SPL en tiempo real (Actual, Mínimo, Promedio y Pico) con gráfico dinámico y zonas de seguridad por color. El audio se procesa únicamente en memoria temporal y nunca se graba ni guarda en disco.\n"
+                            "• Exposición Segura WHO / NIOSH: Convierte los decibelios en tiempo seguro real (85 dB = 8h, 94 dB = 1h, 100 dB = 15m) y calcula tu porcentaje de dosis diaria acumulada.\n"
+                            "• Alertas Hápticas Silenciosas: Elige un umbral (85 dB, 90 dB o 95 dB) para sentir una vibración sutil cuando el ruido cruce niveles de riesgo.\n"
+                            "• Calibración de Micrófono: Ajusta el desplazamiento entre -15.0 dB y +15.0 dB en pasos de 0.5 dB.\n"
+                            "• Historial de Mediciones Offline: Guarda capturas locales con etiqueta (Cuarto bebé, Concierto, Ensayo, Taller, Oficina) sin sincronización en la nube.\n"
+                            "• Modo Oscuro OLED y Claro + Español/Inglés.\n\n"
+                            "PRIVACIDAD TOTAL — SIN PERMISO DE INTERNET\n"
+                            "Cero analíticas, cero archivos de audio y cero conexión requerida. Funciona incluso en modo avión."
+                        ),
+                    }
+                ).execute()
+                print("LoudGuard Store Listings Updated (en-US & es-419)!")
+            except Exception as e:
+                print(f"LoudGuard Listing notice: {e}")
+
+            for lang in ["en-US", "es-419"]:
+                if os.path.exists(icon_path):
+                    try:
+                        edits.images().upload(
+                            packageName=package_name,
+                            editId=edit_id,
+                            language=lang,
+                            imageType="icon",
+                            media_body=MediaFileUpload(icon_path, mimetype="image/png")
+                        ).execute()
+                        print(f"LoudGuard Icon updated for {lang}")
+                    except Exception as e:
+                        print(f"LoudGuard Icon notice ({lang}): {e}")
+
+                if os.path.exists(feature_path):
+                    try:
+                        edits.images().upload(
+                            packageName=package_name,
+                            editId=edit_id,
+                            language=lang,
+                            imageType="featureGraphic",
+                            media_body=MediaFileUpload(feature_path, mimetype="image/jpeg")
+                        ).execute()
+                        print(f"LoudGuard Feature Graphic updated for {lang}")
+                    except Exception as e:
+                        print(f"LoudGuard Feature Graphic notice ({lang}): {e}")
+
+                try:
+                    edits.images().deleteall(
+                        packageName=package_name,
+                        editId=edit_id,
+                        language=lang,
+                        imageType="phoneScreenshots"
+                    ).execute()
+                except Exception:
+                    pass
+
+                for ss_name in [
+                    "screenshot_01_sound_console.png",
+                    "screenshot_02_safe_exposure.png",
+                    "screenshot_03_saved_checks.png",
+                    "screenshot_04_settings_calibration.png",
+                ]:
+                    ss_file = os.path.join(store_dir, ss_name)
+                    if os.path.exists(ss_file):
+                        try:
+                            edits.images().upload(
+                                packageName=package_name,
+                                editId=edit_id,
+                                language=lang,
+                                imageType="phoneScreenshots",
+                                media_body=MediaFileUpload(ss_file, mimetype="image/png")
+                            ).execute()
+                            print(f"LoudGuard Screenshot {ss_name} updated for {lang}")
+                        except Exception as e:
+                            print(f"LoudGuard Screenshot notice ({lang}): {e}")
+
         if package_name == "com.omniverselabs.empacarte":
             rel_name = release_name or f"1.0.0 (Build {version_code})"
             rel_notes_es = notes_es or "Lanzamiento inicial de EmpacArte: El arte de empacar con pasaporte táctil, sellos consulares, tarjetas de embarque y 6 idiomas."
@@ -745,6 +1189,18 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
             rel_notes_pt = "Sensacao tatil de baralho fisico, harmonizacao de controles e calibracao visual nos decks."
             rel_notes_fr = "Profondeur tactile de jeu de cartes, harmonisation des commandes et calibrage visuel des paquets."
             rel_notes_it = "Sensazione tattile del mazzo di carte fisico, armonizzazione dei controlli e calibrazione visiva dei mazzi."
+        elif package_name == "com.omniverselabs.cancel_guard":
+            rel_name = release_name or f"1.0.0 (Build {version_code})"
+            rel_notes_es = notes_es or "Lanzamiento inicial de CancelGuard: alertas locales 48h y 24h antes del cobro, link de cancelación en 1 toque y contador ROI 100% offline."
+            rel_notes_en = notes_en or "Initial release of CancelGuard: 48h & 24h local Cancel-By alerts, 1-tap Cancel Escape Hatch, and 100% offline ROI savings tracker."
+        elif package_name == "com.omniverselabs.pulse_pocket":
+            rel_name = release_name or f"1.0.0 (Build {version_code})"
+            rel_notes_es = notes_es or "Lanzamiento inicial de PulsePocket: metrónomo háptico 100% silencioso, Tap Tempo, Pocket Lock OLED y Setlist Slots en 1 toque."
+            rel_notes_en = notes_en or "Initial release of PulsePocket: 100% silent haptic metronome, Tap Tempo, Pocket Lock OLED guard, and 1-tap Setlist Slots."
+        elif package_name == "com.omniverselabs.loud_guard":
+            rel_name = release_name or f"1.0.0 (Build {version_code})"
+            rel_notes_es = notes_es or "Lanzamiento inicial de LoudGuard: sonómetro 100% offline en memoria RAM, temporizador de exposición segura WHO/NIOSH, alertas hápticas de umbral, calibración de micrófono e historial local."
+            rel_notes_en = notes_en or "Initial release of LoudGuard: 100% offline RAM-only decibel meter, WHO/NIOSH safe-exposure timer, silent haptic threshold alerts, mic calibration, and local check logs."
         else:
             rel_name = release_name or f"1.2.16 (Build {version_code})"
             rel_notes_es = notes_es or "Protección de modo desarrollador, política de privacidad integrada, opción de eliminación completa de datos y mejoras de rendimiento."

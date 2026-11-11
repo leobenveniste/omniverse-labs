@@ -7,27 +7,60 @@ import '../models/event_unified_report.dart';
 import '../models/user_model.dart';
 import 'storage_service.dart';
 import 'firestore_sync_service.dart';
+import 'auth_service.dart';
+import 'demo_data.dart';
 
 class EventService extends ChangeNotifier {
   final StorageService _storage;
   final FirestoreSyncService? firestoreSync;
+  final AuthService? authService;
   List<EventModel> _events = [];
+  List<EventModel> _demoEvents = [];
 
-  EventService(this._storage, {this.firestoreSync}) {
+  EventService(
+    this._storage, {
+    this.firestoreSync,
+    this.authService,
+  }) {
     _events = _storage.loadEvents();
+    _demoEvents = DemoData.getDemoEvents();
+    authService?.addListener(_onAuthChanged);
+  }
+
+  void _onAuthChanged() {
+    if (isDemoMode && _demoEvents.isEmpty) {
+      _demoEvents = DemoData.getDemoEvents();
+    }
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    authService?.removeListener(_onAuthChanged);
+    super.dispose();
+  }
+
+  bool get isDemoMode => authService?.isDemoMode ?? false;
+
+  void resetDemoData() {
+    _demoEvents = DemoData.getDemoEvents();
+    notifyListeners();
   }
 
   /// Recarga eventos cuando Firestore detecta cambios remotos
   void reloadEventsFromStorage() {
+    if (isDemoMode) return;
     _events = _storage.loadEvents();
     notifyListeners();
   }
 
-  List<EventModel> get events => List.unmodifiable(_events);
+  List<EventModel> get events =>
+      List.unmodifiable(isDemoMode ? _demoEvents : _events);
 
   EventModel? getEventById(String id) {
     try {
-      return _events.firstWhere((e) => e.id == id);
+      final list = isDemoMode ? _demoEvents : _events;
+      return list.firstWhere((e) => e.id == id);
     } catch (_) {
       return null;
     }
@@ -73,6 +106,12 @@ class EventService extends ChangeNotifier {
       isManuallyClosed: false,
     );
 
+    if (isDemoMode) {
+      _demoEvents.insert(0, newEvent);
+      notifyListeners();
+      return true;
+    }
+
     _events.insert(0, newEvent);
     await _storage.saveEvents(_events);
     firestoreSync?.syncEvent(newEvent);
@@ -97,6 +136,27 @@ class EventService extends ChangeNotifier {
   }) async {
     if (!currentUser.canCreateEvents) {
       return false;
+    }
+
+    if (isDemoMode) {
+      final index = _demoEvents.indexWhere((e) => e.id == eventId);
+      if (index == -1) return false;
+      final existing = _demoEvents[index];
+      final updated = existing.copyWith(
+        name: name.trim(),
+        date: date,
+        startTime: startTime.trim(),
+        doorsOpenTime: doorsOpenTime.trim(),
+        endTime: endTime.trim(),
+        location: location.trim(),
+        address: address?.trim().isEmpty == true ? null : address?.trim(),
+        imageUrl: imageUrl?.trim().isEmpty == true ? null : imageUrl?.trim(),
+        requiredStaffCount: requiredStaffCount > 0 ? requiredStaffCount : 15,
+        region: region != null && region.trim().isNotEmpty ? region.trim() : existing.region,
+      );
+      _demoEvents[index] = updated;
+      notifyListeners();
+      return true;
     }
 
     final index = _events.indexWhere((e) => e.id == eventId);
@@ -129,6 +189,14 @@ class EventService extends ChangeNotifier {
       return false;
     }
 
+    if (isDemoMode) {
+      final index = _demoEvents.indexWhere((e) => e.id == eventId);
+      if (index == -1) return false;
+      _demoEvents.removeAt(index);
+      notifyListeners();
+      return true;
+    }
+
     final index = _events.indexWhere((e) => e.id == eventId);
     if (index == -1) return false;
 
@@ -141,6 +209,18 @@ class EventService extends ChangeNotifier {
 
   /// Permite a un miembro del staff anotarse a un evento (queda pendiente de confirmación)
   Future<bool> joinEvent(String eventId, String userId) async {
+    if (isDemoMode) {
+      final index = _demoEvents.indexWhere((e) => e.id == eventId);
+      if (index == -1) return false;
+      final event = _demoEvents[index];
+      if (event.staffIds.contains(userId)) return true;
+      final updatedStaff = List<String>.from(event.staffIds)..add(userId);
+      final updated = event.copyWith(staffIds: updatedStaff);
+      _demoEvents[index] = updated;
+      notifyListeners();
+      return true;
+    }
+
     final index = _events.indexWhere((e) => e.id == eventId);
     if (index == -1) return false;
 
@@ -161,6 +241,26 @@ class EventService extends ChangeNotifier {
 
   /// Permite a un miembro bajarse de un evento si aún no comenzó
   Future<bool> leaveEvent(String eventId, String userId) async {
+    if (isDemoMode) {
+      final index = _demoEvents.indexWhere((e) => e.id == eventId);
+      if (index == -1) return false;
+      final event = _demoEvents[index];
+      final updatedStaff = List<String>.from(event.staffIds)..remove(userId);
+      final updatedConfirmed = List<String>.from(event.confirmedStaffIds)..remove(userId);
+      final updatedAbsent = List<String>.from(event.absentStaffIds)..remove(userId);
+      final updatedPairs = List<EventPair>.from(event.pairs)
+        ..removeWhere((p) => p.containsUser(userId));
+      final updated = event.copyWith(
+        staffIds: updatedStaff,
+        confirmedStaffIds: updatedConfirmed,
+        absentStaffIds: updatedAbsent,
+        pairs: updatedPairs,
+      );
+      _demoEvents[index] = updated;
+      notifyListeners();
+      return true;
+    }
+
     final index = _events.indexWhere((e) => e.id == eventId);
     if (index == -1) return false;
 
@@ -196,6 +296,23 @@ class EventService extends ChangeNotifier {
         currentUser.hasRole(AppRoles.produccion) ||
         currentUser.hasRole(AppRoles.rrhh);
     if (!canManage) return false;
+
+    if (isDemoMode) {
+      final index = _demoEvents.indexWhere((e) => e.id == eventId);
+      if (index == -1) return false;
+      final event = _demoEvents[index];
+      final updatedStaff = List<String>.from(event.staffIds);
+      if (!updatedStaff.contains(userId)) updatedStaff.add(userId);
+      final updatedConfirmed = List<String>.from(event.confirmedStaffIds);
+      if (!updatedConfirmed.contains(userId)) updatedConfirmed.add(userId);
+      final updated = event.copyWith(
+        staffIds: updatedStaff,
+        confirmedStaffIds: updatedConfirmed,
+      );
+      _demoEvents[index] = updated;
+      notifyListeners();
+      return true;
+    }
 
     final index = _events.indexWhere((e) => e.id == eventId);
     if (index == -1) return false;
@@ -234,6 +351,26 @@ class EventService extends ChangeNotifier {
         currentUser.hasRole(AppRoles.rrhh);
     if (!canManage) return false;
 
+    if (isDemoMode) {
+      final index = _demoEvents.indexWhere((e) => e.id == eventId);
+      if (index == -1) return false;
+      final event = _demoEvents[index];
+      final updatedStaff = List<String>.from(event.staffIds)..remove(userId);
+      final updatedConfirmed = List<String>.from(event.confirmedStaffIds)..remove(userId);
+      final updatedAbsent = List<String>.from(event.absentStaffIds)..remove(userId);
+      final updatedPairs = List<EventPair>.from(event.pairs)
+        ..removeWhere((p) => p.containsUser(userId));
+      final updated = event.copyWith(
+        staffIds: updatedStaff,
+        confirmedStaffIds: updatedConfirmed,
+        absentStaffIds: updatedAbsent,
+        pairs: updatedPairs,
+      );
+      _demoEvents[index] = updated;
+      notifyListeners();
+      return true;
+    }
+
     final index = _events.indexWhere((e) => e.id == eventId);
     if (index == -1) return false;
 
@@ -270,6 +407,15 @@ class EventService extends ChangeNotifier {
         currentUser.hasRole(AppRoles.rrhh);
     if (!canManage) return false;
 
+    if (isDemoMode) {
+      final index = _demoEvents.indexWhere((e) => e.id == eventId);
+      if (index == -1) return false;
+      final updated = _demoEvents[index].copyWith(absentStaffIds: absentStaffIds);
+      _demoEvents[index] = updated;
+      notifyListeners();
+      return true;
+    }
+
     final index = _events.indexWhere((e) => e.id == eventId);
     if (index == -1) return false;
 
@@ -284,6 +430,18 @@ class EventService extends ChangeNotifier {
 
   /// Alterna inicio manual del evento
   Future<void> toggleEventStarted(String eventId) async {
+    if (isDemoMode) {
+      final index = _demoEvents.indexWhere((e) => e.id == eventId);
+      if (index != -1) {
+        final current = _demoEvents[index];
+        _demoEvents[index] = current.copyWith(
+          isManuallyStarted: !current.isManuallyStarted,
+        );
+        notifyListeners();
+      }
+      return;
+    }
+
     final index = _events.indexWhere((e) => e.id == eventId);
     if (index == -1) return;
 
@@ -300,6 +458,19 @@ class EventService extends ChangeNotifier {
 
   /// Cierra el evento al finalizar
   Future<void> closeEvent(String eventId) async {
+    if (isDemoMode) {
+      final index = _demoEvents.indexWhere((e) => e.id == eventId);
+      if (index != -1) {
+        final updated = _demoEvents[index].copyWith(
+          isManuallyClosed: true,
+          isManuallyStarted: false,
+        );
+        _demoEvents[index] = updated;
+        notifyListeners();
+      }
+      return;
+    }
+
     final index = _events.indexWhere((e) => e.id == eventId);
     if (index == -1) return;
 
@@ -324,6 +495,16 @@ class EventService extends ChangeNotifier {
         currentUser.isSuperAdmin || currentUser.hasRole(AppRoles.produccion);
     if (!canManageReport) {
       return false;
+    }
+
+    if (isDemoMode) {
+      final index = _demoEvents.indexWhere((e) => e.id == eventId);
+      if (index == -1) return false;
+      final current = _demoEvents[index];
+      final updated = current.copyWith(unifiedReport: report);
+      _demoEvents[index] = updated;
+      notifyListeners();
+      return true;
     }
 
     final index = _events.indexWhere((e) => e.id == eventId);
@@ -355,6 +536,27 @@ class EventService extends ChangeNotifier {
     if (!canManagePairs) return false;
 
     if (user1Id == user2Id) return false;
+
+    if (isDemoMode) {
+      final index = _demoEvents.indexWhere((e) => e.id == eventId);
+      if (index == -1) return false;
+      final event = _demoEvents[index];
+      final currentPairs = List<EventPair>.from(event.pairs)
+        ..removeWhere((p) => p.containsUser(user1Id) || p.containsUser(user2Id));
+      final newPair = EventPair(
+        id: const Uuid().v4(),
+        user1Id: user1Id,
+        user1Name: user1Name,
+        user2Id: user2Id,
+        user2Name: user2Name,
+        createdAt: DateTime.now(),
+      );
+      currentPairs.add(newPair);
+      final updated = event.copyWith(pairs: currentPairs);
+      _demoEvents[index] = updated;
+      notifyListeners();
+      return true;
+    }
 
     final index = _events.indexWhere((e) => e.id == eventId);
     if (index == -1) return false;
@@ -394,6 +596,18 @@ class EventService extends ChangeNotifier {
         currentUser.hasRole(AppRoles.produccion);
     if (!canManagePairs) return false;
 
+    if (isDemoMode) {
+      final index = _demoEvents.indexWhere((e) => e.id == eventId);
+      if (index == -1) return false;
+      final event = _demoEvents[index];
+      final currentPairs = List<EventPair>.from(event.pairs)
+        ..removeWhere((p) => p.id == pairId);
+      final updated = event.copyWith(pairs: currentPairs);
+      _demoEvents[index] = updated;
+      notifyListeners();
+      return true;
+    }
+
     final index = _events.indexWhere((e) => e.id == eventId);
     if (index == -1) return false;
 
@@ -420,6 +634,32 @@ class EventService extends ChangeNotifier {
     required String observations,
     required UserModel currentUser,
   }) async {
+    if (isDemoMode) {
+      final index = _demoEvents.indexWhere((e) => e.id == eventId);
+      if (index == -1) return false;
+      final event = _demoEvents[index];
+      final assignedPair = event.getPairForUser(currentUser.id);
+      final partnerId = assignedPair?.getPartnerId(currentUser.id);
+      final partnerName = assignedPair?.getPartnerName(currentUser.id);
+      final newLog = EventRoundLog(
+        id: const Uuid().v4(),
+        timestamp: DateTime.now(),
+        memberId: currentUser.id,
+        memberName: currentUser.fullName,
+        partnerId: partnerId,
+        partnerName: partnerName,
+        detectedCasesCount: detectedCasesCount,
+        callsCount: callsCount,
+        observations: observations.trim(),
+      );
+      final updatedLogs = List<EventRoundLog>.from(event.roundLogs)
+        ..insert(0, newLog);
+      final updated = event.copyWith(roundLogs: updatedLogs);
+      _demoEvents[index] = updated;
+      notifyListeners();
+      return true;
+    }
+
     final index = _events.indexWhere((e) => e.id == eventId);
     if (index == -1) return false;
 

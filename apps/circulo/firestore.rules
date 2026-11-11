@@ -4,7 +4,7 @@ service cloud.firestore {
     // Reglas para Círculo (Omniverse Labs)
     match /circulo_users/{userId} {
       allow read: if true;
-      allow write: if true; // En producción: if request.auth != null && (request.auth.uid == userId || request.auth.token.email == 'leobenveniste@vuelocontrolado.org');
+      allow write: if true; // En producción: if request.auth != null && (request.auth.uid == userId || request.auth.token.email == 'leo.benveniste@gmail.com');
     }
     match /circulo_swipes/{swipeId} {
       allow read, write: if true;

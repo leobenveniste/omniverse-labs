@@ -60,6 +60,71 @@ class HabitService extends ChangeNotifier {
     return habits.where((h) => h.isScheduledForWeekday(weekday)).toList();
   }
 
+  List<Habit> getDailyHabits(DateTime date) {
+    return habits
+        .where((h) => h.frequencyType == HabitFrequencyType.daily && h.isScheduledForWeekday(date.weekday))
+        .toList();
+  }
+
+  List<Habit> getWeeklyHabits() {
+    return habits.where((h) => h.frequencyType == HabitFrequencyType.weekly).toList();
+  }
+
+  List<Habit> getMonthlyHabits() {
+    return habits.where((h) => h.frequencyType == HabitFrequencyType.monthly).toList();
+  }
+
+  ({int completed, int target, bool isMet}) getWeeklyProgress(String habitId, DateTime date) {
+    final habit = _habits.firstWhere(
+      (h) => h.id == habitId,
+      orElse: () => Habit(
+        id: habitId,
+        title: '',
+        category: HabitCategory.health,
+        createdAt: DateTime.now(),
+      ),
+    );
+
+    final cleanDate = DateTime(date.year, date.month, date.day);
+    final startOfWeek = cleanDate.subtract(Duration(days: cleanDate.weekday - 1));
+    var completedDays = 0;
+    for (int i = 0; i < 7; i++) {
+      final day = startOfWeek.add(Duration(days: i));
+      final key = AppDateUtils.toDateKey(day);
+      if (isCompleted(habitId, key)) {
+        completedDays++;
+      }
+    }
+    final target = habit.frequencyTarget;
+    return (completed: completedDays, target: target, isMet: completedDays >= target);
+  }
+
+  ({int completed, int target, bool isMet}) getMonthlyProgress(String habitId, DateTime date) {
+    final habit = _habits.firstWhere(
+      (h) => h.id == habitId,
+      orElse: () => Habit(
+        id: habitId,
+        title: '',
+        category: HabitCategory.health,
+        createdAt: DateTime.now(),
+      ),
+    );
+
+    final year = date.year;
+    final month = date.month;
+    final daysInMonth = DateTime(year, month + 1, 0).day;
+    var completedDays = 0;
+    for (int d = 1; d <= daysInMonth; d++) {
+      final day = DateTime(year, month, d);
+      final key = AppDateUtils.toDateKey(day);
+      if (isCompleted(habitId, key)) {
+        completedDays++;
+      }
+    }
+    final target = habit.frequencyTarget;
+    return (completed: completedDays, target: target, isMet: completedDays >= target);
+  }
+
   int getCompletedCountForDate(DateTime date) {
     final dateKey = AppDateUtils.toDateKey(date);
     final scheduled = getHabitsForDate(date);
@@ -155,6 +220,88 @@ class HabitService extends ChangeNotifier {
     await _persistLogs();
   }
 
+  ({int current, int best}) _calculateWeeklyStreak(Habit habit) {
+    final now = DateTime.now();
+    var currentStreak = 0;
+    var bestStreak = 0;
+    var runningStreak = 0;
+
+    // Check current week
+    final currentWeekProgress = getWeeklyProgress(habit.id, now);
+    if (currentWeekProgress.isMet) {
+      currentStreak++;
+      runningStreak++;
+      if (runningStreak > bestStreak) bestStreak = runningStreak;
+    }
+
+    // Check backwards from last week (start at Monday of previous week)
+    final cleanNow = DateTime(now.year, now.month, now.day);
+    var checkMonday = cleanNow.subtract(Duration(days: cleanNow.weekday - 1 + 7));
+
+    var streakBroken = false;
+    for (int w = 0; w < 104; w++) {
+      final weekProgress = getWeeklyProgress(habit.id, checkMonday);
+      if (weekProgress.isMet) {
+        if (!streakBroken) currentStreak++;
+        runningStreak++;
+        if (runningStreak > bestStreak) bestStreak = runningStreak;
+      } else {
+        streakBroken = true;
+        runningStreak = 0;
+      }
+      checkMonday = checkMonday.subtract(const Duration(days: 7));
+    }
+
+    if (currentStreak > bestStreak) bestStreak = currentStreak;
+    return (current: currentStreak, best: bestStreak);
+  }
+
+  ({int current, int best}) _calculateMonthlyStreak(Habit habit) {
+    final now = DateTime.now();
+    var currentStreak = 0;
+    var bestStreak = 0;
+    var runningStreak = 0;
+
+    // Check current month
+    final currentMonthProgress = getMonthlyProgress(habit.id, now);
+    if (currentMonthProgress.isMet) {
+      currentStreak++;
+      runningStreak++;
+      if (runningStreak > bestStreak) bestStreak = runningStreak;
+    }
+
+    // Check backwards from previous month
+    var checkYear = now.year;
+    var checkMonth = now.month - 1;
+    if (checkMonth < 1) {
+      checkMonth = 12;
+      checkYear--;
+    }
+
+    var streakBroken = false;
+    for (int m = 0; m < 36; m++) {
+      final monthDate = DateTime(checkYear, checkMonth, 1);
+      final monthProgress = getMonthlyProgress(habit.id, monthDate);
+      if (monthProgress.isMet) {
+        if (!streakBroken) currentStreak++;
+        runningStreak++;
+        if (runningStreak > bestStreak) bestStreak = runningStreak;
+      } else {
+        streakBroken = true;
+        runningStreak = 0;
+      }
+
+      checkMonth--;
+      if (checkMonth < 1) {
+        checkMonth = 12;
+        checkYear--;
+      }
+    }
+
+    if (currentStreak > bestStreak) bestStreak = currentStreak;
+    return (current: currentStreak, best: bestStreak);
+  }
+
   // Calculate streaks: current streak and best streak
   ({int current, int best}) calculateStreak(String habitId) {
     final habit = _habits.firstWhere(
@@ -166,6 +313,12 @@ class HabitService extends ChangeNotifier {
         createdAt: DateTime.now(),
       ),
     );
+
+    if (habit.frequencyType == HabitFrequencyType.weekly) {
+      return _calculateWeeklyStreak(habit);
+    } else if (habit.frequencyType == HabitFrequencyType.monthly) {
+      return _calculateMonthlyStreak(habit);
+    }
 
     final now = DateTime.now();
     var checkDate = DateTime(now.year, now.month, now.day);
@@ -232,10 +385,17 @@ class HabitService extends ChangeNotifier {
     HabitType type = HabitType.boolean,
     double targetValue = 1.0,
     String unit = '',
+    HabitFrequencyType frequencyType = HabitFrequencyType.daily,
+    int? frequencyTarget,
     List<int> frequencyDays = const [1, 2, 3, 4, 5, 6, 7],
     String? reminderTime,
     bool reminderEnabled = false,
   }) async {
+    final target = frequencyTarget ??
+        (frequencyType == HabitFrequencyType.daily
+            ? frequencyDays.length
+            : (frequencyType == HabitFrequencyType.weekly ? 3 : 1));
+
     final newHabit = Habit(
       id: _uuid.v4(),
       title: title.trim(),
@@ -243,6 +403,8 @@ class HabitService extends ChangeNotifier {
       type: type,
       targetValue: targetValue,
       unit: unit.trim(),
+      frequencyType: frequencyType,
+      frequencyTarget: target,
       frequencyDays: frequencyDays,
       reminderTime: reminderTime,
       reminderEnabled: reminderEnabled,
