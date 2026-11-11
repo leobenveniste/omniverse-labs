@@ -1170,6 +1170,115 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
                         except Exception as e:
                             print(f"LoudGuard Screenshot notice ({lang}): {e}")
 
+        elif package_name == "com.omniverselabs.did_it":
+            store_dir = r"c:\Projects\Omniverse Labs\apps\did_it\store_assets\play_store"
+            icon_path = os.path.join(store_dir, "icon_512x512.png")
+            feature_path = os.path.join(store_dir, "feature_graphic_1024x500.jpg")
+
+            try:
+                print("Updating Store Listing for DidIt...")
+                edits.listings().update(
+                    packageName=package_name,
+                    editId=edit_id,
+                    language="en-US",
+                    body={
+                        "title": "DidIt: Auto Tasks & Memory",
+                        "shortDescription": "Did I do it? Track done timestamps, auto-repeat loops, chains & flows offline.",
+                        "fullDescription": (
+                            "Never second-guess whether you already did it — and automate what happens next.\n\n"
+                            "DidIt is a 100% offline confirmation memory log and smart repetition engine. Pay $1.49 once — no subscriptions, no ads, and zero internet permission.\n\n"
+                            "WHY DIDIT?\n"
+                            "• Instant Memory Proof: Every card shows exact elapsed proof ('Done 18m ago · Next due in 5h 42m') plus a searchable timestamped Confirmation Logbook.\n"
+                            "• Hybrid Repetition Engine: Repeat items from the exact minute you last completed them (4h, 8h, 3d, 90d) OR on fixed daily, weekly, and monthly schedules.\n"
+                            "• Chained Next-Step Automation: Marking 'Start Washer' Done automatically schedules 'Move Laundry to Dryer' 55 minutes later.\n"
+                            "• Auto-Resetting Flows: Create multi-step checklists like Leaving Home or Pet Care that reset automatically after completion or on schedule.\n"
+                            "• Anti-Double-Do Cooldown Guard: Prevents accidental repeat taps inside a configurable safety window (great for meds, vitamins & pet feeding).\n"
+                            "• Notification Quick Actions: Mark items Did It or Snooze 30m right from Android notifications — completely offline."
+                        ),
+                    }
+                ).execute()
+
+                edits.listings().update(
+                    packageName=package_name,
+                    editId=edit_id,
+                    language="es-419",
+                    body={
+                        "title": "DidIt: Memoria y Flujos",
+                        "shortDescription": "¿Ya lo hice? Registro exacto, ciclos automáticos y flujos 100% offline.",
+                        "fullDescription": (
+                            "No vuelvas a dudar si ya lo hiciste — y automatiza el siguiente paso.\n\n"
+                            "DidIt es un registro de confirmación 100% offline y motor de repetición inteligente. Pago único de $1.49 — sin suscripciones, sin anuncios y sin permiso de internet.\n\n"
+                            "¿POR QUÉ DIDIT?\n"
+                            "• Prueba exacta en 1 vistazo: Mira cuándo completaste cada tarea ('Hecho hace 18m · Próxima en 5h 42m') y consulta tu Historial de Confirmación.\n"
+                            "• Repetición híbrida: Repite desde el último hecho (cada 8h, 3d, 90d) o en horarios diarios, semanales o mensuales fijos.\n"
+                            "• Cadenas automáticas: Al marcar 'Poner lavadora' se programa automáticamente 'Pasar a secadora' en 55 minutos.\n"
+                            "• Flujos con reinicio automático: Checklists de varios pasos (Al salir de casa, Cuidado de mascota) que se reinician solos.\n"
+                            "• Bloqueo anti-doble toque: Protege contra confirmaciones repetidas por error en dosis, mascotas o llaves.\n"
+                            "• Acciones en notificaciones: Marca Hecho o Posponer 30m directo desde la notificación."
+                        ),
+                    }
+                ).execute()
+                print("DidIt Store Listings Updated (en-US & es-419)!")
+            except Exception as e:
+                print(f"DidIt Listing notice: {e}")
+
+            for lang in ["en-US", "es-419"]:
+                if os.path.exists(icon_path):
+                    try:
+                        edits.images().upload(
+                            packageName=package_name,
+                            editId=edit_id,
+                            language=lang,
+                            imageType="icon",
+                            media_body=MediaFileUpload(icon_path, mimetype="image/png")
+                        ).execute()
+                        print(f"DidIt Icon updated for {lang}")
+                    except Exception as e:
+                        print(f"DidIt Icon notice ({lang}): {e}")
+
+                if os.path.exists(feature_path):
+                    try:
+                        edits.images().upload(
+                            packageName=package_name,
+                            editId=edit_id,
+                            language=lang,
+                            imageType="featureGraphic",
+                            media_body=MediaFileUpload(feature_path, mimetype="image/jpeg")
+                        ).execute()
+                        print(f"DidIt Feature Graphic updated for {lang}")
+                    except Exception as e:
+                        print(f"DidIt Feature Graphic notice ({lang}): {e}")
+
+                try:
+                    edits.images().deleteall(
+                        packageName=package_name,
+                        editId=edit_id,
+                        language=lang,
+                        imageType="phoneScreenshots"
+                    ).execute()
+                except Exception:
+                    pass
+
+                for ss_name in [
+                    "screenshot_01_queue_proof.png",
+                    "screenshot_02_flows_chains.png",
+                    "screenshot_03_cooldown_guard.png",
+                    "screenshot_04_logbook_settings.png",
+                ]:
+                    ss_file = os.path.join(store_dir, ss_name)
+                    if os.path.exists(ss_file):
+                        try:
+                            edits.images().upload(
+                                packageName=package_name,
+                                editId=edit_id,
+                                language=lang,
+                                imageType="phoneScreenshots",
+                                media_body=MediaFileUpload(ss_file, mimetype="image/png")
+                            ).execute()
+                            print(f"DidIt Screenshot {ss_name} updated for {lang}")
+                        except Exception as e:
+                            print(f"DidIt Screenshot notice ({lang}): {e}")
+
         if package_name == "com.omniverselabs.empacarte":
             rel_name = release_name or f"1.0.0 (Build {version_code})"
             rel_notes_es = notes_es or "Lanzamiento inicial de EmpacArte: El arte de empacar con pasaporte táctil, sellos consulares, tarjetas de embarque y 6 idiomas."
@@ -1201,6 +1310,10 @@ def deploy_to_playstore(package_name: str, aab_path: str, track: str = "internal
             rel_name = release_name or f"1.0.0 (Build {version_code})"
             rel_notes_es = notes_es or "Lanzamiento inicial de LoudGuard: sonómetro 100% offline en memoria RAM, temporizador de exposición segura WHO/NIOSH, alertas hápticas de umbral, calibración de micrófono e historial local."
             rel_notes_en = notes_en or "Initial release of LoudGuard: 100% offline RAM-only decibel meter, WHO/NIOSH safe-exposure timer, silent haptic threshold alerts, mic calibration, and local check logs."
+        elif package_name == "com.omniverselabs.did_it":
+            rel_name = release_name or f"1.0.0 (Build {version_code})"
+            rel_notes_es = notes_es or "Lanzamiento inicial de DidIt: confirmación con hora exacta, repetición desde último hecho y horarios fijos, cadenas automáticas, flujos auto-reiniciables, bloqueo anti-doble toque y acciones desde notificaciones 100% offline."
+            rel_notes_en = notes_en or "Initial release of DidIt: instant memory proof timestamps, from-last-done & fixed schedules, chained triggers, auto-resetting flows, anti-double-do cooldown guard, and offline notification quick actions."
         else:
             rel_name = release_name or f"1.2.16 (Build {version_code})"
             rel_notes_es = notes_es or "Protección de modo desarrollador, política de privacidad integrada, opción de eliminación completa de datos y mejoras de rendimiento."
